@@ -36,7 +36,7 @@ function handleResize() { //ウィンドウサイズ変更
 
 
 function handleStepEnter(response) { // イベントハンドラ
-    console.log(response);
+    console.log("response", response);
     // response = { element, direction, index }
 
     // add color to current step only
@@ -61,6 +61,15 @@ function init() {
         debug: false
       })
       .onStepEnter(handleStepEnter);
+    /*
+    実行条件：
+        #scrolly article .step セレクタにマッチする要素（各ステップ）が
+        ビューポートの33%（offset: 0.33）の位置に入った時
+
+    実行される処理：
+        現在のステップに is-active クラスを追加
+        図の内容を更新（ステップ番号を表示）
+    */
 }
 
 
