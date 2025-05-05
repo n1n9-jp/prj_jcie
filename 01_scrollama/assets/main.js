@@ -39,6 +39,18 @@ function handleStepEnter(response) { // イベントハンドラ
     console.log("response", response);
     // response = { element, direction, index }
 
+
+    
+    // data-stepの値を取得
+    var _dataStep = response.element.getAttribute('data-step');
+    console.log('data-step:', _dataStep);
+
+    // update graphic based on step
+    // figure.select("p").text(response.index + 1);
+    figure.select("p").text(_dataStep);
+
+
+
     // add color to current step only
     step.classed("is-active", function (d, i) {
       return i === response.index;
@@ -50,10 +62,7 @@ function handleStepEnter(response) { // イベントハンドラ
     step.classed("bg-gray-200 text-gray-500 shadow-none", function (d, i) {
       return i !== response.index;
     });
-
-    // update graphic based on step
-    figure.select("p").text(response.index + 1);
-}
+  }
 
 
 
@@ -61,10 +70,12 @@ function init() {
 
     handleResize();
 
+    const scroller = scrollama();
+
     scroller
       .setup({
         step: "#scrolly article .step",
-        offset: 0.33,
+        offset: 0.5,
         debug: false
       })
       .onStepEnter(handleStepEnter);
