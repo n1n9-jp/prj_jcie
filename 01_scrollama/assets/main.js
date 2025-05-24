@@ -11,9 +11,30 @@ var step = article.selectAll(".step"); //テキストのブロック一つづつ
 // initialize the scrollama
 var scroller = scrollama();
 
+
+
 /* ------------------------------
   functions
 ------------------------------ */
+
+var initScroll = function() {
+  console.log("initScroll");
+
+  const scroller = scrollama();
+
+  scroller
+    .setup({
+      step: "#scrolly article .step",
+      offset: 0.5,
+      debug: false
+    })
+    .onStepEnter(function(response) {
+      console.log('Original response:', response);
+      PubSub.publishSync('handle:step-enter', response);
+    });
+
+  PubSub.publish('handle:resize');
+}
 
 var handleResize = function() {
     console.log("handleResize");
@@ -31,9 +52,8 @@ var handleResize = function() {
     scroller.resize();
 }
 
-var handleStepEnter = function(message, response) { // イベントハンドラ
+var handleStepEnter = function(message, response) {
     console.log("response", response);
-    // response = { element, direction, index }
     
     // data-stepの値を取得
     var _dataStep = response.element.getAttribute('data-step');
@@ -55,24 +75,7 @@ var handleStepEnter = function(message, response) { // イベントハンドラ
     });
 }
 
-var initScroll = function() {
-    console.log("initScroll");
 
-    const scroller = scrollama();
-
-    scroller
-      .setup({
-        step: "#scrolly article .step",
-        offset: 0.5,
-        debug: false
-      })
-      .onStepEnter(function(response) {
-        console.log('Original response:', response);
-        PubSub.publishSync('handle:step-enter', response);
-      });
-
-    PubSub.publish('handle:resize');
-}
 
 // PubSubイベントの購読
 PubSub.subscribe('init:scroll', initScroll);
