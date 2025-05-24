@@ -51,9 +51,8 @@ a:hover {
   border-color: var(--primary-color);
 }
 
-/* 見出しスタイル */
+/* 見出しの基本スタイル（Tailwind CSSの設定に統一） */
 h1, h2, h3, h4, h5, h6 {
   color: var(--text-color);
-  font-weight: 700;
-  margin-bottom: 1rem;
+  line-height: 1.4;
 }
