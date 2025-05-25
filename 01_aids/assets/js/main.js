@@ -70,9 +70,9 @@ var initMap = function() {
     let mapInitialized = false;
 
     // データ読み込み
-    d3.json("assets/data/episode.json")
+    d3.json("data/episode.json")
         .then(episodeData => {
-            d3.json("assets/data/countries-110m.json")
+            d3.json("data/countries-110m.json")
                 .then(data => {
                     const countries = topojson.feature(data, data.objects.countries);
                     
