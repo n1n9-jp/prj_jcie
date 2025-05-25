@@ -16,22 +16,6 @@ var article = scrolly.select("article"); //テキストのブロック全体
 var step = article.selectAll(".step"); //テキストのブロック一つづつ
 var figure = scrolly.select("figure"); //スクロールで変換するコンテンツ
 
-// 地図関連のグローバル変数
-var widthMap = window.innerWidth;
-var heightMap = window.innerHeight;
-var wmProjection = d3.geoMercator()
-    .scale(widthMap / 2 / Math.PI)
-    .translate([widthMap / 2, heightMap / 2]);
-var path = d3.geoPath().projection(wmProjection);
-
-// 地図のズーム機能の設定
-const zoom = d3.zoom()
-    .scaleExtent([1, 8])
-    .on("zoom", (event) => {
-        d3.select("#mapBgContainer svg g")
-            .attr("transform", event.transform);
-    });
-
 // initialize the scrollama
 var scroller = scrollama();
 
@@ -49,6 +33,8 @@ async function loadChartData() {
         maternalFetal
     };
 }
+
+
 
 /* ------------------------------
   functions
@@ -157,26 +143,6 @@ var initMap = function() {
             }
         }, 100);
     });
-}
-
-// 世界地図全体表示
-function showWorldMap() {
-    if (!window.mapSvgContainer) {
-        console.error('Map not initialized');
-        return;
-    }
-
-    const widthMap = window.innerWidth;
-    const heightMap = window.innerHeight;
-    
-    // 地図を表示状態に設定
-    window.mapSvgContainer
-        .style('opacity', '1')
-        .transition()
-        .duration(800)
-        .call(window.mapZoom.transform, d3.zoomIdentity
-            .translate(widthMap / 2, heightMap / 2)
-            .scale(widthMap / 2 / Math.PI));
 }
 
 // スクロールの初期化
