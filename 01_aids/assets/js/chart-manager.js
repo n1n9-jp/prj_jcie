@@ -108,19 +108,17 @@ class ChartManager {
             .attr('transform', `translate(${this.width - 100}, 0)`);
 
         regions.forEach((region, i) => {
-            const legendRow = legend.append('g')
-                .attr('transform', `translate(0, ${i * 20})`);
-
-            legendRow.append('rect')
-                .attr('width', 10)
-                .attr('height', 10)
-                .attr('fill', color(region));
-
-            legendRow.append('text')
-                .attr('x', 15)
-                .attr('y', 10)
-                .text(region)
-                .style('font-size', '10px');
+            legend.append('g')
+                .attr('transform', `translate(0, ${i * 20})`)
+                .call(g => g.append('rect')
+                    .attr('width', 10)
+                    .attr('height', 10)
+                    .attr('fill', color(region)))
+                .call(g => g.append('text')
+                    .attr('x', 15)
+                    .attr('y', 10)
+                    .text(region)
+                    .style('font-size', '10px'));
         });
 
         this.currentChart = 'line';
@@ -178,6 +176,24 @@ class ChartManager {
             .transition()
             .duration(1000)
             .style('opacity', 1);
+            
+        // 円グラフの凡例
+        const legendPie = this.svg.append('g')
+            .attr('transform', `translate(${this.width - 100}, 0)`);
+        
+        chartData.forEach((d, i) => {
+            legendPie.append('g')
+                .attr('transform', `translate(0, ${i * 20})`)
+                .call(g => g.append('circle')
+                    .attr('r', 5)
+                    .attr('cy', 5)
+                    .attr('fill', color(i)))
+                .call(g => g.append('text')
+                    .attr('x', 15)
+                    .attr('y', 10)
+                    .text(d[''])
+                    .style('font-size', '10px'));
+        });
 
         this.currentChart = 'pie';
     }
