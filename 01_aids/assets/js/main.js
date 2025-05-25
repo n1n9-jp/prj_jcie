@@ -27,9 +27,35 @@ const zoom = d3.zoom()
 // initialize the scrollama
 var scroller = scrollama();
 
+
+
+
 /* ------------------------------
   functions
 ------------------------------ */
+
+var initEventHandler = function() {
+    console.log("initEventHandler");
+
+    // イベントリスナーの設定
+    document.addEventListener('DOMContentLoaded', function() {
+        const modal = document.getElementById('modalCountry');
+        const closeModalBtn = document.getElementById('closeModal');
+        
+        if (modal && closeModalBtn) {
+            closeModalBtn.addEventListener('click', hideModal);
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    hideModal();
+                }
+            });
+        }
+    });
+
+    PubSub.publish('init:chart');
+}
+
+
 
 var initChart = function() {
     console.log("initChart");
@@ -56,7 +82,8 @@ var initMap = function() {
                         .attr("width", widthMap)
                         .attr("height", heightMap)
                         .call(zoom)
-                        .style("cursor", "move");
+                        .style("cursor", "move")
+                        .style("opacity", "0"); // 初期状態で非表示
 
                     // 地図の描画
                     const g = mapSvgContainer.append("g");
@@ -87,9 +114,6 @@ var initMap = function() {
                     // 初期化完了を通知
                     mapInitialized = true;
                     PubSub.publish('init:scroll');
-                    
-                    // 世界地図を表示
-                    showWorldMap();
                 })
                 .catch(error => {
                     console.error("Error loading countries data:", error);
@@ -131,43 +155,68 @@ var initScroll = function() {
             progress: true
         })
         .onStepEnter(function(response) {
-            console.log('Step enter:', response);
             const stepId = response.element.getAttribute('data-step');
             const figure = document.getElementById('mainFigure');
-            if (figure) {
-                if (stepId === "3") {
-                    figure.style.display = "none";
-                } else {
-                    figure.style.display = "block";
-                }
-            }
-
             const modal = document.getElementById('modalCountry');
+            const mapBgContainer = document.getElementById('mapBgContainer');
+            const mapContainer = document.getElementById('mapContainer');
+            
             totalEpisodes = window.mapEpisodeData.length;
 
             if (stepId === "3") {
                 isStep3Active = true;
                 lastDirection = response.direction;
-                // スクロール方向で最初/最後のエピソードを表示
+
+                // 地図の表示
+                if (mapBgContainer) {
+                    mapBgContainer.style.display = "block";
+                    showWorldMap();
+                }
+                if (mapContainer) {
+                    mapContainer.style.display = "block";
+                }
+
+                // エピソードの表示
                 if (response.direction === 'up') {
                     currentEpisodeIndex = totalEpisodes - 1;
                 } else {
                     currentEpisodeIndex = 0;
                 }
                 showEpisodeModal(currentEpisodeIndex);
-                // モーダルを表示
+
+                // モーダルの表示
                 if (modal) {
                     modal.classList.remove('hidden');
                     modal.style.opacity = '1';
                 }
+
+                // メインフィギュアの非表示
+                if (figure) {
+                    figure.style.display = "none";
+                }
             } else {
                 isStep3Active = false;
-                // step3以外ではモーダルを必ず非表示
+
+                // 地図の非表示
+                if (mapBgContainer) {
+                    mapBgContainer.style.display = "none";
+                }
+                if (mapContainer) {
+                    mapContainer.style.display = "none";
+                }
+
+                // モーダルの非表示
                 if (modal) {
                     modal.style.opacity = '0';
                     modal.classList.add('hidden');
                 }
+
+                // メインフィギュアの表示
+                if (figure) {
+                    figure.style.display = "block";
+                }
             }
+
             PubSub.publishSync('handle:step-enter', response);
         })
         .onStepProgress(function(response) {
@@ -210,131 +259,7 @@ var initScroll = function() {
 
 
 
-// 世界地図全体表示
-function showWorldMap() {
-    const mapSvgContainer = d3.select("#mapBgContainer svg");
-    const widthMap = window.innerWidth;
-    const heightMap = window.innerHeight;
-    
-    // アニメーション付きで世界地図を表示
-    mapSvgContainer.transition()
-        .duration(800)
-        .call(zoom.transform, d3.zoomIdentity
-            .translate(widthMap / 2, heightMap / 2)
-            .scale(widthMap / 2 / Math.PI));
-}
 
-// 国を中央に表示
-function centerCountryOnMap(countryName) {
-    const mapSvgContainer = d3.select("#mapBgContainer svg");
-    const widthMap = window.innerWidth;
-    const heightMap = window.innerHeight;
-    
-    // 対象の国を取得
-    const country = window.mapGeoData.find(c => c.properties.name === countryName);
-    if (!country) {
-        console.error(`Country not found: ${countryName}`);
-        return;
-    }
-
-    // 国の境界を取得
-    const bounds = path.bounds(country);
-    const dx = bounds[1][0] - bounds[0][0];
-    const dy = bounds[1][1] - bounds[0][1];
-    const x = (bounds[0][0] + bounds[1][0]) / 2;
-    const y = (bounds[0][1] + bounds[1][1]) / 2;
-
-    // ズームレベルを6に固定
-    const scale = 6;
-    const translate = [
-        widthMap / 2 - scale * x,
-        heightMap / 2 - scale * y
-    ];
-
-    // ズームと移動
-    mapSvgContainer.transition()
-        .duration(800)
-        .call(zoom.transform, d3.zoomIdentity
-            .translate(translate[0], translate[1])
-            .scale(scale));
-}
-
-// モーダル表示
-function showEpisodeModal(idx) {
-    const allEpisodes = window.mapEpisodeData;
-    const currentEpisode = allEpisodes[idx];
-    if (!currentEpisode) return;
-    
-    // 地図を該当する国にズーム
-    centerCountryOnMap(currentEpisode.country);
-
-    // モーダルの内容を更新
-    const modalData = {
-        title: currentEpisode['タイトル'],
-        description: currentEpisode['説明文'],
-        imageUrl: `assets/thumb/${currentEpisode['サムネ画像']}`,
-        url: currentEpisode['URL']
-    };
-    
-    // モーダルを表示
-    const modal = document.getElementById('modalCountry');
-    if (modal) {
-        // アニメーション付きでモーダルを更新
-        updateModalContent(modalData, true);
-    } else {
-        console.error('Modal element not found');
-    }
-}
-
-// モーダルの内容を更新（アニメーション付き）
-function updateModalContent(data, withAnimation = false) {
-    const modal = document.getElementById('modalCountry');
-    if (!modal) {
-        console.warn('Modal element not found');
-        return;
-    }
-
-    // アニメーションの処理
-    if (withAnimation) {
-        modal.style.opacity = '0';
-        modal.classList.remove('hidden');
-        setTimeout(() => {
-            modal.style.opacity = '1';
-        }, 50);
-    } else {
-        modal.classList.remove('hidden');
-        modal.style.opacity = '1';
-    }
-
-    // 画像読み込みエラーの処理
-    const modalImage = document.getElementById('modalImage');
-    if (modalImage) {
-        modalImage.src = data.imageUrl;
-        if (withAnimation) {
-            // エラーメッセージの処理
-            const errorDiv = modal.querySelector('.modal-error');
-            if (errorDiv) errorDiv.remove();
-            modalImage.onerror = function() {
-                const errorDiv = document.createElement('div');
-                errorDiv.className = 'modal-error text-red-500 text-sm mt-2';
-                errorDiv.textContent = '画像の読み込みに失敗しました';
-                const modalDescription = document.getElementById('modalDescription');
-                if (modalDescription) {
-                    modalDescription.parentNode.insertBefore(errorDiv, modalDescription.nextSibling);
-                }
-            };
-        }
-    }
-
-    // その他の内容の更新
-    const modalTitle = document.getElementById('modalTitle');
-    const modalDescription = document.getElementById('modalDescription');
-    const modalUrl = document.getElementById('modalUrl');
-    
-    if (modalTitle) modalTitle.textContent = data.title;
-    if (modalDescription) modalDescription.textContent = data.description;
-    if (modalUrl) modalUrl.href = data.url;
-}
 
 // リサイズイベントのハンドラー
 var handleResize = function() {
@@ -354,188 +279,43 @@ var handleResize = function() {
     scroller.resize();
 }
 
+
+
 // ステップエンターイベントのハンドラー
-var handleStepEnter = function(message, response) {
-    console.log("response", response);
-    var stepId = response.element.getAttribute('data-step');
-    console.log('data-step:', stepId);
+const handleStepEnter = (response) => {
+    const { element, direction } = response;
+    const stepId = element.getAttribute('data-step');
+    const isStep3 = stepId === "3";
 
-    // 地図の表示・非表示制御
-    var mapBgContainer = document.getElementById('mapBgContainer');
-    if (mapBgContainer && typeof mapBgContainer.style !== 'undefined') {
-        if (stepId === "3") {
-            mapBgContainer.style.display = "block";
-        } else {
-            mapBgContainer.style.display = "none";
-        }
-    } else {
-        // ここで何もしない（エラー防止）
-        console.warn('mapBgContainer or its style property not found');
-    }
-
-    // 地図とモーダルの表示制御
-    const mapContainer = document.getElementById('mapContainer');
-    const modal = document.getElementById('modalCountry');
-
-    // mapContainerが存在する場合のみstyleを操作
-    if (mapContainer) {
-        if (stepId === "3") {
-            mapContainer.style.display = "block";
-        } else {
-            mapContainer.style.display = "none";
-        }
-    }
-    // ステップ3以外の場合、mapContainerがnullなら何もしない
-    else if (stepId !== "3") {
-        // 何もしない
-    }
-
-    if (stepId === "3") {
-        // ステップ3の場合
+    // 地図の表示制御
+    if (isStep3) {
+        // 地図を表示
+        showWorldMap();
         
-        // 初期表示の設定
-        const allEpisodes = window.mapEpisodeData;
-        const currentEpisode = allEpisodes[0];
-        
-        if (currentEpisode) {
-            const countryName = currentEpisode.country;
-            const country = window.mapEpisodeOrder.find(c => c.properties.name === countryName);
+        // エピソードの表示
+        const episodes = window.mapEpisodeOrder;
+        if (episodes && episodes.length > 0) {
+            const episodeIndex = direction === 'down' ? 0 : episodes.length - 1;
+            const episode = episodes[episodeIndex];
+            const episodeData = window.mapEpisodeData[episodeIndex];
             
-            if (country) {
-                // 地図の表示
-                showCountry(country, 0);
-                
-                // モーダルの表示
-                const modalData = {
-                    title: currentEpisode['タイトル'],
-                    description: currentEpisode['説明文'],
-                    imageUrl: `assets/thumb/${currentEpisode['サムネ画像']}`,
-                    url: currentEpisode['URL']
-                };
-                showModal(modalData);
+            if (episode && episodeData) {
+                showEpisodeModal(episode, episodeData);
             }
         }
     } else {
-        // ステップ3以外の場合
-        if (mapContainer) {
-            mapContainer.style.display = "none";
-        }
-        if (modal) {
-            modal.style.opacity = '0';
-            modal.classList.add('hidden');
+        // 地図を非表示
+        const mapSvgContainer = d3.select("#mapBgContainer svg");
+        if (!mapSvgContainer.empty()) {
+            mapSvgContainer.style("opacity", "0");
         }
     }
-
-    // 対応する関数を実行
-    if (typeof stepFunctions !== 'undefined' && stepFunctions[stepId]) {
-        stepFunctions[stepId]();
-    }
-    step.classed("is-active", function (d, i) {
-      return i === response.index;
-    });
-    step.classed("bg-white text-black shadow-lg", function (d, i) {
-      return i === response.index;
-    });
-    step.classed("bg-gray-200 text-gray-500 shadow-none", function (d, i) {
-      return i !== response.index;
-    });
 }
 
-// 国表示
-function showCountry(country, index) {
-    const mapSvgContainer = d3.select("#mapContainer svg");
-    const widthMap = window.innerWidth;
-    const heightMap = window.innerHeight;
-    
-    // 地図を中央に移動
-    const bounds = path.bounds(country);
-    const dx = bounds[1][0] - bounds[0][0];
-    const dy = bounds[1][1] - bounds[0][1];
-    const x = (bounds[0][0] + bounds[1][0]) / 2;
-    const y = (bounds[0][1] + bounds[1][1]) / 2;
 
-    // ズームレベルを6に固定
-    const scale = 0;
-    const translate = [
-        widthMap / 2 - scale * x,
-        heightMap / 2 - scale * y
-    ];
-    
-    mapSvgContainer.transition()
-        .duration(800)
-        .call(zoom.transform, d3.zoomIdentity
-            .translate(translate[0], translate[1])
-            .scale(scale));
-}
-
-// モーダル表示
-function showModal(data) {
-    const modal = document.getElementById('modalCountry');
-    if (!modal) {
-        console.warn('Modal element not found');
-        return;
-    }
-    
-    updateModalContent(data);
-    
-    // アニメーション付きで表示
-    modal.style.opacity = '0';
-    modal.classList.remove('hidden');
-    setTimeout(() => {
-        modal.style.opacity = '1';
-    }, 50);
-}
-
-// モーダル内容の更新
-function updateModalContent(data) {
-    const modal = document.getElementById('modalCountry');
-    if (!modal) {
-        console.warn('Modal element not found');
-        return;
-    }
-
-    const modalTitle = document.getElementById('modalTitle');
-    const modalDescription = document.getElementById('modalDescription');
-    const modalImage = document.getElementById('modalImage');
-    const modalUrl = document.getElementById('modalUrl');
-    
-    // 内容を更新
-    if (modalTitle) modalTitle.textContent = data.title;
-    if (modalDescription) modalDescription.textContent = data.description;
-    if (modalImage) modalImage.src = data.imageUrl;
-    if (modalUrl) modalUrl.href = data.url;
-}
-
-// モーダルを閉じる
-function hideModal() {
-    const modal = document.getElementById('modalCountry');
-    if (!modal) {
-        console.warn('Modal element not found');
-        return;
-    }
-    
-    modal.style.opacity = '0';
-    setTimeout(() => {
-        modal.classList.add('hidden');
-    }, 300);
-}
-
-// イベントリスナーの設定
-document.addEventListener('DOMContentLoaded', function() {
-    const modal = document.getElementById('modalCountry');
-    const closeModalBtn = document.getElementById('closeModal');
-    
-    if (modal && closeModalBtn) {
-        closeModalBtn.addEventListener('click', hideModal);
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                hideModal();
-            }
-        });
-    }
-});
 
 // PubSubイベントの購読
+PubSub.subscribe('init:event', initEventHandler);
 PubSub.subscribe('init:chart', initChart);
 PubSub.subscribe('init:map', initMap);
 PubSub.subscribe('init:scroll', initScroll);
@@ -543,4 +323,4 @@ PubSub.subscribe('handle:resize', handleResize);
 PubSub.subscribe('handle:step-enter', handleStepEnter);
 
 // 初期化
-PubSub.publish('init:chart');
+PubSub.publish('init:event');
