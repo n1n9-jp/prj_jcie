@@ -7,7 +7,7 @@ function showModal(data) {
         console.warn('Modal element not found');
         return;
     }
-
+    
     // 既存のモーダルを非表示にする
     modal.style.opacity = '0';
     

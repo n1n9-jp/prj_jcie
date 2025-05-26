@@ -25,12 +25,18 @@ async function loadChartData() {
     const newDeaths = await d3.csv('data/trend_new_deaths.csv');
     const hivPositive = await d3.csv('data/HIV陽性者の割合.csv');
     const maternalFetal = await d3.csv('data/trend_maternal_fetal_infection.csv');
+    const artCoverage = await d3.csv('data/trend_抗レトロウイルス療法を受けている感染者の割合.csv');
+    const prepCoverage = await d3.csv('data/trend_PrEPを受けている人の数の推移.csv');
+    const fundingGap = await d3.csv('data/trend_エイズ対策の資金不足.csv');
 
     return {
         newInfections,
         newDeaths,
         hivPositive,
-        maternalFetal
+        maternalFetal,
+        artCoverage,
+        prepCoverage,
+        fundingGap
     };
 }
 
@@ -236,7 +242,7 @@ const handleStepEnter = async (response) => {
     lastDirection = response.direction;
 
     // チャートの表示処理
-    if (stepId.startsWith('2')) {
+    if (stepId.startsWith('2') || stepId.startsWith('5')) {
         try {
             const data = await loadChartData();
             switch(stepId) {
@@ -252,12 +258,21 @@ const handleStepEnter = async (response) => {
                 case '2d':
                     await chartManager.drawLineChart(data.maternalFetal, '母子感染の推移');
                     break;
+                case '5a':
+                    await chartManager.drawLineChart(data.artCoverage, '抗レトロウイルス療法を受けている感染者の割合の推移');
+                    break;
+                case '5b':
+                    await chartManager.drawLineChart(data.prepCoverage, 'PrEPを受けている人の数の推移');
+                    break;
+                case '5c':
+                    await chartManager.drawLineChart(data.fundingGap, 'エイズ対策の資金不足の推移');
+                    break;
             }
         } catch (error) {
             console.error('Error drawing chart:', error);
         }
     } else {
-        // data-step=2以外の場合はチャートをクリア
+        // data-step=2または5以外の場合はチャートをクリア
         if (chartManager.currentChart) {
             chartManager.svg.selectAll('*')
                 .transition()
@@ -270,7 +285,7 @@ const handleStepEnter = async (response) => {
         // data-step=1の場合はチャートコンテナを非表示に
         if (stepId.startsWith('1') && figure) {
             figure.style.display = "none";
-        } else if (!stepId.startsWith('2') && !stepId.startsWith('3') && figure) {
+        } else if (!stepId.startsWith('2') && !stepId.startsWith('3') && !stepId.startsWith('5') && figure) {
             figure.style.display = "none";
         }
     }
