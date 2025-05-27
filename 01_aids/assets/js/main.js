@@ -275,8 +275,11 @@ const handleStepEnter = async (response) => {
     // スクロール方向を記録
     const scrollDirection = response.direction;
     
-    // data-step=2(でば2a以外),4,5の場合はチャートを表示
-    if ((stepId.startsWith('2') && stepId !== '2a') || stepId.startsWith('4') || stepId.startsWith('5')) {
+    // data-step=2(でば2a以外),4,5a,5b,5cの場合はチャートを表示
+    // 5d以降はチャートを表示しない
+    if ((stepId.startsWith('2') && stepId !== '2a') || 
+        stepId.startsWith('4') || 
+        stepId === '5a' || stepId === '5b' || stepId === '5c') {
         try {
             const data = await loadChartData();
             switch(stepId) {
