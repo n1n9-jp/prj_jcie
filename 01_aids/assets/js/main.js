@@ -29,6 +29,10 @@ async function loadChartData() {
     const prepCoverage = await d3.csv('data/trend_PrEPを受けている人の数の推移.csv');
     const fundingGap = await d3.csv('data/trend_エイズ対策の資金不足.csv');
 
+    // アフリカの若者のデータを読み込む
+    const africaYoungMan = await d3.csv('data/trend_arfica_young_man.csv');
+    const africaYoungWoman = await d3.csv('data/trend_arfica_young_woman.csv');
+
     return {
         newInfections,
         newDeaths,
@@ -36,7 +40,9 @@ async function loadChartData() {
         maternalFetal,
         artCoverage,
         prepCoverage,
-        fundingGap
+        fundingGap,
+        africaYoungMan,
+        africaYoungWoman
     };
 }
 
@@ -241,30 +247,46 @@ const handleStepEnter = async (response) => {
     totalEpisodes = window.mapEpisodeData.length;
     lastDirection = response.direction;
 
-    // チャートの表示処理
-    if (stepId.startsWith('2') || stepId.startsWith('5')) {
+    // data-step=2,4,5の場合はチャートを表示
+    if (stepId.startsWith('2') || stepId.startsWith('4') || stepId.startsWith('5')) {
         try {
             const data = await loadChartData();
             switch(stepId) {
                 case '2a':
+                    // デフォルトのmainFigureに描画
                     await chartManager.drawLineChart(data.newInfections, '新規HIV感染者数の推移');
                     break;
                 case '2b':
+                    // デフォルトのmainFigureに描画
                     await chartManager.drawLineChart(data.newDeaths, 'エイズ関連死亡者数の推移');
                     break;
                 case '2c':
+                    // デフォルトのmainFigureに描画
                     await chartManager.drawPieCharts(data.hivPositive);
                     break;
                 case '2d':
+                    // デフォルトのmainFigureに描画
                     await chartManager.drawLineChart(data.maternalFetal, '母子感染の推移');
                     break;
+                case '4d':
+                    // 2つの折れ線グラフを横並びに表示
+                    await chartManager.drawDualLineCharts(
+                        data.africaYoungMan, 
+                        'アフリカの若い男性のHIV感染率', 
+                        data.africaYoungWoman, 
+                        'アフリカの若い女性のHIV感染率'
+                    );
+                    break;
                 case '5a':
+                    // デフォルトのmainFigureに描画
                     await chartManager.drawLineChart(data.artCoverage, '抗レトロウイルス療法を受けている感染者の割合の推移');
                     break;
                 case '5b':
+                    // デフォルトのmainFigureに描画
                     await chartManager.drawLineChart(data.prepCoverage, 'PrEPを受けている人の数の推移');
                     break;
                 case '5c':
+                    // デフォルトのmainFigureに描画
                     await chartManager.drawLineChart(data.fundingGap, 'エイズ対策の資金不足の推移');
                     break;
             }
@@ -272,20 +294,15 @@ const handleStepEnter = async (response) => {
             console.error('Error drawing chart:', error);
         }
     } else {
-        // data-step=2または5以外の場合はチャートをクリア
+        // data-step=2,4,5以外の場合はチャートをクリア
         if (chartManager.currentChart) {
-            chartManager.svg.selectAll('*')
-                .transition()
-                .duration(500)
-                .style('opacity', 0)
-                .remove();
-            chartManager.currentChart = null;
+            chartManager.clearChart();
         }
         
         // data-step=1の場合はチャートコンテナを非表示に
         if (stepId.startsWith('1') && figure) {
             figure.style.display = "none";
-        } else if (!stepId.startsWith('2') && !stepId.startsWith('3') && !stepId.startsWith('5') && figure) {
+        } else if (!stepId.startsWith('2') && !stepId.startsWith('3') && !stepId.startsWith('4') && !stepId.startsWith('5') && figure) {
             figure.style.display = "none";
         }
     }
