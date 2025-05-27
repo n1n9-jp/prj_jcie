@@ -24,7 +24,7 @@ class ChartManager {
         // 複数のSVGコンテナを管理
         this.svgContainers = new Map();
         this.resizeObservers = new Map();
-        this.defaultContainerId = 'mainFigure';
+        this.defaultContainerId = 'smallFigure';
     }
 
     // 統一された凡例を描画するメソッド

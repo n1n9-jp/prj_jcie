@@ -235,7 +235,7 @@ const handleStepEnter = async (response) => {
     }
 
     const stepId = response.element.getAttribute('data-step');
-    const figure = document.getElementById('mainFigure');
+    const figure = document.getElementById('smallFigure');
     const mapBgContainer = document.getElementById('mapBgContainer');
     const mapContainer = document.getElementById('mapContainer');
     
@@ -248,20 +248,20 @@ const handleStepEnter = async (response) => {
     lastDirection = response.direction;
 
     // secondaryFigureの表示制御
-    const secondaryFigureContainer = document.getElementById('secondaryFigureContainer');
+    const largeFigure = document.getElementById('largeFigure');
     
-    // 各ステップに応じてsecondaryFigureContainerの表示を制御
-    if (secondaryFigureContainer) {
+    // 各ステップに応じてlargeFigureの表示を制御
+    if (largeFigure) {
         // デフォルトで非表示
-        secondaryFigureContainer.style.display = "none";
+        largeFigure.style.display = "none";
     }
     
     // data-step=2aの場合のみ特別処理
     if (stepId === '2a') {
         // 2aの場合はメインフィギュアを非表示、secondaryFigureを表示
         if (figure) figure.style.display = "none";
-        if (secondaryFigureContainer) {
-            secondaryFigureContainer.style.display = "block";
+        if (largeFigure) {
+            largeFigure.style.display = "block";
             // データ読み込みと描画をここで行う
             loadChartData().then(data => {
                 chartManager.drawLineChart(data.newInfections, '新規HIV感染者数の推移', 'secondaryFigure');
@@ -285,15 +285,15 @@ const handleStepEnter = async (response) => {
             switch(stepId) {
                 // 2aの場合は上で処理済みなのでここには来ない
                 case '2b':
-                    // デフォルトのmainFigureに描画
+                    // デフォルトのsmallFigureに描画
                     await chartManager.drawLineChart(data.newDeaths, 'エイズ関連死亡者数の推移');
                     break;
                 case '2c':
-                    // デフォルトのmainFigureに描画
+                    // デフォルトのsmallFigureに描画
                     await chartManager.drawPieCharts(data.hivPositive, '抗HIV薬の治療を受けている感染者の割合');
                     break;
                 case '2d':
-                    // デフォルトのmainFigureに描画
+                    // デフォルトのsmallFigureに描画
                     await chartManager.drawLineChart(data.maternalFetal, '母子感染の推移');
                     break;
                 case '4d':
@@ -306,15 +306,15 @@ const handleStepEnter = async (response) => {
                     );
                     break;
                 case '5a':
-                    // デフォルトのmainFigureに描画
+                    // デフォルトのsmallFigureに描画
                     await chartManager.drawLineChart(data.artCoverage, '抗レトロウイルス療法を受けている感染者の割合の推移');
                     break;
                 case '5b':
-                    // デフォルトのmainFigureに描画
+                    // デフォルトのsmallFigureに描画
                     await chartManager.drawLineChart(data.prepCoverage, 'PrEPを受けている人の数の推移');
                     break;
                 case '5c':
-                    // デフォルトのmainFigureに描画
+                    // デフォルトのsmallFigureに描画
                     await chartManager.drawLineChart(data.fundingGap, 'エイズ対策の資金不足の推移');
                     break;
             }
@@ -332,7 +332,7 @@ const handleStepEnter = async (response) => {
         if (scrollDirection === 'up') {
             // 強制的にすべてのコンテナを非表示にする
             if (figure) figure.style.display = "none";
-            if (secondaryFigureContainer) secondaryFigureContainer.style.display = "none";
+            if (largeFigure) largeFigure.style.display = "none";
             
             // チャートマネージャーの状態をリセット
             chartManager.currentChart = null;
