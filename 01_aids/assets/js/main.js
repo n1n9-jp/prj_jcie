@@ -24,7 +24,7 @@ async function loadChartData() {
     const newInfections = await d3.csv('data/trend_new_infections.csv');
     const newDeaths = await d3.csv('data/trend_new_deaths.csv');
     const hivPositive = await d3.csv('data/HIV陽性者の割合.csv');
-    const maternalFetal = await d3.csv('data/trend_maternal_fetal_infection.csv');
+    const maternalFetal = await d3.csv('data/trend_母子感染の推移.csv');
     const artCoverage = await d3.csv('data/trend_抗レトロウイルス療法を受けている感染者の割合.csv');
     const prepCoverage = await d3.csv('data/trend_PrEPを受けている人の数の推移.csv');
     const fundingGap = await d3.csv('data/trend_エイズ対策の資金不足.csv');
