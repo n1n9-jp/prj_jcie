@@ -10,22 +10,20 @@ This is a Japanese interactive scrollytelling web application about HIV/AIDS cre
 
 ### Core Components
 
-- **Scroll Controller** (`main.js`): Central orchestrator that manages scroll-triggered animations, data loading, state management, and component coordination using Scrollama.js and PubSub pattern
-- **Chart System** (`chart-manager.js`): D3.js-based visualization engine supporting line charts, pie charts, and dual charts with responsive design and unified legend system
+- **Scroll Controller** (`main.js`): Central orchestrator that manages scroll-triggered animations, data loading, state management, and component coordination using Scrollama.js and PubSub pattern. 単一チャートコンテナ構造に最適化済み
+- **Chart System** (`chart-manager.js`): D3.js-based visualization engine supporting line charts, pie charts, and dual charts with responsive design and unified legend system. 単一SVGコンテナ管理とスムーズ遷移機能を実装
 - **Map System** (`map.js`): Interactive world map using D3.js and geographic projections with zoom/pan capabilities and smooth transition effects
 - **Modal Manager** (`map-modal.js`): Overlay modal system for displaying country-specific episodes with content management and error handling
 - **CSS Configuration** (`tailwind.config.js`): Tailwind CSS configuration for responsive typography and mobile optimization
-- **HTML Structure** (`index.html`): Single-page application with scrollable sections using data-step attributes (1z-5f) to trigger different visualizations
+- **HTML Structure** (`index.html`): Single-page application with scrollable sections using data-step attributes (1z-5f) to trigger different visualizations. 単一チャートコンテナ構造に最適化済み
 - **PubSub System** (`lib/pubsub.js`): Event-driven communication between components
 
 ### HTML構成要素
 
-#### 入れ子構造
+#### 入れ子構造（最適化後）
 ```
 body
 ├── #mapBgContainer (全画面固定地図背景)
-├── #largeFigure (全画面固定大型チャート)
-│   └── #secondaryFigure (セカンダリチャート)
 ├── main (メインコンテンツ領域)
 │   ├── header
 │   │   └── nav (固定ナビゲーションバー)
@@ -33,7 +31,7 @@ body
 │   ├── #scrolly (スクロールテリングセクション)
 │   │   ├── article (テキストコンテンツ)
 │   │   │   └── .step[data-step] (スクロールトリガー要素群)
-│   │   └── #smallFigure (小型チャート)
+│   │   └── #smallFigure.chart-container (統一チャートコンテナ)
 │   └── footer
 │       └── #outro (アウトロセクション)
 └── #modalCountry (国別エピソードモーダル)
@@ -45,10 +43,9 @@ body
 - **メインコンテンツ** (`main`): 相対配置でスクロール可能なコンテンツ領域
 - **イントロセクション** (`#intro`): 上部余白を提供するための導入部
 
-#### 可視化コンテナ
+#### 可視化コンテナ（最適化後）
 - **地図背景コンテナ** (`#mapBgContainer`): 全画面固定位置で世界地図を描画するための背景領域
-- **大型チャートコンテナ** (`#largeFigure`): 全画面固定位置で大型チャートを表示するためのオーバーレイ領域
-- **小型チャートコンテナ** (`#smallFigure`): 右側の粘着配置でデフォルトのチャート表示領域
+- **統一チャートコンテナ** (`#smallFigure.chart-container`): 単一のレスポンシブチャート表示領域。CSSでモバイル・デスクトップ対応、スムーズ遷移機能付き
 
 #### スクロールテリング構造
 - **スクロールセクション** (`#scrolly`): Flexboxレイアウトでテキストとチャートを並列配置
@@ -74,7 +71,8 @@ body
 ### Key Features
 
 - **Scroll-triggered Visualization**: Different data-step values trigger specific charts or map interactions
-- **Responsive Design**: Charts use viewBox for scalability, map adapts to screen size
+- **Optimized Chart System**: Single container architecture with smooth transitions and improved performance
+- **Responsive Design**: Charts use viewBox for scalability with CSS-controlled responsive sizing, map adapts to screen size
 - **Modal System**: Country episodes display in overlay modals with external links
 - **Progressive Episode Display**: Map episodes advance based on scroll progress within step 3
 
@@ -104,8 +102,25 @@ php -S localhost:8000
 ### Key Technical Details
 
 - Uses D3.js v7 for visualizations
-- Tailwind CSS for styling
+- Tailwind CSS for styling with custom responsive chart container classes
 - Scrollama.js for scroll-based interactions
+- Single SVG container architecture for improved performance
+- Smooth chart transitions with fade effects
 - No build process required - runs directly in browser
 - Japanese language content throughout
 - Responsive design supporting mobile and desktop
+
+### Recent Optimizations (2024)
+
+#### Chart System Improvements
+- **Single Container Architecture**: Eliminated dual container complexity (#largeFigure removed)
+- **Smooth Transitions**: Added fade-in/fade-out effects between chart changes
+- **Performance Optimization**: Reduced memory usage and improved ResizeObserver efficiency
+- **Unified State Management**: Centralized chart state with transition locking
+- **CSS-based Responsiveness**: Moved sizing logic from JavaScript to CSS for better performance
+
+#### Code Structure Enhancements
+- **Simplified Logic**: Reduced main.js complexity by eliminating container switching
+- **Better Error Handling**: Improved async/await patterns for chart rendering
+- **Cleaner APIs**: Updated method signatures to remove unnecessary parameters
+- **Future-proof Design**: Architecture supports easy addition of new chart types

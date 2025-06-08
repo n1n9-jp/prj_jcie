@@ -16,10 +16,6 @@
 <body>
     <!-- 地図をbody直下に描画するためのコンテナ -->
     <div id="mapBgContainer" style="position:fixed; inset:0; z-index:0; width:100vw; height:100vh; pointer-events:none;"></div>
-    <!-- 新しいチャート描画用のスペース（全幅、上下20%マージン） -->
-    <div id="largeFigure" style="position:fixed; inset:0; z-index:0; width:100vw; height:100vh; pointer-events:none; display:none;">
-        <figure id="secondaryFigure" class="w-full h-[60vh] my-[20vh] flex items-center justify-center bg-white rounded shadow"></figure>
-    </div>
 	<main style="position:relative; z-index:1;">
 		<header>
 			<nav class="fixed top-0 left-0 w-full bg-white shadow-md z-50">
@@ -142,7 +138,7 @@
 				</div>
 
 			</article>
-			<figure id="smallFigure" class="md:sticky md:top-[64px] self-start h-48 md:h-[60vh] flex items-center justify-center bg-white rounded shadow w-full md:w-1/2">
+			<figure id="smallFigure" class="chart-container md:sticky md:top-[64px] self-start h-48 md:h-[60vh] flex items-center justify-center bg-white rounded shadow w-full md:w-1/2 transition-all duration-500">
 			</figure>
 		</section>
 

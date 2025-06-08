@@ -247,57 +247,37 @@ const handleStepEnter = async (response) => {
     totalEpisodes = window.mapEpisodeData.length;
     lastDirection = response.direction;
 
-    // secondaryFigureの表示制御
-    const largeFigure = document.getElementById('largeFigure');
-    
-    // 各ステップに応じてlargeFigureの表示を制御
-    if (largeFigure) {
-        // デフォルトで非表示
-        largeFigure.style.display = "none";
-    }
-    
-    // data-step=2aの場合のみ特別処理
-    if (stepId === '2a') {
-        // 2aの場合はメインフィギュアを非表示、secondaryFigureを表示
-        if (figure) figure.style.display = "none";
-        if (largeFigure) {
-            largeFigure.style.display = "block";
-            // データ読み込みと描画をここで行う
-            loadChartData().then(data => {
-                chartManager.drawLineChart(data.newInfections, '新規HIV感染者数の推移', 'secondaryFigure');
-            }).catch(error => {
-                console.error('Error drawing chart on secondaryFigure:', error);
-            });
-        }
-        return; // 2aの場合はここで処理終了
-    }
+    // 単一コンテナ構造に変更したため、特別な処理は不要
     
     // スクロール方向を記録
     const scrollDirection = response.direction;
     
-    // data-step=2(でば2a以外),4,5a,5b,5cの場合はチャートを表示
-    // 5d以降はチャートを表示しない
-    if ((stepId.startsWith('2') && stepId !== '2a') || 
-        stepId.startsWith('4') || 
+    // チャートを表示するステップの判定
+    if (stepId.startsWith('2') || stepId.startsWith('4') || 
         stepId === '5a' || stepId === '5b' || stepId === '5c') {
         try {
             const data = await loadChartData();
+            
+            // コンテナを表示（Tailwindのflexクラスを使用）
+            if (figure) figure.style.display = "";
+            
+            console.log(`Drawing chart for step: ${stepId}`);
+            
             switch(stepId) {
-                // 2aの場合は上で処理済みなのでここには来ない
+                case '2a':
+                    console.log('Drawing line chart: 新規HIV感染者数の推移');
+                    await chartManager.drawLineChart(data.newInfections, '新規HIV感染者数の推移');
+                    break;
                 case '2b':
-                    // デフォルトのsmallFigureに描画
                     await chartManager.drawLineChart(data.newDeaths, 'エイズ関連死亡者数の推移');
                     break;
                 case '2c':
-                    // デフォルトのsmallFigureに描画
                     await chartManager.drawPieCharts(data.hivPositive, '抗HIV薬の治療を受けている感染者の割合');
                     break;
                 case '2d':
-                    // デフォルトのsmallFigureに描画
                     await chartManager.drawLineChart(data.maternalFetal, '母子感染の推移');
                     break;
                 case '4d':
-                    // 2つの折れ線グラフを横並びに表示
                     await chartManager.drawDualLineCharts(
                         data.africaYoungMan, 
                         'アフリカの若い男性の新規HIV感染者数', 
@@ -306,15 +286,12 @@ const handleStepEnter = async (response) => {
                     );
                     break;
                 case '5a':
-                    // デフォルトのsmallFigureに描画
                     await chartManager.drawLineChart(data.artCoverage, '抗レトロウイルス療法を受けている感染者の割合の推移');
                     break;
                 case '5b':
-                    // デフォルトのsmallFigureに描画
                     await chartManager.drawLineChart(data.prepCoverage, 'PrEPを受けている人の数の推移');
                     break;
                 case '5c':
-                    // デフォルトのsmallFigureに描画
                     await chartManager.drawLineChart(data.fundingGap, 'エイズ対策の資金不足の推移');
                     break;
             }
@@ -322,29 +299,13 @@ const handleStepEnter = async (response) => {
             console.error('Error drawing chart:', error);
         }
     } else {
-        // data-step=2,4,5以外の場合はチャートをクリア
+        // チャートを表示しないステップの場合
         if (chartManager.currentChart) {
-            // 確実にクリアするために、強制的にすべてのコンテナをクリア
-            chartManager.clearAllCharts();
+            await chartManager.clearChart();
         }
         
-        // 下から上へスクロールした場合は、特に入念にクリアする
-        if (scrollDirection === 'up') {
-            // 強制的にすべてのコンテナを非表示にする
-            if (figure) figure.style.display = "none";
-            if (largeFigure) largeFigure.style.display = "none";
-            
-            // チャートマネージャーの状態をリセット
-            chartManager.currentChart = null;
-            chartManager.currentContainerId = null;
-            chartManager.currentData = null;
-            chartManager.currentTitle = null;
-        }
-        
-        // data-step=1の場合はチャートコンテナを非表示に
-        if (stepId.startsWith('1') && figure) {
-            figure.style.display = "none";
-        } else if (!stepId.startsWith('2') && !stepId.startsWith('3') && !stepId.startsWith('4') && !stepId.startsWith('5') && figure) {
+        // コンテナを非表示
+        if (figure && !stepId.startsWith('3')) {
             figure.style.display = "none";
         }
     }
@@ -353,7 +314,7 @@ const handleStepEnter = async (response) => {
         isStep3Active = true;
         step3ScrollDirection = response.direction;
 
-        // メインフィギュアの非表示
+        // チャートコンテナの非表示
         if (figure) {
             figure.style.display = "none";
         }
@@ -413,9 +374,9 @@ const handleStepEnter = async (response) => {
             mapContainer.style.display = "none";
         }
 
-        // メインフィギュアの表示
-        if (figure) {
-            figure.style.display = "block";
+        // チャートコンテナの表示（チャートがある場合のみ）
+        if (figure && chartManager.currentChart) {
+            figure.style.display = "";
         }
     }
 }
@@ -430,5 +391,5 @@ PubSub.subscribe('handle:resize', handleResize);
 // 初期化
 document.addEventListener('DOMContentLoaded', async () => {
     await chartManager.initializeCharts();
-    initEventHandler();
+    PubSub.publish('init:event');
 });

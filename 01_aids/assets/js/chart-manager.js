@@ -21,10 +21,16 @@ class ChartManager {
         this.width = this.viewBox.width - this.margins.left - this.margins.right;
         this.height = this.viewBox.height - this.margins.top - this.margins.bottom;
         
-        // 複数のSVGコンテナを管理
-        this.svgContainers = new Map();
-        this.resizeObservers = new Map();
+        // 単一SVGコンテナを管理
+        this.svgContainer = null;
+        this.resizeObserver = null;
         this.defaultContainerId = 'smallFigure';
+        
+        // チャート状態管理
+        this.currentChart = null;
+        this.currentData = null;
+        this.currentTitle = null;
+        this.isTransitioning = false;
     }
 
     // 統一された凡例を描画するメソッド
@@ -77,29 +83,45 @@ class ChartManager {
         return legendGroup;
     }
 
-    // チャートの初期化（デフォルトコンテナ用）
-    initializeCharts(containerId = this.defaultContainerId) {
-        this.createSvgContainer(containerId);
+    // チャートの初期化（単一コンテナ用）
+    initializeCharts() {
+        console.log('ChartManager: Initializing charts');
+        const result = this.createSvgContainer();
+        console.log('ChartManager: SVG container created:', !!result);
+        return result;
     }
 
     // SVGコンテナの作成
-    createSvgContainer(containerId) {
-        const container = document.getElementById(containerId);
+    createSvgContainer() {
+        console.log(`ChartManager: Looking for container: ${this.defaultContainerId}`);
+        const container = document.getElementById(this.defaultContainerId);
         if (!container) {
-            console.error(`Container with id '${containerId}' not found`);
+            console.error(`Container with id '${this.defaultContainerId}' not found`);
             return null;
         }
+        console.log('ChartManager: Container found:', container);
 
         // 既存のSVGがあれば削除
-        if (this.svgContainers.has(containerId)) {
-            this.removeSvgContainer(containerId);
+        if (this.svgContainer) {
+            this.removeSvgContainer();
         }
 
         // SVGの作成と基本設定
-        const svg = d3.select(`#${containerId}`)
+        const svg = d3.select(`#${this.defaultContainerId}`)
             .append('svg')
             .attr('viewBox', `0 0 ${this.viewBox.width} ${this.viewBox.height}`)
             .attr('preserveAspectRatio', 'xMidYMid');
+
+        // 初期サイズを設定
+        const containerRect = container.getBoundingClientRect();
+        const initialWidth = containerRect.width || 800; // フォールバック値
+        const initialHeight = initialWidth / this.aspectRatio;
+        
+        svg
+            .attr('width', initialWidth)
+            .attr('height', initialHeight);
+            
+        console.log(`ChartManager: SVG created with initial size: ${initialWidth}x${initialHeight}`);
 
         // 背景の追加
         svg.append('rect')
@@ -108,48 +130,45 @@ class ChartManager {
             .attr('fill', '#f8f9fa');
 
         // コンテナを保存
-        this.svgContainers.set(containerId, svg);
+        this.svgContainer = svg;
 
         // ResizeObserverの設定
-        this.setupResizeObserver(containerId);
+        this.setupResizeObserver();
 
         return svg;
     }
 
-    // 特定のコンテナのSVGを取得（なければ作成）
-    getSvgContainer(containerId = this.defaultContainerId) {
-        if (!this.svgContainers.has(containerId)) {
-            return this.createSvgContainer(containerId);
+    // SVGコンテナを取得（なければ作成）
+    getSvgContainer() {
+        if (!this.svgContainer) {
+            return this.createSvgContainer();
         }
-        return this.svgContainers.get(containerId);
+        return this.svgContainer;
     }
 
     // SVGコンテナの削除
-    removeSvgContainer(containerId) {
-        const svg = this.svgContainers.get(containerId);
-        if (svg) {
-            svg.remove();
-            this.svgContainers.delete(containerId);
+    removeSvgContainer() {
+        if (this.svgContainer) {
+            this.svgContainer.remove();
+            this.svgContainer = null;
         }
 
-        const observer = this.resizeObservers.get(containerId);
-        if (observer) {
-            observer.disconnect();
-            this.resizeObservers.delete(containerId);
+        if (this.resizeObserver) {
+            this.resizeObserver.disconnect();
+            this.resizeObserver = null;
         }
     }
 
     // ResizeObserverの設定
-    setupResizeObserver(containerId) {
-        const container = document.getElementById(containerId);
+    setupResizeObserver() {
+        const container = document.getElementById(this.defaultContainerId);
         if (!container) return;
 
-        const resizeObserver = new ResizeObserver(this.debounce(() => {
-            this.handleResize(containerId);
+        this.resizeObserver = new ResizeObserver(this.debounce(() => {
+            this.handleResize();
         }, 250));
 
-        resizeObserver.observe(container);
-        this.resizeObservers.set(containerId, resizeObserver);
+        this.resizeObserver.observe(container);
     }
 
     // デバウンス関数
@@ -166,21 +185,29 @@ class ChartManager {
     }
 
     // リサイズ処理
-    handleResize(containerId) {
-        const svg = this.svgContainers.get(containerId);
-        if (!svg) return;
+    handleResize() {
+        if (!this.svgContainer) return;
 
-        const container = d3.select(`#${containerId}`);
-        const containerWidth = container.node().getBoundingClientRect().width;
+        const container = d3.select(`#${this.defaultContainerId}`);
+        const containerNode = container.node();
+        if (!containerNode) {
+            console.warn('ChartManager: Container not found during resize');
+            return;
+        }
+        
+        const containerWidth = containerNode.getBoundingClientRect().width;
         const containerHeight = containerWidth / this.aspectRatio;
 
+        console.log(`ChartManager: Resizing SVG to ${containerWidth}x${containerHeight}`);
+
         // SVGのサイズをコンテナに合わせて更新
-        svg
+        this.svgContainer
             .attr('width', containerWidth)
             .attr('height', containerHeight);
 
-        // 現在のチャートを再描画（該当コンテナの場合のみ）
-        if (this.currentChart && this.currentContainerId === containerId) {
+        // 現在のチャートを再描画
+        if (this.currentChart && !this.isTransitioning) {
+            console.log('ChartManager: Redrawing chart due to resize');
             this.redrawCurrentChart();
         }
     }
@@ -199,21 +226,50 @@ class ChartManager {
         }
     }
 
-    // 折れ線グラフの描画
-    async drawLineChart(data, title, containerId = this.defaultContainerId) {
-        // SVGコンテナを取得または作成
-        const svg = this.getSvgContainer(containerId);
-        if (!svg) return;
-
-        // 現在のチャート情報を更新
-        this.currentContainerId = containerId;
+    // 折れ線グラフの描画（スムーズ遷移対応）
+    async drawLineChart(data, title) {
+        console.log(`ChartManager: drawLineChart called with title: ${title}`);
+        console.log('ChartManager: Data:', data);
+        
+        if (this.isTransitioning) {
+            console.log('ChartManager: Already transitioning, skipping');
+            return;
+        }
+        this.isTransitioning = true;
+        
+        try {
+            // SVGコンテナを取得または作成
+            const svg = this.getSvgContainer();
+            if (!svg) {
+                console.error('ChartManager: Failed to get SVG container');
+                this.isTransitioning = false;
+                return;
+            }
+            console.log('ChartManager: SVG container ready:', svg);
 
         // 既存のチャートをフェードアウト
-        svg.selectAll('*:not(rect:first-child)')
-            .transition()
-            .duration(500)
-            .style('opacity', 0)
-            .remove();
+        const existingElements = svg.selectAll('*:not(rect:first-child)');
+        if (!existingElements.empty()) {
+            const fadeOutPromise = new Promise(resolve => {
+                let completed = 0;
+                const total = existingElements.size();
+                
+                existingElements
+                    .transition()
+                    .duration(300)
+                    .style('opacity', 0)
+                    .on('end', () => {
+                        completed++;
+                        if (completed === total) {
+                            svg.selectAll('*:not(rect:first-child)').remove();
+                            resolve();
+                        }
+                    });
+            });
+            await fadeOutPromise;
+        } else {
+            svg.selectAll('*:not(rect:first-child)').remove();
+        }
 
         // データの整形
         const years = Object.keys(data[0]).filter(key => !isNaN(key) && key !== '地域名');
@@ -335,27 +391,47 @@ class ChartManager {
                 orientation: 'vertical'
             });
 
-        this.currentChart = 'line';
-        // 再描画用にデータを保存
-        this.currentData = data;
-        this.currentTitle = title;
+            this.currentChart = 'line';
+            this.currentData = data;
+            this.currentTitle = title;
+            console.log('ChartManager: Line chart drawn successfully');
+        } catch (error) {
+            console.error('Error in drawLineChart:', error);
+        } finally {
+            this.isTransitioning = false;
+        }
     }
 
-    // 2つの折れ線グラフを横並びに描画
-    async drawDualLineCharts(data1, title1, data2, title2, containerId = this.defaultContainerId) {
-        // SVGコンテナを取得または作成
-        const svg = this.getSvgContainer(containerId);
-        if (!svg) return;
-
-        // 現在のチャート情報を更新
-        this.currentContainerId = containerId;
+    // 2つの折れ線グラフを横並びに描画（スムーズ遷移対応）
+    async drawDualLineCharts(data1, title1, data2, title2) {
+        if (this.isTransitioning) return;
+        this.isTransitioning = true;
+        
+        try {
+            // SVGコンテナを取得または作成
+            const svg = this.getSvgContainer();
+            if (!svg) {
+                this.isTransitioning = false;
+                return;
+            }
 
         // 既存のチャートをフェードアウト
-        svg.selectAll('*:not(rect:first-child)')
-            .transition()
-            .duration(500)
-            .style('opacity', 0)
-            .remove();
+        const existingElements = svg.selectAll('*:not(rect:first-child)');
+        if (!existingElements.empty()) {
+            const fadeOutPromise = new Promise(resolve => {
+                existingElements
+                    .transition()
+                    .duration(300)
+                    .style('opacity', 0)
+                    .on('end', () => {
+                        svg.selectAll('*:not(rect:first-child)').remove();
+                        resolve();
+                    });
+            });
+            await fadeOutPromise;
+        } else {
+            svg.selectAll('*:not(rect:first-child)').remove();
+        }
 
         // 各グラフの幅を計算（中央にスペースを設ける）
         const chartWidth = (this.width - 40) / 2; // 40pxの中央スペース
@@ -401,10 +477,14 @@ class ChartManager {
             fontSize: '11px'
         });
 
-        this.currentChart = 'dual-line';
-        // 再描画用にデータを保存
-        this.currentData = { data1, data2 };
-        this.currentTitle = { title1, title2 };
+            this.currentChart = 'dual-line';
+            this.currentData = { data1, data2 };
+            this.currentTitle = { title1, title2 };
+        } catch (error) {
+            console.error('Error in drawDualLineCharts:', error);
+        } finally {
+            this.isTransitioning = false;
+        }
     }
 
     // グループ内に折れ線グラフを描画（ヘルパーメソッド）
@@ -490,21 +570,36 @@ class ChartManager {
         // 注：個別の凡例は削除し、共通凡例をdrawDualLineChartsで描画
     }
 
-    // 円グラフの描画
-    async drawPieCharts(data, title = '', containerId = this.defaultContainerId) {
-        // SVGコンテナを取得または作成
-        const svg = this.getSvgContainer(containerId);
-        if (!svg) return;
-
-        // 現在のチャート情報を更新
-        this.currentContainerId = containerId;
+    // 円グラフの描画（スムーズ遷移対応）
+    async drawPieCharts(data, title = '') {
+        if (this.isTransitioning) return;
+        this.isTransitioning = true;
+        
+        try {
+            // SVGコンテナを取得または作成
+            const svg = this.getSvgContainer();
+            if (!svg) {
+                this.isTransitioning = false;
+                return;
+            }
 
         // 既存のチャートをフェードアウト
-        svg.selectAll('*:not(rect:first-child)')
-            .transition()
-            .duration(500)
-            .style('opacity', 0)
-            .remove();
+        const existingElements = svg.selectAll('*:not(rect:first-child)');
+        if (!existingElements.empty()) {
+            const fadeOutPromise = new Promise(resolve => {
+                existingElements
+                    .transition()
+                    .duration(300)
+                    .style('opacity', 0)
+                    .on('end', () => {
+                        svg.selectAll('*:not(rect:first-child)').remove();
+                        resolve();
+                    });
+            });
+            await fadeOutPromise;
+        } else {
+            svg.selectAll('*:not(rect:first-child)').remove();
+        }
 
         const radius = Math.min(this.width, this.height) / 3;
         const pie = d3.pie()
@@ -567,9 +662,13 @@ class ChartManager {
             orientation: 'vertical'
         });
 
-        this.currentChart = 'pie';
-        // 再描画用にデータを保存
-        this.currentData = data;
+            this.currentChart = 'pie';
+            this.currentData = data;
+        } catch (error) {
+            console.error('Error in drawPieCharts:', error);
+        } finally {
+            this.isTransitioning = false;
+        }
     }
 
     // 折れ線グラフの再描画
@@ -585,8 +684,8 @@ class ChartManager {
     // 円グラフの再描画
     redrawPieChart() {
         // 現在のデータで円グラフを再描画
-        if (this.currentData) {
-            this.drawPieCharts(this.currentData, this.currentContainerId);
+        if (this.currentData && this.currentTitle) {
+            this.drawPieCharts(this.currentData, this.currentTitle);
         }
     }
 
@@ -600,49 +699,61 @@ class ChartManager {
         }
     }
 
-    // 特定のコンテナのチャートをクリア
-    clearChart(containerId = this.currentContainerId) {
-        if (!containerId) return;
+    // チャートをクリア
+    async clearChart() {
+        if (!this.svgContainer) return;
         
-        const svg = this.svgContainers.get(containerId);
-        if (svg) {
-            svg.selectAll('*:not(rect:first-child)')
-                .transition()
-                .duration(500)
-                .style('opacity', 0)
-                .on('end', function() {
-                    d3.select(this).remove();
-                });
+        const existingElements = this.svgContainer.selectAll('*:not(rect:first-child)');
+        
+        if (!existingElements.empty()) {
+            await new Promise(resolve => {
+                let completed = 0;
+                const total = existingElements.size();
+                
+                existingElements
+                    .transition()
+                    .duration(300)
+                    .style('opacity', 0)
+                    .on('end', function() {
+                        d3.select(this).remove();
+                        completed++;
+                        if (completed === total) {
+                            resolve();
+                        }
+                    });
+            });
         }
         
-        // 現在のチャート情報をクリア（該当コンテナの場合）
-        if (this.currentContainerId === containerId) {
-            this.currentChart = null;
-            this.currentContainerId = null;
-            this.currentData = null;
-            this.currentTitle = null;
-        }
+        // 現在のチャート情報をクリア
+        this.currentChart = null;
+        this.currentData = null;
+        this.currentTitle = null;
+        this.isTransitioning = false;
     }
 
-    // すべてのチャートをクリア
+    // すべてのチャートをクリア（単一コンテナのためclearChartと同等）
     clearAllCharts() {
-        this.svgContainers.forEach((svg, containerId) => {
-            this.clearChart(containerId);
-        });
+        return this.clearChart();
     }
 
     // クリーンアップ
     cleanup() {
-        // すべてのResizeObserverを切断
-        this.resizeObservers.forEach(observer => {
-            observer.disconnect();
-        });
-        this.resizeObservers.clear();
+        // ResizeObserverを切断
+        if (this.resizeObserver) {
+            this.resizeObserver.disconnect();
+            this.resizeObserver = null;
+        }
 
-        // すべてのSVGコンテナを削除
-        this.svgContainers.forEach(svg => {
-            svg.remove();
-        });
-        this.svgContainers.clear();
+        // SVGコンテナを削除
+        if (this.svgContainer) {
+            this.svgContainer.remove();
+            this.svgContainer = null;
+        }
+        
+        // 状態をリセット
+        this.currentChart = null;
+        this.currentData = null;
+        this.currentTitle = null;
+        this.isTransitioning = false;
     }
 }
