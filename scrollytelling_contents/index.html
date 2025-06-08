@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scrollytelling Content</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://d3js.org/topojson.v3.min.js"></script>
+    <script src="https://unpkg.com/scrollama"></script>
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body class="bg-gray-100">
+    <!-- メインコンテナ -->
+    <div id="container" class="relative min-h-screen">
+        <!-- 固定背景（チャート・地図エリア） -->
+        <div id="fixed-background" class="fixed inset-0 w-full h-full">
+            <!-- チャートエリア -->
+            <div id="chart-container" class="absolute inset-0 flex items-center justify-center">
+                <div id="chart" class="w-full h-full"></div>
+            </div>
+            
+            <!-- 地図エリア -->
+            <div id="map-container" class="absolute inset-0">
+                <div id="map" class="w-full h-full"></div>
+            </div>
+        </div>
+
+        <!-- スクロール可能なテキストエリア -->
+        <div id="scroll-content" class="relative z-10">
+            <!-- 各段落のステップ -->
+            <div class="step" data-step="0">
+                <div class="w-full min-h-screen flex items-center">
+                    <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
+                        <h2 class="text-2xl font-bold mb-4">イントロダクション</h2>
+                        <p class="text-gray-700 leading-relaxed">
+                            このコンテンツは、スクロールに応じてデータの可視化が変化するScrollytellingの実装例です。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step" data-step="1">
+                <div class="w-full min-h-screen flex items-center">
+                    <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
+                        <h2 class="text-2xl font-bold mb-4">データの傾向</h2>
+                        <p class="text-gray-700 leading-relaxed">
+                            最初のチャートでは、時系列データの傾向を確認することができます。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step" data-step="2">
+                <div class="w-full min-h-screen flex items-center">
+                    <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
+                        <h2 class="text-2xl font-bold mb-4">地域別分析</h2>
+                        <p class="text-gray-700 leading-relaxed">
+                            地図上で地域別のデータ分布を確認していきましょう。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step" data-step="3">
+                <div class="w-full min-h-screen flex items-center">
+                    <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
+                        <h2 class="text-2xl font-bold mb-4">詳細分析</h2>
+                        <p class="text-gray-700 leading-relaxed">
+                            特定の地域にフォーカスして、より詳細なデータを見てみます。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step" data-step="4">
+                <div class="w-full min-h-screen flex items-center">
+                    <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
+                        <h2 class="text-2xl font-bold mb-4">まとめ</h2>
+                        <p class="text-gray-700 leading-relaxed">
+                            これまでのデータ分析から得られた知見をまとめます。
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- スクリプト読み込み -->
+    <script src="assets/js/pubsub.js"></script>
+    <script src="assets/js/chart-manager.js"></script>
+    <script src="assets/js/map-manager.js"></script>
+    <script src="assets/js/main.js"></script>
+</body>
+</html>

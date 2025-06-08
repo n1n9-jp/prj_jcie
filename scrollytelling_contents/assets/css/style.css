@@ -1,0 +1,147 @@
+/* カスタムスタイル */
+#container {
+    position: relative;
+}
+
+#fixed-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+#scroll-content {
+    position: relative;
+    z-index: 10;
+}
+
+.step {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+}
+
+/* チャートコンテナのスタイル */
+#chart-container {
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+}
+
+#chart-container.visible {
+    opacity: 1;
+}
+
+/* 地図コンテナのスタイル */
+#map-container {
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+}
+
+#map-container.visible {
+    opacity: 1;
+}
+
+/* D3チャート共通スタイル */
+.chart-axis {
+    font-size: 12px;
+    fill: #333;
+}
+
+.chart-axis .domain {
+    stroke: #333;
+}
+
+.chart-axis .tick line {
+    stroke: #333;
+}
+
+.chart-line {
+    fill: none;
+    stroke-width: 2;
+    transition: all 0.5s ease;
+}
+
+.chart-circle {
+    transition: all 0.5s ease;
+}
+
+/* 棒グラフスタイル */
+.bar {
+    transition: all 0.5s ease;
+}
+
+.bar:hover {
+    opacity: 0.8;
+}
+
+/* 円グラフスタイル */
+.pie-slice {
+    stroke: #fff;
+    stroke-width: 2;
+    transition: all 0.5s ease;
+}
+
+.pie-slice:hover {
+    opacity: 0.8;
+}
+
+/* 地図スタイル */
+.map-country {
+    fill: #e5e7eb;
+    stroke: #fff;
+    stroke-width: 0.5;
+    transition: all 0.3s ease;
+}
+
+.map-country.highlighted {
+    fill: #3b82f6;
+    stroke: #1d4ed8;
+    stroke-width: 1;
+}
+
+.map-city {
+    fill: #ef4444;
+    stroke: #fff;
+    stroke-width: 2;
+    transition: all 0.3s ease;
+}
+
+.map-city:hover {
+    fill: #dc2626;
+    r: 8;
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+    .step {
+        padding: 1rem;
+    }
+    
+    .step .max-w-lg {
+        max-width: 100%;
+        margin: 0 1rem;
+    }
+}
+
+/* スムーズスクロール */
+html {
+    scroll-behavior: smooth;
+}
+
+/* ローディング状態 */
+.loading {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+/* エラー状態 */
+.error {
+    background-color: #fee2e2;
+    border: 1px solid #fca5a5;
+    color: #dc2626;
+}

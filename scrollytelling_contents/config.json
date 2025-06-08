@@ -1,0 +1,102 @@
+{
+  "steps": [
+    {
+      "id": "step0",
+      "text": "イントロダクション",
+      "chart": {
+        "visible": false
+      },
+      "map": {
+        "visible": false
+      }
+    },
+    {
+      "id": "step1",
+      "text": "データの傾向",
+      "chart": {
+        "type": "line",
+        "dataFile": "data/sample-line-data.csv",
+        "visible": true,
+        "config": {
+          "width": 600,
+          "height": 400,
+          "xField": "date",
+          "yField": "value",
+          "color": "#3b82f6"
+        }
+      },
+      "map": {
+        "visible": false
+      }
+    },
+    {
+      "id": "step2",
+      "text": "地域別分析",
+      "chart": {
+        "visible": false
+      },
+      "map": {
+        "center": [0, 0],
+        "zoom": 1,
+        "visible": true,
+        "highlightCountries": ["Japan", "United States", "Germany"],
+        "cities": []
+      }
+    },
+    {
+      "id": "step3",
+      "text": "詳細分析",
+      "chart": {
+        "type": "bar",
+        "dataFile": "data/sample-bar-data.csv",
+        "visible": true,
+        "config": {
+          "width": 500,
+          "height": 350,
+          "xField": "category",
+          "yField": "value",
+          "color": "#10b981"
+        }
+      },
+      "map": {
+        "visible": false
+      }
+    },
+    {
+      "id": "step4",
+      "text": "まとめ",
+      "chart": {
+        "type": "pie",
+        "dataFile": "data/sample-pie-data.csv",
+        "visible": true,
+        "config": {
+          "width": 400,
+          "height": 400,
+          "labelField": "category",
+          "valueField": "value",
+          "colors": ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6"]
+        }
+      },
+      "map": {
+        "visible": false
+      }
+    }
+  ],
+  "settings": {
+    "transition": {
+      "duration": 500,
+      "ease": "cubic-in-out"
+    },
+    "layout": {
+      "textPosition": "overlay",
+      "chartPosition": "background"
+    },
+    "responsive": {
+      "breakpoints": {
+        "mobile": 768,
+        "tablet": 1024,
+        "desktop": 1200
+      }
+    }
+  }
+}
