@@ -42,9 +42,14 @@ class MapManager {
         if (visible) {
             this.show();
             if (this.geoData) {
-                console.log('MapManager: Rendering map...');
-                // this.geoDataを使用（dataは空のオブジェクトの可能性があるため）
-                this.renderMap(this.geoData, { center, zoom, highlightCountries, cities });
+                // 地図が既に描画されているかチェック
+                if (!this.svg || this.svg.selectAll('.map-country').empty()) {
+                    console.log('MapManager: Initial map rendering...');
+                    this.renderMap(this.geoData, { center, zoom, highlightCountries, cities });
+                } else {
+                    console.log('MapManager: Updating existing map...');
+                    this.updateExistingMap({ center, zoom, highlightCountries, cities });
+                }
             } else {
                 console.error('MapManager: No geo data available for rendering');
             }
@@ -345,6 +350,150 @@ class MapManager {
                 .transition()
                 .duration(300)
                 .delay(200)
+                .style('opacity', 1);
+        }
+    }
+
+    /**
+     * 既存の地図を更新（再描画せずにアニメーション）
+     * @param {Object} config - 設定オプション
+     */
+    updateExistingMap(config = {}) {
+        const { 
+            center = [0, 0], 
+            zoom = 1, 
+            highlightCountries = [], 
+            cities = []
+        } = config;
+
+        console.log('MapManager: updateExistingMap called with:', config);
+
+        if (!this.svg || !this.projection) {
+            console.error('MapManager: No SVG or projection available for update');
+            return;
+        }
+
+        // プロジェクションの現在の設定を取得
+        const currentCenter = this.projection.center();
+        const currentScale = this.projection.scale();
+        const targetScale = zoom * 150;
+
+        console.log('Transition from:', { center: currentCenter, scale: currentScale });
+        console.log('Transition to:', { center, scale: targetScale });
+
+        // アニメーション開始前に既存の都市マーカー・ラベルを削除
+        const mapGroup = this.svg.select('.map-group');
+        mapGroup.selectAll('.map-city, .city-label')
+            .transition()
+            .duration(200)
+            .style('opacity', 0)
+            .remove();
+
+        // スムーズなトランジション
+        this.svg
+            .transition()
+            .delay(200) // 既存要素の削除を待つ
+            .duration(1500)
+            .ease(d3.easeCubicInOut)
+            .tween('projection', () => {
+                const interpolateCenter = d3.interpolate(currentCenter, center);
+                const interpolateScale = d3.interpolate(currentScale, targetScale);
+                
+                return (t) => {
+                    // プロジェクションを更新
+                    this.projection
+                        .center(interpolateCenter(t))
+                        .scale(interpolateScale(t));
+                    
+                    // 国境パスを再描画
+                    this.svg.selectAll('.map-country')
+                        .attr('d', this.path);
+                };
+            })
+            .on('end', () => {
+                // アニメーション完了後に国のハイライトと都市マーカーを更新
+                this.updateCountryHighlights(highlightCountries);
+                this.updateCityMarkers(cities);
+            });
+    }
+
+    /**
+     * 国のハイライトを更新
+     * @param {Array} highlightCountries - ハイライトする国名の配列
+     */
+    updateCountryHighlights(highlightCountries) {
+        if (!this.svg) return;
+
+        this.svg.selectAll('.map-country')
+            .transition()
+            .duration(500)
+            .style('fill', d => {
+                const countryName = d.properties.NAME || d.properties.name || d.properties.NAME_EN;
+                return highlightCountries.includes(countryName) ? '#3b82f6' : '#e5e7eb';
+            })
+            .style('stroke', d => {
+                const countryName = d.properties.NAME || d.properties.name || d.properties.NAME_EN;
+                return highlightCountries.includes(countryName) ? '#1d4ed8' : '#fff';
+            });
+    }
+
+    /**
+     * 都市マーカーを更新
+     * @param {Array} cities - 都市データの配列
+     */
+    updateCityMarkers(cities) {
+        if (!this.projection || !this.svg) return;
+
+        const mapGroup = this.svg.select('.map-group');
+        
+        // 新しい都市マーカーを追加（既存要素は既に削除済み）
+        if (cities && cities.length > 0) {
+            // 都市マーカーを追加
+            mapGroup.selectAll('.new-city')
+                .data(cities)
+                .enter()
+                .append('circle')
+                .attr('class', 'map-city')
+                .attr('cx', d => {
+                    const coords = this.projection([d.longitude, d.latitude]);
+                    return coords ? coords[0] : 0;
+                })
+                .attr('cy', d => {
+                    const coords = this.projection([d.longitude, d.latitude]);
+                    return coords ? coords[1] : 0;
+                })
+                .attr('r', 0)
+                .style('fill', '#ef4444')
+                .style('stroke', '#fff')
+                .style('stroke-width', 2)
+                .transition()
+                .duration(500)
+                .delay(300)
+                .attr('r', 6);
+
+            // 都市ラベルを追加
+            mapGroup.selectAll('.new-label')
+                .data(cities)
+                .enter()
+                .append('text')
+                .attr('class', 'city-label')
+                .attr('x', d => {
+                    const coords = this.projection([d.longitude, d.latitude]);
+                    return coords ? coords[0] : 0;
+                })
+                .attr('y', d => {
+                    const coords = this.projection([d.longitude, d.latitude]);
+                    return coords ? coords[1] - 10 : 0;
+                })
+                .attr('text-anchor', 'middle')
+                .attr('font-size', '12px')
+                .attr('fill', '#1f2937')
+                .attr('font-weight', 'bold')
+                .text(d => d.name)
+                .style('opacity', 0)
+                .transition()
+                .duration(500)
+                .delay(500)
                 .style('opacity', 1);
         }
     }

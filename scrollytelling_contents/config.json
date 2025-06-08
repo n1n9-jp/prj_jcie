@@ -47,6 +47,36 @@
       "id": "step3",
       "text": "詳細分析",
       "chart": {
+        "visible": false
+      },
+      "map": {
+        "center": [139.6917, 35.6895],
+        "zoom": 4,
+        "visible": true,
+        "highlightCountries": ["Japan"],
+        "cities": [
+          {
+            "name": "Tokyo",
+            "latitude": 35.6895,
+            "longitude": 139.6917
+          },
+          {
+            "name": "Osaka",
+            "latitude": 34.6937,
+            "longitude": 135.5023
+          },
+          {
+            "name": "Kyoto",
+            "latitude": 35.0116,
+            "longitude": 135.7681
+          }
+        ]
+      }
+    },
+    {
+      "id": "step4",
+      "text": "棒グラフの分析",
+      "chart": {
         "type": "bar",
         "dataFile": "data/sample-bar-data.csv",
         "visible": true,
@@ -63,7 +93,7 @@
       }
     },
     {
-      "id": "step4",
+      "id": "step5",
       "text": "まとめ",
       "chart": {
         "type": "pie",
