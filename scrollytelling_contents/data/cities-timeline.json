@@ -1,0 +1,188 @@
+{
+  "timeline": {
+    "title": "世界主要都市の発展",
+    "description": "スクロールに応じて主要都市が順次表示されます"
+  },
+  "cities": [
+    {
+      "id": "tokyo",
+      "name": "東京",
+      "nameEn": "Tokyo",
+      "country": "Japan",
+      "latitude": 35.6762,
+      "longitude": 139.6503,
+      "order": 1,
+      "data": {
+        "population": 14000000,
+        "gdp": 1000,
+        "year": 2023
+      },
+      "style": {
+        "color": "#ff6b6b",
+        "size": 8
+      }
+    },
+    {
+      "id": "london",
+      "name": "ロンドン",
+      "nameEn": "London",
+      "country": "United Kingdom",
+      "latitude": 51.5074,
+      "longitude": -0.1278,
+      "order": 2,
+      "data": {
+        "population": 9000000,
+        "gdp": 800,
+        "year": 2023
+      },
+      "style": {
+        "color": "#4ecdc4",
+        "size": 7
+      }
+    },
+    {
+      "id": "newyork",
+      "name": "ニューヨーク",
+      "nameEn": "New York",
+      "country": "United States",
+      "latitude": 40.7128,
+      "longitude": -74.0060,
+      "order": 3,
+      "data": {
+        "population": 8400000,
+        "gdp": 900,
+        "year": 2023
+      },
+      "style": {
+        "color": "#45b7d1",
+        "size": 7
+      }
+    },
+    {
+      "id": "paris",
+      "name": "パリ",
+      "nameEn": "Paris",
+      "country": "France",
+      "latitude": 48.8566,
+      "longitude": 2.3522,
+      "order": 4,
+      "data": {
+        "population": 2200000,
+        "gdp": 700,
+        "year": 2023
+      },
+      "style": {
+        "color": "#f7d794",
+        "size": 6
+      }
+    },
+    {
+      "id": "singapore",
+      "name": "シンガポール",
+      "nameEn": "Singapore",
+      "country": "Singapore",
+      "latitude": 1.3521,
+      "longitude": 103.8198,
+      "order": 5,
+      "data": {
+        "population": 5900000,
+        "gdp": 400,
+        "year": 2023
+      },
+      "style": {
+        "color": "#ff9ff3",
+        "size": 6
+      }
+    },
+    {
+      "id": "sydney",
+      "name": "シドニー",
+      "nameEn": "Sydney",
+      "country": "Australia",
+      "latitude": -33.8688,
+      "longitude": 151.2093,
+      "order": 6,
+      "data": {
+        "population": 5300000,
+        "gdp": 350,
+        "year": 2023
+      },
+      "style": {
+        "color": "#54a0ff",
+        "size": 6
+      }
+    },
+    {
+      "id": "shanghai",
+      "name": "上海",
+      "nameEn": "Shanghai",
+      "country": "China",
+      "latitude": 31.2304,
+      "longitude": 121.4737,
+      "order": 7,
+      "data": {
+        "population": 24000000,
+        "gdp": 600,
+        "year": 2023
+      },
+      "style": {
+        "color": "#ff6348",
+        "size": 8
+      }
+    },
+    {
+      "id": "mumbai",
+      "name": "ムンバイ",
+      "nameEn": "Mumbai",
+      "country": "India",
+      "latitude": 19.0760,
+      "longitude": 72.8777,
+      "order": 8,
+      "data": {
+        "population": 20000000,
+        "gdp": 300,
+        "year": 2023
+      },
+      "style": {
+        "color": "#2ed573",
+        "size": 7
+      }
+    },
+    {
+      "id": "saopaulo",
+      "name": "サンパウロ",
+      "nameEn": "São Paulo",
+      "country": "Brazil",
+      "latitude": -23.5505,
+      "longitude": -46.6333,
+      "order": 9,
+      "data": {
+        "population": 12300000,
+        "gdp": 250,
+        "year": 2023
+      },
+      "style": {
+        "color": "#ffa502",
+        "size": 7
+      }
+    },
+    {
+      "id": "cairo",
+      "name": "カイロ",
+      "nameEn": "Cairo",
+      "country": "Egypt",
+      "latitude": 30.0444,
+      "longitude": 31.2357,
+      "order": 10,
+      "data": {
+        "population": 10000000,
+        "gdp": 200,
+        "year": 2023
+      },
+      "style": {
+        "color": "#3742fa",
+        "size": 6
+      }
+    }
+  ]
+}

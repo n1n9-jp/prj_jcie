@@ -90,6 +90,7 @@ window.EVENTS = {
     STEP_PROGRESS: 'step:progress',
     CHART_UPDATE: 'chart:update',
     MAP_UPDATE: 'map:update',
+    MAP_PROGRESS: 'map:progress',
     IMAGE_UPDATE: 'image:update',
     DATA_LOADED: 'data:loaded',
     DATA_ERROR: 'data:error',

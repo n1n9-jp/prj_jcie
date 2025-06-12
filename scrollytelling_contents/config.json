@@ -54,32 +54,15 @@
     },
     {
       "id": "step3",
-      "text": "詳細分析",
+      "text": "東京",
       "chart": {
         "visible": false
       },
       "map": {
-        "center": [139.6917, 35.6895],
-        "zoom": 4,
         "visible": true,
-        "highlightCountries": ["Japan"],
-        "cities": [
-          {
-            "name": "Tokyo",
-            "latitude": 35.6895,
-            "longitude": 139.6917
-          },
-          {
-            "name": "Osaka",
-            "latitude": 34.6937,
-            "longitude": 135.5023
-          },
-          {
-            "name": "Kyoto",
-            "latitude": 35.0116,
-            "longitude": 135.7681
-          }
-        ]
+        "mode": "single-city",
+        "cityId": "tokyo",
+        "citiesFile": "data/cities-timeline.json"
       },
       "image": {
         "visible": false
@@ -87,6 +70,150 @@
     },
     {
       "id": "step4",
+      "text": "ロンドン",
+      "chart": {
+        "visible": false
+      },
+      "map": {
+        "visible": true,
+        "mode": "single-city",
+        "cityId": "london",
+        "citiesFile": "data/cities-timeline.json"
+      },
+      "image": {
+        "visible": false
+      }
+    },
+    {
+      "id": "step5",
+      "text": "ニューヨーク",
+      "chart": {
+        "visible": false
+      },
+      "map": {
+        "visible": true,
+        "mode": "single-city",
+        "cityId": "newyork",
+        "citiesFile": "data/cities-timeline.json"
+      },
+      "image": {
+        "visible": false
+      }
+    },
+    {
+      "id": "step6",
+      "text": "パリ",
+      "chart": {
+        "visible": false
+      },
+      "map": {
+        "visible": true,
+        "mode": "single-city",
+        "cityId": "paris",
+        "citiesFile": "data/cities-timeline.json"
+      },
+      "image": {
+        "visible": false
+      }
+    },
+    {
+      "id": "step7",
+      "text": "シンガポール",
+      "chart": {
+        "visible": false
+      },
+      "map": {
+        "visible": true,
+        "mode": "single-city",
+        "cityId": "singapore",
+        "citiesFile": "data/cities-timeline.json"
+      },
+      "image": {
+        "visible": false
+      }
+    },
+    {
+      "id": "step8",
+      "text": "シドニー",
+      "chart": {
+        "visible": false
+      },
+      "map": {
+        "visible": true,
+        "mode": "single-city",
+        "cityId": "sydney",
+        "citiesFile": "data/cities-timeline.json"
+      },
+      "image": {
+        "visible": false
+      }
+    },
+    {
+      "id": "step9",
+      "text": "上海",
+      "chart": {
+        "visible": false
+      },
+      "map": {
+        "visible": true,
+        "mode": "single-city",
+        "cityId": "shanghai",
+        "citiesFile": "data/cities-timeline.json"
+      },
+      "image": {
+        "visible": false
+      }
+    },
+    {
+      "id": "step10",
+      "text": "ムンバイ",
+      "chart": {
+        "visible": false
+      },
+      "map": {
+        "visible": true,
+        "mode": "single-city",
+        "cityId": "mumbai",
+        "citiesFile": "data/cities-timeline.json"
+      },
+      "image": {
+        "visible": false
+      }
+    },
+    {
+      "id": "step11",
+      "text": "サンパウロ",
+      "chart": {
+        "visible": false
+      },
+      "map": {
+        "visible": true,
+        "mode": "single-city",
+        "cityId": "saopaulo",
+        "citiesFile": "data/cities-timeline.json"
+      },
+      "image": {
+        "visible": false
+      }
+    },
+    {
+      "id": "step12",
+      "text": "カイロ",
+      "chart": {
+        "visible": false
+      },
+      "map": {
+        "visible": true,
+        "mode": "single-city",
+        "cityId": "cairo",
+        "citiesFile": "data/cities-timeline.json"
+      },
+      "image": {
+        "visible": false
+      }
+    },
+    {
+      "id": "step13",
       "text": "棒グラフの分析",
       "chart": {
         "type": "bar",
@@ -108,7 +235,7 @@
       }
     },
     {
-      "id": "step5",
+      "id": "step14",
       "text": "まとめ",
       "chart": {
         "type": "pie",
@@ -130,7 +257,7 @@
       }
     },
     {
-      "id": "step6",
+      "id": "step15",
       "text": "画像表示",
       "chart": {
         "visible": false

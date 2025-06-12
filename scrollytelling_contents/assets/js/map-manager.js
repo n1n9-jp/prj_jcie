@@ -20,9 +20,23 @@ class MapManager {
             this.updateMap(data);
         });
 
+        pubsub.subscribe(EVENTS.MAP_PROGRESS, (data) => {
+            this.handleMapProgress(data);
+        });
+
         pubsub.subscribe(EVENTS.RESIZE, () => {
             this.resize();
         });
+        
+        // 都市タイムライン用の状態
+        this.citiesTimelineData = null;
+        this.timelineMode = false;
+        this.visibleCities = [];
+        
+        // 単一都市モード用の状態
+        this.singleCityMode = false;
+        this.currentCity = null;
+        this.mapInitialized = false;
     }
 
     /**
@@ -32,15 +46,28 @@ class MapManager {
     updateMap(mapData) {
         console.log('MapManager: updateMap called with:', mapData);
         
-        const { center, zoom, visible, data, highlightCountries = [], cities = [] } = mapData;
+        const { center, zoom, visible, data, highlightCountries = [], cities = [], mode, citiesFile, cityId } = mapData;
         
-        this.currentView = { center, zoom, highlightCountries, cities };
+        this.currentView = { center, zoom, highlightCountries, cities, mode, citiesFile, cityId };
         console.log('MapManager: Current view set to:', this.currentView);
         console.log('MapManager: Map visible:', visible);
         console.log('MapManager: GeoData available:', !!this.geoData);
 
         if (visible) {
             this.show();
+            
+            // 都市タイムラインモードの場合
+            if (mode === 'cities-timeline' && citiesFile) {
+                this.initCitiesTimeline(citiesFile);
+                return;
+            }
+            
+            // 単一都市表示モードの場合
+            if (mode === 'single-city' && cityId && citiesFile) {
+                this.handleSingleCityMode(citiesFile, cityId);
+                return;
+            }
+            
             if (this.geoData) {
                 // 地図が既に描画されているかチェック
                 if (!this.svg || this.svg.selectAll('.map-country').empty()) {
@@ -499,10 +526,427 @@ class MapManager {
     }
 
     /**
+     * 都市タイムラインを初期化
+     * @param {string} citiesFile - 都市データファイルのパス
+     */
+    async initCitiesTimeline(citiesFile) {
+        try {
+            console.log('MapManager: Initializing cities timeline with:', citiesFile);
+            
+            // 都市データを読み込み
+            if (!this.citiesTimelineData) {
+                console.log('MapManager: Loading cities data from:', citiesFile);
+                this.citiesTimelineData = await d3.json(citiesFile);
+                console.log('MapManager: Cities timeline data loaded:', this.citiesTimelineData);
+                console.log('MapManager: Cities count:', this.citiesTimelineData?.cities?.length);
+            }
+            
+            this.timelineMode = true;
+            this.visibleCities = [];
+            
+            console.log('MapManager: Timeline mode activated. GeoData available:', !!this.geoData);
+            
+            // 基本地図を描画
+            if (this.geoData) {
+                console.log('MapManager: Rendering timeline map...');
+                this.renderTimelineMap();
+            } else {
+                console.error('MapManager: Cannot render timeline map - no geo data');
+            }
+            
+        } catch (error) {
+            console.error('MapManager: Failed to load cities timeline data:', error);
+            console.error('MapManager: Error details:', error.message);
+        }
+    }
+
+    /**
+     * タイムライン用の地図を描画
+     */
+    renderTimelineMap() {
+        const width = 800;
+        const height = 600;
+        
+        const svg = this.initSVG(width, height);
+        
+        // 投影法を設定（世界全体を表示）
+        this.projection = d3.geoNaturalEarth1()
+            .scale(150)
+            .center([0, 0])
+            .translate([width / 2, height / 2]);
+            
+        this.path = d3.geoPath().projection(this.projection);
+
+        // 地図グループを作成
+        const mapGroup = svg.append('g').attr('class', 'map-group');
+
+        // 国境を描画
+        if (this.geoData && this.geoData.features) {
+            mapGroup.selectAll('.map-country')
+                .data(this.geoData.features)
+                .enter()
+                .append('path')
+                .attr('class', 'map-country')
+                .attr('d', this.path)
+                .style('opacity', 0)
+                .transition()
+                .duration(500)
+                .style('opacity', 1);
+        }
+        
+        console.log('Timeline map rendered, ready for city progression');
+    }
+
+    /**
+     * スクロール進行度に応じた都市表示処理
+     * @param {Object} progressData - 進行度データ
+     */
+    handleMapProgress(progressData) {
+        if (!this.timelineMode || !this.citiesTimelineData) {
+            console.log('MapManager: Progress ignored - timeline mode:', this.timelineMode, 'data:', !!this.citiesTimelineData);
+            return;
+        }
+        
+        const { progress, direction, config } = progressData;
+        console.log('MapManager: Handling progress:', progress * 100 + '%', 'direction:', direction);
+        
+        // より緩やかな都市表示のために進行度を調整
+        // 進行度を二乗してゆっくりスタート、速く終了のカーブにする
+        const adjustedProgress = Math.pow(progress, 0.7); // 0.7乗でゆっくりスタート
+        
+        // 進行度から表示する都市数を計算（0-100% -> 0-10都市）
+        const totalCities = this.citiesTimelineData.cities.length;
+        let targetCityCount = Math.floor(adjustedProgress * totalCities);
+        
+        // 進行度が0.1以下の場合は都市を表示しない（遅延スタート）
+        if (progress < 0.1) {
+            targetCityCount = 0;
+        }
+        
+        // 最低0都市、最大全都市
+        targetCityCount = Math.max(0, Math.min(targetCityCount, totalCities));
+        
+        // 都市を順序通りに並べ替え
+        const sortedCities = [...this.citiesTimelineData.cities]
+            .sort((a, b) => a.order - b.order);
+        
+        // 順スクロールと逆スクロールで順序を変える
+        const orderedCities = direction === 'up' 
+            ? [...sortedCities].reverse()
+            : sortedCities;
+            
+        const targetCities = orderedCities.slice(0, targetCityCount);
+        
+        console.log(`MapManager: Showing ${targetCities.length} of ${totalCities} cities`);
+        console.log('MapManager: Target cities:', targetCities.map(c => c.name));
+        
+        this.updateTimelineCities(targetCities);
+    }
+
+    /**
+     * タイムライン都市を更新
+     * @param {Array} targetCities - 表示する都市の配列
+     */
+    updateTimelineCities(targetCities) {
+        if (!this.svg || !this.projection) return;
+        
+        const mapGroup = this.svg.select('.map-group');
+        
+        // データバインディング
+        const cityMarkers = mapGroup.selectAll('.timeline-city')
+            .data(targetCities, d => d.id);
+        
+        // 新しい都市を追加
+        const enteringCities = cityMarkers.enter()
+            .append('circle')
+            .attr('class', 'timeline-city')
+            .attr('cx', d => {
+                const coords = this.projection([d.longitude, d.latitude]);
+                return coords ? coords[0] : 0;
+            })
+            .attr('cy', d => {
+                const coords = this.projection([d.longitude, d.latitude]);
+                return coords ? coords[1] : 0;
+            })
+            .attr('r', 0)
+            .style('fill', d => d.style.color)
+            .style('stroke', '#fff')
+            .style('stroke-width', 2)
+            .style('opacity', 0);
+        
+        // 都市の表示アニメーション（ゆっくり）
+        enteringCities
+            .transition()
+            .duration(800)
+            .ease(d3.easeBackOut.overshoot(1.7))
+            .attr('r', d => d.style.size)
+            .style('opacity', 1);
+        
+        // 都市ラベルを追加
+        const cityLabels = mapGroup.selectAll('.timeline-label')
+            .data(targetCities, d => d.id);
+        
+        const enteringLabels = cityLabels.enter()
+            .append('text')
+            .attr('class', 'timeline-label')
+            .attr('x', d => {
+                const coords = this.projection([d.longitude, d.latitude]);
+                return coords ? coords[0] : 0;
+            })
+            .attr('y', d => {
+                const coords = this.projection([d.longitude, d.latitude]);
+                return coords ? coords[1] - (d.style.size + 5) : 0;
+            })
+            .attr('text-anchor', 'middle')
+            .attr('font-size', '11px')
+            .attr('fill', '#1f2937')
+            .attr('font-weight', 'bold')
+            .style('opacity', 0)
+            .text(d => d.name);
+        
+        enteringLabels
+            .transition()
+            .duration(600)
+            .delay(400)
+            .style('opacity', 1);
+        
+        // 都市の削除アニメーション
+        cityMarkers.exit()
+            .transition()
+            .duration(600)
+            .ease(d3.easeBackIn)
+            .attr('r', 0)
+            .style('opacity', 0)
+            .remove();
+        
+        cityLabels.exit()
+            .transition()
+            .duration(400)
+            .style('opacity', 0)
+            .remove();
+        
+        this.visibleCities = targetCities;
+    }
+
+    /**
+     * 単一都市モードを処理（初回 or 都市切替）
+     * @param {string} citiesFile - 都市データファイルのパス
+     * @param {string} cityId - 表示する都市のID
+     */
+    async handleSingleCityMode(citiesFile, cityId) {
+        try {
+            console.log('MapManager: Handling single city mode:', cityId);
+            
+            // 都市データを読み込み
+            if (!this.citiesTimelineData) {
+                console.log('MapManager: Loading cities data from:', citiesFile);
+                this.citiesTimelineData = await d3.json(citiesFile);
+                console.log('MapManager: Cities data loaded for single city mode');
+            }
+            
+            // 指定された都市を検索
+            const targetCity = this.citiesTimelineData.cities.find(city => city.id === cityId);
+            
+            if (!targetCity) {
+                console.error('MapManager: City not found:', cityId);
+                return;
+            }
+            
+            console.log('MapManager: Found target city:', targetCity);
+            
+            // タイムラインモードをリセット
+            this.timelineMode = false;
+            this.visibleCities = [];
+            this.singleCityMode = true;
+            
+            // 初回の場合は地図を初期化、2回目以降は平行移動
+            if (!this.mapInitialized || !this.svg) {
+                console.log('MapManager: Initializing single city map...');
+                this.initializeSingleCityMap(targetCity);
+                this.mapInitialized = true;
+            } else {
+                console.log('MapManager: Animating to new city:', targetCity.name);
+                this.animateToCity(targetCity);
+            }
+            
+            this.currentCity = targetCity;
+            
+        } catch (error) {
+            console.error('MapManager: Failed to load single city data:', error);
+        }
+    }
+
+    /**
+     * 単一都市地図を初期化（初回のみ）
+     * @param {Object} targetCity - 表示する都市データ
+     */
+    initializeSingleCityMap(targetCity) {
+        const width = 800;
+        const height = 600;
+        
+        const svg = this.initSVG(width, height);
+        
+        // 投影法を設定
+        this.projection = d3.geoNaturalEarth1()
+            .scale(400)
+            .center([targetCity.longitude, targetCity.latitude])
+            .translate([width / 2, height / 2]);
+            
+        this.path = d3.geoPath().projection(this.projection);
+
+        // 地図グループを作成
+        const mapGroup = svg.append('g').attr('class', 'map-group');
+
+        // 国境を描画
+        if (this.geoData && this.geoData.features) {
+            mapGroup.selectAll('.map-country')
+                .data(this.geoData.features)
+                .enter()
+                .append('path')
+                .attr('class', 'map-country')
+                .attr('d', this.path)
+                .style('stroke', '#fff')
+                .style('stroke-width', 0.5)
+                .style('opacity', 0)
+                .transition()
+                .duration(500)
+                .style('opacity', 1);
+        }
+        
+        // 初回都市マーカーを表示
+        this.showCityMarker(targetCity);
+        
+        console.log('Single city map initialized for:', targetCity.name);
+    }
+
+    /**
+     * 都市への平行移動アニメーション
+     * @param {Object} targetCity - 移動先の都市データ
+     */
+    animateToCity(targetCity) {
+        if (!this.projection || !this.svg || !this.currentCity) return;
+        
+        console.log(`Animating from ${this.currentCity.name} to ${targetCity.name}`);
+        
+        // 現在の投影設定を取得
+        const currentCenter = this.projection.center();
+        const currentScale = this.projection.scale();
+        const targetCenter = [targetCity.longitude, targetCity.latitude];
+        const targetScale = 400; // 固定ズームレベル
+        
+        // 既存の都市マーカーをフェードアウト
+        this.svg.selectAll('.single-city-marker, .single-city-label, .single-city-info')
+            .transition()
+            .duration(600)
+            .style('opacity', 0)
+            .remove();
+        
+        // 地図のアニメーション
+        this.svg
+            .transition()
+            .duration(1500)
+            .ease(d3.easeCubicInOut)
+            .tween('projection', () => {
+                const interpolateCenter = d3.interpolate(currentCenter, targetCenter);
+                const interpolateScale = d3.interpolate(currentScale, targetScale);
+                
+                return (t) => {
+                    // プロジェクションを更新
+                    this.projection
+                        .center(interpolateCenter(t))
+                        .scale(interpolateScale(t));
+                    
+                    // 国境パスを再描画
+                    this.svg.selectAll('.map-country')
+                        .attr('d', this.path)
+                        .style('fill', d => {
+                            // 新しい都市の国をハイライト
+                            const countryName = d.properties.NAME || d.properties.name || d.properties.NAME_EN;
+                            return countryName === targetCity.country ? '#3b82f6' : '#e5e7eb';
+                        });
+                };
+            })
+            .on('end', () => {
+                // アニメーション完了後に新しい都市マーカーを表示
+                console.log('Map animation completed, showing new city marker');
+                this.showCityMarker(targetCity);
+            });
+    }
+
+    /**
+     * 都市マーカーを表示
+     * @param {Object} city - 都市データ
+     */
+    showCityMarker(city) {
+        const coords = this.projection([city.longitude, city.latitude]);
+        
+        if (!coords) {
+            console.error('Failed to project city coordinates:', city);
+            return;
+        }
+        
+        const mapGroup = this.svg.select('.map-group');
+        
+        // 都市マーカーを追加
+        mapGroup.append('circle')
+            .attr('class', 'single-city-marker')
+            .attr('cx', coords[0])
+            .attr('cy', coords[1])
+            .attr('r', 0)
+            .style('fill', city.style.color)
+            .style('stroke', '#fff')
+            .style('stroke-width', 3)
+            .style('opacity', 0)
+            .transition()
+            .duration(800)
+            .ease(d3.easeBackOut.overshoot(1.7))
+            .attr('r', city.style.size * 1.5)  // 少し大きめに表示
+            .style('opacity', 1);
+        
+        // 都市ラベルを追加
+        mapGroup.append('text')
+            .attr('class', 'single-city-label')
+            .attr('x', coords[0])
+            .attr('y', coords[1] - (city.style.size * 1.5 + 8))
+            .attr('text-anchor', 'middle')
+            .attr('font-size', '16px')
+            .attr('font-weight', 'bold')
+            .attr('fill', '#1f2937')
+            .style('opacity', 0)
+            .text(city.name)
+            .transition()
+            .duration(600)
+            .delay(400)
+            .style('opacity', 1);
+        
+        // 人口・GDP情報を表示
+        const infoText = `人口: ${(city.data.population / 1000000).toFixed(0)}百万人`;
+        mapGroup.append('text')
+            .attr('class', 'single-city-info')
+            .attr('x', coords[0])
+            .attr('y', coords[1] + (city.style.size * 1.5 + 20))
+            .attr('text-anchor', 'middle')
+            .attr('font-size', '12px')
+            .attr('fill', '#6b7280')
+            .style('opacity', 0)
+            .text(infoText)
+            .transition()
+            .duration(600)
+            .delay(600)
+            .style('opacity', 1);
+    }
+
+    /**
      * リサイズ処理
      */
     resize() {
-        if (this.currentView && this.geoData) {
+        if (this.timelineMode && this.citiesTimelineData) {
+            this.renderTimelineMap();
+            // 現在表示中の都市を再描画
+            if (this.visibleCities.length > 0) {
+                this.updateTimelineCities(this.visibleCities);
+            }
+        } else if (this.currentView && this.geoData) {
             this.renderMap(this.geoData, this.currentView);
         }
     }

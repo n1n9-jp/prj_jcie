@@ -108,6 +108,7 @@ class ScrollytellingApp {
             .setup({
                 step: '.step',
                 offset: 0.5,
+                progress: true,
                 debug: false
             })
             .onStepEnter((response) => {
@@ -115,6 +116,9 @@ class ScrollytellingApp {
             })
             .onStepExit((response) => {
                 this.handleStepExit(response);
+            })
+            .onStepProgress((response) => {
+                this.handleStepProgress(response);
             });
     }
 
@@ -177,6 +181,35 @@ class ScrollytellingApp {
         
         // ステップ退出イベントを発行
         pubsub.publish(EVENTS.STEP_EXIT, { index, direction });
+    }
+
+    /**
+     * ステップ進行度変化時の処理
+     * @param {Object} response - scrollamaのレスポンス
+     */
+    handleStepProgress(response) {
+        const { index, progress, direction } = response;
+        const stepConfig = this.config?.steps?.[index];
+        
+        if (!stepConfig) {
+            console.log('Main: No step config for index', index);
+            return;
+        }
+
+        console.log(`Main: Step ${index} progress: ${(progress * 100).toFixed(1)}%, direction: ${direction}`);
+
+        // 都市タイムラインモードの場合のみ進行度イベントを発行
+        if (stepConfig.map?.mode === "cities-timeline") {
+            console.log(`Main: Publishing MAP_PROGRESS for cities timeline`);
+            pubsub.publish(EVENTS.MAP_PROGRESS, {
+                progress: progress,
+                direction: direction,
+                config: stepConfig.map
+            });
+        }
+
+        // ステップ進行度イベントを発行
+        pubsub.publish(EVENTS.STEP_PROGRESS, { index, progress, direction, config: stepConfig });
     }
 
     /**
