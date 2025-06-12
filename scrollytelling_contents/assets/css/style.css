@@ -46,6 +46,16 @@
     opacity: 1;
 }
 
+/* 画像コンテナのスタイル */
+#image-container {
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+}
+
+#image-container.visible {
+    opacity: 1;
+}
+
 /* D3チャート共通スタイル */
 .chart-axis {
     font-size: 12px;

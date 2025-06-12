@@ -85,6 +85,7 @@ class ScrollytellingApp {
         console.log('Initializing managers...');
         this.chartManager = new ChartManager('#chart-container');
         this.mapManager = new MapManager('#map-container');
+        this.imageManager = new ImageManager('#image-container');
         
         // 地図データを設定
         console.log('Setting geo data...');
@@ -154,6 +155,11 @@ class ScrollytellingApp {
             pubsub.publish(EVENTS.MAP_UPDATE, mapData);
         } else {
             console.log('Step has no map config');
+        }
+
+        // 画像更新
+        if (stepConfig.image) {
+            pubsub.publish(EVENTS.IMAGE_UPDATE, stepConfig.image);
         }
 
         // ステップ進入イベントを発行

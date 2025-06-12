@@ -8,6 +8,9 @@
       },
       "map": {
         "visible": false
+      },
+      "image": {
+        "visible": false
       }
     },
     {
@@ -27,6 +30,9 @@
       },
       "map": {
         "visible": false
+      },
+      "image": {
+        "visible": false
       }
     },
     {
@@ -41,6 +47,9 @@
         "visible": true,
         "highlightCountries": ["Japan", "United States", "Germany"],
         "cities": []
+      },
+      "image": {
+        "visible": false
       }
     },
     {
@@ -71,6 +80,9 @@
             "longitude": 135.7681
           }
         ]
+      },
+      "image": {
+        "visible": false
       }
     },
     {
@@ -89,6 +101,9 @@
         }
       },
       "map": {
+        "visible": false
+      },
+      "image": {
         "visible": false
       }
     },
@@ -109,6 +124,30 @@
       },
       "map": {
         "visible": false
+      },
+      "image": {
+        "visible": false
+      }
+    },
+    {
+      "id": "step6",
+      "text": "画像表示",
+      "chart": {
+        "visible": false
+      },
+      "map": {
+        "visible": false
+      },
+      "image": {
+        "src": "https://placehold.co/800x500/10b981/ffffff?text=Summary+Report",
+        "alt": "分析結果のまとめ",
+        "visible": true,
+        "config": {
+          "width": "80%",
+          "height": "auto",
+          "position": "center",
+          "opacity": 0.8
+        }
       }
     }
   ],

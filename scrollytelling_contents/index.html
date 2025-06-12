@@ -24,6 +24,11 @@
             <div id="map-container" class="absolute inset-0">
                 <div id="map" class="w-full h-full"></div>
             </div>
+            
+            <!-- 画像エリア -->
+            <div id="image-container" class="absolute inset-0 flex items-center justify-center">
+                <img id="image" class="max-w-full max-h-full object-contain" src="" alt="" />
+            </div>
         </div>
 
         <!-- スクロール可能なテキストエリア -->
@@ -94,6 +99,17 @@
                     </div>
                 </div>
             </div>
+
+            <div class="step" data-step="6">
+                <div class="w-full min-h-screen flex items-center">
+                    <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
+                        <h2 class="text-2xl font-bold mb-4">詳細レポート</h2>
+                        <p class="text-gray-700 leading-relaxed">
+                            詳細な分析結果を画像で確認することができます。
+                        </p>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -101,6 +117,7 @@
     <script src="assets/js/pubsub.js"></script>
     <script src="assets/js/chart-manager.js"></script>
     <script src="assets/js/map-manager.js"></script>
+    <script src="assets/js/image-manager.js"></script>
     <script src="assets/js/main.js"></script>
 </body>
 </html>
