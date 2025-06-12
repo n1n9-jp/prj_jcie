@@ -21,7 +21,7 @@
         "dataFile": "data/sample-line-data.csv",
         "visible": true,
         "config": {
-          "width": 600,
+          "width": 1000,
           "height": 400,
           "xField": "date",
           "yField": "value",

@@ -75,13 +75,42 @@ class ChartManager {
     }
 
     /**
+     * レスポンシブなサイズを計算
+     * @param {Object} config - 設定
+     * @returns {Object} - { width, height }
+     */
+    getResponsiveSize(config) {
+        const containerNode = this.container.node();
+        const containerWidth = containerNode.clientWidth;
+        const containerHeight = containerNode.clientHeight;
+        
+        // 最大サイズの80%を使用
+        const maxWidth = Math.min(containerWidth * 0.8, config.width || 600);
+        const maxHeight = Math.min(containerHeight * 0.8, config.height || 400);
+        
+        // アスペクト比を維持
+        const aspectRatio = (config.width || 600) / (config.height || 400);
+        
+        let width = maxWidth;
+        let height = width / aspectRatio;
+        
+        if (height > maxHeight) {
+            height = maxHeight;
+            width = height * aspectRatio;
+        }
+        
+        return { width, height };
+    }
+
+    /**
      * チャートを描画
      * @param {string} type - チャートタイプ
      * @param {Array} data - データ
      * @param {Object} config - 設定
      */
     renderChart(type, data, config) {
-        const { width = 600, height = 400, margin = { top: 20, right: 20, bottom: 40, left: 40 } } = config;
+        const { width, height } = this.getResponsiveSize(config);
+        const margin = config.margin || { top: 20, right: 20, bottom: 40, left: 40 };
         
         switch (type) {
             case 'line':
