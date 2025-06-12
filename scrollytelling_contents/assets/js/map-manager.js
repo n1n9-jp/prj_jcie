@@ -934,6 +934,56 @@ class MapManager {
             .duration(600)
             .delay(600)
             .style('opacity', 1);
+        
+        // 地理的情報をHTMLコンテナに動的表示
+        this.updateGeographicInfo(city);
+    }
+
+    /**
+     * 地理的情報をHTMLに動的表示（地図専用機能）
+     * @param {Object} city - 都市データ
+     */
+    updateGeographicInfo(city) {
+        // ステップIDから対応するHTMLコンテナを特定
+        const stepId = city.order + 2; // step3から開始（order 1 = step3）
+        const geoInfoContainer = document.getElementById(`geographic-info-${stepId}`);
+        
+        if (!geoInfoContainer) {
+            console.log('Geographic info container not found for step:', stepId);
+            return;
+        }
+        
+        // 距離・移動情報がある場合のみ表示
+        if (city.transitions && city.transitions.distanceFromPrevious > 0) {
+            const {
+                distanceFromPrevious,
+                routeType,
+                crossedFeatures = []
+            } = city.transitions;
+            
+            // 飛行時間を概算（時速900kmで計算）
+            const flightHours = Math.round(distanceFromPrevious / 900 * 10) / 10;
+            
+            // 地理的情報のHTML
+            let infoHTML = `
+                <strong>前都市からの距離:</strong> ${distanceFromPrevious.toLocaleString()}km<br>
+                <strong>移動方法:</strong> ${routeType === 'flight' ? '航空機' : '陸路'}
+            `;
+            
+            if (routeType === 'flight' && flightHours > 0) {
+                infoHTML += `<br><strong>飛行時間:</strong> 約${flightHours}時間`;
+            }
+            
+            if (crossedFeatures.length > 0) {
+                infoHTML += `<br><strong>経由地域:</strong> ${crossedFeatures.join('、')}`;
+            }
+            
+            geoInfoContainer.innerHTML = infoHTML;
+            geoInfoContainer.style.display = 'block';
+        } else {
+            // 最初の都市など距離情報がない場合は非表示
+            geoInfoContainer.style.display = 'none';
+        }
     }
 
     /**

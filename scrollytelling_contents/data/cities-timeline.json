@@ -20,6 +20,11 @@
       "style": {
         "color": "#ff6b6b",
         "size": 8
+      },
+      "transitions": {
+        "distanceFromPrevious": 0,
+        "scrollHeight": "100vh",
+        "routeType": "start"
       }
     },
     {
@@ -38,6 +43,12 @@
       "style": {
         "color": "#4ecdc4",
         "size": 7
+      },
+      "transitions": {
+        "distanceFromPrevious": 9560,
+        "scrollHeight": "180vh",
+        "routeType": "flight",
+        "crossedFeatures": ["Siberia", "Europe"]
       }
     },
     {
@@ -56,6 +67,12 @@
       "style": {
         "color": "#45b7d1",
         "size": 7
+      },
+      "transitions": {
+        "distanceFromPrevious": 5585,
+        "scrollHeight": "140vh",
+        "routeType": "flight",
+        "crossedFeatures": ["Atlantic Ocean"]
       }
     },
     {
@@ -74,6 +91,12 @@
       "style": {
         "color": "#f7d794",
         "size": 6
+      },
+      "transitions": {
+        "distanceFromPrevious": 344,
+        "scrollHeight": "110vh",
+        "routeType": "flight",
+        "crossedFeatures": ["English Channel"]
       }
     },
     {
@@ -92,6 +115,12 @@
       "style": {
         "color": "#ff9ff3",
         "size": 6
+      },
+      "transitions": {
+        "distanceFromPrevious": 10863,
+        "scrollHeight": "190vh",
+        "routeType": "flight",
+        "crossedFeatures": ["Mediterranean Sea", "Middle East", "India", "Southeast Asia"]
       }
     },
     {
@@ -110,6 +139,12 @@
       "style": {
         "color": "#54a0ff",
         "size": 6
+      },
+      "transitions": {
+        "distanceFromPrevious": 6307,
+        "scrollHeight": "150vh",
+        "routeType": "flight",
+        "crossedFeatures": ["South China Sea", "Indonesia", "Australia"]
       }
     },
     {
@@ -128,6 +163,12 @@
       "style": {
         "color": "#ff6348",
         "size": 8
+      },
+      "transitions": {
+        "distanceFromPrevious": 8003,
+        "scrollHeight": "170vh",
+        "routeType": "flight",
+        "crossedFeatures": ["Tasman Sea", "Pacific Ocean", "China"]
       }
     },
     {
@@ -146,6 +187,12 @@
       "style": {
         "color": "#2ed573",
         "size": 7
+      },
+      "transitions": {
+        "distanceFromPrevious": 3123,
+        "scrollHeight": "125vh",
+        "routeType": "flight",
+        "crossedFeatures": ["South China Sea", "Bay of Bengal"]
       }
     },
     {
@@ -164,6 +211,12 @@
       "style": {
         "color": "#ffa502",
         "size": 7
+      },
+      "transitions": {
+        "distanceFromPrevious": 17057,
+        "scrollHeight": "220vh",
+        "routeType": "flight",
+        "crossedFeatures": ["Arabian Sea", "Indian Ocean", "Atlantic Ocean", "South America"]
       }
     },
     {
@@ -182,6 +235,12 @@
       "style": {
         "color": "#3742fa",
         "size": 6
+      },
+      "transitions": {
+        "distanceFromPrevious": 10248,
+        "scrollHeight": "185vh",
+        "routeType": "flight",
+        "crossedFeatures": ["Atlantic Ocean", "Mediterranean Sea", "Africa"]
       }
     }
   ]
