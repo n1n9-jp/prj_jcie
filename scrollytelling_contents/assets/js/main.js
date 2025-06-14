@@ -152,7 +152,7 @@ class ScrollytellingApp {
             return;
         }
 
-        console.log(`Entering step ${index}`, stepConfig);
+        console.log(`Entering step ${index} (direction: ${direction})`, stepConfig);
 
         // チャート更新
         if (stepConfig.chart) {
@@ -168,9 +168,24 @@ class ScrollytellingApp {
                 pubsub.publish(EVENTS.CHART_UPDATE, dualChartData);
             } else {
                 // 従来の単一チャート
+                let updateMode = stepConfig.chart.updateMode || 'replace';
+                
+                // 逆方向スクロールでトランジション対応を判定
+                if (direction === 'up' && index > 0) {
+                    const prevStepConfig = this.config?.steps?.[index - 1];
+                    // 前のstepと同じデータファイル、かつ前のstepがtransitionモードの場合
+                    if (prevStepConfig?.chart?.dataFile === stepConfig.chart.dataFile &&
+                        prevStepConfig?.chart?.updateMode === 'transition') {
+                        updateMode = 'transition';
+                        console.log(`Using transition mode for reverse scroll from step ${index - 1} to ${index}`);
+                    }
+                }
+                
                 const chartData = {
                     ...stepConfig.chart,
-                    data: this.getChartData(stepConfig.chart.type, stepConfig.chart.dataFile)
+                    data: this.getChartData(stepConfig.chart.type, stepConfig.chart.dataFile),
+                    updateMode: updateMode,
+                    direction: direction // スクロール方向を追加
                 };
                 pubsub.publish(EVENTS.CHART_UPDATE, chartData);
             }

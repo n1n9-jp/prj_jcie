@@ -24,7 +24,7 @@
     },
     {
       "id": "step1",
-      "text": "母子感染の推移（単一系列）",
+      "text": "母子感染の推移（2010-2015年）",
       "chart": {
         "type": "line",
         "dataFile": "data/trend_母子感染の推移.csv",
@@ -37,7 +37,39 @@
           "seriesField": "series",
           "multiSeries": false,
           "seriesName": "母子感染率",
-          "colors": ["#3b82f6"]
+          "colors": ["#3b82f6"],
+          "filter": {
+            "type": "range",
+            "field": "year",
+            "range": [2010, 2015]
+          }
+        }
+      },
+      "map": {
+        "visible": false
+      },
+      "image": {
+        "visible": false
+      }
+    },
+    {
+      "id": "step1a",
+      "text": "母子感染の推移（全期間データ）",
+      "chart": {
+        "type": "line",
+        "dataFile": "data/trend_母子感染の推移.csv",
+        "visible": true,
+        "updateMode": "transition",
+        "config": {
+          "width": 1000,
+          "height": 400,
+          "xField": "year",
+          "yField": "value",
+          "seriesField": "series",
+          "multiSeries": false,
+          "seriesName": "母子感染率",
+          "colors": ["#3b82f6"],
+          "transitionDuration": 1000
         }
       },
       "map": {
@@ -226,11 +258,12 @@
     },
     {
       "id": "step13",
-      "text": "エイズ対策の資金推移（複数系列）",
+      "text": "エイズ対策の資金推移（2000-2010年）",
       "chart": {
         "type": "line",
         "dataFile": "data/trend_エイズ対策の資金不足.csv",
         "visible": true,
+        "updateMode": "transition",
         "config": {
           "width": 1000,
           "height": 500,
@@ -238,7 +271,39 @@
           "yField": "value",
           "seriesField": "series",
           "multiSeries": true,
-          "colors": ["#3b82f6", "#10b981", "#f59e0b", "#ef4444"]
+          "colors": ["#3b82f6", "#10b981", "#f59e0b", "#ef4444"],
+          "transitionDuration": 1200,
+          "filter": {
+            "type": "range",
+            "field": "year",
+            "range": [2000, 2010]
+          }
+        }
+      },
+      "map": {
+        "visible": false
+      },
+      "image": {
+        "visible": false
+      }
+    },
+    {
+      "id": "step13a",
+      "text": "エイズ対策の資金推移（全期間）",
+      "chart": {
+        "type": "line",
+        "dataFile": "data/trend_エイズ対策の資金不足.csv",
+        "visible": true,
+        "updateMode": "transition",
+        "config": {
+          "width": 1000,
+          "height": 500,
+          "xField": "year",
+          "yField": "value",
+          "seriesField": "series",
+          "multiSeries": true,
+          "colors": ["#3b82f6", "#10b981", "#f59e0b", "#ef4444"],
+          "transitionDuration": 1500
         }
       },
       "map": {
