@@ -1,126 +1,117 @@
-# CLAUDE.md
+# Scrollytelling コンテンツ要件定義
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+## 概要
+スクロールに応じてテキスト、チャート、地図が連動して表示・変化するWebコンテンツを作成する。汎用的な実装とし、テーマ特有の機能は含まない。
 
-## Project Overview
+## 技術仕様
 
-This is a Japanese interactive scrollytelling web application about HIV/AIDS created for JCIE (Japan Center for International Exchange). The application presents historical data and personal stories about HIV/AIDS through interactive charts and an immersive world map experience.
+### 利用ライブラリ・スクリプト
+- **pubsub.js**: イベント管理
+- **d3.js**: データ可視化・チャート描画
+- **scrollama.js**: スクロールトリガー制御
+- **Tailwind CSS**: スタイリング
+- **Vanilla JavaScript**: フレームワーク不使用
 
-## Architecture
+### 対応環境
+- モダンブラウザのみ対応（IE非対応）
+- レスポンシブレイアウト対応
 
-### Core Components
+## 機能要件
 
-- **Scroll Controller** (`main.js`): Central orchestrator that manages scroll-triggered animations, data loading, state management, and component coordination using Scrollama.js and PubSub pattern. 単一チャートコンテナ構造に最適化済み
-- **Chart System** (`chart-manager.js`): D3.js-based visualization engine supporting line charts, pie charts, and dual charts with responsive design and unified legend system. 単一SVGコンテナ管理とスムーズ遷移機能を実装
-- **Map System** (`map.js`): Interactive world map using D3.js and geographic projections with zoom/pan capabilities and smooth transition effects
-- **Modal Manager** (`map-modal.js`): Overlay modal system for displaying country-specific episodes with content management and error handling
-- **CSS Configuration** (`tailwind.config.js`): Tailwind CSS configuration for responsive typography and mobile optimization
-- **HTML Structure** (`index.html`): Single-page application with scrollable sections using data-step attributes (1z-5f) to trigger different visualizations. 単一チャートコンテナ構造に最適化済み
-- **PubSub System** (`lib/pubsub.js`): Event-driven communication between components
+### レイアウト
+- **オーバーレイ方式**: チャート・地図の上にテキストを重ねて表示
+- **HTML1ファイル完結**: 外部ファイル依存を最小化
+- **レスポンシブ対応**: 各デバイスサイズに対応
 
-### HTML構成要素
+### データ形式
+- **CSV形式**: チャートデータ
+- **JSON形式**: 設定ファイル、地図データ
+- **設定ファイル**: 各段落とデータの対応関係をJSONで管理
 
-#### 入れ子構造（最適化後）
-```
-body
-├── #mapBgContainer (全画面固定地図背景)
-├── main (メインコンテンツ領域)
-│   ├── header
-│   │   └── nav (固定ナビゲーションバー)
-│   ├── #intro (イントロセクション)
-│   ├── #scrolly (スクロールテリングセクション)
-│   │   ├── article (テキストコンテンツ)
-│   │   │   └── .step[data-step] (スクロールトリガー要素群)
-│   │   └── #smallFigure.chart-container (統一チャートコンテナ)
-│   └── footer
-│       └── #outro (アウトロセクション)
-└── #modalCountry (国別エピソードモーダル)
-    └── モーダル内容要素 (タイトル、画像、説明文、リンク)
-```
+### 表示コンテンツ
 
-#### 基本レイアウト
-- **ナビゲーションバー** (`header > nav`): 固定ヘッダーでJCIEブランドとコンテンツ切り替え（エイズ・結核・マラリア）を提供
-- **メインコンテンツ** (`main`): 相対配置でスクロール可能なコンテンツ領域
-- **イントロセクション** (`#intro`): 上部余白を提供するための導入部
+#### テキスト
+- **段落数**: 5〜10段落を想定
+- **表示制御**: スクロール位置に応じた表示・非表示
+- **位置**: 柔軟に指定可能
 
-#### 可視化コンテナ（最適化後）
-- **地図背景コンテナ** (`#mapBgContainer`): 全画面固定位置で世界地図を描画するための背景領域
-- **統一チャートコンテナ** (`#smallFigure.chart-container`): 単一のレスポンシブチャート表示領域。CSSでモバイル・デスクトップ対応、スムーズ遷移機能付き
+#### チャート
+- **種類**: 折れ線グラフ、円グラフ、棒グラフ
+- **表示制御**: d3.jsのtransition機能を使用
+- **サイズ**: 縦・横・アスペクト比を柔軟に指定可能
+- **要素**: 色、配置場所の変更対応
 
-#### スクロールテリング構造
-- **スクロールセクション** (`#scrolly`): Flexboxレイアウトでテキストとチャートを並列配置
-- **テキスト記事** (`article`): 左側（モバイルでは上部）に配置されたスクロール可能なストーリー領域
-- **ステップ要素** (`.step`): 各data-step属性（1z-5f）を持つスクロールトリガー要素群
-  - 見出しステップ（1z, 2z, 3z, 4z, 5z）: 各章の導入
-  - 内容ステップ（1a-1c, 2a-2e, 3a-3, 4a-4d, 5a-5f）: 詳細なストーリーコンテンツ
-  - 特殊ステップ（3）: 地図エピソード表示用の大型スクロール領域
+#### 地図
+- **対象**: 世界地図および各都市フォーカス
+- **アニメーション**: 画面中心の緯度経度とズームレベル変更
+- **表示制御**: スムーズなトランジション
 
-#### モーダルシステム
-- **国別エピソードモーダル** (`#modalCountry`): オーバーレイ形式で国別ストーリーを表示
-- **モーダル内容要素**: タイトル、画像、説明文、外部リンクを含む構造化されたコンテンツ
+### アニメーション・トランジション
+- **一定の設定**: トランジション時間・種類は統一
+- **スムーズな表示切替**: チャート・地図の表示・非表示
+- **d3.js活用**: transition機能によるアニメーション実装
 
-#### フッター
-- **アウトロセクション** (`#outro`): 終了メッセージを表示する終了部
+## 設定管理
+- **JSON設定ファイル**: 段落とデータの対応関係
+- **柔軟な指定**: 表示位置、サイズ、色などの設定
+- **データバインディング**: 各段落に対応するチャート・地図状態の定義
 
-### Data Flow
+## 設定ファイル構造
 
-1. **Episode Data** (`data/episode.json`): Contains country stories with titles, descriptions, thumbnails, and URLs
-2. **Chart Data** (`data/*.csv`): Time-series data for HIV/AIDS statistics across different regions
-3. **Geographic Data** (`data/countries-110m.json`): TopoJSON world map data for country visualization
-
-### Key Features
-
-- **Scroll-triggered Visualization**: Different data-step values trigger specific charts or map interactions
-- **Optimized Chart System**: Single container architecture with smooth transitions and improved performance
-- **Responsive Design**: Charts use viewBox for scalability with CSS-controlled responsive sizing, map adapts to screen size
-- **Modal System**: Country episodes display in overlay modals with external links
-- **Progressive Episode Display**: Map episodes advance based on scroll progress within step 3
-
-## Development
-
-### Running the Application
-
-This is a static HTML application. Serve locally using any HTTP server:
-```bash
-# Python 3
-python -m http.server 8000
-
-# Node.js
-npx http-server
-
-# PHP
-php -S localhost:8000
+### 基本構造（config.json）
+```json
+{
+  "steps": [
+    {
+      "id": "step1",
+      "text": "段落のテキスト内容",
+      "chart": {
+        "type": "line",
+        "data": "data/chart1.csv",
+        "visible": true,
+        "size": { "width": 600, "height": 400 }
+      },
+      "map": {
+        "center": [35.6762, 139.6503],
+        "zoom": 10,
+        "visible": false
+      }
+    }
+  ],
+  "settings": {
+    "transition": { "duration": 500, "ease": "cubic-in-out" },
+    "layout": { "textPosition": "left", "chartPosition": "right" }
+  }
+}
 ```
 
-### File Structure
+### データファイル構造
+- **CSVファイル**: チャートデータ（ヘッダー行必須）
+- **GeoJSONファイル**: 地図データ（標準GeoJSON形式）
 
-- `assets/js/`: All JavaScript modules
-- `assets/css/`: Styling (uses Tailwind CSS via CDN)
-- `data/`: CSV and JSON data files
-- `assets/thumb/`: Episode thumbnail images
+## エラーハンドリング
 
-### Key Technical Details
+### データ読み込み
+- **Promise.all()**: 複数ファイルの並列読み込み
+- **d3.csv(), d3.json()**: d3.jsの標準読み込み関数を使用
+- **フォールバック**: 読み込み失敗時のデフォルト表示
 
-- Uses D3.js v7 for visualizations
-- Tailwind CSS for styling with custom responsive chart container classes
-- Scrollama.js for scroll-based interactions
-- Single SVG container architecture for improved performance
-- Smooth chart transitions with fade effects
-- No build process required - runs directly in browser
-- Japanese language content throughout
-- Responsive design supporting mobile and desktop
+### 実装例
+```javascript
+Promise.all([
+  d3.json('config.json'),
+  d3.csv('data/chart1.csv'),
+  d3.json('data/world-map.json')
+]).then(([config, chartData, mapData]) => {
+  // 正常処理
+}).catch(error => {
+  console.error('データ読み込みエラー:', error);
+  // エラー表示またはデフォルト状態
+});
+```
 
-### Recent Optimizations (2024)
-
-#### Chart System Improvements
-- **Single Container Architecture**: Eliminated dual container complexity (#largeFigure removed)
-- **Smooth Transitions**: Added fade-in/fade-out effects between chart changes
-- **Performance Optimization**: Reduced memory usage and improved ResizeObserver efficiency
-- **Unified State Management**: Centralized chart state with transition locking
-- **CSS-based Responsiveness**: Moved sizing logic from JavaScript to CSS for better performance
-
-#### Code Structure Enhancements
-- **Simplified Logic**: Reduced main.js complexity by eliminating container switching
-- **Better Error Handling**: Improved async/await patterns for chart rendering
-- **Cleaner APIs**: Updated method signatures to remove unnecessary parameters
-- **Future-proof Design**: Architecture supports easy addition of new chart types
+## 実装方針
+- 汎用性を重視し、特定テーマに依存しない設計
+- 設定ファイルによる柔軟なカスタマイズ対応
+- パフォーマンスを考慮したスムーズなスクロール体験
+- シンプルな階層構造でメンテナンス性を確保

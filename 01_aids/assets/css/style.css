@@ -1,98 +1,159 @@
-@charset "UTF-8";
-
-/* 基本フォントの設定 */
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap');
-
-/* 基本スタイル */
-:root {
-  --primary-color: #76507f;
-  --background-color: #f8f8f8;
-  --accent-color: #f2ecf4;
-  --text-color: #3d3b30;
-  --sub-text-color: #707070;
-  --sub-text-color-alt: #65645a;
-}
-
-/* リンクスタイル */
-a {
-  color: var(--primary-color);
-  text-decoration: none;
-  transition: opacity 0.3s ease;
-}
-
-a:hover {
-  opacity: 0.7;
-}
-
-/* テキストカラーのユーティリティクラス */
-.text-primary {
-  color: var(--primary-color);
-}
-
-.text-sub {
-  color: var(--sub-text-color);
-}
-
-.text-sub-alt {
-  color: var(--sub-text-color-alt);
-}
-
-/* 背景色のユーティリティクラス */
-.bg-primary {
-  background-color: var(--primary-color);
-}
-
-.bg-accent {
-  background-color: var(--accent-color);
-}
-
-/* ボーダーカラーのユーティリティクラス */
-.border-primary {
-  border-color: var(--primary-color);
-}
-
-/* 見出しの基本スタイル（Tailwind CSSの設定に統一） */
-h1, h2, h3, h4, h5, h6 {
-  color: var(--text-color);
-  line-height: 1.4;
-}
-
-/* チャートコンテナの追加スタイル（Tailwindクラスで基本スタイルは設定済み） */
-.chart-container {
-    /* SVGの子要素を適切にサイズ調整 */
+/* カスタムスタイル */
+#container {
     position: relative;
 }
 
-.chart-container svg {
-    width: 100% !important;
-    height: 100% !important;
-    max-width: 100%;
-    max-height: 100%;
-}
-
-/* 大型チャート表示モード */
-.chart-container.large-mode {
+#fixed-background {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+#scroll-content {
+    position: relative;
     z-index: 10;
-    background-color: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(5px);
+}
+
+.step {
+    position: relative;
+    min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 2rem;
 }
 
-@media (min-width: 768px) {
-    .chart-container.large-mode {
-        padding: 4rem;
+/* チャートコンテナのスタイル */
+#chart-container {
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+}
+
+#chart-container.visible {
+    opacity: 1;
+}
+
+/* 地図コンテナのスタイル */
+#map-container {
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+}
+
+#map-container.visible {
+    opacity: 1;
+}
+
+/* 画像コンテナのスタイル */
+#image-container {
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+}
+
+#image-container.visible {
+    opacity: 1;
+}
+
+/* D3チャート共通スタイル */
+.chart-axis {
+    font-size: 12px;
+    fill: none;
+}
+
+.chart-axis .domain {
+    stroke: #333;
+    stroke-width: 1px;
+}
+
+.chart-axis .tick line {
+    stroke: #333;
+    stroke-width: 1px;
+}
+
+.chart-line {
+    fill: none;
+    stroke-width: 2;
+    transition: all 0.5s ease;
+}
+
+.chart-circle {
+    transition: all 0.5s ease;
+}
+
+/* 棒グラフスタイル */
+.bar {
+    transition: all 0.5s ease;
+}
+
+.bar:hover {
+    opacity: 0.8;
+}
+
+/* 円グラフスタイル */
+.pie-slice {
+    stroke: #fff;
+    stroke-width: 2;
+    transition: all 0.5s ease;
+}
+
+.pie-slice:hover {
+    opacity: 0.8;
+}
+
+/* 地図スタイル */
+.map-country {
+    fill: #e5e7eb;
+    stroke: #fff;
+    stroke-width: 0.5;
+    transition: all 0.3s ease;
+}
+
+.map-country.highlighted {
+    fill: #3b82f6;
+    stroke: #1d4ed8;
+    stroke-width: 1;
+}
+
+.map-city {
+    fill: #ef4444;
+    stroke: #fff;
+    stroke-width: 2;
+    transition: all 0.3s ease;
+}
+
+.map-city:hover {
+    fill: #dc2626;
+    r: 8;
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+    .step {
+        padding: 1rem;
+    }
+    
+    .step .max-w-lg {
+        max-width: 100%;
+        margin: 0 1rem;
     }
 }
 
-/* 非推奨となった#mainFigureスタイルを削除用に残す */
-#mainFigure {
-    display: none;
+/* スムーズスクロール */
+html {
+    scroll-behavior: smooth;
+}
+
+/* ローディング状態 */
+.loading {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+/* エラー状態 */
+.error {
+    background-color: #fee2e2;
+    border: 1px solid #fca5a5;
+    color: #dc2626;
 }
