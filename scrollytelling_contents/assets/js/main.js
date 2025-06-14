@@ -21,8 +21,11 @@ class ScrollytellingApp {
             // マネージャーを初期化
             this.initManagers();
             
-            // スクロールを初期化
-            this.initScroller();
+            // スクロールを初期化（都市ステップ生成後）
+            // DOM更新を待つため、次のティックで初期化
+            setTimeout(() => {
+                this.initScroller();
+            }, 0);
             
             // リサイズイベントを設定
             this.initResizeHandler();
@@ -45,6 +48,10 @@ class ScrollytellingApp {
             // 設定ファイルを最初に読み込む
             const config = await d3.json('config.json');
             console.log('Config loaded:', config);
+            
+            // cities-timeline.jsonを読み込む
+            const citiesData = await d3.json('data/cities-timeline.json');
+            console.log('Cities timeline data loaded:', citiesData);
             
             // 設定から必要なデータファイルを抽出
             const dataFiles = new Set();
@@ -83,8 +90,12 @@ class ScrollytellingApp {
             this.config = config;
             this.data = {
                 csv: csvData,
-                map: mapData
+                map: mapData,
+                cities: citiesData
             };
+            
+            // 都市ステップを動的に生成
+            this.generateCitySteps(citiesData);
 
             pubsub.publish(EVENTS.DATA_LOADED, this.data);
             
@@ -93,6 +104,48 @@ class ScrollytellingApp {
             pubsub.publish(EVENTS.DATA_ERROR, error);
             throw error;
         }
+    }
+
+    /**
+     * 都市ステップを動的に生成
+     * @param {Object} citiesData - cities-timeline.jsonのデータ
+     */
+    generateCitySteps(citiesData) {
+        const container = document.getElementById('city-steps-container');
+        if (!container) {
+            console.error('City steps container not found');
+            return;
+        }
+        
+        // 都市データから動的にHTMLを生成
+        citiesData.cities.forEach((city, index) => {
+            const stepIndex = 3 + index; // step3から開始
+            const stepDiv = document.createElement('div');
+            stepDiv.className = 'step';
+            stepDiv.setAttribute('data-step', stepIndex.toString());
+            
+            stepDiv.innerHTML = `
+                <div class="w-full min-h-screen flex items-center">
+                    <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
+                        <h2 class="text-2xl font-bold mb-4">${city.data.title}</h2>
+                        <p class="text-gray-700 leading-relaxed">
+                            ${city.data.description}
+                        </p>
+                        <div class="mt-4 pt-4 border-t border-gray-200">
+                            <p class="text-sm text-gray-600">
+                                <span class="font-semibold">${city.name}</span> 
+                                (${city.nameEn}), ${city.country}
+                            </p>
+                        </div>
+                        <div id="geographic-info-${stepIndex}" class="text-sm text-gray-500 border-t pt-3 mt-4" style="display: none;"></div>
+                    </div>
+                </div>
+            `;
+            
+            container.appendChild(stepDiv);
+        });
+        
+        console.log(`Generated ${citiesData.cities.length} city steps`);
     }
 
     /**
