@@ -42,30 +42,39 @@ class ScrollytellingApp {
         try {
             console.log('Starting data loading...');
             
-            const promises = [
-                d3.json('config.json'),
-                d3.csv('data/sample-line-data.csv'),
-                d3.csv('data/sample-bar-data.csv'),
-                d3.csv('data/sample-pie-data.csv'),
+            // 設定ファイルを最初に読み込む
+            const config = await d3.json('config.json');
+            console.log('Config loaded:', config);
+            
+            // 設定から必要なデータファイルを抽出
+            const dataFiles = new Set();
+            config.steps.forEach(step => {
+                if (step.chart?.dataFile) {
+                    dataFiles.add(step.chart.dataFile);
+                }
+            });
+            
+            console.log('Data files to load:', Array.from(dataFiles));
+            
+            // 動的にデータファイルを読み込む
+            const dataPromises = [
+                ...Array.from(dataFiles).map(file => d3.csv(file)),
                 d3.json('data/countries-110m.json')
             ];
-
-            const [config, lineData, barData, pieData, mapData] = await Promise.all(promises);
             
-            console.log('Data loaded successfully:');
-            console.log('- Config:', config);
-            console.log('- Line data:', lineData);
-            console.log('- Bar data:', barData);
-            console.log('- Pie data:', pieData);
-            console.log('- Map data (TopoJSON):', mapData);
-            console.log('- Map data type:', mapData?.type);
-            console.log('- Map objects:', mapData?.objects);
+            const dataResults = await Promise.all(dataPromises);
+            const mapData = dataResults.pop(); // 最後は地図データ
+            
+            // ファイル名でデータをマッピング
+            const csvData = {};
+            Array.from(dataFiles).forEach((file, index) => {
+                csvData[file] = dataResults[index];
+                console.log(`Loaded ${file}:`, dataResults[index].slice(0, 2));
+            });
             
             this.config = config;
             this.data = {
-                line: lineData,
-                bar: barData,
-                pie: pieData,
+                csv: csvData,
                 map: mapData
             };
 
@@ -219,26 +228,14 @@ class ScrollytellingApp {
      * @returns {Array} チャートデータ
      */
     getChartData(type, dataFile) {
-        // データファイル名からデータタイプを判定
-        if (dataFile && dataFile.includes('line')) {
-            return this.data.line;
-        } else if (dataFile && dataFile.includes('bar')) {
-            return this.data.bar;
-        } else if (dataFile && dataFile.includes('pie')) {
-            return this.data.pie;
+        // 新しいデータ構造から指定されたファイルのデータを取得
+        if (dataFile && this.data.csv && this.data.csv[dataFile]) {
+            console.log(`Returning data for ${dataFile}:`, this.data.csv[dataFile].slice(0, 2));
+            return this.data.csv[dataFile];
         }
         
-        // タイプベースのフォールバック
-        switch (type) {
-            case 'line':
-                return this.data.line;
-            case 'bar':
-                return this.data.bar;
-            case 'pie':
-                return this.data.pie;
-            default:
-                return this.data.line || [];
-        }
+        console.warn(`Data file not found: ${dataFile}`);
+        return [];
     }
 
     /**

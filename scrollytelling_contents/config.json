@@ -24,17 +24,20 @@
     },
     {
       "id": "step1",
-      "text": "データの傾向",
+      "text": "母子感染の推移（単一系列）",
       "chart": {
         "type": "line",
-        "dataFile": "data/sample-line-data.csv",
+        "dataFile": "data/trend_母子感染の推移.csv",
         "visible": true,
         "config": {
           "width": 1000,
           "height": 400,
-          "xField": "date",
+          "xField": "year",
           "yField": "value",
-          "color": "#3b82f6"
+          "seriesField": "series",
+          "multiSeries": false,
+          "seriesName": "母子感染率",
+          "colors": ["#3b82f6"]
         }
       },
       "map": {
@@ -223,17 +226,19 @@
     },
     {
       "id": "step13",
-      "text": "棒グラフの分析",
+      "text": "エイズ対策の資金推移（複数系列）",
       "chart": {
-        "type": "bar",
-        "dataFile": "data/sample-bar-data.csv",
+        "type": "line",
+        "dataFile": "data/trend_エイズ対策の資金不足.csv",
         "visible": true,
         "config": {
-          "width": 500,
-          "height": 350,
-          "xField": "category",
+          "width": 1000,
+          "height": 500,
+          "xField": "year",
           "yField": "value",
-          "color": "#10b981"
+          "seriesField": "series",
+          "multiSeries": true,
+          "colors": ["#3b82f6", "#10b981", "#f59e0b", "#ef4444"]
         }
       },
       "map": {

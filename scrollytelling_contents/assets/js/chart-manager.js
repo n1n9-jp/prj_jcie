@@ -128,10 +128,48 @@ class ChartManager {
     }
 
     /**
+     * データを系列別に変換
+     * @param {Array} data - 生データ
+     * @param {Object} config - 設定
+     * @returns {Array} 系列別データ
+     */
+    transformToSeries(data, config) {
+        const { xField = 'year', yField = 'value', seriesField = 'series' } = config;
+        
+        if (config.multiSeries === false) {
+            // 単一系列として強制的に扱う
+            return [{
+                name: config.seriesName || 'Data',
+                values: data.map(d => ({
+                    [xField]: d[xField],
+                    [yField]: d[yField]
+                }))
+            }];
+        }
+        
+        // 複数系列の場合
+        const seriesNames = [...new Set(data.map(d => d[seriesField]))];
+        return seriesNames.map(name => ({
+            name,
+            values: data
+                .filter(d => d[seriesField] === name)
+                .map(d => ({
+                    [xField]: d[xField],
+                    [yField]: d[yField]
+                }))
+        }));
+    }
+
+    /**
      * 折れ線グラフを描画
      */
     renderLineChart(data, config) {
-        const { width, height, margin, xField = 'x', yField = 'y', color = '#3b82f6' } = config;
+        const { 
+            width, height, margin, 
+            xField = 'year', yField = 'value', 
+            colors = d3.schemeCategory10,
+            multiSeries = true
+        } = config;
         
         const svg = this.initSVG(width, height);
         const innerWidth = width - margin.left - margin.right;
@@ -140,18 +178,36 @@ class ChartManager {
         const g = svg.append('g')
             .attr('transform', `translate(${margin.left},${margin.top})`);
 
-        // スケール設定
-        const xScale = d3.scaleTime()
-            .domain(d3.extent(data, d => new Date(d[xField])))
-            .range([0, innerWidth]);
+        // データを系列別に変換
+        const series = this.transformToSeries(data, config);
+        
+        // 全データからドメインを計算
+        const allValues = series.flatMap(s => s.values);
+        
+        // スケール設定 - 年データの場合は線形スケールを使用
+        const isYearData = allValues.every(d => !isNaN(d[xField]) && d[xField] > 1900 && d[xField] < 2100);
+        
+        const xScale = isYearData 
+            ? d3.scaleLinear()
+                .domain(d3.extent(allValues, d => +d[xField]))
+                .range([0, innerWidth])
+            : d3.scaleTime()
+                .domain(d3.extent(allValues, d => new Date(d[xField])))
+                .range([0, innerWidth]);
 
         const yScale = d3.scaleLinear()
-            .domain(d3.extent(data, d => +d[yField]))
+            .domain(d3.extent(allValues, d => +d[yField]))
             .nice()
             .range([innerHeight, 0]);
 
+        // 色スケール設定
+        const colorScale = d3.scaleOrdinal(colors)
+            .domain(series.map(d => d.name));
+
         // 軸を描画
-        const xAxis = d3.axisBottom(xScale);
+        const xAxis = isYearData 
+            ? d3.axisBottom(xScale).tickFormat(d3.format("d"))  // 年データは整数表示
+            : d3.axisBottom(xScale);
         const yAxis = d3.axisLeft(yScale);
 
         g.append('g')
@@ -163,36 +219,79 @@ class ChartManager {
             .attr('class', 'chart-axis y-axis')
             .call(yAxis);
 
-        // ラインを描画
+        // ライン生成器
         const line = d3.line()
-            .x(d => xScale(new Date(d[xField])))
+            .x(d => isYearData ? xScale(+d[xField]) : xScale(new Date(d[xField])))
             .y(d => yScale(+d[yField]))
             .curve(d3.curveMonotoneX);
 
-        const path = g.append('path')
-            .datum(data)
+        // 系列ごとにラインを描画
+        const seriesGroups = g.selectAll('.series-group')
+            .data(series)
+            .enter()
+            .append('g')
+            .attr('class', 'series-group');
+
+        // ラインを描画
+        seriesGroups.append('path')
             .attr('class', 'chart-line')
-            .attr('d', line)
-            .attr('stroke', color)
+            .attr('d', d => line(d.values))
+            .attr('stroke', d => colorScale(d.name))
             .attr('stroke-width', 0)
+            .attr('fill', 'none')
             .transition()
             .duration(500)
             .attr('stroke-width', 2);
 
         // ポイントを描画
-        g.selectAll('.chart-circle')
-            .data(data)
+        seriesGroups.selectAll('.chart-circle')
+            .data(d => d.values.map(v => ({ ...v, seriesName: d.name })))
             .enter()
             .append('circle')
             .attr('class', 'chart-circle')
-            .attr('cx', d => xScale(new Date(d[xField])))
+            .attr('cx', d => isYearData ? xScale(+d[xField]) : xScale(new Date(d[xField])))
             .attr('cy', d => yScale(+d[yField]))
             .attr('r', 0)
-            .attr('fill', color)
+            .attr('fill', d => colorScale(d.seriesName))
             .transition()
             .duration(500)
-            .delay((d, i) => i * 50)
-            .attr('r', 4);
+            .delay((d, i) => i * 30)
+            .attr('r', 3);
+
+        // レジェンドを追加（複数系列の場合のみ）
+        if (series.length > 1) {
+            this.addLegend(svg, series, colorScale, width, height);
+        }
+    }
+
+    /**
+     * レジェンドを追加
+     */
+    addLegend(svg, series, colorScale, width, height) {
+        const legend = svg.append('g')
+            .attr('class', 'chart-legend')
+            .attr('transform', `translate(${width - 120}, 20)`);
+
+        const legendItems = legend.selectAll('.legend-item')
+            .data(series)
+            .enter()
+            .append('g')
+            .attr('class', 'legend-item')
+            .attr('transform', (d, i) => `translate(0, ${i * 20})`);
+
+        legendItems.append('circle')
+            .attr('cx', 6)
+            .attr('cy', 6)
+            .attr('r', 5)
+            .attr('fill', d => colorScale(d.name));
+
+        legendItems.append('text')
+            .attr('x', 16)
+            .attr('y', 6)
+            .attr('dy', '0.35em')
+            .attr('font-size', '12px')
+            .attr('fill', '#333')
+            .text(d => d.name);
     }
 
     /**
