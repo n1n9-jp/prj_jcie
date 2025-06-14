@@ -35,6 +35,12 @@ class ChartManager {
             return;
         }
         
+        // Triple chart layoutの場合
+        if (chartData.layout === 'triple' && chartData.charts) {
+            this.updateTripleChart(chartData);
+            return;
+        }
+        
         // 従来の単一チャート
         const { type, data, config, visible, updateMode, direction } = chartData;
         
@@ -358,6 +364,24 @@ class ChartManager {
         if (visible) {
             this.show();
             this.renderDualChart(charts);
+        } else {
+            this.hide();
+        }
+    }
+
+    /**
+     * Triple chart layout用の更新メソッド
+     * @param {Object} tripleChartData - Triple chart データ
+     */
+    updateTripleChart(tripleChartData) {
+        const { charts, visible } = tripleChartData;
+        
+        this.currentChart = 'triple';
+        this.tripleCharts = charts;
+
+        if (visible) {
+            this.show();
+            this.renderTripleChart(charts);
         } else {
             this.hide();
         }
@@ -1013,6 +1037,132 @@ class ChartManager {
             .transition()
             .duration(500)
             .delay(500)
+            .style('opacity', 1);
+    }
+
+    /**
+     * Triple チャートを描画
+     * @param {Array} charts - チャート設定配列（3つ）
+     */
+    renderTripleChart(charts) {
+        const containerNode = this.container.node();
+        const containerWidth = containerNode.clientWidth;
+        const containerHeight = containerNode.clientHeight;
+        
+        // 全体のSVGサイズを計算
+        const totalWidth = Math.min(containerWidth * 0.95, 1200);
+        const totalHeight = Math.min(containerHeight * 0.8, 500);
+        
+        const svg = this.initSVG(totalWidth, totalHeight);
+        
+        // 各チャートの幅を計算（間隔を含む）
+        const chartSpacing = 30;
+        const chartWidth = (totalWidth - chartSpacing * 2) / 3;
+        const chartHeight = totalHeight - 60; // タイトル分を確保
+        
+        charts.forEach((chartConfig, index) => {
+            const xOffset = index * (chartWidth + chartSpacing);
+            this.renderSinglePieChartInTriple(svg, chartConfig, {
+                x: xOffset,
+                y: 40,
+                width: chartWidth,
+                height: chartHeight
+            });
+        });
+    }
+
+    /**
+     * Triple layout内で単一の円グラフを描画
+     */
+    renderSinglePieChartInTriple(svg, chartConfig, layout) {
+        const { data, config, title } = chartConfig;
+        const { x, y, width, height } = layout;
+        
+        const radius = Math.min(width, height - 80) / 2; // タイトル分を除く
+        
+        // チャートグループを作成
+        const chartGroup = svg.append('g')
+            .attr('transform', `translate(${x}, ${y})`);
+        
+        // タイトルを追加
+        chartGroup.append('text')
+            .attr('x', width / 2)
+            .attr('y', 20)
+            .attr('text-anchor', 'middle')
+            .attr('font-size', '14px')
+            .attr('font-weight', 'bold')
+            .attr('fill', '#333')
+            .text(title);
+        
+        // 円グラフ描画エリア
+        const g = chartGroup.append('g')
+            .attr('transform', `translate(${width/2}, ${height/2 + 20})`);
+        
+        // 円グラフを描画
+        this.renderPieChartInGroup(g, data, {
+            ...config,
+            radius: radius
+        });
+    }
+
+    /**
+     * 指定されたグループ内で円グラフを描画
+     */
+    renderPieChartInGroup(g, data, config) {
+        const { radius, labelField = 'label', valueField = 'value', colors = d3.schemeCategory10 } = config;
+        
+        // パイ生成器
+        const pie = d3.pie()
+            .value(d => +d[valueField])
+            .sort(null);
+        
+        // アーク生成器
+        const arc = d3.arc()
+            .innerRadius(0)
+            .outerRadius(radius);
+        
+        // 色スケール
+        const colorScale = d3.scaleOrdinal(colors)
+            .domain(data.map(d => d[labelField]));
+        
+        // パイデータを生成
+        const pieData = pie(data);
+        
+        // パイスライスを描画
+        const slices = g.selectAll('.slice')
+            .data(pieData)
+            .enter()
+            .append('g')
+            .attr('class', 'slice');
+        
+        slices.append('path')
+            .attr('class', 'pie-slice')
+            .attr('d', arc)
+            .attr('fill', d => colorScale(d.data[labelField]))
+            .attr('stroke', '#fff')
+            .attr('stroke-width', 1)
+            .style('opacity', 0)
+            .transition()
+            .duration(500)
+            .delay((d, i) => i * 100)
+            .style('opacity', 1);
+        
+        // ラベルを追加
+        const labelArc = d3.arc()
+            .innerRadius(radius * 0.7)
+            .outerRadius(radius * 0.7);
+        
+        slices.append('text')
+            .attr('class', 'pie-label')
+            .attr('transform', d => `translate(${labelArc.centroid(d)})`)
+            .attr('text-anchor', 'middle')
+            .attr('font-size', '12px')
+            .attr('fill', '#333')
+            .style('opacity', 0)
+            .text(d => `${d.data[valueField]}%`)
+            .transition()
+            .duration(500)
+            .delay((d, i) => i * 100 + 200)
             .style('opacity', 1);
     }
 

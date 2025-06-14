@@ -234,6 +234,16 @@ class ScrollytellingApp {
                     }))
                 };
                 pubsub.publish(EVENTS.CHART_UPDATE, dualChartData);
+            } else if (stepConfig.chart.layout === 'triple' && stepConfig.chart.charts) {
+                // Triple chart の場合
+                const tripleChartData = {
+                    ...stepConfig.chart,
+                    charts: stepConfig.chart.charts.map(chartConfig => ({
+                        ...chartConfig,
+                        data: this.getChartData('pie', chartConfig.dataFile)
+                    }))
+                };
+                pubsub.publish(EVENTS.CHART_UPDATE, tripleChartData);
             } else {
                 // 従来の単一チャート
                 let updateMode = stepConfig.chart.updateMode || 'replace';

@@ -117,19 +117,51 @@
     },
     {
       "id": "step4",
-      "text": "地域別のエイズ関連死亡者割合",
+      "text": "地域別のHIV治療カバレッジ",
       "chart": {
-        "type": "pie",
-        "dataFile": "data/regional_impact_pie.csv",
+        "layout": "triple",
         "visible": true,
-        "config": {
-          "width": 800,
-          "height": 600,
-          "labelField": "label",
-          "valueField": "value",
-          "colors": ["#e74c3c", "#f39c12", "#3b82f6", "#95a5a6"],
-          "title": "地域別エイズ関連死亡者の割合（％）"
-        }
+        "charts": [
+          {
+            "id": "adults",
+            "title": "抗HIV治療を受けている成人(15歳以上)HIV陽性者の割合",
+            "dataFile": "data/hiv_treatment_adults.csv",
+            "position": "left",
+            "config": {
+              "width": 350,
+              "height": 400,
+              "labelField": "label",
+              "valueField": "value",
+              "colors": ["#3b82f6", "#e74c3c", "#f39c12", "#2ecc71", "#9b59b6", "#1abc9c", "#e67e22"]
+            }
+          },
+          {
+            "id": "children",
+            "title": "抗HIV治療を受けているこども(0歳から14歳)のHIV陽性者の割合",
+            "dataFile": "data/hiv_treatment_children.csv",
+            "position": "center",
+            "config": {
+              "width": 350,
+              "height": 400,
+              "labelField": "label",
+              "valueField": "value",
+              "colors": ["#3b82f6", "#e74c3c", "#f39c12", "#2ecc71", "#9b59b6", "#1abc9c", "#e67e22"]
+            }
+          },
+          {
+            "id": "total",
+            "title": "抗HIV治療を受けているHIV陽性者の割合(合計)",
+            "dataFile": "data/hiv_treatment_total.csv",
+            "position": "right",
+            "config": {
+              "width": 350,
+              "height": 400,
+              "labelField": "label",
+              "valueField": "value",
+              "colors": ["#3b82f6", "#e74c3c", "#f39c12", "#2ecc71", "#9b59b6", "#1abc9c", "#e67e22"]
+            }
+          }
+        ]
       },
       "map": {
         "visible": false
