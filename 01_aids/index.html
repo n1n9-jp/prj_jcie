@@ -37,9 +37,9 @@
             <div class="step" data-step="0">
                 <div class="w-full min-h-screen flex items-center">
                     <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
-                        <h2 class="text-2xl font-bold mb-4">イントロダクション</h2>
+                        <h2 class="text-2xl font-bold mb-4">エイズ対策の物語</h2>
                         <p class="text-gray-700 leading-relaxed">
-                            このコンテンツは、スクロールに応じてデータの可視化が変化するScrollytellingの実装例です。
+                            世界各地でのエイズ対策の取り組みと、その影響を受けた人々の物語をお伝えします。
                         </p>
                     </div>
                 </div>
@@ -48,20 +48,9 @@
             <div class="step" data-step="1">
                 <div class="w-full min-h-screen flex items-center">
                     <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
-                        <h2 class="text-2xl font-bold mb-4">データの傾向（期間限定）</h2>
+                        <h2 class="text-2xl font-bold mb-4">はじめに</h2>
                         <p class="text-gray-700 leading-relaxed">
-                            まず2010-2015年の期間に絞って母子感染の推移を確認します。データのフィルタリング機能により、特定期間に焦点を当てて分析できます。
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="step" data-step="1a">
-                <div class="w-full min-h-screen flex items-center">
-                    <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
-                        <h2 class="text-2xl font-bold mb-4">データの傾向（全期間）</h2>
-                        <p class="text-gray-700 leading-relaxed">
-                            次に全期間のデータを表示します。同じデータセットでも表示範囲を変更することで、より幅広い傾向を把握できます。
+                            HIV/AIDS は1980年代から世界的な健康課題となっており、特にサハラ以南のアフリカ地域で深刻な影響を与えています。しかし、国際的な支援と地域の努力により、感染拡大の防止と治療の改善が進んでいます。
                         </p>
                     </div>
                 </div>
@@ -70,67 +59,100 @@
             <div class="step" data-step="2">
                 <div class="w-full min-h-screen flex items-center">
                     <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
-                        <h2 class="text-2xl font-bold mb-4">世界全体の分析</h2>
+                        <h2 class="text-2xl font-bold mb-4">母子感染の推移（2010-2015年）</h2>
                         <p class="text-gray-700 leading-relaxed">
-                            世界全体の地図を見て、各国のデータ分布を確認していきましょう。
+                            母子感染防止対策の効果を、まず2010-2015年の期間に絞って確認します。この期間は重要な転換点となりました。
                         </p>
                     </div>
                 </div>
             </div>
 
-            <!-- 都市ステップは動的に生成されます -->
+            <div class="step" data-step="2a">
+                <div class="w-full min-h-screen flex items-center">
+                    <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
+                        <h2 class="text-2xl font-bold mb-4">母子感染の推移（全期間）</h2>
+                        <p class="text-gray-700 leading-relaxed">
+                            全期間のデータで見ると、長期的な改善傾向が明確に確認できます。継続的な取り組みの成果が現れています。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step" data-step="3">
+                <div class="w-full min-h-screen flex items-center">
+                    <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
+                        <h2 class="text-2xl font-bold mb-4">エイズ対策の資金推移（初期）</h2>
+                        <p class="text-gray-700 leading-relaxed">
+                            2000年代初期の資金動向を見ると、国際的な支援体制の構築過程が分かります。グローバルファンドの設立が大きな転換点となりました。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step" data-step="4">
+                <div class="w-full min-h-screen flex items-center">
+                    <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
+                        <h2 class="text-2xl font-bold mb-4">エイズ対策の資金推移（全期間）</h2>
+                        <p class="text-gray-700 leading-relaxed">
+                            長期的な資金の流れを見ると、持続的な支援の重要性が理解できます。各国の支援額の変化も注目すべき点です。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step" data-step="5">
+                <div class="w-full min-h-screen flex items-center">
+                    <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
+                        <h2 class="text-2xl font-bold mb-4">世界全体での取り組み</h2>
+                        <p class="text-gray-700 leading-relaxed">
+                            エイズ対策は世界各地で展開されています。特に重点的な支援が行われている国々を見てみましょう。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 都市ステップは動的に生成されます（step6-12） -->
             <div id="city-steps-container"></div>
-
-            <div class="step" data-step="10">
-                <div class="w-full min-h-screen flex items-center">
-                    <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
-                        <h2 class="text-2xl font-bold mb-4">資金推移分析（初期）</h2>
-                        <p class="text-gray-700 leading-relaxed">
-                            エイズ対策の資金推移を2000-2010年の期間に絞って表示します。複数系列データでもフィルタリングが機能することを確認できます。
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="step" data-step="10a">
-                <div class="w-full min-h-screen flex items-center">
-                    <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
-                        <h2 class="text-2xl font-bold mb-4">資金推移分析（全期間）</h2>
-                        <p class="text-gray-700 leading-relaxed">
-                            同じデータセットの全期間を表示することで、長期的なトレンドを把握できます。フィルタの有無による表示の違いを確認してください。
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="step" data-step="11">
-                <div class="w-full min-h-screen flex items-center">
-                    <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
-                        <h2 class="text-2xl font-bold mb-4">まとめ</h2>
-                        <p class="text-gray-700 leading-relaxed">
-                            これまでのデータ分析から得られた知見をまとめます。
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="step" data-step="12">
-                <div class="w-full min-h-screen flex items-center">
-                    <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
-                        <h2 class="text-2xl font-bold mb-4">アフリカの若者のHIV感染者数比較</h2>
-                        <p class="text-gray-700 leading-relaxed">
-                            アフリカの若者（15-24歳）のHIV感染者数を男女別に比較します。
-                        </p>
-                    </div>
-                </div>
-            </div>
 
             <div class="step" data-step="13">
                 <div class="w-full min-h-screen flex items-center">
                     <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
-                        <h2 class="text-2xl font-bold mb-4">詳細レポート</h2>
+                        <h2 class="text-2xl font-bold mb-4">取り組みの成果</h2>
                         <p class="text-gray-700 leading-relaxed">
-                            詳細な分析結果を画像で確認することができます。
+                            これまでのエイズ対策の取り組みにより、多くの生命が救われました。特に母子感染の防止や治療へのアクセス改善において大きな進歩が見られています。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step" data-step="14">
+                <div class="w-full min-h-screen flex items-center">
+                    <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
+                        <h2 class="text-2xl font-bold mb-4">アフリカ地域での成果</h2>
+                        <p class="text-gray-700 leading-relaxed">
+                            アフリカ地域では特に顕著な改善が見られています。感染率の減少や治療普及率の向上など、具体的な数値で成果を確認できます。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step" data-step="15">
+                <div class="w-full min-h-screen flex items-center">
+                    <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
+                        <h2 class="text-2xl font-bold mb-4">アフリカの若者のHIV感染者数比較（男女別）</h2>
+                        <p class="text-gray-700 leading-relaxed">
+                            アフリカの若者（15-24歳）のHIV感染者数を男女別に比較します。ジェンダーによる違いや時系列での変化を詳しく見ていきます。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step" data-step="16">
+                <div class="w-full min-h-screen flex items-center">
+                    <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
+                        <h2 class="text-2xl font-bold mb-4">今後の展望</h2>
+                        <p class="text-gray-700 leading-relaxed">
+                            これまでの成果を踏まえ、2030年までのエイズ終息に向けた取り組みが続いています。持続可能な支援体制の構築が今後の鍵となります。
                         </p>
                     </div>
                 </div>

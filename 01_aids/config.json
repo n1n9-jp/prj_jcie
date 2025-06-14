@@ -2,7 +2,7 @@
   "steps": [
     {
       "id": "step0",
-      "text": "イントロダクション",
+      "text": "エイズ対策の物語",
       "chart": {
         "visible": false
       },
@@ -10,8 +10,8 @@
         "visible": false
       },
       "image": {
-        "src": "https://placehold.co/800x600/1f2937/ffffff?text=World+Cities+Analysis",
-        "alt": "世界都市分析の導入画像",
+        "src": "https://placehold.co/800x600/1f2937/ffffff?text=AIDS+Story",
+        "alt": "エイズ対策の物語の導入画像",
         "visible": true,
         "config": {
           "width": "100%",
@@ -24,6 +24,19 @@
     },
     {
       "id": "step1",
+      "text": "はじめに",
+      "chart": {
+        "visible": false
+      },
+      "map": {
+        "visible": false
+      },
+      "image": {
+        "visible": false
+      }
+    },
+    {
+      "id": "step2",
       "text": "母子感染の推移（2010-2015年）",
       "chart": {
         "type": "line",
@@ -53,7 +66,7 @@
       }
     },
     {
-      "id": "step1a",
+      "id": "step2a",
       "text": "母子感染の推移（全期間データ）",
       "chart": {
         "type": "line",
@@ -80,151 +93,20 @@
       }
     },
     {
-      "id": "step2",
-      "text": "地域別分析",
-      "chart": {
-        "visible": false
-      },
-      "map": {
-        "center": [0, 0],
-        "zoom": 1,
-        "visible": true,
-        "highlightCountries": ["Japan", "United States", "Germany"],
-        "cities": []
-      },
-      "image": {
-        "visible": false
-      }
-    },
-    {
       "id": "step3",
-      "text": "ムリカットの物語",
-      "chart": {
-        "visible": false
-      },
-      "map": {
-        "visible": true,
-        "mode": "single-city",
-        "cityId": "lagos",
-        "citiesFile": "data/cities-timeline.json"
-      },
-      "image": {
-        "visible": false
-      }
-    },
-    {
-      "id": "step4",
-      "text": "闘うマラウイの女性達",
-      "chart": {
-        "visible": false
-      },
-      "map": {
-        "visible": true,
-        "mode": "single-city",
-        "cityId": "lilongwe",
-        "citiesFile": "data/cities-timeline.json"
-      },
-      "image": {
-        "visible": false
-      }
-    },
-    {
-      "id": "step5",
-      "text": "ローズマリーの物語",
-      "chart": {
-        "visible": false
-      },
-      "map": {
-        "visible": true,
-        "mode": "single-city",
-        "cityId": "nairobi",
-        "citiesFile": "data/cities-timeline.json"
-      },
-      "image": {
-        "visible": false
-      }
-    },
-    {
-      "id": "step6",
-      "text": "エリカ・カステヤノスの物語",
-      "chart": {
-        "visible": false
-      },
-      "map": {
-        "visible": true,
-        "mode": "single-city",
-        "cityId": "belmopan",
-        "citiesFile": "data/cities-timeline.json"
-      },
-      "image": {
-        "visible": false
-      }
-    },
-    {
-      "id": "step7",
-      "text": "マーク・ダイブル（支援者）の物語",
-      "chart": {
-        "visible": false
-      },
-      "map": {
-        "visible": true,
-        "mode": "single-city",
-        "cityId": "washington",
-        "citiesFile": "data/cities-timeline.json"
-      },
-      "image": {
-        "visible": false
-      }
-    },
-    {
-      "id": "step8",
-      "text": "モーリーン・ムレンガの物語",
-      "chart": {
-        "visible": false
-      },
-      "map": {
-        "visible": true,
-        "mode": "single-city",
-        "cityId": "nairobi2",
-        "citiesFile": "data/cities-timeline.json"
-      },
-      "image": {
-        "visible": false
-      }
-    },
-    {
-      "id": "step9",
-      "text": "ジェフリー・アカバの物語",
-      "chart": {
-        "visible": false
-      },
-      "map": {
-        "visible": true,
-        "mode": "single-city",
-        "cityId": "manila",
-        "citiesFile": "data/cities-timeline.json"
-      },
-      "image": {
-        "visible": false
-      }
-    },
-    {
-      "id": "step10",
-      "text": "エイズ対策の資金推移（2000-2010年）",
+      "text": "エイズ対策の資金推移（初期）",
       "chart": {
         "type": "line",
         "dataFile": "data/trend_エイズ対策の資金不足.csv",
         "visible": true,
-        "updateMode": "transition",
         "config": {
           "width": 1000,
-          "height": 500,
+          "height": 400,
           "xField": "year",
           "yField": "value",
           "seriesField": "series",
           "multiSeries": true,
           "colors": ["#3b82f6", "#10b981", "#f59e0b", "#ef4444"],
-          "transitionDuration": 1200,
           "filter": {
             "type": "range",
             "field": "year",
@@ -240,7 +122,7 @@
       }
     },
     {
-      "id": "step10a",
+      "id": "step4",
       "text": "エイズ対策の資金推移（全期間）",
       "chart": {
         "type": "line",
@@ -249,17 +131,114 @@
         "updateMode": "transition",
         "config": {
           "width": 1000,
-          "height": 500,
+          "height": 400,
           "xField": "year",
           "yField": "value",
           "seriesField": "series",
           "multiSeries": true,
           "colors": ["#3b82f6", "#10b981", "#f59e0b", "#ef4444"],
-          "transitionDuration": 1500
+          "transitionDuration": 1200
         }
       },
       "map": {
         "visible": false
+      },
+      "image": {
+        "visible": false
+      }
+    },
+    {
+      "id": "step5",
+      "text": "世界全体での取り組み",
+      "chart": {
+        "visible": false
+      },
+      "map": {
+        "center": [0, 0],
+        "zoom": 1,
+        "visible": true,
+        "highlightCountries": ["Nigeria", "Malawi", "Kenya", "Belize", "United States", "Philippines"],
+        "cities": []
+      },
+      "image": {
+        "visible": false
+      }
+    },
+    {
+      "id": "step6",
+      "text": "ムリカットの物語",
+      "chart": {
+        "visible": false
+      },
+      "map": {
+        "visible": true,
+        "mode": "single-city",
+        "cityId": "lagos",
+        "citiesFile": "data/cities-timeline.json"
+      },
+      "image": {
+        "visible": false
+      }
+    },
+    {
+      "id": "step7",
+      "text": "闘うマラウイの女性達",
+      "chart": {
+        "visible": false
+      },
+      "map": {
+        "visible": true,
+        "mode": "single-city",
+        "cityId": "lilongwe",
+        "citiesFile": "data/cities-timeline.json"
+      },
+      "image": {
+        "visible": false
+      }
+    },
+    {
+      "id": "step8",
+      "text": "ローズマリーの物語",
+      "chart": {
+        "visible": false
+      },
+      "map": {
+        "visible": true,
+        "mode": "single-city",
+        "cityId": "nairobi",
+        "citiesFile": "data/cities-timeline.json"
+      },
+      "image": {
+        "visible": false
+      }
+    },
+    {
+      "id": "step9",
+      "text": "エリカ・カステヤノスの物語",
+      "chart": {
+        "visible": false
+      },
+      "map": {
+        "visible": true,
+        "mode": "single-city",
+        "cityId": "belmopan",
+        "citiesFile": "data/cities-timeline.json"
+      },
+      "image": {
+        "visible": false
+      }
+    },
+    {
+      "id": "step10",
+      "text": "マーク・ダイブル（支援者）の物語",
+      "chart": {
+        "visible": false
+      },
+      "map": {
+        "visible": true,
+        "mode": "single-city",
+        "cityId": "washington",
+        "citiesFile": "data/cities-timeline.json"
       },
       "image": {
         "visible": false
@@ -267,17 +246,65 @@
     },
     {
       "id": "step11",
-      "text": "まとめ",
+      "text": "モーリーン・ムレンガの物語",
       "chart": {
-        "type": "pie",
-        "dataFile": "data/sample-pie-data.csv",
+        "visible": false
+      },
+      "map": {
+        "visible": true,
+        "mode": "single-city",
+        "cityId": "nairobi2",
+        "citiesFile": "data/cities-timeline.json"
+      },
+      "image": {
+        "visible": false
+      }
+    },
+    {
+      "id": "step12",
+      "text": "ジェフリー・アカバの物語",
+      "chart": {
+        "visible": false
+      },
+      "map": {
+        "visible": true,
+        "mode": "single-city",
+        "cityId": "manila",
+        "citiesFile": "data/cities-timeline.json"
+      },
+      "image": {
+        "visible": false
+      }
+    },
+    {
+      "id": "step13",
+      "text": "取り組みの成果",
+      "chart": {
+        "visible": false
+      },
+      "map": {
+        "visible": false
+      },
+      "image": {
+        "visible": false
+      }
+    },
+    {
+      "id": "step14",
+      "text": "アフリカ地域での成果",
+      "chart": {
+        "type": "line",
+        "dataFile": "data/trend_母子感染の推移.csv",
         "visible": true,
         "config": {
-          "width": 400,
+          "width": 1000,
           "height": 400,
-          "labelField": "category",
-          "valueField": "value",
-          "colors": ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6"]
+          "xField": "year",
+          "yField": "value",
+          "seriesField": "series",
+          "multiSeries": false,
+          "seriesName": "感染率の変化",
+          "colors": ["#10b981"]
         }
       },
       "map": {
@@ -288,7 +315,7 @@
       }
     },
     {
-      "id": "step12",
+      "id": "step15",
       "text": "アフリカの若者のHIV感染者数比較（男女別）",
       "chart": {
         "layout": "dual",
@@ -334,24 +361,27 @@
       }
     },
     {
-      "id": "step13",
-      "text": "画像表示",
+      "id": "step16",
+      "text": "今後の展望",
       "chart": {
-        "visible": false
+        "type": "line",
+        "dataFile": "data/trend_エイズ対策の資金不足.csv",
+        "visible": true,
+        "config": {
+          "width": 1000,
+          "height": 400,
+          "xField": "year",
+          "yField": "value",
+          "seriesField": "series",
+          "multiSeries": true,
+          "colors": ["#3b82f6", "#10b981", "#f59e0b", "#ef4444"]
+        }
       },
       "map": {
         "visible": false
       },
       "image": {
-        "src": "https://placehold.co/800x500/10b981/ffffff?text=Summary+Report",
-        "alt": "分析結果のまとめ",
-        "visible": true,
-        "config": {
-          "width": "80%",
-          "height": "auto",
-          "position": "center",
-          "opacity": 0.8
-        }
+        "visible": false
       }
     }
   ],
