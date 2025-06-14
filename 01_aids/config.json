@@ -37,10 +37,10 @@
     },
     {
       "id": "step2",
-      "text": "母子感染の推移（2010-2015年）",
+      "text": "新規感染者数の推移（1990-1998年）",
       "chart": {
         "type": "line",
-        "dataFile": "data/trend_母子感染の推移.csv",
+        "dataFile": "data/trend_new_infections_normalized.csv",
         "visible": true,
         "config": {
           "width": 1000,
@@ -48,13 +48,12 @@
           "xField": "year",
           "yField": "value",
           "seriesField": "series",
-          "multiSeries": false,
-          "seriesName": "母子感染率",
-          "colors": ["#3b82f6"],
+          "multiSeries": true,
+          "colors": ["#3b82f6", "#e74c3c", "#f39c12", "#2ecc71", "#9b59b6", "#1abc9c", "#e67e22", "#34495e", "#95a5a6"],
           "filter": {
             "type": "range",
             "field": "year",
-            "range": [2010, 2015]
+            "range": [1990, 1998]
           }
         }
       },
@@ -67,22 +66,19 @@
     },
     {
       "id": "step2a",
-      "text": "母子感染の推移（全期間データ）",
+      "text": "新規感染者数の推移（全期間データ）",
       "chart": {
         "type": "line",
-        "dataFile": "data/trend_母子感染の推移.csv",
+        "dataFile": "data/trend_new_infections_normalized.csv",
         "visible": true,
-        "updateMode": "transition",
         "config": {
           "width": 1000,
           "height": 400,
           "xField": "year",
           "yField": "value",
           "seriesField": "series",
-          "multiSeries": false,
-          "seriesName": "母子感染率",
-          "colors": ["#3b82f6"],
-          "transitionDuration": 1000
+          "multiSeries": true,
+          "colors": ["#3b82f6", "#e74c3c", "#f39c12", "#2ecc71", "#9b59b6", "#1abc9c", "#e67e22", "#34495e", "#95a5a6"]
         }
       },
       "map": {
@@ -94,10 +90,10 @@
     },
     {
       "id": "step3",
-      "text": "エイズ対策の資金推移（初期）",
+      "text": "エイズの死者数",
       "chart": {
         "type": "line",
-        "dataFile": "data/trend_エイズ対策の資金不足.csv",
+        "dataFile": "data/trend_new_deaths_normalized.csv",
         "visible": true,
         "config": {
           "width": 1000,
@@ -106,12 +102,7 @@
           "yField": "value",
           "seriesField": "series",
           "multiSeries": true,
-          "colors": ["#3b82f6", "#10b981", "#f59e0b", "#ef4444"],
-          "filter": {
-            "type": "range",
-            "field": "year",
-            "range": [2000, 2010]
-          }
+          "colors": ["#e74c3c", "#3b82f6", "#f39c12", "#2ecc71", "#9b59b6", "#1abc9c", "#e67e22", "#34495e", "#95a5a6"]
         }
       },
       "map": {
@@ -123,12 +114,33 @@
     },
     {
       "id": "step4",
+      "text": "国際的な支援体制の構築",
+      "chart": {
+        "visible": false
+      },
+      "map": {
+        "visible": false
+      },
+      "image": {
+        "src": "https://placehold.co/800x600/2563eb/ffffff?text=Global+Fund+Support",
+        "alt": "国際的な支援体制の構築の画像",
+        "visible": true,
+        "config": {
+          "width": "100%",
+          "height": "100%",
+          "position": "center",
+          "opacity": 0.9,
+          "objectFit": "cover"
+        }
+      }
+    },
+    {
+      "id": "step5",
       "text": "エイズ対策の資金推移（全期間）",
       "chart": {
         "type": "line",
         "dataFile": "data/trend_エイズ対策の資金不足.csv",
         "visible": true,
-        "updateMode": "transition",
         "config": {
           "width": 1000,
           "height": 400,
@@ -136,8 +148,7 @@
           "yField": "value",
           "seriesField": "series",
           "multiSeries": true,
-          "colors": ["#3b82f6", "#10b981", "#f59e0b", "#ef4444"],
-          "transitionDuration": 1200
+          "colors": ["#3b82f6", "#10b981", "#f59e0b", "#ef4444"]
         }
       },
       "map": {
@@ -148,7 +159,7 @@
       }
     },
     {
-      "id": "step5",
+      "id": "step6",
       "text": "世界全体での取り組み",
       "chart": {
         "visible": false
@@ -165,7 +176,7 @@
       }
     },
     {
-      "id": "step6",
+      "id": "step7",
       "text": "ムリカットの物語",
       "chart": {
         "visible": false
@@ -181,7 +192,7 @@
       }
     },
     {
-      "id": "step7",
+      "id": "step8",
       "text": "闘うマラウイの女性達",
       "chart": {
         "visible": false
@@ -197,7 +208,7 @@
       }
     },
     {
-      "id": "step8",
+      "id": "step9",
       "text": "ローズマリーの物語",
       "chart": {
         "visible": false
@@ -213,7 +224,7 @@
       }
     },
     {
-      "id": "step9",
+      "id": "step10",
       "text": "エリカ・カステヤノスの物語",
       "chart": {
         "visible": false
@@ -229,7 +240,7 @@
       }
     },
     {
-      "id": "step10",
+      "id": "step11",
       "text": "マーク・ダイブル（支援者）の物語",
       "chart": {
         "visible": false
@@ -245,7 +256,7 @@
       }
     },
     {
-      "id": "step11",
+      "id": "step12",
       "text": "モーリーン・ムレンガの物語",
       "chart": {
         "visible": false
@@ -261,7 +272,7 @@
       }
     },
     {
-      "id": "step12",
+      "id": "step13",
       "text": "ジェフリー・アカバの物語",
       "chart": {
         "visible": false
@@ -277,7 +288,7 @@
       }
     },
     {
-      "id": "step13",
+      "id": "step14",
       "text": "取り組みの成果",
       "chart": {
         "visible": false
@@ -290,7 +301,7 @@
       }
     },
     {
-      "id": "step14",
+      "id": "step15",
       "text": "アフリカ地域での成果",
       "chart": {
         "type": "line",
@@ -315,7 +326,7 @@
       }
     },
     {
-      "id": "step15",
+      "id": "step16",
       "text": "アフリカの若者のHIV感染者数比較（男女別）",
       "chart": {
         "layout": "dual",
@@ -361,7 +372,7 @@
       }
     },
     {
-      "id": "step16",
+      "id": "step17",
       "text": "今後の展望",
       "chart": {
         "type": "line",

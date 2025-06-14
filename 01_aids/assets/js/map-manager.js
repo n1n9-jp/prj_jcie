@@ -919,21 +919,6 @@ class MapManager {
             .delay(400)
             .style('opacity', 1);
         
-        // 人口・GDP情報を表示
-        const infoText = `人口: ${(city.data.population / 1000000).toFixed(0)}百万人`;
-        mapGroup.append('text')
-            .attr('class', 'single-city-info')
-            .attr('x', coords[0])
-            .attr('y', coords[1] + (city.style.size * 1.5 + 20))
-            .attr('text-anchor', 'middle')
-            .attr('font-size', '12px')
-            .attr('fill', '#6b7280')
-            .style('opacity', 0)
-            .text(infoText)
-            .transition()
-            .duration(600)
-            .delay(600)
-            .style('opacity', 1);
         
         // 地理的情報をHTMLコンテナに動的表示
         this.updateGeographicInfo(city);
