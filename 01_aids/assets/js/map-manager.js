@@ -210,9 +210,17 @@ class MapManager {
                 .append('path')
                 .attr('class', 'map-country')
                 .attr('d', this.path)
-                .classed('highlighted', d => {
+                .style('fill', d => {
                     const countryName = d.properties.NAME || d.properties.name || d.properties.NAME_EN;
-                    return highlightCountries.includes(countryName);
+                    return highlightCountries.includes(countryName) ? '#3b82f6' : '#e5e7eb';
+                })
+                .style('stroke', d => {
+                    const countryName = d.properties.NAME || d.properties.name || d.properties.NAME_EN;
+                    return highlightCountries.includes(countryName) ? '#1d4ed8' : '#fff';
+                })
+                .style('stroke-width', d => {
+                    const countryName = d.properties.NAME || d.properties.name || d.properties.NAME_EN;
+                    return highlightCountries.includes(countryName) ? '1' : '0.5';
                 })
                 .style('opacity', 0);
                 
@@ -841,6 +849,12 @@ class MapManager {
             .style('opacity', 0)
             .remove();
         
+        // すべての国のハイライトをリセット
+        this.svg.selectAll('.map-country')
+            .style('fill', '#e5e7eb')
+            .style('stroke', '#fff')
+            .style('stroke-width', '0.5');
+        
         // 地図のアニメーション
         this.svg
             .transition()
@@ -863,6 +877,16 @@ class MapManager {
                             // 新しい都市の国をハイライト
                             const countryName = d.properties.NAME || d.properties.name || d.properties.NAME_EN;
                             return countryName === targetCity.country ? '#3b82f6' : '#e5e7eb';
+                        })
+                        .style('stroke', d => {
+                            // ストロークも適切に設定（該当国のみダークブルー、その他は白）
+                            const countryName = d.properties.NAME || d.properties.name || d.properties.NAME_EN;
+                            return countryName === targetCity.country ? '#1d4ed8' : '#fff';
+                        })
+                        .style('stroke-width', d => {
+                            // ストローク幅も適切に設定（該当国のみ太く、その他は標準）
+                            const countryName = d.properties.NAME || d.properties.name || d.properties.NAME_EN;
+                            return countryName === targetCity.country ? '1' : '0.5';
                         });
                 };
             })

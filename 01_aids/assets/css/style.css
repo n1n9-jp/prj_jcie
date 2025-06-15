@@ -104,16 +104,7 @@
 
 /* 地図スタイル */
 .map-country {
-    fill: #e5e7eb;
-    stroke: #fff;
-    stroke-width: 0.5;
     transition: all 0.3s ease;
-}
-
-.map-country.highlighted {
-    fill: #3b82f6;
-    stroke: #1d4ed8;
-    stroke-width: 1;
 }
 
 .map-city {
