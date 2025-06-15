@@ -813,6 +813,7 @@ class MapManager {
                 .append('path')
                 .attr('class', 'map-country')
                 .attr('d', this.path)
+                .style('fill', '#e5e7eb')
                 .style('stroke', '#fff')
                 .style('stroke-width', 0.5)
                 .style('opacity', 0)

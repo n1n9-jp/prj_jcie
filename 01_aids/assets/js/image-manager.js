@@ -28,14 +28,26 @@ class ImageManager {
      * @param {Object} imageData - 画像データとオプション
      */
     updateImage(imageData) {
-        const { src, alt, config, visible } = imageData;
+        const { src, alt, config, visible, position } = imageData;
         
         this.config = config;
-        this.currentImage = { src, alt, visible };
+        this.currentImage = { src, alt, visible, position };
 
         if (visible && src) {
             this.show();
             this.loadImage(src, alt, config);
+            
+            // 位置設定を適用（main.jsでも適用されるが、確実にするため）
+            if (position && window.PositionManager) {
+                const container = document.getElementById('image-container');
+                if (container) {
+                    const positionConfig = PositionManager.mergePositionConfig(position, 'image');
+                    PositionManager.applyPosition(container, positionConfig, {
+                        responsive: true,
+                        debugMode: false
+                    });
+                }
+            }
         } else {
             this.hide();
         }

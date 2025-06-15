@@ -13,10 +13,13 @@
         "src": "https://placehold.co/800x600/1f2937/ffffff?text=AIDS+Story",
         "alt": "エイズ対策の物語の導入画像",
         "visible": true,
-        "config": {
+        "position": {
+          "horizontal": "center",
+          "vertical": "center",
           "width": "100%",
-          "height": "100%",
-          "position": "center",
+          "height": "100%"
+        },
+        "config": {
           "opacity": 0.9,
           "objectFit": "cover"
         }
@@ -42,6 +45,13 @@
         "type": "line",
         "dataFile": "data/trend_new_infections_normalized.csv",
         "visible": true,
+        "position": {
+          "horizontal": "right",
+          "vertical": "center",
+          "width": "60%",
+          "height": "70%",
+          "padding": "2rem"
+        },
         "config": {
           "widthPercent": 80,
           "height": 400,
@@ -72,6 +82,13 @@
         "type": "line",
         "dataFile": "data/trend_new_infections_normalized.csv",
         "visible": true,
+        "position": {
+          "horizontal": "left",
+          "vertical": "center",
+          "width": "60%",
+          "height": "70%",
+          "padding": "2rem"
+        },
         "config": {
           "widthPercent": 80,
           "height": 400,
@@ -244,12 +261,38 @@
       "id": "step8",
       "text": "世界全体での取り組み",
       "chart": {
-        "visible": false
+        "type": "line",
+        "dataFile": "data/trend_new_deaths_normalized.csv",
+        "visible": true,
+        "position": {
+          "horizontal": "left",
+          "vertical": "center",
+          "width": "45%",
+          "height": "80%",
+          "padding": "1rem"
+        },
+        "config": {
+          "width": 400,
+          "height": 400,
+          "xField": "year",
+          "yField": "value",
+          "seriesField": "series",
+          "multiSeries": true,
+          "title": "エイズ関連死亡者数の推移",
+          "colors": ["#3b82f6", "#e74c3c", "#f39c12", "#2ecc71", "#9b59b6", "#1abc9c", "#e67e22"]
+        }
       },
       "map": {
         "center": [0, 0],
         "zoom": 1,
         "visible": true,
+        "position": {
+          "horizontal": "right",
+          "vertical": "center", 
+          "width": "45%",
+          "height": "80%",
+          "padding": "1rem"
+        },
         "highlightCountries": ["Nigeria", "Malawi", "Kenya", "Belize", "United States of America", "Philippines"],
         "cities": []
       },
@@ -375,6 +418,12 @@
       "chart": {
         "layout": "dual",
         "visible": true,
+        "position": {
+          "horizontal": "center",
+          "vertical": "center",
+          "width": "100%",
+          "height": "80%"
+        },
         "charts": [
           {
             "id": "women",

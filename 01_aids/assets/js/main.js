@@ -290,6 +290,9 @@ class ScrollytellingApp {
             pubsub.publish(EVENTS.IMAGE_UPDATE, stepConfig.image);
         }
 
+        // コンテンツポジション設定を適用
+        this.applyStepPositioning(stepConfig, index);
+
         // ステップ進入イベントを発行
         pubsub.publish(EVENTS.STEP_ENTER, { index, direction, config: stepConfig });
     }
@@ -399,6 +402,272 @@ class ScrollytellingApp {
                 errorDiv.parentNode.removeChild(errorDiv);
             }
         }, 5000);
+    }
+
+    /**
+     * ステップのコンテンツポジション設定を適用
+     * @param {Object} stepConfig - ステップ設定
+     * @param {number} stepIndex - ステップインデックス
+     */
+    applyStepPositioning(stepConfig, stepIndex) {
+        if (!window.PositionManager) {
+            console.warn('PositionManager not available, skipping positioning');
+            return;
+        }
+
+        console.log(`Applying positioning for step ${stepIndex}:`, stepConfig);
+
+        // チャートポジション設定
+        if (stepConfig.chart && stepConfig.chart.visible !== false) {
+            this.applyChartPositioning(stepConfig.chart, stepIndex);
+        }
+
+        // 地図ポジション設定
+        if (stepConfig.map && stepConfig.map.visible !== false) {
+            this.applyMapPositioning(stepConfig.map, stepIndex);
+        }
+
+        // 画像ポジション設定
+        if (stepConfig.image && stepConfig.image.visible !== false) {
+            this.applyImagePositioning(stepConfig.image, stepIndex);
+        }
+
+        // 複数コンテンツの場合の調整
+        this.adjustMultiContentPositioning(stepConfig, stepIndex);
+    }
+
+    /**
+     * チャートのポジション設定を適用
+     * @param {Object} chartConfig - チャート設定
+     * @param {number} stepIndex - ステップインデックス
+     */
+    applyChartPositioning(chartConfig, stepIndex) {
+        const container = document.getElementById('chart-container');
+        if (!container) {
+            console.warn('Chart container not found');
+            return;
+        }
+
+        // ポジション設定を取得
+        const positionConfig = PositionManager.mergePositionConfig(
+            chartConfig.position || {},
+            'chart'
+        );
+
+        // バリデーション
+        const validation = PositionManager.validatePositionConfig(positionConfig);
+        if (!validation.valid) {
+            console.error('Invalid chart position config:', validation.errors);
+            return;
+        }
+
+        if (validation.warnings.length > 0) {
+            console.warn('Chart position warnings:', validation.warnings);
+        }
+
+        // ポジション適用
+        PositionManager.applyPosition(container, positionConfig, {
+            responsive: true,
+            debugMode: true  // チャートのデバッグモードを有効化
+        });
+
+        console.log(`Applied chart positioning for step ${stepIndex}:`, positionConfig);
+        
+        // デバッグ用：実際のコンテナクラスとスタイルを確認
+        console.log(`Chart container classes:`, Array.from(container.classList));
+        console.log(`Chart container styles:`, {
+            position: container.style.position,
+            justifyContent: window.getComputedStyle(container).justifyContent,
+            alignItems: window.getComputedStyle(container).alignItems,
+            width: container.style.width,
+            height: container.style.height
+        });
+    }
+
+    /**
+     * 地図のポジション設定を適用
+     * @param {Object} mapConfig - 地図設定
+     * @param {number} stepIndex - ステップインデックス
+     */
+    applyMapPositioning(mapConfig, stepIndex) {
+        const container = document.getElementById('map-container');
+        if (!container) {
+            console.warn('Map container not found');
+            return;
+        }
+
+        // ポジション設定を取得
+        const positionConfig = PositionManager.mergePositionConfig(
+            mapConfig.position || {},
+            'map'
+        );
+
+        // バリデーション
+        const validation = PositionManager.validatePositionConfig(positionConfig);
+        if (!validation.valid) {
+            console.error('Invalid map position config:', validation.errors);
+            return;
+        }
+
+        // ポジション適用
+        PositionManager.applyPosition(container, positionConfig, {
+            responsive: true,
+            debugMode: false
+        });
+
+        console.log(`Applied map positioning for step ${stepIndex}:`, positionConfig);
+    }
+
+    /**
+     * 画像のポジション設定を適用
+     * @param {Object} imageConfig - 画像設定
+     * @param {number} stepIndex - ステップインデックス
+     */
+    applyImagePositioning(imageConfig, stepIndex) {
+        const container = document.getElementById('image-container');
+        if (!container) {
+            console.warn('Image container not found');
+            return;
+        }
+
+        // ポジション設定を取得
+        const positionConfig = PositionManager.mergePositionConfig(
+            imageConfig.position || {},
+            'image'
+        );
+
+        // バリデーション
+        const validation = PositionManager.validatePositionConfig(positionConfig);
+        if (!validation.valid) {
+            console.error('Invalid image position config:', validation.errors);
+            return;
+        }
+
+        // ポジション適用
+        PositionManager.applyPosition(container, positionConfig, {
+            responsive: true,
+            debugMode: false
+        });
+
+        console.log(`Applied image positioning for step ${stepIndex}:`, positionConfig);
+        
+        // デバッグ用：実際の要素スタイルを確認
+        const imgElement = container.querySelector('#image');
+        if (imgElement) {
+            console.log(`Image element styles:`, {
+                containerWidth: container.style.width,
+                containerHeight: container.style.height,
+                imgWidth: imgElement.style.width,
+                imgHeight: imgElement.style.height,
+                objectFit: imgElement.style.objectFit
+            });
+        }
+    }
+
+    /**
+     * 複数コンテンツの位置調整
+     * @param {Object} stepConfig - ステップ設定
+     * @param {number} stepIndex - ステップインデックス
+     */
+    adjustMultiContentPositioning(stepConfig, stepIndex) {
+        const visibleContents = [];
+
+        // 表示されているコンテンツを収集
+        if (stepConfig.chart && stepConfig.chart.visible !== false) {
+            visibleContents.push({
+                type: 'chart',
+                element: document.getElementById('chart-container'),
+                config: stepConfig.chart.position || {}
+            });
+        }
+
+        if (stepConfig.map && stepConfig.map.visible !== false) {
+            visibleContents.push({
+                type: 'map',
+                element: document.getElementById('map-container'),
+                config: stepConfig.map.position || {}
+            });
+        }
+
+        if (stepConfig.image && stepConfig.image.visible !== false) {
+            visibleContents.push({
+                type: 'image',
+                element: document.getElementById('image-container'),
+                config: stepConfig.image.position || {}
+            });
+        }
+
+        // 複数コンテンツが表示される場合の調整
+        if (visibleContents.length > 1) {
+            console.log(`Adjusting multi-content layout for step ${stepIndex}:`, visibleContents.map(c => c.type));
+
+            // z-indexの調整
+            visibleContents.forEach((content, index) => {
+                if (content.element) {
+                    content.element.style.zIndex = 1 + index;
+                }
+            });
+
+            // レイアウトの競合チェック
+            this.checkLayoutConflicts(visibleContents, stepIndex);
+        }
+    }
+
+    /**
+     * レイアウト競合をチェック
+     * @param {Array} visibleContents - 表示コンテンツリスト
+     * @param {number} stepIndex - ステップインデックス
+     */
+    checkLayoutConflicts(visibleContents, stepIndex) {
+        const positions = visibleContents.map(content => ({
+            type: content.type,
+            horizontal: content.config.horizontal || 'center',
+            vertical: content.config.vertical || 'center'
+        }));
+
+        // 同じ位置にあるコンテンツをチェック
+        const conflicts = [];
+        for (let i = 0; i < positions.length; i++) {
+            for (let j = i + 1; j < positions.length; j++) {
+                if (positions[i].horizontal === positions[j].horizontal &&
+                    positions[i].vertical === positions[j].vertical) {
+                    conflicts.push({
+                        content1: positions[i].type,
+                        content2: positions[j].type,
+                        position: `${positions[i].horizontal}-${positions[i].vertical}`
+                    });
+                }
+            }
+        }
+
+        if (conflicts.length > 0) {
+            console.warn(`Layout conflicts detected in step ${stepIndex}:`, conflicts);
+            console.warn('Consider using different positions or adjusting z-index values');
+        }
+    }
+
+    /**
+     * 全コンテンツのポジションをリセット
+     */
+    resetAllPositions() {
+        if (!window.PositionManager) return;
+
+        const containers = [
+            document.getElementById('chart-container'),
+            document.getElementById('map-container'),
+            document.getElementById('image-container')
+        ];
+
+        containers.forEach(container => {
+            if (container) {
+                PositionManager.resetContainerClasses(container);
+                // デフォルトスタイルに戻す
+                container.style.cssText = '';
+                container.className = container.className.replace(/content-\w+/g, '');
+            }
+        });
+
+        console.log('All content positions reset to default');
     }
 }
 
