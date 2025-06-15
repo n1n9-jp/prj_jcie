@@ -21,6 +21,9 @@ class ScrollytellingApp {
             // マネージャーを初期化
             this.initManagers();
             
+            // テキストポジションを事前適用（ちらつき防止）
+            this.preApplyTextPositions();
+            
             // スクロールを初期化（都市ステップ生成後）
             // DOM更新を待つため、次のティックで初期化
             setTimeout(() => {
@@ -788,6 +791,32 @@ class ScrollytellingApp {
 
         console.log('All content and text positions reset to default');
     }
+
+    /**
+     * テキストポジションを事前適用（ちらつき防止）
+     */
+    preApplyTextPositions() {
+        if (!window.PositionManager || !this.config?.steps) {
+            return;
+        }
+
+        console.log('Pre-applying text positions to prevent flickering...');
+        
+        this.config.steps.forEach((stepConfig, stepIndex) => {
+            if (stepConfig.text && stepConfig.text.position) {
+                // 要素を取得
+                let stepElement = document.querySelector(`[data-step="${stepConfig.id}"]`) ||
+                               document.querySelector(`[data-step="${stepConfig.id.replace(/^step/, '')}"]`) ||
+                               document.querySelector(`[data-step="${stepIndex}"]`);
+                
+                if (stepElement) {
+                    // フルのテキストポジションを適用（白い矩形の位置制御も含む）
+                    this.applyTextPositioning(stepConfig, stepIndex);
+                }
+            }
+        });
+    }
+
 }
 
 // DOMContentLoaded後にアプリケーションを開始
