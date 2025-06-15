@@ -248,29 +248,37 @@ class ScrollytellingApp {
                 };
                 pubsub.publish(EVENTS.CHART_UPDATE, tripleChartData);
             } else {
-                // 従来の単一チャート
-                let updateMode = stepConfig.chart.updateMode || 'replace';
-                
-                // 逆方向スクロールでトランジション対応を判定
-                if (direction === 'up') {
-                    // 現在のstepから、次のstep（より大きいindex）を探す
-                    const nextStepConfig = this.config?.steps?.[index + 1];
-                    // 次のstepと同じデータファイル、かつ次のstepがtransitionモードの場合
-                    if (nextStepConfig?.chart?.dataFile === stepConfig.chart.dataFile &&
-                        nextStepConfig?.chart?.updateMode === 'transition') {
-                        updateMode = 'transition';
-                        console.log(`Using transition mode for reverse scroll from step ${index + 1} to ${index}`);
+                // visible: false の場合は最小限の情報で非表示指示
+                if (stepConfig.chart.visible === false) {
+                    pubsub.publish(EVENTS.CHART_UPDATE, { visible: false });
+                } else {
+                    // 従来の単一チャート
+                    let updateMode = stepConfig.chart.updateMode || 'replace';
+                    
+                    // 逆方向スクロールでトランジション対応を判定
+                    if (direction === 'up') {
+                        // 現在のstepから、次のstep（より大きいindex）を探す
+                        const nextStepConfig = this.config?.steps?.[index + 1];
+                        // 次のstepと同じデータファイル、かつ次のstepがtransitionモードの場合
+                        if (nextStepConfig?.chart?.dataFile === stepConfig.chart.dataFile &&
+                            nextStepConfig?.chart?.updateMode === 'transition') {
+                            updateMode = 'transition';
+                            console.log(`Using transition mode for reverse scroll from step ${index + 1} to ${index}`);
+                        }
                     }
+                    
+                    const chartData = {
+                        ...stepConfig.chart,
+                        data: this.getChartData(stepConfig.chart.type, stepConfig.chart.dataFile),
+                        updateMode: updateMode,
+                        direction: direction // スクロール方向を追加
+                    };
+                    pubsub.publish(EVENTS.CHART_UPDATE, chartData);
                 }
-                
-                const chartData = {
-                    ...stepConfig.chart,
-                    data: this.getChartData(stepConfig.chart.type, stepConfig.chart.dataFile),
-                    updateMode: updateMode,
-                    direction: direction // スクロール方向を追加
-                };
-                pubsub.publish(EVENTS.CHART_UPDATE, chartData);
             }
+        } else {
+            // チャート設定がない場合は明示的に非表示にする
+            pubsub.publish(EVENTS.CHART_UPDATE, { visible: false });
         }
 
         // 地図更新
@@ -293,9 +301,6 @@ class ScrollytellingApp {
             pubsub.publish(EVENTS.IMAGE_UPDATE, stepConfig.image);
         }
 
-        // 全コンテンツコンテナの表示状態をリセット
-        this.resetContentVisibility();
-        
         // コンテンツポジション設定を適用
         this.applyStepPositioning(stepConfig, index);
         
@@ -429,6 +434,16 @@ class ScrollytellingApp {
         // チャートポジション設定
         if (stepConfig.chart && stepConfig.chart.visible !== false) {
             this.applyChartPositioning(stepConfig.chart, stepIndex);
+        } else {
+            // チャートが存在しないまたは非表示の場合、chart-containerと#chartを非表示にする
+            const chartContainer = document.getElementById('chart-container');
+            const chartElement = document.getElementById('chart');
+            if (chartContainer) {
+                chartContainer.classList.remove('visible');
+            }
+            if (chartElement) {
+                chartElement.classList.remove('visible');
+            }
         }
 
         // 地図ポジション設定
@@ -831,22 +846,6 @@ class ScrollytellingApp {
         });
     }
 
-    /**
-     * 全コンテンツコンテナの表示状態をリセット
-     */
-    resetContentVisibility() {
-        const containers = [
-            document.getElementById('chart-container'),
-            document.getElementById('map-container'),
-            document.getElementById('image-container')
-        ];
-
-        containers.forEach(container => {
-            if (container) {
-                container.classList.remove('visible');
-            }
-        });
-    }
 
 }
 

@@ -474,6 +474,10 @@ class ChartManager {
      */
     hide() {
         this.container.classed('visible', false);
+        // コンテンツも完全にクリア
+        this.container.selectAll('*').remove();
+        this.svg = null;
+        this.currentChart = null;
     }
 
     /**
