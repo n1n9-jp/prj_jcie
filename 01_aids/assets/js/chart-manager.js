@@ -733,30 +733,83 @@ class ChartManager {
      * コンパクトなレジェンドを追加
      */
     addCompactLegend(g, series, colorScale, width, height) {
+        if (!series || series.length <= 1) return;
+        
+        // ChartLayoutHelperを使用して最適な凡例レイアウトを計算（コンパクト版）
+        let legendLayout;
+        if (window.ChartLayoutHelper) {
+            const seriesNames = series.map(s => s.name);
+            legendLayout = ChartLayoutHelper.calculateLegendLayout(seriesNames, width, height);
+            // コンパクト版の調整
+            legendLayout.itemHeight = 16;
+            legendLayout.itemWidth = Math.min(legendLayout.itemWidth, width * 0.3);
+        } else {
+            // フォールバック：従来の固定レイアウト
+            legendLayout = {
+                show: true,
+                position: 'right',
+                orientation: 'vertical',
+                itemWidth: 100,
+                itemHeight: 16,
+                totalWidth: 100
+            };
+        }
+        
+        if (!legendLayout.show) return;
+        
+        // 凡例位置を計算（コンパクト版はより保守的に）
+        const legendX = Math.max(10, width - legendLayout.totalWidth - 10);
+        const legendY = 10;
+        
         const legend = g.append('g')
-            .attr('class', 'chart-legend')
-            .attr('transform', `translate(${width - 140}, 10)`);
+            .attr('class', 'chart-legend compact-legend')
+            .attr('transform', `translate(${legendX}, ${legendY})`);
 
         const legendItems = legend.selectAll('.legend-item')
             .data(series)
             .enter()
             .append('g')
             .attr('class', 'legend-item')
-            .attr('transform', (d, i) => `translate(0, ${i * 16})`);
+            .attr('transform', (d, i) => `translate(0, ${i * legendLayout.itemHeight})`);
 
+        // コンパクトな凡例アイコン（小さな円）
         legendItems.append('circle')
             .attr('cx', 4)
             .attr('cy', 4)
             .attr('r', 3)
             .attr('fill', d => colorScale(d.name));
 
-        legendItems.append('text')
+        // コンパクトな凡例テキスト
+        const legendTexts = legendItems.append('text')
             .attr('x', 12)
             .attr('y', 4)
             .attr('dy', '0.35em')
             .attr('font-size', '10px')
-            .attr('fill', '#333')
-            .text(d => d.name);
+            .attr('fill', '#333');
+        
+        // コンパクト版でもテキストの長さをチェック
+        legendTexts.each(function(d) {
+            const textElement = d3.select(this);
+            const text = d.name;
+            const maxWidth = legendLayout.itemWidth - 20; // アイコン分を除く
+            
+            // テキスト幅を測定
+            textElement.text(text);
+            const textWidth = this.getBBox ? this.getBBox().width : text.length * 6; // フォールバック
+            
+            if (textWidth > maxWidth) {
+                // テキストを省略（コンパクト版はより積極的に）
+                let truncatedText = text;
+                while (truncatedText.length > 3) {
+                    truncatedText = truncatedText.slice(0, -1);
+                    textElement.text(truncatedText + '...');
+                    if (!this.getBBox || this.getBBox().width <= maxWidth) break;
+                }
+                
+                // ツールチップで完全なテキストを表示
+                textElement.append('title').text(text);
+            }
+        });
     }
 
     /**
@@ -1082,30 +1135,94 @@ class ChartManager {
      * レジェンドを追加
      */
     addLegend(svg, series, colorScale, width, height) {
+        if (!series || series.length <= 1) return;
+        
+        // ChartLayoutHelperを使用して最適な凡例レイアウトを計算
+        let legendLayout;
+        if (window.ChartLayoutHelper) {
+            const seriesNames = series.map(s => s.name);
+            legendLayout = ChartLayoutHelper.calculateLegendLayout(seriesNames, width, height);
+        } else {
+            // フォールバック：従来の固定レイアウト
+            legendLayout = {
+                show: true,
+                position: 'right',
+                orientation: 'vertical',
+                itemWidth: 120,
+                itemHeight: 20
+            };
+        }
+        
+        if (!legendLayout.show) return;
+        
+        // 凡例コンテナを作成
         const legend = svg.append('g')
-            .attr('class', 'chart-legend')
-            .attr('transform', `translate(${width - 120}, 20)`);
-
+            .attr('class', 'chart-legend');
+        
+        // 凡例位置を計算
+        let legendX, legendY;
+        if (legendLayout.position === 'bottom') {
+            legendX = width / 2 - (legendLayout.itemWidth * series.length) / 2;
+            legendY = height + 40;
+        } else {
+            // 右側配置（デフォルト）
+            legendX = Math.max(20, width - legendLayout.totalWidth);
+            legendY = 20;
+        }
+        
+        legend.attr('transform', `translate(${legendX}, ${legendY})`);
+        
+        // 凡例アイテムを作成
         const legendItems = legend.selectAll('.legend-item')
             .data(series)
             .enter()
             .append('g')
-            .attr('class', 'legend-item')
-            .attr('transform', (d, i) => `translate(0, ${i * 20})`);
-
+            .attr('class', 'legend-item');
+        
+        // アイテムの配置
+        if (legendLayout.orientation === 'horizontal') {
+            legendItems.attr('transform', (d, i) => `translate(${i * legendLayout.itemWidth}, 0)`);
+        } else {
+            legendItems.attr('transform', (d, i) => `translate(0, ${i * legendLayout.itemHeight})`);
+        }
+        
+        // 凡例アイコン（円）
         legendItems.append('circle')
             .attr('cx', 6)
             .attr('cy', 6)
             .attr('r', 5)
             .attr('fill', d => colorScale(d.name));
-
-        legendItems.append('text')
+        
+        // 凡例テキスト
+        const legendTexts = legendItems.append('text')
             .attr('x', 16)
             .attr('y', 6)
             .attr('dy', '0.35em')
             .attr('font-size', '12px')
-            .attr('fill', '#333')
-            .text(d => d.name);
+            .attr('fill', '#333');
+        
+        // テキストの長さをチェックして必要に応じて省略
+        legendTexts.each(function(d) {
+            const textElement = d3.select(this);
+            const text = d.name;
+            const maxWidth = legendLayout.itemWidth - 25; // アイコン分を除く
+            
+            // テキスト幅を測定
+            textElement.text(text);
+            const textWidth = this.getBBox().width;
+            
+            if (textWidth > maxWidth) {
+                // テキストを省略
+                let truncatedText = text;
+                while (truncatedText.length > 0 && this.getBBox().width > maxWidth) {
+                    truncatedText = truncatedText.slice(0, -1);
+                    textElement.text(truncatedText + '...');
+                }
+                
+                // ツールチップで完全なテキストを表示
+                textElement.append('title').text(text);
+            }
+        });
     }
 
     /**

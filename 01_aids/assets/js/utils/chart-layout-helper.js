@@ -638,17 +638,29 @@ class ChartLayoutHelper {
      */
     static calculateLegendLayout(seriesNames, chartWidth, chartHeight) {
         if (!seriesNames || seriesNames.length <= 1) {
+            console.log('calculateLegendLayout: Not showing legend (no series or single series)');
             return { show: false };
         }
 
-        const maxNameLength = Math.max(...seriesNames.map(name => name.length));
-        const estimatedItemWidth = maxNameLength * 8 + 40; // 文字幅 + アイコン + 余白
+        // 実際のテキスト幅を測定して、より正確な幅を計算
+        const maxTextWidth = Math.max(...seriesNames.map(name => 
+            this.measureTextWidth(name, '12px Arial')
+        ));
+        const estimatedItemWidth = maxTextWidth + 40; // 実測テキスト幅 + アイコン + 余白
         const itemHeight = 20;
+
+        console.log('calculateLegendLayout: seriesNames:', seriesNames);
+        console.log('calculateLegendLayout: maxTextWidth:', maxTextWidth);
+        console.log('calculateLegendLayout: estimatedItemWidth:', estimatedItemWidth);
+        console.log('calculateLegendLayout: chartWidth:', chartWidth, 'chartHeight:', chartHeight);
 
         // 横置きが可能かチェック
         const totalHorizontalWidth = seriesNames.length * estimatedItemWidth;
+        console.log('calculateLegendLayout: totalHorizontalWidth:', totalHorizontalWidth);
+        console.log('calculateLegendLayout: 80% of chartWidth:', chartWidth * 0.8);
+        
         if (totalHorizontalWidth <= chartWidth * 0.8) {
-            return {
+            const layout = {
                 show: true,
                 position: 'bottom',
                 orientation: 'horizontal',
@@ -656,10 +668,12 @@ class ChartLayoutHelper {
                 itemHeight: itemHeight,
                 totalHeight: itemHeight + 20
             };
+            console.log('calculateLegendLayout: Using horizontal layout:', layout);
+            return layout;
         }
 
         // 縦置きの場合
-        return {
+        const layout = {
             show: true,
             position: 'right',
             orientation: 'vertical',
@@ -668,6 +682,8 @@ class ChartLayoutHelper {
             totalWidth: estimatedItemWidth + 20,
             totalHeight: seriesNames.length * itemHeight
         };
+        console.log('calculateLegendLayout: Using vertical layout:', layout);
+        return layout;
     }
 
     /**
