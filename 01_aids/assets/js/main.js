@@ -266,12 +266,6 @@ class ScrollytellingApp {
                     updateMode: updateMode,
                     direction: direction // スクロール方向を追加
                 };
-                console.log('Step Config Chart:', stepConfig.chart);
-                console.log('Chart Data being published:', chartData);
-                console.log('Config in chartData:', chartData.config);
-                if (chartData.config) {
-                    console.log('widthPercent in config:', chartData.config.widthPercent);
-                }
                 pubsub.publish(EVENTS.CHART_UPDATE, chartData);
             }
         }

@@ -43,7 +43,7 @@
         "dataFile": "data/trend_new_infections_normalized.csv",
         "visible": true,
         "config": {
-          "width": 1000,
+          "widthPercent": 80,
           "height": 400,
           "xField": "year",
           "yField": "value",
@@ -73,7 +73,7 @@
         "dataFile": "data/trend_new_infections_normalized.csv",
         "visible": true,
         "config": {
-          "width": 1000,
+          "widthPercent": 80,
           "height": 400,
           "xField": "year",
           "yField": "value",
@@ -98,7 +98,7 @@
         "dataFile": "data/trend_new_deaths_normalized.csv",
         "visible": true,
         "config": {
-          "width": 1000,
+          "widthPercent": 80,
           "height": 400,
           "xField": "year",
           "yField": "value",
@@ -223,14 +223,14 @@
         "visible": true,
         "config": {
           "widthPercent": 50,
-          "height": 900,
+          "height": 400,
           "xField": "year",
           "yField": "value",
           "seriesField": "series",
           "multiSeries": false,
           "seriesName": "母子感染率",
           "colors": ["#10b981"],
-          "title": "HIV母子感染率の推移（％）"
+          "title": "HIV母子感染率の推移（%）"
         }
       },
       "map": {

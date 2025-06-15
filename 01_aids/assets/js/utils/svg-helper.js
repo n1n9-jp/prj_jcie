@@ -37,21 +37,13 @@ class SVGHelper {
                 const widthStyle = actualWidth ? `${actualWidth}px` : '100%';
                 const heightStyle = actualHeight ? `${actualHeight}px` : 'auto';
                 
-                console.log(`SVGHelper: Setting specific size - width: ${widthStyle}, height: ${heightStyle}`);
                 svg
                     .style('width', widthStyle)
                     .style('height', heightStyle)
                     .style('max-width', '100%')
                     .style('display', 'block');
-                console.log('SVG styles applied:', {
-                    width: svg.style('width'),
-                    height: svg.style('height'),
-                    maxWidth: svg.style('max-width'),
-                    display: svg.style('display')
-                });
             } else {
                 // レスポンシブ設定：コンテナのサイズに合わせる
-                console.log('SVGHelper: Using 100% width responsive mode');
                 svg
                     .style('width', '100%')
                     .style('height', 'auto')
