@@ -292,6 +292,9 @@ class ScrollytellingApp {
 
         // コンテンツポジション設定を適用
         this.applyStepPositioning(stepConfig, index);
+        
+        // テキストポジション設定を適用
+        this.applyTextPositioning(stepConfig, index);
 
         // ステップ進入イベントを発行
         pubsub.publish(EVENTS.STEP_ENTER, { index, direction, config: stepConfig });
@@ -647,11 +650,118 @@ class ScrollytellingApp {
     }
 
     /**
+     * テキストのポジション設定を適用
+     * @param {Object} stepConfig - ステップ設定
+     * @param {number} stepIndex - ステップインデックス
+     */
+    applyTextPositioning(stepConfig, stepIndex) {
+        if (!window.PositionManager) {
+            console.warn('PositionManager not available, skipping text positioning');
+            return;
+        }
+
+        // 現在のステップ要素を取得
+        const stepElement = document.querySelector(`[data-step="${stepIndex}"]`);
+        if (!stepElement) {
+            console.warn(`Step element not found for index ${stepIndex}`);
+            return;
+        }
+
+        // テキストポジション設定があるかチェック
+        if (stepConfig.text && stepConfig.text.position) {
+            console.log(`Applying text positioning for step ${stepIndex}:`, stepConfig.text.position);
+
+            // ポジション設定を取得・マージ
+            const positionConfig = PositionManager.mergePositionConfig(
+                stepConfig.text.position,
+                'text'
+            );
+
+            // バリデーション
+            const validation = PositionManager.validatePositionConfig(positionConfig);
+            if (!validation.valid) {
+                console.error('Invalid text position config:', validation.errors);
+                return;
+            }
+
+            if (validation.warnings.length > 0) {
+                console.warn('Text position warnings:', validation.warnings);
+            }
+
+            // 他のコンテンツとの組み合わせクラスを追加
+            this.addContentCombinationClasses(stepElement, stepConfig);
+
+            // テキストポジション適用
+            PositionManager.applyTextPosition(stepElement, positionConfig, {
+                responsive: true,
+                debugMode: false // デバッグモードをオフに
+            });
+
+            console.log(`Applied text positioning for step ${stepIndex}:`, positionConfig);
+        } else {
+            // テキストポジション設定がない場合はデフォルト（中央）
+            this.resetTextPosition(stepElement);
+        }
+    }
+
+    /**
+     * 他のコンテンツとの組み合わせに応じたクラスを追加
+     * @param {HTMLElement} stepElement - ステップ要素
+     * @param {Object} stepConfig - ステップ設定
+     */
+    addContentCombinationClasses(stepElement, stepConfig) {
+        // 既存の組み合わせクラスをリセット
+        const combinationClasses = [
+            'has-chart-left', 'has-chart-right', 'has-chart-center',
+            'has-map-left', 'has-map-right', 'has-map-center',
+            'has-image-left', 'has-image-right', 'has-image-center'
+        ];
+        stepElement.classList.remove(...combinationClasses);
+
+        // チャートがある場合
+        if (stepConfig.chart && stepConfig.chart.visible !== false) {
+            const chartPosition = stepConfig.chart.position?.horizontal || 'center';
+            stepElement.classList.add(`has-chart-${chartPosition}`);
+        }
+
+        // 地図がある場合
+        if (stepConfig.map && stepConfig.map.visible !== false) {
+            const mapPosition = stepConfig.map.position?.horizontal || 'center';
+            stepElement.classList.add(`has-map-${mapPosition}`);
+        }
+
+        // 画像がある場合
+        if (stepConfig.image && stepConfig.image.visible !== false) {
+            const imagePosition = stepConfig.image.position?.horizontal || 'center';
+            stepElement.classList.add(`has-image-${imagePosition}`);
+        }
+    }
+
+    /**
+     * テキストポジションをリセット
+     * @param {HTMLElement} stepElement - ステップ要素
+     */
+    resetTextPosition(stepElement) {
+        if (!stepElement || !window.PositionManager) return;
+
+        PositionManager.resetTextClasses(stepElement);
+        
+        // 組み合わせクラスもリセット
+        const combinationClasses = [
+            'has-chart-left', 'has-chart-right', 'has-chart-center',
+            'has-map-left', 'has-map-right', 'has-map-center',
+            'has-image-left', 'has-image-right', 'has-image-center'
+        ];
+        stepElement.classList.remove(...combinationClasses);
+    }
+
+    /**
      * 全コンテンツのポジションをリセット
      */
     resetAllPositions() {
         if (!window.PositionManager) return;
 
+        // コンテンツコンテナのリセット
         const containers = [
             document.getElementById('chart-container'),
             document.getElementById('map-container'),
@@ -667,7 +777,13 @@ class ScrollytellingApp {
             }
         });
 
-        console.log('All content positions reset to default');
+        // テキストポジションのリセット
+        const steps = document.querySelectorAll('.step');
+        steps.forEach(step => {
+            this.resetTextPosition(step);
+        });
+
+        console.log('All content and text positions reset to default');
     }
 }
 

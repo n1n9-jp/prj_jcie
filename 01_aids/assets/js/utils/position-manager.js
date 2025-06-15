@@ -378,7 +378,7 @@ class PositionManager {
 
     /**
      * デフォルト位置設定を取得
-     * @param {string} contentType - コンテンツタイプ ('chart', 'map', 'image')
+     * @param {string} contentType - コンテンツタイプ ('chart', 'map', 'image', 'text')
      * @returns {Object} デフォルト位置設定
      */
     static getDefaultPositionConfig(contentType) {
@@ -401,6 +401,13 @@ class PositionManager {
                 vertical: 'center',
                 width: '100%',
                 height: '100%'
+            },
+            text: {
+                horizontal: 'center',
+                vertical: 'center',
+                width: 'auto',
+                maxWidth: '500px',
+                padding: '2rem'
             }
         };
 
@@ -416,6 +423,190 @@ class PositionManager {
     static mergePositionConfig(userConfig, contentType) {
         const defaultConfig = this.getDefaultPositionConfig(contentType);
         return { ...defaultConfig, ...userConfig };
+    }
+
+    /**
+     * テキストコンテンツのポジション設定を適用
+     * @param {HTMLElement} stepElement - ステップ要素
+     * @param {Object} positionConfig - 位置設定
+     * @param {Object} options - 追加オプション
+     */
+    static applyTextPosition(stepElement, positionConfig = {}, options = {}) {
+        if (!stepElement) {
+            console.warn('PositionManager: Step element not found');
+            return;
+        }
+
+        const {
+            horizontal = 'center',
+            vertical = 'center',
+            width = 'auto',
+            maxWidth = '500px',
+            padding = '2rem',
+            margin = null
+        } = positionConfig;
+
+        const {
+            responsive = true,
+            debugMode = false
+        } = options;
+
+        if (debugMode) {
+            console.log('PositionManager: Applying text position config:', positionConfig);
+        }
+
+        // ステップ要素のクラスをリセット
+        this.resetTextClasses(stepElement);
+
+        // テキストポジション用のクラスを追加
+        const horizontalClass = this.getTextHorizontalClass(horizontal);
+        const verticalClass = this.getTextVerticalClass(vertical);
+        
+        stepElement.classList.add('positioned-text');
+        stepElement.classList.add(horizontalClass);
+        stepElement.classList.add(verticalClass);
+
+        // テキストコンテナ（白背景の部分）を取得
+        const textContainer = stepElement.querySelector('.max-w-lg, .text-content, div[class*="bg-white"]');
+        if (textContainer) {
+            // テキストコンテナのスタイルを適用
+            this.applyTextContainerStyles(textContainer, {
+                width,
+                maxWidth,
+                padding,
+                margin
+            });
+        }
+
+        // レスポンシブ調整
+        if (responsive) {
+            this.applyTextResponsiveAdjustments(stepElement, positionConfig);
+        }
+
+        if (debugMode) {
+            console.log('PositionManager: Text positioning applied:', {
+                step: stepElement.getAttribute('data-step'),
+                classes: Array.from(stepElement.classList),
+                textContainer: textContainer
+            });
+        }
+    }
+
+    /**
+     * テキスト用の水平位置クラスを取得
+     * @param {string} horizontal - 水平位置
+     * @returns {string} CSSクラス名
+     */
+    static getTextHorizontalClass(horizontal) {
+        switch (horizontal.toLowerCase()) {
+            case 'left':
+                return 'text-left';
+            case 'right':
+                return 'text-right';
+            case 'center':
+            default:
+                return 'text-center';
+        }
+    }
+
+    /**
+     * テキスト用の垂直位置クラスを取得
+     * @param {string} vertical - 垂直位置
+     * @returns {string} CSSクラス名
+     */
+    static getTextVerticalClass(vertical) {
+        switch (vertical.toLowerCase()) {
+            case 'top':
+                return 'text-top';
+            case 'bottom':
+                return 'text-bottom';
+            case 'center':
+            case 'middle':
+            default:
+                return 'text-middle';
+        }
+    }
+
+    /**
+     * テキスト要素のクラスをリセット
+     * @param {HTMLElement} stepElement - ステップ要素
+     */
+    static resetTextClasses(stepElement) {
+        const textClasses = [
+            'positioned-text',
+            'text-left', 'text-center', 'text-right',
+            'text-top', 'text-middle', 'text-bottom',
+            'text-small-screen'
+        ];
+        
+        stepElement.classList.remove(...textClasses);
+    }
+
+    /**
+     * テキストコンテナのスタイルを適用
+     * @param {HTMLElement} container - テキストコンテナ
+     * @param {Object} styleConfig - スタイル設定
+     */
+    static applyTextContainerStyles(container, styleConfig) {
+        const { width, maxWidth, padding, margin } = styleConfig;
+
+        // サイズ設定
+        if (width && width !== 'auto') {
+            container.style.width = this.normalizeSize(width);
+        }
+        if (maxWidth) {
+            container.style.maxWidth = this.normalizeSize(maxWidth);
+        }
+
+        // スペーシング設定
+        if (padding) {
+            container.style.padding = this.normalizeSpacing(padding);
+        }
+        if (margin) {
+            container.style.margin = this.normalizeSpacing(margin);
+        }
+
+        // テキストの可読性を確保
+        container.style.minWidth = '300px';
+        container.style.boxSizing = 'border-box';
+    }
+
+    /**
+     * テキスト用レスポンシブ調整を適用
+     * @param {HTMLElement} stepElement - ステップ要素
+     * @param {Object} positionConfig - 位置設定
+     */
+    static applyTextResponsiveAdjustments(stepElement, positionConfig) {
+        const checkScreenSize = () => {
+            const screenWidth = window.innerWidth;
+            const smallScreenThreshold = 768;
+
+            if (screenWidth <= smallScreenThreshold) {
+                // 小画面では中央配置に強制変更
+                this.resetTextClasses(stepElement);
+                stepElement.classList.add('positioned-text', 'text-center', 'text-middle', 'text-small-screen');
+            } else {
+                // 通常画面では設定通りに配置
+                stepElement.classList.remove('text-small-screen');
+                // 必要に応じて元の設定を再適用
+                if (!stepElement.classList.contains('positioned-text')) {
+                    this.applyTextPosition(stepElement, positionConfig, { responsive: false });
+                }
+            }
+        };
+
+        // 初回実行
+        checkScreenSize();
+
+        // リサイズ時の再調整（重複登録を避けるため一度削除）
+        const existingHandler = stepElement._textResizeHandler;
+        if (existingHandler) {
+            window.removeEventListener('resize', existingHandler);
+        }
+
+        const newHandler = checkScreenSize;
+        stepElement._textResizeHandler = newHandler;
+        window.addEventListener('resize', newHandler);
     }
 
     /**

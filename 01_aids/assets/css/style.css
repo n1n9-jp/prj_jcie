@@ -274,6 +274,197 @@
     }
 }
 
+/* ====================================
+   テキストポジショニングシステム
+   ==================================== */
+
+/* 基本テキストポジション設定 */
+.positioned-text {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    transition: all 0.5s ease-in-out;
+}
+
+/* 水平位置制御 */
+.positioned-text.text-left {
+    justify-content: flex-start !important;
+    padding-left: 2rem;
+    padding-right: 6rem; /* 右側に余白を確保 */
+}
+
+.positioned-text.text-center {
+    justify-content: center !important;
+    padding-left: 2rem;
+    padding-right: 2rem;
+}
+
+.positioned-text.text-right {
+    justify-content: flex-end !important;
+    padding-left: 6rem; /* 左側に余白を確保 */
+    padding-right: 2rem;
+}
+
+/* 垂直位置制御 */
+.positioned-text.text-top {
+    align-items: flex-start !important;
+    padding-top: 4rem;
+    padding-bottom: 2rem;
+}
+
+.positioned-text.text-middle {
+    align-items: center !important;
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+}
+
+.positioned-text.text-bottom {
+    align-items: flex-end !important;
+    padding-top: 2rem;
+    padding-bottom: 4rem;
+}
+
+/* テキストコンテナの基本設定 */
+.positioned-text .text-container,
+.positioned-text .max-w-lg,
+.positioned-text div[class*="bg-white"] {
+    flex-shrink: 0;
+    box-sizing: border-box;
+    min-width: 300px;
+    max-width: 100%;
+}
+
+/* グリッドベースレイアウト対応 */
+.text-grid-left {
+    justify-content: flex-start !important;
+    max-width: 50%;
+}
+
+.text-grid-right {
+    justify-content: flex-end !important;
+    max-width: 50%;
+    margin-left: auto;
+}
+
+.text-grid-center {
+    justify-content: center !important;
+    max-width: 60%;
+    margin: 0 auto;
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+    .text-small-screen {
+        justify-content: center !important;
+        align-items: center !important;
+        padding: 1rem !important;
+    }
+    
+    .text-small-screen .text-container,
+    .text-small-screen .max-w-lg,
+    .text-small-screen div[class*="bg-white"] {
+        max-width: 100% !important;
+        margin: 0 !important;
+    }
+    
+    /* 小画面では左右配置を中央に強制変更 */
+    .text-small-screen.text-left,
+    .text-small-screen.text-right {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .text-small-screen {
+        padding: 0.5rem !important;
+    }
+    
+    .text-small-screen .text-container,
+    .text-small-screen .max-w-lg,
+    .text-small-screen div[class*="bg-white"] {
+        min-width: 280px !important;
+        padding: 1rem !important;
+    }
+}
+
+/* 複数コンテンツとの組み合わせ対応 */
+.positioned-text.has-chart-left {
+    padding-left: 50%; /* チャートが左にある場合 */
+}
+
+.positioned-text.has-chart-right {
+    padding-right: 50%; /* チャートが右にある場合 */
+}
+
+.positioned-text.has-map-left {
+    padding-left: 50%; /* 地図が左にある場合 */
+}
+
+.positioned-text.has-map-right {
+    padding-right: 50%; /* 地図が右にある場合 */
+}
+
+/* テキストポジション用アニメーション */
+.positioned-text.animate-in {
+    animation: textSlideIn 0.6s ease-out;
+}
+
+.positioned-text.animate-out {
+    animation: textSlideOut 0.4s ease-in;
+}
+
+@keyframes textSlideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes textSlideOut {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+}
+
+/* 既存の.stepスタイルとの競合回避 */
+.step.positioned-text {
+    /* positioned-textが優先されるように !important を使用 */
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 2rem !important;
+}
+
+/* デバッグ用（開発時のみ） */
+.positioned-text.debug {
+    border: 2px dashed rgba(0, 255, 0, 0.5);
+    background: rgba(0, 255, 0, 0.1);
+}
+
+.positioned-text.debug::before {
+    content: attr(data-text-position-info);
+    position: absolute;
+    top: -25px;
+    left: 0;
+    background: rgba(0, 128, 0, 0.8);
+    color: white;
+    padding: 2px 8px;
+    font-size: 12px;
+    border-radius: 3px;
+    z-index: 1000;
+}
+
 /* D3チャート共通スタイル */
 .chart-axis {
     font-size: 12px;
