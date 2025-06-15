@@ -419,28 +419,43 @@ class ChartManager {
     }
 
     /**
-     * レスポンシブなサイズを計算
+     * レスポンシブなサイズを計算（viewBox基準版）
      * @param {Object} config - 設定
      * @returns {Object} - { width, height }
      */
     getResponsiveSize(config) {
-        const containerNode = this.container.node();
-        const containerWidth = containerNode.clientWidth;
-        const containerHeight = containerNode.clientHeight;
-        
-        // 最大サイズの80%を使用
-        const maxWidth = Math.min(containerWidth * 0.8, config.width || 600);
-        const maxHeight = Math.min(containerHeight * 0.8, config.height || 400);
-        
+        // SVGHelperが利用可能な場合は共通ユーティリティを使用
+        if (window.SVGHelper) {
+            return SVGHelper.getResponsiveSize(this.container, {
+                defaultWidth: 800,  // viewBoxの基準幅
+                defaultHeight: 600, // viewBoxの基準高さ
+                width: config.width,
+                height: config.height,
+                minWidth: 300,
+                minHeight: 200,
+                maxWidth: 1200,
+                maxHeight: 800,
+                aspectRatio: config.aspectRatio || ((config.width || 800) / (config.height || 600)),
+                widthPercent: config.widthPercent || null,
+                heightPercent: config.heightPercent || null
+            });
+        }
+
+        // フォールバック（SVGHelperが利用できない場合）
+        let width = config.width || 800;
+        let height = config.height || 600;
+
+        // パーセンテージ指定の場合
+        if (config.widthPercent) {
+            width = window.innerWidth * (config.widthPercent / 100);
+        }
+        if (config.heightPercent) {
+            height = window.innerHeight * (config.heightPercent / 100);
+        }
+
         // アスペクト比を維持
-        const aspectRatio = (config.width || 600) / (config.height || 400);
-        
-        let width = maxWidth;
-        let height = width / aspectRatio;
-        
-        if (height > maxHeight) {
-            height = maxHeight;
-            width = height * aspectRatio;
+        if (config.widthPercent && !config.heightPercent && config.aspectRatio) {
+            height = width / config.aspectRatio;
         }
         
         return { width, height };
@@ -638,7 +653,7 @@ class ChartManager {
     }
 
     /**
-     * チャートを描画
+     * チャートを描画（レスポンシブ対応版）
      * @param {string} type - チャートタイプ
      * @param {Array} data - データ
      * @param {Object} config - 設定
@@ -646,6 +661,22 @@ class ChartManager {
     renderChart(type, data, config) {
         const { width, height } = this.getResponsiveSize(config);
         const margin = config.margin || { top: 40, right: 20, bottom: 40, left: 50 };
+        
+        // SVGHelperを使用してレスポンシブSVGを作成
+        if (window.SVGHelper) {
+            this.svg = SVGHelper.initSVG(this.container, width, height, {
+                className: 'chart-svg',
+                responsive: true,
+                preserveAspectRatio: 'xMidYMid meet'
+            });
+        } else {
+            // フォールバック
+            this.container.selectAll('*').remove();
+            this.svg = this.container.append('svg')
+                .attr('viewBox', `0 0 ${width} ${height}`)
+                .style('width', '100%')
+                .style('height', 'auto');
+        }
         
         switch (type) {
             case 'line':

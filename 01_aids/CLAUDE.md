@@ -164,6 +164,75 @@ Promise.all([
 }
 ```
 
+### チャートサイズのパーセンテージ指定
+ブラウザのビューポートサイズに対してパーセンテージでチャートサイズを指定可能。
+
+#### 設定オプション
+- **widthPercent**: ブラウザ幅に対するパーセンテージ（例: 100 = ブラウザ幅の100%）
+- **heightPercent**: ブラウザ高さに対するパーセンテージ（例: 50 = ブラウザ高さの50%）
+
+#### 使用例
+```json
+{
+  "chart": {
+    "type": "line",
+    "dataFile": "data/trend_new_infections.csv",
+    "visible": true,
+    "config": {
+      "widthPercent": 100,    // ブラウザ幅の100%
+      "height": 400,          // 高さは固定値
+      "title": "新規感染者数の推移"
+    }
+  }
+}
+
+// または両方をパーセンテージ指定
+{
+  "chart": {
+    "type": "bar",
+    "dataFile": "data/sample.csv",
+    "visible": true,
+    "config": {
+      "widthPercent": 50,     // ブラウザ幅の50%
+      "heightPercent": 40,    // ブラウザ高さの40%
+      "title": "サンプルチャート"
+    }
+  }
+}
+```
+
+#### 注意事項
+- パーセンテージ指定時も最小・最大サイズの制約（minWidth/maxWidth等）が適用される
+- アスペクト比は`widthPercent`のみ指定時に有効（heightが自動計算される）
+- レスポンシブ対応のため、ウィンドウリサイズ時に自動的に再計算される
+
+### レスポンシブSVG実装
+[Responsive D3.js](https://visualizing.jp/responsive-d3/)のベストプラクティスに基づく実装。
+
+#### 実装方針
+- **viewBox属性**: SVGの座標系を定義（例: `viewBox="0 0 800 600"`）
+- **preserveAspectRatio**: 中央配置とアスペクト比維持（`xMidYMid meet`）
+- **CSSでサイズ制御**: `width: 100%`, `height: auto`で親要素に合わせる
+- **固定座標系**: D3.jsコードは固定座標系（800x600等）で記述、表示は自動スケール
+
+#### SVG設定例
+```javascript
+// 従来の固定サイズ
+svg.attr('width', 800).attr('height', 600);
+
+// レスポンシブ版
+svg.attr('viewBox', '0 0 800 600')
+   .attr('preserveAspectRatio', 'xMidYMid meet')
+   .style('width', '100%')
+   .style('height', 'auto');
+```
+
+#### メリット
+- **デバイス対応**: PC・タブレット・スマートフォンで最適表示
+- **コード簡素化**: D3.jsコードは固定座標系で記述可能
+- **パフォーマンス**: ブラウザネイティブのスケーリング機能を活用
+- **アクセシビリティ**: ズーム機能との親和性が高い
+
 ## 実装方針
 - 汎用性を重視し、特定テーマに依存しない設計
 - 設定ファイルによる柔軟なカスタマイズ対応

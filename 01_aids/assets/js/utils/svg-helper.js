@@ -4,10 +4,10 @@
  */
 class SVGHelper {
     /**
-     * SVG要素を初期化する
+     * SVG要素を初期化する（レスポンシブ対応版）
      * @param {d3.Selection} container - D3で選択されたコンテナ要素
-     * @param {number} width - SVGの幅
-     * @param {number} height - SVGの高さ
+     * @param {number} width - SVGの幅（viewBoxの基準幅）
+     * @param {number} height - SVGの高さ（viewBoxの基準高さ）
      * @param {Object} options - オプション設定
      * @returns {d3.Selection} 作成されたSVG要素
      */
@@ -15,7 +15,8 @@ class SVGHelper {
         const {
             preserveAspectRatio = 'xMidYMid meet',
             className = '',
-            clearContainer = true
+            clearContainer = true,
+            responsive = true  // レスポンシブモードのフラグ
         } = options;
 
         // コンテナをクリア
@@ -25,14 +26,22 @@ class SVGHelper {
 
         // SVG要素を作成
         const svg = container.append('svg')
-            .attr('width', width)
-            .attr('height', height)
             .attr('viewBox', `0 0 ${width} ${height}`)
-            .attr('preserveAspectRatio', preserveAspectRatio)
-            .style('width', '100%')
-            .style('height', '100%')
-            .style('max-width', '100%')
-            .style('display', 'block');
+            .attr('preserveAspectRatio', preserveAspectRatio);
+
+        if (responsive) {
+            // レスポンシブ設定：コンテナのサイズに合わせる
+            svg
+                .style('width', '100%')
+                .style('height', 'auto')
+                .style('max-width', '100%')
+                .style('display', 'block');
+        } else {
+            // 固定サイズ設定（従来モード）
+            svg
+                .attr('width', width)
+                .attr('height', height);
+        }
 
         if (className) {
             svg.classed(className, true);
@@ -42,21 +51,23 @@ class SVGHelper {
     }
 
     /**
-     * レスポンシブなサイズを計算する
+     * レスポンシブなサイズを計算する（viewBox基準版）
      * @param {d3.Selection|HTMLElement} container - コンテナ要素
      * @param {Object} config - 設定オブジェクト
-     * @returns {Object} 計算された幅と高さ
+     * @returns {Object} 計算された幅と高さ（viewBox用）
      */
     static getResponsiveSize(container, config = {}) {
         const {
             defaultWidth = 800,
             defaultHeight = 600,
-            scale = 0.8,
+            scale = 1.0,  // viewBoxではスケールは通常1.0
             minWidth = 300,
             minHeight = 200,
             maxWidth = 1200,
             maxHeight = 800,
-            aspectRatio = null
+            aspectRatio = null,
+            widthPercent = null,  // ブラウザ幅に対するパーセンテージ
+            heightPercent = null  // ブラウザ高さに対するパーセンテージ
         } = config;
 
         // コンテナのサイズを取得
@@ -70,17 +81,37 @@ class SVGHelper {
             return { width: defaultWidth, height: defaultHeight };
         }
 
-        const rect = containerElement.getBoundingClientRect();
-        let width = rect.width * scale || defaultWidth;
-        let height = rect.height * scale || defaultHeight;
+        let width, height;
+
+        // パーセンテージ指定の場合
+        if (widthPercent !== null || heightPercent !== null) {
+            // ビューポートサイズを取得
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+
+            if (widthPercent !== null) {
+                width = viewportWidth * (widthPercent / 100);
+            } else {
+                width = defaultWidth;
+            }
+
+            if (heightPercent !== null) {
+                height = viewportHeight * (heightPercent / 100);
+            } else if (aspectRatio && widthPercent !== null) {
+                // 幅がパーセンテージ指定でアスペクト比がある場合
+                height = width / aspectRatio;
+            } else {
+                height = defaultHeight;
+            }
+        } else {
+            // 固定値またはデフォルト値を使用
+            width = config.width || defaultWidth;
+            height = config.height || defaultHeight;
+        }
 
         // アスペクト比を維持
-        if (aspectRatio) {
-            if (width / height > aspectRatio) {
-                width = height * aspectRatio;
-            } else {
-                height = width / aspectRatio;
-            }
+        if (aspectRatio && heightPercent === null) {
+            height = width / aspectRatio;
         }
 
         // 最小・最大値の制約を適用
@@ -88,6 +119,51 @@ class SVGHelper {
         height = Math.max(minHeight, Math.min(maxHeight, height));
 
         return { width, height };
+    }
+
+    /**
+     * SVGの実際の表示サイズを取得する
+     * @param {d3.Selection} svg - SVG要素
+     * @returns {Object} 実際の表示サイズ
+     */
+    static getActualSize(svg) {
+        const node = svg.node();
+        if (!node) return { width: 0, height: 0 };
+        
+        const rect = node.getBoundingClientRect();
+        return {
+            width: rect.width,
+            height: rect.height
+        };
+    }
+
+    /**
+     * コンテナサイズに基づいてSVGをリサイズする
+     * @param {d3.Selection} svg - SVG要素
+     * @param {d3.Selection|HTMLElement} container - コンテナ要素
+     * @param {Object} config - 設定オブジェクト
+     */
+    static resizeSVG(svg, container, config = {}) {
+        const { aspectRatio = null } = config;
+        
+        let containerElement;
+        if (container.node) {
+            containerElement = container.node();
+        } else if (container instanceof HTMLElement) {
+            containerElement = container;
+        } else {
+            console.error('Invalid container provided to resizeSVG');
+            return;
+        }
+
+        const containerRect = containerElement.getBoundingClientRect();
+        const containerWidth = containerRect.width;
+
+        if (aspectRatio) {
+            // アスペクト比に基づいて高さを計算
+            const height = containerWidth / aspectRatio;
+            svg.style('height', `${height}px`);
+        }
     }
 
     /**
