@@ -169,3 +169,82 @@ Promise.all([
 - 設定ファイルによる柔軟なカスタマイズ対応
 - パフォーマンスを考慮したスムーズなスクロール体験
 - シンプルな階層構造でメンテナンス性を確保
+
+## 共通ユーティリティクラス
+
+### 概要
+コードの重複を削減し、保守性を向上させるため、以下の共通ユーティリティクラスを実装。
+
+### 1. SVGHelper (`utils/svg-helper.js`)
+D3.jsを使用したSVG操作の共通処理を提供。
+
+#### 主な機能
+- **initSVG**: SVG要素の初期化
+- **getResponsiveSize**: レスポンシブなサイズ計算
+- **getInnerSize**: マージンを考慮した内部サイズ計算
+- **createGroup**: マージン付きグループ要素の作成
+- **styleAxis**: 軸のスタイリング
+- **calculatePosition**: ビューポート内での要素位置計算
+- **addGridLines**: グリッドラインの追加
+- **createTooltip**: ツールチップコンテナの作成
+
+### 2. AnimationConfig (`utils/animation-config.js`)
+D3.jsのトランジション設定を一元管理。
+
+#### 主な機能
+- **速度定数**: INSTANT, FAST, NORMAL, SLOW, VERY_SLOW
+- **イージング関数**: LINEAR, QUAD, CUBIC, ELASTIC, BOUNCE等
+- **プリセット設定**: 
+  - FAST_SMOOTH: UI要素の高速切り替え
+  - DEFAULT: 通常のチャート更新
+  - SLOW_SMOOTH: 地図ズーム等のゆっくりした動作
+  - ENTER/EXIT: 要素の追加・削除アニメーション
+- **apply**: トランジションの適用
+- **stagger**: 順次アニメーション
+- **fadeIn/fadeOut**: フェード効果
+- **scale**: スケール効果
+- **sequence**: 連続トランジション
+- **アクセシビリティ対応**: prefers-reduced-motionの考慮
+
+### 3. ErrorHandler (`utils/error-handler.js`)
+アプリケーション全体のエラー処理を統一管理。
+
+#### 主な機能
+- **エラータイプ分類**: DATA_LOAD, RENDER, TRANSITION, VALIDATION, NETWORK
+- **重要度レベル**: LOW, MEDIUM, HIGH, CRITICAL
+- **handle**: エラーハンドリングのメイン関数
+- **wrap/wrapAsync**: try-catchラッパー関数
+- **handleDataValidationError**: データ検証エラー専用処理
+- **ユーザー通知**: 重要度に応じた通知表示
+- **デバッグ機能**: エラーログの保存・エクスポート
+- **開発環境対応**: localhost環境での詳細デバッグパネル
+
+### 使用例
+```javascript
+// SVGHelper
+const { width, height } = SVGHelper.getResponsiveSize(container, {
+    defaultWidth: 800,
+    defaultHeight: 600,
+    scale: 0.8
+});
+const svg = SVGHelper.initSVG(container, width, height);
+
+// AnimationConfig
+AnimationConfig.apply(selection, 'SLOW_SMOOTH')
+    .attr('transform', `translate(${x}, ${y})`);
+
+// ErrorHandler
+ErrorHandler.wrap(() => {
+    // エラーが発生する可能性のある処理
+    chartManager.renderChart(type, data, config);
+}, 'ChartManager.renderChart', {
+    type: ErrorHandler.ERROR_TYPES.RENDER,
+    severity: ErrorHandler.SEVERITY.HIGH
+})();
+```
+
+### 今後の移行計画
+1. 既存のManagerクラスで共通ユーティリティを使用するよう段階的にリファクタリング
+2. ES6モジュール化への移行（現在はグローバルスコープで提供）
+3. TypeScript導入の検討
+4. 単体テストの追加
