@@ -335,7 +335,14 @@
     },
     {
       "id": "step9",
-      "text": "ムリカットの物語",
+      "text": {
+        "content": "ムリカットの物語",
+        "position": {
+          "width": "30%",
+          "horizontal": "left",
+          "vertical": "center"
+        }
+      },
       "map": {
         "visible": true,
         "mode": "single-city",
@@ -347,7 +354,14 @@
     },
     {
       "id": "step10",
-      "text": "闘うマラウイの女性達",
+      "text": {
+        "content": "闘うマラウイの女性達",
+        "position": {
+          "width": "30%",
+          "horizontal": "left",
+          "vertical": "center"
+        }
+      },
       "map": {
         "visible": true,
         "mode": "single-city",
@@ -359,7 +373,14 @@
     },
     {
       "id": "step11",
-      "text": "ローズマリーの物語",
+      "text": {
+        "content": "ローズマリーの物語",
+        "position": {
+          "width": "30%",
+          "horizontal": "left",
+          "vertical": "center"
+        }
+      },
       "map": {
         "visible": true,
         "mode": "single-city",
@@ -371,7 +392,14 @@
     },
     {
       "id": "step12",
-      "text": "エリカ・カステヤノスの物語",
+      "text": {
+        "content": "エリカ・カステヤノスの物語",
+        "position": {
+          "width": "30%",
+          "horizontal": "left",
+          "vertical": "center"
+        }
+      },
       "map": {
         "visible": true,
         "mode": "single-city",
@@ -383,7 +411,14 @@
     },
     {
       "id": "step13",
-      "text": "マーク・ダイブル（支援者）の物語",
+      "text": {
+        "content": "マーク・ダイブル（支援者）の物語",
+        "position": {
+          "width": "30%",
+          "horizontal": "left",
+          "vertical": "center"
+        }
+      },
       "map": {
         "visible": true,
         "mode": "single-city",
@@ -395,7 +430,14 @@
     },
     {
       "id": "step14",
-      "text": "モーリーン・ムレンガの物語",
+      "text": {
+        "content": "モーリーン・ムレンガの物語",
+        "position": {
+          "width": "30%",
+          "horizontal": "left",
+          "vertical": "center"
+        }
+      },
       "map": {
         "visible": true,
         "mode": "single-city",
@@ -407,7 +449,14 @@
     },
     {
       "id": "step15",
-      "text": "ジェフリー・アカバの物語",
+      "text": {
+        "content": "ジェフリー・アカバの物語",
+        "position": {
+          "width": "30%",
+          "horizontal": "left",
+          "vertical": "center"
+        }
+      },
       "map": {
         "visible": true,
         "mode": "single-city",
