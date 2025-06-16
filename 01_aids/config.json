@@ -80,13 +80,20 @@
           "yField": "value",
           "seriesField": "series",
           "multiSeries": true,
-          "colors": ["#3b82f6", "#e74c3c", "#f39c12", "#2ecc71", "#9b59b6", "#1abc9c", "#e67e22", "#34495e", "#95a5a6"],
           "title": "新規HIV感染者数の推移（1990-1998年）",
           "filter": {
             "type": "range",
             "field": "year",
             "range": [1990, 1998]
-          }
+          },
+          "annotations": [
+            {
+              "type": "verticalLine",
+              "year": 1997,
+              "label": "世界の年間新規感染者のピーク",
+              "position": "top-right"
+            }
+          ]
         }
       },
       "map": {
@@ -124,7 +131,6 @@
           "yField": "value",
           "seriesField": "series",
           "multiSeries": true,
-          "colors": ["#3b82f6", "#e74c3c", "#f39c12", "#2ecc71", "#9b59b6", "#1abc9c", "#e67e22", "#34495e", "#95a5a6"],
           "title": "新規HIV感染者数の推移（全期間）"
         }
       },
@@ -164,7 +170,6 @@
           "yField": "value",
           "seriesField": "series",
           "multiSeries": true,
-          "colors": ["#e74c3c", "#3b82f6", "#f39c12", "#2ecc71", "#9b59b6", "#1abc9c", "#e67e22", "#34495e", "#95a5a6"],
           "title": "エイズ関連死亡者数の推移（2010-2022年）"
         }
       },
@@ -204,8 +209,7 @@
               "width": 350,
               "height": 400,
               "labelField": "label",
-              "valueField": "value",
-              "colors": ["#3b82f6", "#e74c3c", "#f39c12", "#2ecc71", "#9b59b6", "#1abc9c", "#e67e22"]
+              "valueField": "value"
             }
           },
           {
@@ -217,8 +221,7 @@
               "width": 350,
               "height": 400,
               "labelField": "label",
-              "valueField": "value",
-              "colors": ["#3b82f6", "#e74c3c", "#f39c12", "#2ecc71", "#9b59b6", "#1abc9c", "#e67e22"]
+              "valueField": "value"
             }
           },
           {
@@ -230,8 +233,7 @@
               "width": 350,
               "height": 400,
               "labelField": "label",
-              "valueField": "value",
-              "colors": ["#3b82f6", "#e74c3c", "#f39c12", "#2ecc71", "#9b59b6", "#1abc9c", "#e67e22"]
+              "valueField": "value"
             }
           }
         ]
@@ -447,8 +449,7 @@
               "xField": "year",
               "yField": "value",
               "seriesField": "series",
-              "multiSeries": true,
-              "colors": ["#e91e63", "#9c27b0", "#673ab7"]
+              "multiSeries": true
             }
           },
           {
@@ -462,8 +463,7 @@
               "xField": "year",
               "yField": "value",
               "seriesField": "series",
-              "multiSeries": true,
-              "colors": ["#2196f3", "#03a9f4", "#00bcd4"]
+              "multiSeries": true
             }
           }
         ]
@@ -514,7 +514,6 @@
           "yField": "value",
           "seriesField": "series",
           "multiSeries": true,
-          "colors": ["#3b82f6", "#10b981", "#f59e0b", "#ef4444"],
           "title": "エイズ対策資金の推移（資金源別）"
         }
       },
@@ -561,7 +560,6 @@
           "yField": "value",
           "seriesField": "series",
           "multiSeries": true,
-          "colors": ["#3b82f6", "#10b981", "#f59e0b", "#ef4444"],
           "title": "エイズ対策資金の必要額と実績の推移"
         }
       },

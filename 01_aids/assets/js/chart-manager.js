@@ -652,8 +652,26 @@ class ChartManager {
             .nice()
             .range([height, 0]);
 
-        // 色スケール設定
-        const colorScale = d3.scaleOrdinal(colors)
+        // 統一された色スケール設定
+        let chartColors;
+        if (window.ColorScheme && config.useUnifiedColors !== false) {
+            // 統一カラースキームを使用（ダミーデータでgenerateColorsForChartを呼び出し）
+            const dummyData = series.flatMap(s => s.values.map(v => ({ 
+                ...v, 
+                [config.seriesField || 'series']: s.name 
+            })));
+            chartColors = window.ColorScheme.generateColorsForChart(dummyData, config);
+        } else {
+            // フォールバック：設定で指定された色または既定色
+            chartColors = colors;
+        }
+        
+        // 特別なケース：設定で色が明示されている場合はそれを優先
+        if (config.colors && config.colors.length > 0) {
+            chartColors = config.colors;
+        }
+        
+        const colorScale = d3.scaleOrdinal(chartColors)
             .domain(series.map(d => d.name));
 
         // 単位情報を分析
@@ -735,6 +753,11 @@ class ChartManager {
         // レジェンドを追加（小さいサイズ）
         if (series.length > 1) {
             this.addCompactLegend(g, series, colorScale, width, height);
+        }
+
+        // 注釈（アノテーション）を描画
+        if (config.annotations) {
+            this.renderAnnotations(g, config.annotations, { xScale, yScale, width, height, isYearData, xField, yField });
         }
     }
 
@@ -1052,8 +1075,24 @@ class ChartManager {
             .nice()
             .range([innerHeight, 0]);
 
-        // 色スケール設定
-        const colorScale = d3.scaleOrdinal(colors)
+        // 統一された色スケール設定
+        let chartColors;
+        if (window.ColorScheme && config.useUnifiedColors !== false) {
+            // 統一カラースキームを使用
+            chartColors = window.ColorScheme.generateColorsForChart(data, config);
+            console.log('Using unified color scheme for regions:', series.map(d => d.name), '→', chartColors);
+        } else {
+            // フォールバック：設定で指定された色または既定色
+            chartColors = colors;
+        }
+        
+        // 特別なケース：設定で色が明示されている場合はそれを優先
+        if (config.colors && config.colors.length > 0) {
+            chartColors = config.colors;
+            console.log('Using explicitly configured colors:', chartColors);
+        }
+        
+        const colorScale = d3.scaleOrdinal(chartColors)
             .domain(series.map(d => d.name));
 
         // 単位情報を分析
@@ -1156,6 +1195,11 @@ class ChartManager {
         // レジェンドを追加（複数系列の場合のみ）
         if (series.length > 1) {
             this.addLegend(svg, series, colorScale, width, height);
+        }
+
+        // 注釈（アノテーション）を描画
+        if (config.annotations) {
+            this.renderAnnotations(g, config.annotations, { xScale, yScale, width: innerWidth, height: innerHeight, isYearData, xField, yField });
         }
     }
 
@@ -1328,6 +1372,28 @@ class ChartManager {
             ChartLayoutHelper.addAxisLabels(g, unitInfo, innerWidth, innerHeight);
         }
 
+        // 統一された色設定
+        let barColors;
+        if (window.ColorScheme && config.useUnifiedColors !== false && config.multiColor) {
+            // 複数色の場合は統一カラースキームを使用
+            barColors = window.ColorScheme.generateColorsForChart(data, { 
+                ...config, 
+                seriesField: xField 
+            });
+        } else if (window.ColorScheme && config.useUnifiedColors !== false && data.length === 1) {
+            // 単一データの場合は地域に応じた色を使用
+            const regionName = data[0][xField];
+            barColors = [window.ColorScheme.getColorForRegion(regionName)];
+        } else {
+            // フォールバック：設定で指定された色
+            barColors = [color];
+        }
+        
+        // 特別なケース：設定で色が明示されている場合はそれを優先
+        if (config.colors && config.colors.length > 0) {
+            barColors = config.colors;
+        }
+
         // 棒を描画
         g.selectAll('.bar')
             .data(data)
@@ -1338,7 +1404,7 @@ class ChartManager {
             .attr('y', innerHeight)
             .attr('width', xScale.bandwidth())
             .attr('height', 0)
-            .attr('fill', color)
+            .attr('fill', (d, i) => barColors[i % barColors.length])
             .transition()
             .duration(500)
             .delay((d, i) => i * 100)
@@ -1379,6 +1445,24 @@ class ChartManager {
             .innerRadius(0)
             .outerRadius(radius);
 
+        // 統一された色スケール設定
+        let chartColors;
+        if (window.ColorScheme && config.useUnifiedColors !== false) {
+            // 統一カラースキームを使用
+            chartColors = window.ColorScheme.generateColorsForChart(data, { 
+                ...config, 
+                seriesField: labelField 
+            });
+        } else {
+            // フォールバック：設定で指定された色または既定色
+            chartColors = colors;
+        }
+        
+        // 特別なケース：設定で色が明示されている場合はそれを優先
+        if (config.colors && config.colors.length > 0) {
+            chartColors = config.colors;
+        }
+
         const arcs = g.selectAll('.pie-slice')
             .data(pie(data))
             .enter()
@@ -1387,7 +1471,7 @@ class ChartManager {
 
         arcs.append('path')
             .attr('d', arc)
-            .attr('fill', (d, i) => colors[i % colors.length])
+            .attr('fill', (d, i) => chartColors[i % chartColors.length])
             .transition()
             .duration(500)
             .delay((d, i) => i * 100)
@@ -1501,8 +1585,25 @@ class ChartManager {
             .innerRadius(0)
             .outerRadius(radius);
         
-        // 色スケール
-        const colorScale = d3.scaleOrdinal(colors)
+        // 統一された色スケール設定
+        let chartColors;
+        if (window.ColorScheme && config.useUnifiedColors !== false) {
+            // 統一カラースキームを使用
+            chartColors = window.ColorScheme.generateColorsForChart(data, { 
+                ...config, 
+                seriesField: labelField 
+            });
+        } else {
+            // フォールバック：設定で指定された色または既定色
+            chartColors = colors;
+        }
+        
+        // 特別なケース：設定で色が明示されている場合はそれを優先
+        if (config.colors && config.colors.length > 0) {
+            chartColors = config.colors;
+        }
+        
+        const colorScale = d3.scaleOrdinal(chartColors)
             .domain(data.map(d => d[labelField]));
         
         // パイデータを生成
@@ -1566,6 +1667,109 @@ class ChartManager {
             .duration(500)
             .delay((d, i) => i * 100 + 200)
             .style('opacity', 1);
+    }
+
+    /**
+     * チャートに注釈（アノテーション）を描画
+     * @param {Object} g - D3選択オブジェクト（グループ要素）
+     * @param {Array} annotations - 注釈設定の配列
+     * @param {Object} scales - スケールオブジェクト
+     */
+    renderAnnotations(g, annotations, scales) {
+        const { xScale, yScale, width, height, isYearData, xField, yField } = scales;
+
+        annotations.forEach((annotation, index) => {
+            if (annotation.type === 'verticalLine') {
+                const { year, label, position = 'top-right' } = annotation;
+                
+                // 年度がデータ範囲内かチェック
+                const xDomain = xScale.domain();
+                if (year < xDomain[0] || year > xDomain[1]) {
+                    console.warn(`Annotation year ${year} is outside data range [${xDomain[0]}, ${xDomain[1]}]`);
+                    return;
+                }
+
+                const x = xScale(year);
+                
+                // 垂直の点線を描画
+                g.append('line')
+                    .attr('class', 'annotation-line')
+                    .attr('x1', x)
+                    .attr('x2', x)
+                    .attr('y1', 0)
+                    .attr('y2', height)
+                    .attr('stroke', '#666')
+                    .attr('stroke-width', 1)
+                    .attr('stroke-dasharray', '5,5')
+                    .style('opacity', 0)
+                    .transition()
+                    .duration(500)
+                    .delay(800) // チャート描画後に表示
+                    .style('opacity', 0.7);
+
+                // ラベルテキストを描画
+                const labelGroup = g.append('g')
+                    .attr('class', 'annotation-label')
+                    .style('opacity', 0);
+
+                // ラベル位置を計算
+                let labelX, labelY, textAnchor;
+                switch (position) {
+                    case 'top-left':
+                        labelX = x - 10;
+                        labelY = 20;
+                        textAnchor = 'end';
+                        break;
+                    case 'top-right':
+                        labelX = x + 10;
+                        labelY = 20;
+                        textAnchor = 'start';
+                        break;
+                    case 'bottom-left':
+                        labelX = x - 10;
+                        labelY = height - 10;
+                        textAnchor = 'end';
+                        break;
+                    case 'bottom-right':
+                        labelX = x + 10;
+                        labelY = height - 10;
+                        textAnchor = 'start';
+                        break;
+                    default:
+                        labelX = x + 10;
+                        labelY = 20;
+                        textAnchor = 'start';
+                }
+
+                // ラベル背景（読みやすさ向上）
+                const labelText = labelGroup.append('text')
+                    .attr('x', labelX)
+                    .attr('y', labelY)
+                    .attr('text-anchor', textAnchor)
+                    .attr('font-size', '12px')
+                    .attr('font-weight', 'bold')
+                    .attr('fill', '#333')
+                    .text(label);
+
+                // 背景の白い矩形（オプション）
+                const bbox = labelText.node().getBBox();
+                labelGroup.insert('rect', 'text')
+                    .attr('x', bbox.x - 3)
+                    .attr('y', bbox.y - 2)
+                    .attr('width', bbox.width + 6)
+                    .attr('height', bbox.height + 4)
+                    .attr('fill', 'rgba(255, 255, 255, 0.9)')
+                    .attr('stroke', '#ccc')
+                    .attr('stroke-width', 0.5)
+                    .attr('rx', 3);
+
+                // ラベルをフェードイン
+                labelGroup.transition()
+                    .duration(500)
+                    .delay(1000) // 点線の後に表示
+                    .style('opacity', 1);
+            }
+        });
     }
 
     /**
