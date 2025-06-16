@@ -812,7 +812,7 @@ class MapManager {
                 return coords ? coords[1] : 0;
             })
             .attr('r', 0)
-            .style('fill', d => d.style.color)
+            .style('fill', d => this.getCityColor(d))
             .style('stroke', '#fff')
             .style('stroke-width', 2)
             .style('opacity', 0);
@@ -1085,12 +1085,13 @@ class MapManager {
         const mapGroup = this.svg.select('.map-group');
         
         // 都市マーカーを追加
+        const markerColor = this.getCityColor(city);
         mapGroup.append('circle')
             .attr('class', 'single-city-marker')
             .attr('cx', coords[0])
             .attr('cy', coords[1])
             .attr('r', 0)
-            .style('fill', city.style.color)
+            .style('fill', markerColor)
             .style('stroke', '#fff')
             .style('stroke-width', 3)
             .style('opacity', 0)
@@ -1166,6 +1167,28 @@ class MapManager {
             // 最初の都市など距離情報がない場合は非表示
             geoInfoContainer.style.display = 'none';
         }
+    }
+
+    /**
+     * 都市の地域に基づく色を取得
+     * @param {Object} city - 都市データ
+     * @returns {string} 色コード
+     */
+    getCityColor(city) {
+        if (!city || !city.country) {
+            return '#808080'; // フォールバック色
+        }
+        
+        // 地域色機能が利用可能かチェック
+        if (window.CountryRegionMapping && window.ColorScheme) {
+            const region = window.CountryRegionMapping.getRegionForCountry(city.country);
+            if (region) {
+                return window.ColorScheme.getRegionColor(region);
+            }
+        }
+        
+        // フォールバック：元のstyle.colorまたはデフォルト色
+        return city.style?.color || '#808080';
     }
 
     /**

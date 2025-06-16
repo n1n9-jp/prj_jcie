@@ -154,6 +154,7 @@
           "yField": "value",
           "xAxisLabel": "年",
           "yAxisLabel": "感染者数（百万人）",
+          "yearRange": [1980, 2025],
           "seriesField": "series",
           "multiSeries": true,
           "title": "新規HIV感染者数の推移（全期間）",
