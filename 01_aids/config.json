@@ -427,15 +427,22 @@
     },
     {
       "id": "step16",
-      "text": "それでもなお存在する課題",
+      "text": {
+        "content": "それでもなお存在する課題",
+        "position": {
+          "width": "30%",
+          "horizontal": "right",
+          "vertical": "center"
+        }
+      },
       "chart": {
         "layout": "dual",
         "visible": true,
         "position": {
-          "horizontal": "center",
+          "horizontal": "left",
           "vertical": "center",
-          "width": "100%",
-          "height": "80%"
+          "width": "70%",
+          "height": "100%"
         },
         "charts": [
           {
@@ -444,8 +451,8 @@
             "dataFile": "data/trend_africa_young_woman_normalized.csv",
             "position": "left",
             "config": {
-              "width": 480,
-              "height": 400,
+              "widthPercent": 50,
+              "heightPercent": 50,
               "xField": "year",
               "yField": "value",
               "seriesField": "series",
@@ -477,14 +484,27 @@
     },
     {
       "id": "step17",
-      "text": "解決に向けて",
+      "text": {
+        "content": "解決に向けて",
+        "position": {
+          "width": "30%",
+          "horizontal": "right",
+          "vertical": "center"
+        }
+      },
       "chart": {
         "type": "line",
         "dataFile": "data/trend_PrEP_normalized.csv",
         "visible": true,
+        "position": {
+          "horizontal": "left",
+          "vertical": "center",
+          "width": "70%",
+          "height": "100%"
+        },
         "config": {
-          "width": 1000,
-          "height": 400,
+          "widthPercent": 70,
+          "heightPercent": 100,
           "xField": "year",
           "yField": "value",
           "multiSeries": false,
@@ -502,14 +522,27 @@
     },
     {
       "id": "step18",
-      "text": "継続的な支援の重要性",
+      "text": {
+        "content": "継続的な支援の重要性",
+        "position": {
+          "width": "30%",
+          "horizontal": "right",
+          "vertical": "center"
+        }
+      },
       "chart": {
         "type": "line",
         "dataFile": "data/trend_エイズ対策の資金不足.csv",
         "visible": true,
+        "position": {
+          "horizontal": "left",
+          "vertical": "center",
+          "width": "70%",
+          "height": "100%"
+        },
         "config": {
-          "width": 1000,
-          "height": 400,
+          "widthPercent": 70,
+          "heightPercent": 100,
           "xField": "year",
           "yField": "value",
           "seriesField": "series",
@@ -548,11 +581,24 @@
     },
     {
       "id": "step20",
-      "text": "今後の展望",
+      "text": {
+        "content": "今後の展望",
+        "position": {
+          "width": "30%",
+          "horizontal": "right",
+          "vertical": "center"
+        }
+      },
       "chart": {
         "type": "line",
         "dataFile": "data/trend_エイズ対策の資金不足.csv",
         "visible": true,
+        "position": {
+          "horizontal": "left",
+          "vertical": "center",
+          "width": "70%",
+          "height": "100%"
+        },
         "config": {
           "width": 1000,
           "height": 400,
