@@ -232,8 +232,8 @@ class MapManager {
                                 }
                             }
                             
-                            // step8の場合：highlightCountries以外を明るくする
-                            if (highlightCountries && highlightCountries.length > 0 && !highlightCountries.includes(countryName)) {
+                            // step8の場合：すべての国を50%明るくする
+                            if (highlightCountries && highlightCountries.length > 0) {
                                 color = window.ColorScheme.getLighterColor(color, 0.5);
                             }
                             
@@ -545,8 +545,8 @@ class MapManager {
                             }
                         }
                         
-                        // step8の場合：highlightCountries以外を明るくする
-                        if (highlightCountries && highlightCountries.length > 0 && !highlightCountries.includes(countryName)) {
+                        // step8の場合：すべての国を50%明るくする
+                        if (highlightCountries && highlightCountries.length > 0) {
                             color = window.ColorScheme.getLighterColor(color, 0.5);
                         }
                         
