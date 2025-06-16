@@ -525,14 +525,15 @@ class ChartLayoutHelper {
     }
 
     /**
-     * 軸ラベル（タイトル）を追加する
+     * 軸ラベルを統一的に追加する（カスタムラベル優先、デフォルト単位ラベルフォールバック）
      * @param {d3.Selection} g - グループ要素
-     * @param {Object} unitInfo - 単位情報
+     * @param {Object} data - チャートデータ
+     * @param {Object} config - チャート設定
      * @param {number} width - チャート幅
      * @param {number} height - チャート高さ
      * @param {Object} options - オプション
      */
-    static addAxisLabels(g, unitInfo, width, height, options = {}) {
+    static addAxisLabels(g, data, config, width, height, options = {}) {
         const {
             xAxisLabelOffset = 35,
             yAxisLabelOffset = -40,
@@ -540,12 +541,35 @@ class ChartLayoutHelper {
             labelColor = '#666'
         } = options;
 
-        // デバッグ用ログ
-        console.log('addAxisLabels called with unitInfo:', unitInfo);
+        // 既存の軸ラベルを削除
+        g.selectAll('.axis-label').remove();
 
-        // X軸ラベル
-        if (unitInfo.xAxis && unitInfo.xAxis.label) {
-            console.log('Adding X-axis label:', unitInfo.xAxis.label);
+        // X軸ラベルの決定（カスタム優先、デフォルト単位フォールバック）
+        let xAxisLabel = null;
+        if (config.xAxisLabel) {
+            xAxisLabel = config.xAxisLabel;
+        } else {
+            // デフォルト単位ラベルを生成
+            const unitInfo = this.analyzeUnits(data, config);
+            if (unitInfo.xAxis && unitInfo.xAxis.label) {
+                xAxisLabel = unitInfo.xAxis.label;
+            }
+        }
+
+        // Y軸ラベルの決定（カスタム優先、デフォルト単位フォールバック）
+        let yAxisLabel = null;
+        if (config.yAxisLabel) {
+            yAxisLabel = config.yAxisLabel;
+        } else {
+            // デフォルト単位ラベルを生成
+            const unitInfo = this.analyzeUnits(data, config);
+            if (unitInfo.yAxis && unitInfo.yAxis.label) {
+                yAxisLabel = unitInfo.yAxis.label;
+            }
+        }
+
+        // X軸ラベルを追加
+        if (xAxisLabel) {
             g.append('text')
                 .attr('class', 'axis-label x-axis-label')
                 .attr('x', width / 2)
@@ -553,14 +577,11 @@ class ChartLayoutHelper {
                 .attr('text-anchor', 'middle')
                 .attr('font-size', labelFontSize)
                 .attr('fill', labelColor)
-                .text(unitInfo.xAxis.label);
-        } else {
-            console.log('No X-axis label to add');
+                .text(xAxisLabel);
         }
 
-        // Y軸ラベル
-        if (unitInfo.yAxis && unitInfo.yAxis.label) {
-            console.log('Adding Y-axis label:', unitInfo.yAxis.label);
+        // Y軸ラベルを追加
+        if (yAxisLabel) {
             g.append('text')
                 .attr('class', 'axis-label y-axis-label')
                 .attr('transform', 'rotate(-90)')
@@ -569,9 +590,7 @@ class ChartLayoutHelper {
                 .attr('text-anchor', 'middle')
                 .attr('font-size', labelFontSize)
                 .attr('fill', labelColor)
-                .text(unitInfo.yAxis.label);
-        } else {
-            console.log('No Y-axis label to add');
+                .text(yAxisLabel);
         }
     }
 

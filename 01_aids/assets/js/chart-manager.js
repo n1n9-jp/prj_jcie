@@ -587,6 +587,12 @@ class ChartManager {
         const { data, config, title } = chartConfig;
         const { x, y, width, height } = layout;
         
+        // データの存在確認
+        if (!data || data.length === 0) {
+            console.warn('renderSingleChartInDual: No data provided', { data, config, title });
+            return;
+        }
+        
         // ChartLayoutHelperを使用して動的マージンを計算
         let margin;
         if (window.ChartLayoutHelper) {
@@ -705,9 +711,9 @@ class ChartManager {
             .attr('class', 'chart-axis y-axis')
             .call(yAxis);
 
-        // 軸ラベル（単位表示）を追加
-        if (window.ChartLayoutHelper && unitInfo) {
-            ChartLayoutHelper.addAxisLabels(g, unitInfo, width, height);
+        // 軸ラベルを統一的に追加（カスタム優先、デフォルト単位フォールバック）
+        if (window.ChartLayoutHelper) {
+            ChartLayoutHelper.addAxisLabels(g, data, config, width, height);
         }
 
         // ライン生成器
@@ -1145,9 +1151,9 @@ class ChartManager {
             .attr('class', 'chart-axis y-axis')
             .call(yAxis);
 
-        // 軸ラベル（単位表示）を追加
-        if (window.ChartLayoutHelper && unitInfo) {
-            ChartLayoutHelper.addAxisLabels(g, unitInfo, innerWidth, innerHeight);
+        // 軸ラベルを統一的に追加（カスタム優先、デフォルト単位フォールバック）
+        if (window.ChartLayoutHelper) {
+            ChartLayoutHelper.addAxisLabels(g, data, config, innerWidth, innerHeight);
         }
 
         // ライン生成器
@@ -1427,9 +1433,9 @@ class ChartManager {
             .attr('class', 'chart-axis y-axis')
             .call(yAxis);
 
-        // 軸ラベル（単位表示）を追加
-        if (window.ChartLayoutHelper && unitInfo) {
-            ChartLayoutHelper.addAxisLabels(g, unitInfo, innerWidth, innerHeight);
+        // 軸ラベルを統一的に追加（カスタム優先、デフォルト単位フォールバック）
+        if (window.ChartLayoutHelper) {
+            ChartLayoutHelper.addAxisLabels(g, data, config, innerWidth, innerHeight);
         }
 
         // 統一された色設定
