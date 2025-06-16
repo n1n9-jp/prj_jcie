@@ -119,17 +119,40 @@ class ChartManager {
         const { xField = 'year', yField = 'value' } = config;
         const isYearData = allNewValues.every(d => !isNaN(d[xField]) && d[xField] > 1900 && d[xField] < 2100);
         
+        // X軸のドメインを決定（設定で年度範囲が指定されていればそれを使用、なければデータ範囲）
+        let xDomain;
+        if (config.yearRange && config.yearRange.length === 2) {
+            // 設定ファイルで年度範囲が指定されている場合
+            xDomain = config.yearRange;
+        } else if (isYearData) {
+            // 年データの場合はデータの範囲を使用
+            xDomain = d3.extent(allNewValues, d => +d[xField]);
+        } else {
+            // 時間データの場合
+            xDomain = d3.extent(allNewValues, d => new Date(d[xField]));
+        }
+        
         // 新しいスケールを計算
         const newXScale = isYearData 
             ? d3.scaleLinear()
-                .domain(d3.extent(allNewValues, d => +d[xField]))
+                .domain(xDomain)
                 .range([0, innerWidth])
             : d3.scaleTime()
-                .domain(d3.extent(allNewValues, d => new Date(d[xField])))
+                .domain(xDomain)
                 .range([0, innerWidth]);
 
+        // Y軸のドメインを決定（設定でY軸範囲が指定されていればそれを使用、なければデータ範囲）
+        let yDomain;
+        if (config.yRange && config.yRange.length === 2) {
+            // 設定ファイルでY軸範囲が指定されている場合
+            yDomain = config.yRange;
+        } else {
+            // データの範囲を使用
+            yDomain = d3.extent(allNewValues, d => +d[yField]);
+        }
+        
         const newYScale = d3.scaleLinear()
-            .domain(d3.extent(allNewValues, d => +d[yField]))
+            .domain(yDomain)
             .nice()
             .range([innerHeight, 0]);
 
@@ -672,8 +695,18 @@ class ChartManager {
                 .domain(xDomain)
                 .range([0, width]);
 
+        // Y軸のドメインを決定（設定でY軸範囲が指定されていればそれを使用、なければデータ範囲）
+        let yDomain;
+        if (config.yRange && config.yRange.length === 2) {
+            // 設定ファイルでY軸範囲が指定されている場合
+            yDomain = config.yRange;
+        } else {
+            // データの範囲を使用
+            yDomain = d3.extent(allValues, d => +d[yField]);
+        }
+        
         const yScale = d3.scaleLinear()
-            .domain(d3.extent(allValues, d => +d[yField]))
+            .domain(yDomain)
             .nice()
             .range([height, 0]);
 
@@ -1125,8 +1158,18 @@ class ChartManager {
                 .domain(xDomain)
                 .range([0, innerWidth]);
 
+        // Y軸のドメインを決定（設定でY軸範囲が指定されていればそれを使用、なければデータ範囲）
+        let yDomain;
+        if (config.yRange && config.yRange.length === 2) {
+            // 設定ファイルでY軸範囲が指定されている場合
+            yDomain = config.yRange;
+        } else {
+            // データの範囲を使用
+            yDomain = d3.extent(allValues, d => +d[yField]);
+        }
+        
         const yScale = d3.scaleLinear()
-            .domain(d3.extent(allValues, d => +d[yField]))
+            .domain(yDomain)
             .nice()
             .range([innerHeight, 0]);
 
