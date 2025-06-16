@@ -56,26 +56,6 @@
     {
       "id": "step2",
       "text": {
-        "content": "エイズの歴史",
-        "position": {
-          "width": "30%",
-          "horizontal": "right",
-          "vertical": "center"
-        }
-      },
-      "chart": {
-        "visible": false
-      },
-      "map": {
-        "visible": false
-      },
-      "image": {
-        "visible": false
-      }
-    },
-    {
-      "id": "step3",
-      "text": {
         "content": "新規感染者数の推移（1990-1998年）",
         "position": {
           "width": "30%",
@@ -127,7 +107,7 @@
       }
     },
     {
-      "id": "step3a",
+      "id": "step2a",
       "text": {
         "content": "新規感染者数の推移（全期間データ）",
         "position": {
@@ -167,7 +147,7 @@
       }
     },
     {
-      "id": "step4",
+      "id": "step3",
       "text": {
         "content": "エイズの死者数",
         "position": {
@@ -208,7 +188,7 @@
       }
     },
     {
-      "id": "step5",
+      "id": "step4",
       "text": {
         "content": "地域別のHIV治療カバレッジ",
         "position": {
@@ -249,7 +229,7 @@
       }
     },
     {
-      "id": "step6",
+      "id": "step5",
       "text": {
         "content": "治療の進歩",
         "position": {
@@ -278,7 +258,7 @@
       }
     },
     {
-      "id": "step7",
+      "id": "step6",
       "text": {
         "content": "国際的な支援体制の構築",
         "position": {
@@ -307,7 +287,7 @@
       }
     },
     {
-      "id": "step8",
+      "id": "step7",
       "text": {
         "content": "母子感染防止の成果",
         "position": {
@@ -349,7 +329,7 @@
       }
     },
     {
-      "id": "step9",
+      "id": "step8",
       "text": "世界全体での取り組み",
       "map": {
         "center": [0, 0],
@@ -362,7 +342,7 @@
       }
     },
     {
-      "id": "step10",
+      "id": "step9",
       "text": {
         "content": "ムリカットの物語",
         "position": {
@@ -381,7 +361,7 @@
       }
     },
     {
-      "id": "step11",
+      "id": "step10",
       "text": {
         "content": "闘うマラウイの女性達",
         "position": {
@@ -400,7 +380,7 @@
       }
     },
     {
-      "id": "step12",
+      "id": "step11",
       "text": {
         "content": "ローズマリーの物語",
         "position": {
@@ -419,7 +399,7 @@
       }
     },
     {
-      "id": "step13",
+      "id": "step12",
       "text": {
         "content": "エリカ・カステヤノスの物語",
         "position": {
@@ -438,7 +418,7 @@
       }
     },
     {
-      "id": "step14",
+      "id": "step13",
       "text": {
         "content": "マーク・ダイブル（支援者）の物語",
         "position": {
@@ -457,7 +437,7 @@
       }
     },
     {
-      "id": "step15",
+      "id": "step14",
       "text": {
         "content": "モーリーン・ムレンガの物語",
         "position": {
@@ -476,7 +456,7 @@
       }
     },
     {
-      "id": "step16",
+      "id": "step15",
       "text": {
         "content": "ジェフリー・アカバの物語",
         "position": {
@@ -495,7 +475,7 @@
       }
     },
     {
-      "id": "step17",
+      "id": "step16",
       "text": {
         "content": "それでもなお存在する課題",
         "position": {
@@ -552,7 +532,7 @@
       }
     },
     {
-      "id": "step18",
+      "id": "step17",
       "text": {
         "content": "解決に向けて",
         "position": {
@@ -592,7 +572,7 @@
       }
     },
     {
-      "id": "step19",
+      "id": "step18",
       "text": {
         "content": "継続的な支援の重要性",
         "position": {
@@ -631,7 +611,7 @@
       }
     },
     {
-      "id": "step20",
+      "id": "step19",
       "text": {
         "content": "連帯の力",
         "position": {
