@@ -188,6 +188,12 @@
       "chart": {
         "layout": "triple",
         "visible": true,
+        "position": {
+          "horizontal": "center",
+          "vertical": "center",
+          "width": "80%",
+          "height": "80%"
+        },
         "charts": [
           {
             "id": "adults",

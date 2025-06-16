@@ -427,8 +427,10 @@ class ChartManager {
         this.container.selectAll('*').remove();
         
         const containerNode = this.container.node();
-        const containerWidth = containerNode.clientWidth;
-        const containerHeight = containerNode.clientHeight;
+        const containerWidth = containerNode.clientWidth || 800; // フォールバック値
+        const containerHeight = containerNode.clientHeight || 600; // フォールバック値
+        
+        console.log('ChartManager: createSVGForLayout container dimensions:', { containerWidth, containerHeight });
         
         let totalWidth, totalHeight;
         
@@ -1415,9 +1417,11 @@ class ChartManager {
      * @param {Array} charts - チャート設定配列（3つ）
      */
     renderTripleChart(charts) {
+        console.log('ChartManager: renderTripleChart called with:', charts);
         const containerNode = this.container.node();
         const containerWidth = containerNode.clientWidth;
         const containerHeight = containerNode.clientHeight;
+        console.log('ChartManager: Container dimensions:', { containerWidth, containerHeight });
         
         // 全体のSVGサイズを計算
         const totalWidth = Math.min(containerWidth * 0.95, 1200);
@@ -1446,8 +1450,10 @@ class ChartManager {
      * Triple layout内で単一の円グラフを描画
      */
     renderSinglePieChartInTriple(svg, chartConfig, layout) {
+        console.log('ChartManager: renderSinglePieChartInTriple called with:', { chartConfig, layout });
         const { data, config, title } = chartConfig;
         const { x, y, width, height } = layout;
+        console.log('ChartManager: Data for pie chart:', data);
         
         const radius = Math.min(width, height - 80) / 2; // タイトル分を除く
         
