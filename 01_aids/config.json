@@ -356,12 +356,13 @@
           "yField": "value",
           "xAxisLabel": "年",
           "yAxisLabel": "母子感染率",
+          "yearRange": [1990, 2025],
           "seriesField": "series",
           "multiSeries": false,
           "seriesName": "母子感染率",
           "colors": ["#10b981"],
           "title": "HIV母子感染率の推移（%）",
-          "yRange": [0, 30]
+          "yRange": [0, 40]
         }
       },
       "map": {
