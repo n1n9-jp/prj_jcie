@@ -633,6 +633,7 @@
       "id": "step22",
       "text": {
         "content": "終わりに",
+        "visible": false,
         "position": {
           "width": "30%",
           "horizontal": "right",
