@@ -1422,7 +1422,7 @@ class MapManager {
             {
                 id: 'usa-asia',
                 from: { name: 'アメリカ', coords: [-95, 40] },
-                to: { name: 'アジア・太平洋', coords: [120, 30] },
+                to: { name: 'アジア・太平洋', coords: [104, 35] },
                 delay: 150
             },
             {
