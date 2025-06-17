@@ -70,6 +70,8 @@
         "visible": true,
         "center": [-100, 40],
         "zoom": 1.2,
+        "widthPercent": 100,
+        "heightPercent": 60,
         "useRegionColors": true,
         "highlightCountries": ["United States", "United States of America", "USA"]
       },
@@ -94,6 +96,8 @@
         "visible": true,
         "center": [0, 20],
         "zoom": 1.0,
+        "widthPercent": 100,
+        "height": 700,
         "useRegionColors": true,
         "targetRegions": ["西・中央ヨーロッパおよび北米", "アジア・太平洋地域", "東部・南部アフリカ", "西部・中部アフリカ"]
       },

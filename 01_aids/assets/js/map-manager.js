@@ -46,7 +46,7 @@ class MapManager {
     updateMap(mapData) {
         console.log('MapManager: updateMap called with:', mapData);
         
-        const { center, zoom, visible, data, highlightCountries = [], cities = [], mode, citiesFile, cityId, useRegionColors = false, lightenNonVisited = false, targetRegions = [] } = mapData;
+        const { center, zoom, visible, data, highlightCountries = [], cities = [], mode, citiesFile, cityId, useRegionColors = false, lightenNonVisited = false, targetRegions = [], width = 800, height = 600, widthPercent, heightPercent, aspectRatio } = mapData;
         
         this.currentView = { center, zoom, highlightCountries, cities, mode, citiesFile, cityId, useRegionColors, lightenNonVisited, targetRegions };
         console.log('MapManager: Current view set to:', this.currentView);
@@ -72,10 +72,10 @@ class MapManager {
                 // 地図が既に描画されているかチェック
                 if (!this.svg || this.svg.selectAll('.map-country').empty()) {
                     console.log('MapManager: Initial map rendering...');
-                    this.renderMap(this.geoData, { center, zoom, highlightCountries, cities, useRegionColors, lightenNonVisited, targetRegions });
+                    this.renderMap(this.geoData, { center, zoom, highlightCountries, cities, useRegionColors, lightenNonVisited, targetRegions, width, height, widthPercent, heightPercent, aspectRatio });
                 } else {
                     console.log('MapManager: Updating existing map...');
-                    this.updateExistingMap({ center, zoom, highlightCountries, cities, useRegionColors, lightenNonVisited, targetRegions });
+                    this.updateExistingMap({ center, zoom, highlightCountries, cities, useRegionColors, lightenNonVisited, targetRegions, width, height, widthPercent, heightPercent, aspectRatio });
                 }
             } else {
                 console.error('MapManager: No geo data available for rendering');
@@ -129,22 +129,79 @@ class MapManager {
     }
 
     /**
-     * SVG要素を初期化
+     * SVG要素を初期化（レスポンシブ対応）
      */
-    initSVG(width, height) {
-        console.log('MapManager: initSVG called with', width, height);
+    initSVG(config = {}) {
+        console.log('MapManager: initSVG called with config:', config);
         console.log('MapManager: Container:', this.container);
         console.log('MapManager: Container node:', this.container.node());
         
+        // 地図専用のレスポンシブサイズ計算
+        let responsiveSize;
+        if (config.widthPercent || config.heightPercent) {
+            // パーセント指定の場合は、コンテナサイズに基づいて計算
+            const containerElement = this.container.node();
+            const containerRect = containerElement.getBoundingClientRect();
+            const containerWidth = containerRect.width || window.innerWidth;
+            const containerHeight = containerRect.height || window.innerHeight;
+            
+            let width = config.width || 800;
+            let height = config.height || 600;
+            
+            if (config.widthPercent) {
+                width = containerWidth * (config.widthPercent / 100);
+            }
+            if (config.heightPercent) {
+                height = containerHeight * (config.heightPercent / 100);
+            }
+            
+            responsiveSize = { width, height };
+            console.log('MapManager: Container-based responsive size:', responsiveSize, 'from container:', {containerWidth, containerHeight});
+        } else if (window.SVGHelper) {
+            responsiveSize = SVGHelper.getResponsiveSize(this.container, {
+                defaultWidth: config.width || 800,
+                defaultHeight: config.height || 600,
+                aspectRatio: config.aspectRatio
+            });
+        } else {
+            // フォールバック：固定サイズ
+            responsiveSize = {
+                width: config.width || 800,
+                height: config.height || 600
+            };
+        }
+        
+        const { width, height } = responsiveSize;
+        console.log('MapManager: Calculated responsive size:', { width, height });
+        
         this.container.selectAll('*').remove();
         
-        this.svg = this.container
-            .append('svg')
-            .attr('width', width)
-            .attr('height', height)
-            .attr('viewBox', `0 0 ${width} ${height}`)
-            .style('width', '100%')
-            .style('height', '100%');
+        // パーセント指定の場合は独自にSVGを作成
+        if (config.widthPercent || config.heightPercent) {
+            this.svg = this.container
+                .append('svg')
+                .attr('viewBox', `0 0 ${width} ${height}`)
+                .attr('preserveAspectRatio', 'xMidYMid meet')
+                .style('width', '100%')
+                .style('height', 'auto')
+                .style('max-width', '100%')
+                .style('display', 'block');
+        } else if (window.SVGHelper) {
+            // 固定サイズの場合はSVGHelperを使用
+            this.svg = SVGHelper.initSVG(this.container, width, height, {
+                responsive: true,
+                preserveAspectRatio: 'xMidYMid meet'
+            });
+        } else {
+            // フォールバック：従来の方法
+            this.svg = this.container
+                .append('svg')
+                .attr('width', width)
+                .attr('height', height)
+                .attr('viewBox', `0 0 ${width} ${height}`)
+                .style('width', '100%')
+                .style('height', '100%');
+        }
             
         console.log('MapManager: SVG created:', this.svg);
         console.log('MapManager: SVG node:', this.svg.node());
@@ -176,21 +233,24 @@ class MapManager {
             center = [0, 0], 
             zoom = 1, 
             highlightCountries = [], 
-            cities = [],
-            width = 800,
-            height = 600 
+            cities = []
         } = config;
         
-        console.log('renderMap parameters:', { center, zoom, width, height });
+        console.log('renderMap parameters:', { center, zoom, config });
         
-        const svg = this.initSVG(width, height);
+        const svg = this.initSVG(config);
         console.log('SVG initialized:', svg);
         
-        // 投影法を設定
+        // 現在のSVGサイズを取得
+        const actualSize = SVGHelper.getActualSize(svg);
+        const svgWidth = actualSize.width || config.width || 800;
+        const svgHeight = actualSize.height || config.height || 600;
+        
+        // 投影法を設定（150%拡大）
         this.projection = d3.geoNaturalEarth1()
-            .scale(zoom * 150)
+            .scale(zoom * 150 * 1.5)
             .center(center)
-            .translate([width / 2, height / 2]);
+            .translate([svgWidth / 2, svgHeight / 2]);
             
         this.path = d3.geoPath().projection(this.projection);
         console.log('Projection and path initialized');
@@ -368,7 +428,7 @@ class MapManager {
         const duration = window.AppDefaults?.animation?.chartTransitionDuration || 1000;
         const currentCenter = this.projection.center();
         const currentScale = this.projection.scale();
-        const targetScale = zoom * 150;
+        const targetScale = zoom * 150 * 1.5;
         
         // SVGに対してtransitionを適用（projectionではなく）
         this.svg
@@ -482,7 +542,12 @@ class MapManager {
             cities = [],
             useRegionColors = false,
             lightenNonVisited = false,
-            targetRegions = []
+            targetRegions = [],
+            width = 800,
+            height = 600,
+            widthPercent,
+            heightPercent,
+            aspectRatio
         } = config;
 
         console.log('MapManager: updateExistingMap called with:', config);
@@ -495,7 +560,7 @@ class MapManager {
         // プロジェクションの現在の設定を取得
         const currentCenter = this.projection.center();
         const currentScale = this.projection.scale();
-        const targetScale = zoom * 150;
+        const targetScale = zoom * 150 * 1.5;
 
         console.log('Transition from:', { center: currentCenter, scale: currentScale });
         console.log('Transition to:', { center, scale: targetScale });
@@ -761,16 +826,20 @@ class MapManager {
      * タイムライン用の地図を描画
      */
     renderTimelineMap() {
-        const width = 800;
-        const height = 600;
+        const config = { width: 800, height: 600 };
         
-        const svg = this.initSVG(width, height);
+        const svg = this.initSVG(config);
         
-        // 投影法を設定（世界全体を表示）
+        // 現在のSVGサイズを取得
+        const actualSize = SVGHelper.getActualSize(svg);
+        const svgWidth = actualSize.width || config.width || 800;
+        const svgHeight = actualSize.height || config.height || 600;
+        
+        // 投影法を設定（世界全体を表示、150%拡大）
         this.projection = d3.geoNaturalEarth1()
-            .scale(150)
+            .scale(150 * 1.5)
             .center([0, 0])
-            .translate([width / 2, height / 2]);
+            .translate([svgWidth / 2, svgHeight / 2]);
             
         this.path = d3.geoPath().projection(this.projection);
 
@@ -978,16 +1047,20 @@ class MapManager {
      * @param {Object} targetCity - 表示する都市データ
      */
     initializeSingleCityMap(targetCity) {
-        const width = 800;
-        const height = 600;
+        const config = { width: 800, height: 600 };
         
-        const svg = this.initSVG(width, height);
+        const svg = this.initSVG(config);
         
-        // 投影法を設定
+        // 現在のSVGサイズを取得
+        const actualSize = SVGHelper.getActualSize(svg);
+        const svgWidth = actualSize.width || config.width || 800;
+        const svgHeight = actualSize.height || config.height || 600;
+        
+        // 投影法を設定（150%拡大）
         this.projection = d3.geoNaturalEarth1()
-            .scale(400)
+            .scale(400 * 1.5)
             .center([targetCity.longitude, targetCity.latitude])
-            .translate([width / 2, height / 2]);
+            .translate([svgWidth / 2, svgHeight / 2]);
             
         this.path = d3.geoPath().projection(this.projection);
 
