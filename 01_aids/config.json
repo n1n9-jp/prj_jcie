@@ -4,7 +4,7 @@
       "id": "step0",
       "text": {
         "content": "エイズ対策の物語",
-        "visible": false,
+        "visible": true,
         "position": {
           "width": "30%",
           "horizontal": "right",
@@ -196,9 +196,9 @@
           "annotations": [
             {
               "type": "verticalLine",
-              "year": 1983,
-              "label": "1983年：原因がHIVだと特定",
-              "position": "top-right"
+              "year": 1987,
+              "label": "1987年：最初の抗HIV薬が誕生",
+              "position": "top-left"
             },
             {
               "type": "verticalLine",
@@ -403,6 +403,12 @@
           "title": "HIV母子感染率の推移（%）",
           "yRange": [0, 40],
           "annotations": [
+            {
+              "type": "horizontalLine",
+              "value": 8.7,
+              "label": "2023年には8.7%まで減少した",
+              "position": "right"
+            },
             {
               "type": "horizontalLine",
               "value": 35.2,
