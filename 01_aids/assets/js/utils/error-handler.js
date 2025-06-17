@@ -206,12 +206,12 @@ class ErrorHandler {
             position: fixed;
             top: 20px;
             right: 20px;
-            max-width: 400px;
+            max-width: ${window.AppDefaults?.errorModal?.imageMaxWidth || '400px'};
             padding: 16px;
             background: ${errorInfo.severity === ErrorHandler.SEVERITY.CRITICAL ? '#e74c3c' : '#f8f9fa'};
             color: ${errorInfo.severity === ErrorHandler.SEVERITY.CRITICAL ? '#fff' : '#333'};
             border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 6px ${window.AppDefaults?.colors?.background?.shadow || 'rgba(0, 0, 0, 0.1)'};
             z-index: 10000;
             animation: slideIn 0.3s ease-out;
         `;
@@ -280,10 +280,10 @@ class ErrorHandler {
         const debugPanel = document.createElement('div');
         debugPanel.id = 'error-debug-panel';
         debugPanel.innerHTML = `
-            <div style="position: fixed; bottom: 20px; left: 20px; max-width: 600px; 
+            <div style="position: fixed; bottom: 20px; left: 20px; max-width: ${window.AppDefaults?.errorModal?.maxWidth || '600px'}; 
                         background: #2c3e50; color: #ecf0f1; padding: 20px; 
                         border-radius: 8px; font-family: monospace; font-size: 12px;
-                        max-height: 400px; overflow-y: auto; z-index: 10001;">
+                        max-height: ${window.AppDefaults?.errorModal?.imageMaxHeight || '400px'}; overflow-y: auto; z-index: 10001;">
                 <h3 style="margin-top: 0;">Debug Information</h3>
                 <pre>${JSON.stringify(errorInfo, null, 2)}</pre>
                 <button onclick="this.parentElement.remove()" 

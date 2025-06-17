@@ -237,7 +237,7 @@ class AnimationConfig {
         }
         
         // モバイルデバイスでは少し速く
-        if (window.innerWidth < 768) {
+        if (window.innerWidth < (window.AppDefaults?.breakpoints?.mobile || 768)) {
             return baseSpeed * 0.8;
         }
         

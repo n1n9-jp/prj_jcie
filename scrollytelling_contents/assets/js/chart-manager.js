@@ -148,7 +148,7 @@ class ChartManager {
         enterSeriesGroups.append('path')
             .attr('class', 'chart-line')
             .attr('stroke', d => colorScale(d.name))
-            .attr('stroke-width', 2)
+            .attr('stroke-width', window.AppDefaults?.strokeWidth?.thick || 2)
             .attr('fill', 'none')
             .attr('d', d => newLine(d.values))
             .style('opacity', 0);
@@ -475,7 +475,7 @@ class ChartManager {
             .attr('text-anchor', 'middle')
             .attr('font-size', '16px')
             .attr('font-weight', 'bold')
-            .attr('fill', '#333')
+            .attr('fill', window.AppDefaults?.colors?.text?.primary || '#333')
             .text(title);
         
         // チャート描画エリア
@@ -556,11 +556,11 @@ class ChartManager {
             .attr('class', 'chart-line')
             .attr('d', d => line(d.values))
             .attr('stroke', d => colorScale(d.name))
-            .attr('stroke-width', 0)
+            .attr('stroke-width', window.AppDefaults?.strokeWidth?.none || 0)
             .attr('fill', 'none')
             .transition()
             .duration(500)
-            .attr('stroke-width', 2);
+            .attr('stroke-width', window.AppDefaults?.strokeWidth?.thick || 2);
 
         // ポイントを描画
         seriesGroups.selectAll('.chart-circle')
@@ -609,7 +609,7 @@ class ChartManager {
             .attr('y', 4)
             .attr('dy', '0.35em')
             .attr('font-size', '10px')
-            .attr('fill', '#333')
+            .attr('fill', window.AppDefaults?.colors?.text?.primary || '#333')
             .text(d => d.name);
     }
 
@@ -812,11 +812,11 @@ class ChartManager {
             .datum(d => d) // 系列データを設定
             .attr('d', d => line(d.values))
             .attr('stroke', d => colorScale(d.name))
-            .attr('stroke-width', 0)
+            .attr('stroke-width', window.AppDefaults?.strokeWidth?.none || 0)
             .attr('fill', 'none')
             .style('opacity', 0)
             .transition(initialTransition)
-            .attr('stroke-width', 2)
+            .attr('stroke-width', window.AppDefaults?.strokeWidth?.thick || 2)
             .style('opacity', 1);
 
         // Object Constancyを使ったポイント描画（線と同期）
@@ -880,7 +880,7 @@ class ChartManager {
             .attr('y', 6)
             .attr('dy', '0.35em')
             .attr('font-size', '12px')
-            .attr('fill', '#333')
+            .attr('fill', window.AppDefaults?.colors?.text?.primary || '#333')
             .text(d => d.name);
     }
 
@@ -888,7 +888,7 @@ class ChartManager {
      * 棒グラフを描画
      */
     renderBarChart(data, config) {
-        const { width, height, margin, xField = 'category', yField = 'value', color = '#10b981' } = config;
+        const { width, height, margin, xField = 'category', yField = 'value', color = window.AppDefaults?.colors?.accent?.success || '#10b981' } = config;
         
         const svg = this.initSVG(width, height);
         const innerWidth = width - margin.left - margin.right;

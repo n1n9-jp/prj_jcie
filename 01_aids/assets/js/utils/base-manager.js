@@ -36,7 +36,7 @@ class BaseManager {
      */
     show(options = {}) {
         const { 
-            transitionDuration = 300,
+            transitionDuration = window.AppDefaults?.animation?.defaultDuration || 300,
             ease = d3.easeQuadInOut,
             delay = 0
         } = options;
@@ -60,7 +60,7 @@ class BaseManager {
      */
     hide(options = {}) {
         const { 
-            transitionDuration = 300,
+            transitionDuration = window.AppDefaults?.animation?.defaultDuration || 300,
             ease = d3.easeQuadInOut,
             delay = 0
         } = options;

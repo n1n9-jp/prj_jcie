@@ -284,7 +284,7 @@ class MapManager {
             console.log('Country paths created:', paths.size());
             
             paths.transition()
-                .duration(500)
+                .duration(window.AppDefaults?.animation?.shortDuration || 500)
                 .delay((d, i) => i * 10)
                 .style('opacity', 1);
                 
@@ -305,7 +305,7 @@ class MapManager {
                 .attr('cy', d => this.projection([d.longitude, d.latitude])[1])
                 .attr('r', 0)
                 .transition()
-                .duration(500)
+                .duration(window.AppDefaults?.animation?.shortDuration || 500)
                 .delay(1000)
                 .attr('r', 6);
 
@@ -324,7 +324,7 @@ class MapManager {
                 .text(d => d.name)
                 .style('opacity', 0)
                 .transition()
-                .duration(500)
+                .duration(window.AppDefaults?.animation?.shortDuration || 500)
                 .delay(1200)
                 .style('opacity', 1);
         }
@@ -341,7 +341,7 @@ class MapManager {
     animateToView(center, zoom) {
         if (!this.projection || !this.svg) return;
 
-        const duration = 1000;
+        const duration = window.AppDefaults?.animation?.chartTransitionDuration || 1000;
         const currentCenter = this.projection.center();
         const currentScale = this.projection.scale();
         const targetScale = zoom * 150;
@@ -423,7 +423,7 @@ class MapManager {
                 .attr('cy', d => this.projection([d.longitude, d.latitude])[1])
                 .attr('r', 0)
                 .transition()
-                .duration(300)
+                .duration(window.AppDefaults?.animation?.defaultDuration || 300)
                 .attr('r', 6);
 
             mapGroup.selectAll('.city-label')
@@ -440,7 +440,7 @@ class MapManager {
                 .text(d => d.name)
                 .style('opacity', 0)
                 .transition()
-                .duration(300)
+                .duration(window.AppDefaults?.animation?.defaultDuration || 300)
                 .delay(200)
                 .style('opacity', 1);
         }
@@ -479,7 +479,7 @@ class MapManager {
         const mapGroup = this.svg.select('.map-group');
         mapGroup.selectAll('.map-city, .city-label, .single-city-marker, .single-city-label, .single-city-info')
             .transition()
-            .duration(200)
+            .duration(window.AppDefaults?.animation?.defaultDuration || 200)
             .style('opacity', 0)
             .remove();
 
@@ -487,7 +487,7 @@ class MapManager {
         this.svg
             .transition()
             .delay(200) // 既存要素の削除を待つ
-            .duration(1500)
+            .duration((window.AppDefaults?.animation?.chartTransitionDuration || 1000) * 1.5)
             .ease(d3.easeCubicInOut)
             .tween('projection', () => {
                 const interpolateCenter = d3.interpolate(currentCenter, center);
@@ -522,7 +522,7 @@ class MapManager {
 
         this.svg.selectAll('.map-country')
             .transition()
-            .duration(500)
+            .duration(window.AppDefaults?.animation?.shortDuration || 500)
             .style('fill', d => {
                 const countryName = d.properties.NAME || d.properties.name || d.properties.NAME_EN;
                 
@@ -637,7 +637,7 @@ class MapManager {
                 .style('stroke', '#fff')
                 .style('stroke-width', 2)
                 .transition()
-                .duration(500)
+                .duration(window.AppDefaults?.animation?.shortDuration || 500)
                 .delay(300)
                 .attr('r', 6);
 
@@ -662,7 +662,7 @@ class MapManager {
                 .text(d => d.name)
                 .style('opacity', 0)
                 .transition()
-                .duration(500)
+                .duration(window.AppDefaults?.animation?.shortDuration || 500)
                 .delay(500)
                 .style('opacity', 1);
         }
@@ -733,7 +733,7 @@ class MapManager {
                 .attr('d', this.path)
                 .style('opacity', 0)
                 .transition()
-                .duration(500)
+                .duration(window.AppDefaults?.animation?.shortDuration || 500)
                 .style('opacity', 1);
         }
         
@@ -820,7 +820,7 @@ class MapManager {
         // 都市の表示アニメーション（ゆっくり）
         enteringCities
             .transition()
-            .duration(800)
+            .duration((window.AppDefaults?.animation?.shortDuration || 500) * 1.6)
             .ease(d3.easeBackOut.overshoot(1.7))
             .attr('r', d => d.style.size)
             .style('opacity', 1);
@@ -849,14 +849,14 @@ class MapManager {
         
         enteringLabels
             .transition()
-            .duration(600)
+            .duration((window.AppDefaults?.animation?.shortDuration || 500) * 1.2)
             .delay(400)
             .style('opacity', 1);
         
         // 都市の削除アニメーション
         cityMarkers.exit()
             .transition()
-            .duration(600)
+            .duration((window.AppDefaults?.animation?.shortDuration || 500) * 1.2)
             .ease(d3.easeBackIn)
             .attr('r', 0)
             .style('opacity', 0)
@@ -864,7 +864,7 @@ class MapManager {
         
         cityLabels.exit()
             .transition()
-            .duration(400)
+            .duration((window.AppDefaults?.animation?.defaultDuration || 300) * 1.33)
             .style('opacity', 0)
             .remove();
         
@@ -984,7 +984,7 @@ class MapManager {
                 .style('stroke-width', this.currentView && this.currentView.useRegionColors ? 0.75 : 0.5)
                 .style('opacity', 0)
                 .transition()
-                .duration(500)
+                .duration(window.AppDefaults?.animation?.shortDuration || 500)
                 .style('opacity', 1);
         }
         
@@ -1012,7 +1012,7 @@ class MapManager {
         // 既存の都市マーカーをフェードアウト
         this.svg.selectAll('.single-city-marker, .single-city-label, .single-city-info')
             .transition()
-            .duration(600)
+            .duration((window.AppDefaults?.animation?.shortDuration || 500) * 1.2)
             .style('opacity', 0)
             .remove();
         
@@ -1021,7 +1021,7 @@ class MapManager {
         // 地図のアニメーション
         this.svg
             .transition()
-            .duration(1500)
+            .duration((window.AppDefaults?.animation?.chartTransitionDuration || 1000) * 1.5)
             .ease(d3.easeCubicInOut)
             .tween('projection', () => {
                 const interpolateCenter = d3.interpolate(currentCenter, targetCenter);
@@ -1096,7 +1096,7 @@ class MapManager {
             .style('stroke-width', 3)
             .style('opacity', 0)
             .transition()
-            .duration(800)
+            .duration((window.AppDefaults?.animation?.shortDuration || 500) * 1.6)
             .ease(d3.easeBackOut.overshoot(1.7))
             .attr('r', city.style.size * 1.5)  // 少し大きめに表示
             .style('opacity', 1);
@@ -1113,7 +1113,7 @@ class MapManager {
             .style('opacity', 0)
             .text(city.name)
             .transition()
-            .duration(600)
+            .duration((window.AppDefaults?.animation?.shortDuration || 500) * 1.2)
             .delay(400)
             .style('opacity', 1);
         

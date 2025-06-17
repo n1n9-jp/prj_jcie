@@ -287,7 +287,7 @@ class PositionManager {
             const screenHeight = window.innerHeight;
 
             // 小画面の閾値
-            const smallScreenThreshold = 768;
+            const smallScreenThreshold = window.AppDefaults?.breakpoints?.mobile || 768;
             const verySmallScreenThreshold = 480;
 
             if (screenWidth <= verySmallScreenThreshold) {
@@ -364,7 +364,7 @@ class PositionManager {
 
             // 小画面での積み重ねレイアウト
             if (stackOnSmallScreen) {
-                const mediaQuery = window.matchMedia('(max-width: 768px)');
+                const mediaQuery = window.matchMedia(`(max-width: ${window.AppDefaults?.breakpoints?.mobile || 768}px)`);
                 const handleSmallScreen = (e) => {
                     if (e.matches) {
                         container.element.style.position = 'relative';
@@ -660,7 +660,7 @@ class PositionManager {
     static applyTextResponsiveAdjustments(stepElement, positionConfig) {
         const checkScreenSize = () => {
             const screenWidth = window.innerWidth;
-            const smallScreenThreshold = 768;
+            const smallScreenThreshold = window.AppDefaults?.breakpoints?.mobile || 768;
 
             if (screenWidth <= smallScreenThreshold) {
                 // 小画面では中央配置に強制変更

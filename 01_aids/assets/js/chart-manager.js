@@ -111,7 +111,7 @@ class ChartManager {
             });
         } else {
             // フォールバック：従来の固定マージン
-            margin = config.margin || { top: 20, right: 20, bottom: 40, left: 40 };
+            margin = config.margin || window.AppDefaults?.chartMargin?.compact || { top: 20, right: 20, bottom: 40, left: 40 };
         }
         const innerWidth = width - margin.left - margin.right;
         const innerHeight = height - margin.top - margin.bottom;
@@ -200,7 +200,7 @@ class ChartManager {
         enterSeriesGroups.append('path')
             .attr('class', 'chart-line')
             .attr('stroke', d => colorScale(d.name))
-            .attr('stroke-width', 2)
+            .attr('stroke-width', window.AppDefaults?.strokeWidth?.thick || 2)
             .attr('fill', 'none')
             .attr('d', d => newLine(d.values))
             .style('opacity', 0);
@@ -627,7 +627,7 @@ class ChartManager {
             });
         } else {
             // フォールバック：従来の固定マージン
-            margin = config.margin || { top: 20, right: 20, bottom: 40, left: 50 };
+            margin = config.margin || window.AppDefaults?.chartMargin?.minimal || { top: 20, right: 20, bottom: 40, left: 50 };
         }
         const innerWidth = width - margin.left - margin.right;
         const innerHeight = height - margin.top - margin.bottom;
@@ -643,7 +643,7 @@ class ChartManager {
             .attr('text-anchor', 'middle')
             .attr('font-size', '16px')
             .attr('font-weight', 'bold')
-            .attr('fill', '#333')
+            .attr('fill', window.AppDefaults?.colors?.text?.primary || '#333')
             .text(title);
         
         // チャート描画エリア
@@ -780,11 +780,11 @@ class ChartManager {
             .attr('class', 'chart-line')
             .attr('d', d => line(d.values))
             .attr('stroke', d => colorScale(d.name))
-            .attr('stroke-width', 0)
+            .attr('stroke-width', window.AppDefaults?.strokeWidth?.none || 0)
             .attr('fill', 'none')
             .transition()
             .duration(500)
-            .attr('stroke-width', 2);
+            .attr('stroke-width', window.AppDefaults?.strokeWidth?.thick || 2);
 
         // ポイントを描画
         seriesGroups.selectAll('.chart-circle')
@@ -868,7 +868,7 @@ class ChartManager {
             .attr('y', 4)
             .attr('dy', '0.35em')
             .attr('font-size', '10px')
-            .attr('fill', '#333');
+            .attr('fill', window.AppDefaults?.colors?.text?.primary || '#333');
         
         // 改善されたテキスト省略処理
         legendTexts.each(function(d) {
@@ -936,7 +936,7 @@ class ChartManager {
             });
         } else {
             // フォールバック：従来の固定マージン
-            margin = config.margin || { top: 40, right: 20, bottom: 40, left: 50 };
+            margin = config.margin || window.AppDefaults?.chartMargin?.default || { top: 40, right: 20, bottom: 40, left: 50 };
         }
         
         // SVGHelperを使用してレスポンシブSVGを作成
@@ -1123,7 +1123,7 @@ class ChartManager {
                 .attr('text-anchor', 'start')
                 .attr('font-size', '16px')
                 .attr('font-weight', 'bold')
-                .attr('fill', '#333')
+                .attr('fill', window.AppDefaults?.colors?.text?.primary || '#333')
                 .text(title);
         }
 
@@ -1249,11 +1249,11 @@ class ChartManager {
             .datum(d => d) // 系列データを設定
             .attr('d', d => line(d.values))
             .attr('stroke', d => colorScale(d.name))
-            .attr('stroke-width', 0)
+            .attr('stroke-width', window.AppDefaults?.strokeWidth?.none || 0)
             .attr('fill', 'none')
             .style('opacity', 0)
             .transition(initialTransition)
-            .attr('stroke-width', 2)
+            .attr('stroke-width', window.AppDefaults?.strokeWidth?.thick || 2)
             .style('opacity', 1);
 
         // Object Constancyを使ったポイント描画（線と同期）
@@ -1376,7 +1376,7 @@ class ChartManager {
             .attr('y', 6)
             .attr('dy', '0.35em')
             .attr('font-size', '12px')
-            .attr('fill', '#333');
+            .attr('fill', window.AppDefaults?.colors?.text?.primary || '#333');
         
         // 改善されたテキスト省略処理
         legendTexts.each(function(d) {
@@ -1439,7 +1439,7 @@ class ChartManager {
         const { 
             width, height, margin, 
             xField = 'category', yField = 'value', 
-            color = '#10b981',
+            color = window.AppDefaults?.colors?.accent?.success || '#10b981',
             title = ''
         } = config;
         
@@ -1459,7 +1459,7 @@ class ChartManager {
                 .attr('text-anchor', 'start')
                 .attr('font-size', '16px')
                 .attr('font-weight', 'bold')
-                .attr('fill', '#333')
+                .attr('fill', window.AppDefaults?.colors?.text?.primary || '#333')
                 .text(title);
         }
 
@@ -1568,7 +1568,7 @@ class ChartManager {
                 .attr('text-anchor', 'start')
                 .attr('font-size', '16px')
                 .attr('font-weight', 'bold')
-                .attr('fill', '#333')
+                .attr('fill', window.AppDefaults?.colors?.text?.primary || '#333')
                 .text(title);
         }
 
@@ -1622,7 +1622,7 @@ class ChartManager {
             .attr('transform', d => `translate(${arc.centroid(d)})`)
             .attr('text-anchor', 'middle')
             .attr('font-size', '12px')
-            .attr('fill', 'white')
+            .attr('fill', window.AppDefaults?.colors?.text?.white || '#fff')
             .text(d => d.data[labelField])
             .style('opacity', 0)
             .transition()
@@ -1687,7 +1687,7 @@ class ChartManager {
             .attr('text-anchor', 'middle')
             .attr('font-size', '14px')
             .attr('font-weight', 'bold')
-            .attr('fill', '#333')
+            .attr('fill', window.AppDefaults?.colors?.text?.primary || '#333')
             .text(title);
         
         // 円グラフ描画エリア
@@ -1755,8 +1755,8 @@ class ChartManager {
             .attr('class', 'pie-slice')
             .attr('d', arc)
             .attr('fill', d => colorScale(d.data[labelField]))
-            .attr('stroke', '#fff')
-            .attr('stroke-width', 1)
+            .attr('stroke', window.AppDefaults?.colors?.text?.white || '#fff')
+            .attr('stroke-width', window.AppDefaults?.strokeWidth?.normal || 1)
             .style('opacity', 0)
             .transition()
             .duration(500)
@@ -1781,7 +1781,7 @@ class ChartManager {
             .attr('y', '-0.3em')
             .attr('font-size', '11px')
             .attr('font-weight', 'bold')
-            .attr('fill', '#333')
+            .attr('fill', window.AppDefaults?.colors?.text?.primary || '#333')
             .text(d => d.data[labelField]);
         
         // パーセンテージを追加
@@ -1790,7 +1790,7 @@ class ChartManager {
             .attr('text-anchor', 'middle')
             .attr('y', '0.8em')
             .attr('font-size', '11px')
-            .attr('fill', '#666')
+            .attr('fill', window.AppDefaults?.colors?.text?.secondary || '#666')
             .text(d => {
                 // 実際のパーセンテージを計算
                 const percentage = (d.data[valueField] / total * 100).toFixed(1);
@@ -1833,8 +1833,8 @@ class ChartManager {
                     .attr('x2', x)
                     .attr('y1', 0)
                     .attr('y2', height)
-                    .attr('stroke', '#666')
-                    .attr('stroke-width', 1)
+                    .attr('stroke', window.AppDefaults?.colors?.text?.secondary || '#666')
+                    .attr('stroke-width', window.AppDefaults?.strokeWidth?.normal || 1)
                     .attr('stroke-dasharray', '5,5')
                     .style('opacity', 0)
                     .transition()
@@ -1883,7 +1883,7 @@ class ChartManager {
                     .attr('text-anchor', textAnchor)
                     .attr('font-size', '12px')
                     .attr('font-weight', 'bold')
-                    .attr('fill', '#333')
+                    .attr('fill', window.AppDefaults?.colors?.text?.primary || '#333')
                     .text(label);
 
                 // 背景の白い矩形（オプション）
@@ -1893,9 +1893,9 @@ class ChartManager {
                     .attr('y', bbox.y - 2)
                     .attr('width', bbox.width + 6)
                     .attr('height', bbox.height + 4)
-                    .attr('fill', 'rgba(255, 255, 255, 0.9)')
-                    .attr('stroke', '#ccc')
-                    .attr('stroke-width', 0.5)
+                    .attr('fill', window.AppDefaults?.colors?.background?.overlay || 'rgba(255, 255, 255, 0.9)')
+                    .attr('stroke', window.AppDefaults?.colors?.border?.light || '#ccc')
+                    .attr('stroke-width', window.AppDefaults?.strokeWidth?.thin || 0.5)
                     .attr('rx', 3);
 
                 // ラベルをフェードイン
@@ -1922,8 +1922,8 @@ class ChartManager {
                     .attr('x2', width)
                     .attr('y1', y)
                     .attr('y2', y)
-                    .attr('stroke', '#666')
-                    .attr('stroke-width', 1)
+                    .attr('stroke', window.AppDefaults?.colors?.text?.secondary || '#666')
+                    .attr('stroke-width', window.AppDefaults?.strokeWidth?.normal || 1)
                     .attr('stroke-dasharray', '5,5')
                     .style('opacity', 0)
                     .transition()
@@ -1967,7 +1967,7 @@ class ChartManager {
                     .attr('text-anchor', textAnchor)
                     .attr('font-size', '12px')
                     .attr('font-weight', 'bold')
-                    .attr('fill', '#333')
+                    .attr('fill', window.AppDefaults?.colors?.text?.primary || '#333')
                     .text(label);
 
                 // 背景の白い矩形
@@ -1977,9 +1977,9 @@ class ChartManager {
                     .attr('y', bbox.y - 2)
                     .attr('width', bbox.width + 6)
                     .attr('height', bbox.height + 4)
-                    .attr('fill', 'rgba(255, 255, 255, 0.9)')
-                    .attr('stroke', '#ccc')
-                    .attr('stroke-width', 0.5)
+                    .attr('fill', window.AppDefaults?.colors?.background?.overlay || 'rgba(255, 255, 255, 0.9)')
+                    .attr('stroke', window.AppDefaults?.colors?.border?.light || '#ccc')
+                    .attr('stroke-width', window.AppDefaults?.strokeWidth?.thin || 0.5)
                     .attr('rx', 3);
 
                 // ラベルをフェードイン
@@ -2043,7 +2043,7 @@ class ChartManager {
                 .attr('text-anchor', 'middle')
                 .attr('font-size', '18px')
                 .attr('font-weight', 'bold')
-                .attr('fill', '#333')
+                .attr('fill', window.AppDefaults?.colors?.text?.primary || '#333')
                 .text(title);
         }
         
@@ -2103,8 +2103,8 @@ class ChartManager {
         slices.append('path')
             .attr('d', arc)
             .attr('fill', d => d.data.color)
-            .attr('stroke', '#fff')
-            .attr('stroke-width', 1)
+            .attr('stroke', window.AppDefaults?.colors?.text?.white || '#fff')
+            .attr('stroke-width', window.AppDefaults?.strokeWidth?.normal || 1)
             .style('opacity', 0)
             .transition()
             .duration(500)
@@ -2121,7 +2121,7 @@ class ChartManager {
                 .attr('text-anchor', 'middle')
                 .attr('font-size', '10px')
                 .attr('font-weight', 'bold')
-                .attr('fill', '#333')
+                .attr('fill', window.AppDefaults?.colors?.text?.primary || '#333')
                 .text(cellData.region);
             
             // 年齢層
@@ -2131,7 +2131,7 @@ class ChartManager {
                 .attr('y', height/2 - 5)
                 .attr('text-anchor', 'middle')
                 .attr('font-size', '9px')
-                .attr('fill', '#666')
+                .attr('fill', window.AppDefaults?.colors?.text?.secondary || '#666')
                 .text(cellData.ageGroup);
         }
         
@@ -2144,7 +2144,7 @@ class ChartManager {
                 .attr('text-anchor', 'middle')
                 .attr('font-size', '12px')
                 .attr('font-weight', 'bold')
-                .attr('fill', '#333')
+                .attr('fill', window.AppDefaults?.colors?.text?.primary || '#333')
                 .text(`${cellData.percentage}%`);
         }
     }
@@ -2172,8 +2172,8 @@ class ChartManager {
             if (region && region.trim()) {
                 // ColorSchemeから色を取得
                 const colorScheme = window.ColorScheme;
-                const treatmentColor = colorScheme ? colorScheme.getRegionColor(region) : '#2563eb';
-                const untreatedColor = '#e5e7eb';
+                const treatmentColor = colorScheme ? colorScheme.getRegionColor(region) : window.AppDefaults?.colors?.accent?.primary || '#2563eb';
+                const untreatedColor = window.AppDefaults?.colors?.background?.neutral || '#e5e7eb';
                 
                 
                 // 成人データとこどもデータを保存
@@ -2188,7 +2188,7 @@ class ChartManager {
                 };
                 
                 // こどもデータ（少し明るい色を使用）
-                const childTreatmentColor = colorScheme ? colorScheme.getLighterColor(treatmentColor) : '#3b82f6';
+                const childTreatmentColor = colorScheme ? colorScheme.getLighterColor(treatmentColor) : window.AppDefaults?.colors?.accent?.secondary || '#3b82f6';
                 const childData = {
                     region: region,
                     ageGroup: 'こども（0-14歳）',

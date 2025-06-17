@@ -13,7 +13,7 @@ class ConfigHelper {
             height: 600,
             margin: { top: 40, right: 20, bottom: 40, left: 50 },
             colors: d3.schemeCategory10,
-            transitionDuration: 1000,
+            transitionDuration: window.AppDefaults?.animation?.chartTransitionDuration || 1000,
             xField: 'year',
             yField: 'value',
             seriesField: 'series',
@@ -44,7 +44,7 @@ class ConfigHelper {
             zoom: 1,
             highlightCountries: [],
             cities: [],
-            transitionDuration: 1000,
+            transitionDuration: window.AppDefaults?.animation?.chartTransitionDuration || 1000,
             // プロジェクション設定
             projection: 'geoNaturalEarth1',
             // スタイル設定
@@ -70,7 +70,7 @@ class ConfigHelper {
             position: 'center',
             opacity: 1,
             objectFit: 'contain',
-            transitionDuration: 500,
+            transitionDuration: window.AppDefaults?.animation?.shortDuration || 500,
             // レスポンシブ設定
             maxWidth: '100%',
             maxHeight: '100vh',
@@ -86,7 +86,7 @@ class ConfigHelper {
      */
     static getDefaultAnimationConfig() {
         return {
-            duration: 1000,
+            duration: window.AppDefaults?.animation?.chartTransitionDuration || 1000,
             ease: d3.easeQuadInOut,
             delay: 0,
             staggerDelay: 100,

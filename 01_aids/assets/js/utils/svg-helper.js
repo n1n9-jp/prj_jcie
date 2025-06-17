@@ -372,7 +372,7 @@ class SVGHelper {
      * @param {number} delay - 遅延時間（ミリ秒）
      * @returns {d3.Transition} トランジション
      */
-    static createTransition(duration = 1000, ease = d3.easeQuadInOut, delay = 0) {
+    static createTransition(duration = window.AppDefaults?.animation?.chartTransitionDuration || 1000, ease = d3.easeQuadInOut, delay = 0) {
         return d3.transition()
             .duration(duration)
             .ease(ease)
@@ -386,7 +386,7 @@ class SVGHelper {
      * @param {Function} ease - イージング関数
      * @returns {Function} トランジション関数
      */
-    static createStaggeredTransition(duration = 1000, staggerDelay = 100, ease = d3.easeQuadInOut) {
+    static createStaggeredTransition(duration = window.AppDefaults?.animation?.chartTransitionDuration || 1000, staggerDelay = 100, ease = d3.easeQuadInOut) {
         return (d, i) => d3.transition()
             .duration(duration)
             .ease(ease)
@@ -400,7 +400,7 @@ class SVGHelper {
      * @param {number} delay - 遅延時間
      * @returns {d3.Transition} トランジション
      */
-    static fadeIn(selection, duration = 500, delay = 0) {
+    static fadeIn(selection, duration = window.AppDefaults?.animation?.shortDuration || 500, delay = 0) {
         return selection
             .style('opacity', 0)
             .transition()
@@ -416,7 +416,7 @@ class SVGHelper {
      * @param {number} delay - 遅延時間
      * @returns {d3.Transition} トランジション
      */
-    static fadeOut(selection, duration = 500, delay = 0) {
+    static fadeOut(selection, duration = window.AppDefaults?.animation?.shortDuration || 500, delay = 0) {
         return selection
             .transition()
             .duration(duration)
@@ -433,7 +433,7 @@ class SVGHelper {
      * @param {number} delay - 遅延時間
      * @returns {d3.Transition} トランジション
      */
-    static scaleTransition(selection, fromScale = 0, toScale = 1, duration = 500, delay = 0) {
+    static scaleTransition(selection, fromScale = 0, toScale = 1, duration = window.AppDefaults?.animation?.shortDuration || 500, delay = 0) {
         return selection
             .style('transform', `scale(${fromScale})`)
             .transition()
@@ -451,7 +451,7 @@ class SVGHelper {
         return transitionSteps.reduce((promise, step) => {
             return promise.then(() => {
                 return new Promise(resolve => {
-                    const { selection, duration = 500, delay = 0, callback } = step;
+                    const { selection, duration = window.AppDefaults?.animation?.shortDuration || 500, delay = 0, callback } = step;
                     
                     const transition = selection
                         .transition()
