@@ -159,7 +159,6 @@ class ScrollytellingApp {
                             </a>
                         </div>
                         ` : ''}
-                        <div id="geographic-info-${stepIndex}" class="text-sm text-gray-500 border-t pt-3 mt-4" style="display: none;"></div>
                     </div>
                 </div>
             `;
