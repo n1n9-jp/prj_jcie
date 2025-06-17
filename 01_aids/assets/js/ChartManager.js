@@ -27,15 +27,27 @@ class ChartManager extends BaseManager {
         this.transitionManager = null;
         
         console.log('ChartManager initialized with container:', actualContainerId);
+        console.log('ChartManager: Initial renderers state:', this.renderers);
+        
+        // Now that all properties are set up, call init
+        this.init();
     }
 
     /**
      * 初期化処理
      */
     init() {
+        console.log('ChartManager: Starting init()...');
+        console.log('ChartManager: Renderers before super.init():', this.renderers);
+        
         super.init();
+        
+        console.log('ChartManager: Renderers after super.init():', this.renderers);
+        
         this.initializeRenderers();
         this.initializeTransitionManager();
+        
+        console.log('ChartManager: Init complete. Final renderers state:', this.renderers);
     }
 
     /**
@@ -55,6 +67,8 @@ class ChartManager extends BaseManager {
      * 専門化されたレンダラーを初期化
      */
     initializeRenderers() {
+        console.log('ChartManager: Starting renderer initialization...');
+        
         // renderersオブジェクトが存在しない場合は初期化
         if (!this.renderers) {
             this.renderers = {
@@ -66,33 +80,48 @@ class ChartManager extends BaseManager {
         }
         
         const containerId = this.container.node().id ? `#${this.container.node().id}` : '.chart-container';
+        console.log('ChartManager: Using container ID:', containerId);
+        
+        // グローバルで利用可能なレンダラークラスを確認
+        console.log('Available renderer classes:', {
+            LineChartRenderer: !!window.LineChartRenderer,
+            BarChartRenderer: !!window.BarChartRenderer,
+            PieChartRenderer: !!window.PieChartRenderer,
+            GridChartRenderer: !!window.GridChartRenderer
+        });
         
         try {
             // LineChartRenderer
             if (window.LineChartRenderer) {
                 this.renderers.line = new LineChartRenderer(containerId);
-                console.log('LineChartRenderer initialized');
+                console.log('✓ LineChartRenderer initialized successfully');
                 console.log('LineChartRenderer has renderLineChartInGroup:', !!this.renderers.line.renderLineChartInGroup);
             } else {
-                console.error('LineChartRenderer not available in window');
+                console.error('✗ LineChartRenderer not available in window');
             }
             
             // BarChartRenderer
             if (window.BarChartRenderer) {
                 this.renderers.bar = new BarChartRenderer(containerId);
-                console.log('BarChartRenderer initialized');
+                console.log('✓ BarChartRenderer initialized successfully');
+            } else {
+                console.error('✗ BarChartRenderer not available in window');
             }
             
             // PieChartRenderer
             if (window.PieChartRenderer) {
                 this.renderers.pie = new PieChartRenderer(containerId);
-                console.log('PieChartRenderer initialized');
+                console.log('✓ PieChartRenderer initialized successfully');
+            } else {
+                console.error('✗ PieChartRenderer not available in window');
             }
             
             // GridChartRenderer
             if (window.GridChartRenderer) {
                 this.renderers.grid = new GridChartRenderer(containerId);
-                console.log('GridChartRenderer initialized');
+                console.log('✓ GridChartRenderer initialized successfully');
+            } else {
+                console.error('✗ GridChartRenderer not available in window');
             }
         } catch (error) {
             console.error('ChartManager: Error initializing renderers:', error);
@@ -104,6 +133,14 @@ class ChartManager extends BaseManager {
                     context: { containerId }
                 });
             }
+        }
+        
+        // 初期化結果のサマリー
+        const initializedRenderers = Object.keys(this.renderers).filter(key => this.renderers[key] !== null);
+        console.log(`ChartManager: Renderer initialization complete. Available renderers: [${initializedRenderers.join(', ')}]`);
+        
+        if (initializedRenderers.length === 0) {
+            console.error('ChartManager: WARNING - No renderers were successfully initialized!');
         }
     }
 
@@ -304,9 +341,18 @@ class ChartManager extends BaseManager {
      * @returns {Object|null} レンダラーインスタンス
      */
     getRenderer(type) {
+        console.log(`ChartManager: Getting renderer for type '${type}'`);
+        console.log('Current renderers state:', this.renderers);
+        console.log('Renderers object type:', typeof this.renderers);
+        console.log('Is renderers array?', Array.isArray(this.renderers));
+        
         const renderer = this.renderers[type];
         if (!renderer) {
             console.warn(`ChartManager: No renderer available for type: ${type}`);
+            console.log('Available renderer keys:', Object.keys(this.renderers));
+            console.log('Available renderer values:', Object.values(this.renderers));
+        } else {
+            console.log(`ChartManager: Found renderer for ${type}:`, renderer.constructor.name);
         }
         return renderer;
     }

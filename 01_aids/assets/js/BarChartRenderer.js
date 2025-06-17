@@ -9,6 +9,9 @@ class BarChartRenderer extends BaseManager {
         this.currentChart = null;
         this.data = null;
         this.config = null;
+        
+        // Initialize after properties are set
+        this.init();
     }
 
     /**

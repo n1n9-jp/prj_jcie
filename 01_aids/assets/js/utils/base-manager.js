@@ -9,7 +9,8 @@ class BaseManager {
         this.config = null;
         this.isVisible = false;
         
-        this.init();
+        // Don't auto-init - let subclasses control initialization timing
+        // this.init();
     }
 
     /**
