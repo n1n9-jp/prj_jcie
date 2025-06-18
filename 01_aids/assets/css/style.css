@@ -1,3 +1,187 @@
+/* ==================================================
+   Typography System - JCIE Style Inspired
+   ================================================== */
+
+/* CSS Variables for Typography */
+:root {
+    /* Font Families */
+    --font-family-primary: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+    --font-family-heading: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+    --font-family-serif: "Yu Mincho", "YuMincho", "Hiragino Mincho ProN", "Hiragino Mincho Pro", "Noto Serif JP", "HG Mincho E", "MS Mincho", serif;
+    
+    /* Font Sizes */
+    --font-size-xs: 0.75rem;      /* 12px */
+    --font-size-sm: 0.875rem;     /* 14px */
+    --font-size-base: 1rem;       /* 16px */
+    --font-size-lg: 1.125rem;     /* 18px */
+    --font-size-xl: 1.25rem;      /* 20px */
+    --font-size-2xl: 1.5rem;      /* 24px */
+    --font-size-3xl: 1.875rem;    /* 30px */
+    --font-size-4xl: 2.25rem;     /* 36px */
+    
+    /* Font Weights */
+    --font-weight-normal: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+    
+    /* Line Heights */
+    --line-height-tight: 1.25;
+    --line-height-normal: 1.5;
+    --line-height-relaxed: 1.625;
+    --line-height-loose: 1.75;
+    
+    /* Letter Spacing */
+    --letter-spacing-tight: -0.025em;
+    --letter-spacing-normal: 0em;
+    --letter-spacing-wide: 0.025em;
+}
+
+/* Base Typography */
+body {
+    font-family: var(--font-family-primary);
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-normal);
+    letter-spacing: var(--letter-spacing-normal);
+    color: #374151;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Heading Hierarchy */
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-family-heading);
+    font-weight: var(--font-weight-bold);
+    line-height: var(--line-height-tight);
+    color: #1f2937;
+    margin: 0 0 1rem 0;
+}
+
+h1 {
+    font-family: var(--font-family-serif);
+    font-size: var(--font-size-4xl);
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: var(--letter-spacing-normal);
+    margin-bottom: 1.5rem;
+}
+
+h2 {
+    font-family: var(--font-family-serif);
+    font-size: var(--font-size-3xl);
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: var(--letter-spacing-normal);
+    margin-bottom: 1.25rem;
+}
+
+h3 {
+    font-family: var(--font-family-serif);
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: var(--letter-spacing-normal);
+    margin-bottom: 1rem;
+}
+
+h4 {
+    font-size: var(--font-size-xl);
+    letter-spacing: var(--letter-spacing-normal);
+    margin-bottom: 0.75rem;
+}
+
+h5 {
+    font-size: var(--font-size-lg);
+    letter-spacing: var(--letter-spacing-normal);
+    margin-bottom: 0.5rem;
+}
+
+h6 {
+    font-size: var(--font-size-base);
+    letter-spacing: var(--letter-spacing-wide);
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+}
+
+/* Body Text */
+p {
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-relaxed);
+    color: #4b5563;
+    margin: 0 0 1.25rem 0;
+}
+
+p.lead {
+    font-size: var(--font-size-lg);
+    line-height: var(--line-height-relaxed);
+    font-weight: var(--font-weight-normal);
+    color: #374151;
+}
+
+p.small {
+    font-size: var(--font-size-sm);
+    line-height: var(--line-height-normal);
+    color: #6b7280;
+}
+
+/* Text Utility Classes */
+.text-emphasis {
+    font-weight: var(--font-weight-semibold);
+    color: #1f2937;
+}
+
+.text-muted {
+    color: #6b7280;
+}
+
+.text-subtle {
+    color: #9ca3af;
+}
+
+/* Lists */
+ul, ol {
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-relaxed);
+    color: #4b5563;
+    margin: 0 0 1.25rem 0;
+    padding-left: 1.5rem;
+}
+
+li {
+    margin-bottom: 0.5rem;
+}
+
+/* Links */
+a {
+    color: #2563eb;
+    text-decoration: none;
+    transition: color 0.2s ease-in-out;
+}
+
+a:hover {
+    color: #1d4ed8;
+    text-decoration: underline;
+}
+
+/* Responsive Typography */
+@media (max-width: 768px) {
+    :root {
+        --font-size-4xl: 1.875rem;  /* 30px */
+        --font-size-3xl: 1.5rem;    /* 24px */
+        --font-size-2xl: 1.25rem;   /* 20px */
+    }
+    
+    body {
+        font-size: var(--font-size-sm);
+    }
+    
+    p {
+        font-size: var(--font-size-sm);
+        line-height: var(--line-height-loose);
+    }
+}
+
+/* ==================================================
+   End Typography System
+   ================================================== */
+
 /* カスタムスタイル */
 
 /* サイトヘッダー */
@@ -9,10 +193,12 @@
 }
 
 #site-header .site-title h1 {
-    font-size: 1.125rem;
-    font-weight: 700;
+    font-family: var(--font-family-serif);
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
     color: #1f2937;
     margin: 0;
+    line-height: var(--line-height-tight);
 }
 
 #site-header .site-nav ul {
@@ -30,7 +216,8 @@
 #site-header .site-nav a {
     text-decoration: none;
     color: #6b7280;
-    font-weight: 500;
+    font-weight: var(--font-weight-medium);
+    font-size: var(--font-size-sm);
     transition: color 0.2s ease;
 }
 
@@ -40,7 +227,8 @@
 
 #site-header .site-nav span {
     color: #111827;
-    font-weight: 700;
+    font-weight: var(--font-weight-bold);
+    font-size: var(--font-size-sm);
 }
 
 #container {
@@ -380,7 +568,7 @@
     background: rgba(0, 0, 0, 0.8);
     color: white;
     padding: 2px 8px;
-    font-size: 12px;
+    font-size: var(--font-size-xs);
     border-radius: 3px;
     z-index: 1000;
 }
@@ -593,14 +781,14 @@
     background: rgba(0, 128, 0, 0.8);
     color: white;
     padding: 2px 8px;
-    font-size: 12px;
+    font-size: var(--font-size-xs);
     border-radius: 3px;
     z-index: 1000;
 }
 
 /* D3チャート共通スタイル */
 .chart-axis {
-    font-size: 12px;
+    font-size: var(--font-size-xs);
     fill: none;
 }
 
