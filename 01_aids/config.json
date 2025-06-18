@@ -440,9 +440,9 @@
         "zoom": 1,
         "visible": true,
         "mode": "world-overview",
-        "highlightCountries": ["Nigeria", "Malawi", "Kenya", "Belize", "United States of America", "Philippines"],
         "cities": [],
-        "useRegionColors": true
+        "useRegionColors": true,
+        "lightenAllCountries": true
       }
     },
     {

@@ -46,7 +46,7 @@ class MapManager {
     updateMap(mapData) {
         console.log('MapManager: updateMap called with:', mapData);
         
-        const { center, zoom, visible, data, highlightCountries = [], cities = [], mode, citiesFile, cityId, useRegionColors = false, lightenNonVisited = false, targetRegions = [], width = 800, height = 600, widthPercent, heightPercent, aspectRatio, showSpreadingArrows = false } = mapData;
+        const { center, zoom, visible, data, highlightCountries = [], cities = [], mode, citiesFile, cityId, useRegionColors = false, lightenNonVisited = false, lightenAllCountries = false, targetRegions = [], width = 800, height = 600, widthPercent, heightPercent, aspectRatio, showSpreadingArrows = false } = mapData;
         
         // 地図更新の最初に拡散矢印の状態をチェック
         if (!showSpreadingArrows) {
@@ -54,7 +54,7 @@ class MapManager {
             this.clearSpreadingArrows();
         }
         
-        this.currentView = { center, zoom, highlightCountries, cities, mode, citiesFile, cityId, useRegionColors, lightenNonVisited, targetRegions };
+        this.currentView = { center, zoom, highlightCountries, cities, mode, citiesFile, cityId, useRegionColors, lightenNonVisited, lightenAllCountries, targetRegions };
         console.log('MapManager: Current view set to:', this.currentView);
         console.log('MapManager: Map visible:', visible);
         console.log('MapManager: GeoData available:', !!this.geoData);
@@ -78,10 +78,10 @@ class MapManager {
                 // 地図が既に描画されているかチェック
                 if (!this.svg || this.svg.selectAll('.map-country').empty()) {
                     console.log('MapManager: Initial map rendering...');
-                    this.renderMap(this.geoData, { center, zoom, highlightCountries, cities, useRegionColors, lightenNonVisited, targetRegions, width, height, widthPercent, heightPercent, aspectRatio, showSpreadingArrows, mode });
+                    this.renderMap(this.geoData, { center, zoom, highlightCountries, cities, useRegionColors, lightenNonVisited, lightenAllCountries, targetRegions, width, height, widthPercent, heightPercent, aspectRatio, showSpreadingArrows, mode });
                 } else {
                     console.log('MapManager: Updating existing map...');
-                    this.updateExistingMap({ center, zoom, highlightCountries, cities, useRegionColors, lightenNonVisited, targetRegions, width, height, widthPercent, heightPercent, aspectRatio, showSpreadingArrows, mode });
+                    this.updateExistingMap({ center, zoom, highlightCountries, cities, useRegionColors, lightenNonVisited, lightenAllCountries, targetRegions, width, height, widthPercent, heightPercent, aspectRatio, showSpreadingArrows, mode });
                 }
             } else {
                 console.error('MapManager: No geo data available for rendering');
@@ -247,6 +247,10 @@ class MapManager {
             zoom = 1, 
             highlightCountries = [], 
             cities = [],
+            useRegionColors = false,
+            lightenNonVisited = false,
+            lightenAllCountries = false,
+            targetRegions = [],
             showSpreadingArrows = false,
             mode = null
         } = config;
@@ -335,6 +339,11 @@ class MapManager {
                                 if (visitedCountry && countryName !== visitedCountry) {
                                     color = window.ColorScheme.getLighterColor(color, 0.5);
                                 }
+                            }
+                            
+                            // lightenAllCountriesが有効な場合：すべての国を50%明るくする
+                            if (lightenAllCountries) {
+                                color = window.ColorScheme.getLighterColor(color, 0.5);
                             }
                             
                             return color;
@@ -568,6 +577,7 @@ class MapManager {
             cities = [],
             useRegionColors = false,
             lightenNonVisited = false,
+            lightenAllCountries = false,
             targetRegions = [],
             width = 800,
             height = 600,
@@ -631,7 +641,7 @@ class MapManager {
             })
             .on('end', () => {
                 // アニメーション完了後に国のハイライトと都市マーカーを更新
-                this.updateCountryHighlights(highlightCountries, useRegionColors, lightenNonVisited, targetRegions);
+                this.updateCountryHighlights(highlightCountries, useRegionColors, lightenNonVisited, lightenAllCountries, targetRegions);
                 this.updateCityMarkers(cities);
                 
                 // エイズ拡散矢印を処理（step3用）
@@ -652,7 +662,7 @@ class MapManager {
      * @param {boolean} useRegionColors - 地域色を使用するかどうか
      * @param {boolean} lightenNonVisited - 訪問国以外を明るくするかどうか
      */
-    updateCountryHighlights(highlightCountries, useRegionColors = false, lightenNonVisited = false, targetRegions = []) {
+    updateCountryHighlights(highlightCountries, useRegionColors = false, lightenNonVisited = false, lightenAllCountries = false, targetRegions = []) {
         if (!this.svg) return;
 
         this.svg.selectAll('.map-country')
@@ -709,8 +719,8 @@ class MapManager {
                             }
                         }
                         
-                        // step8の場合：すべての国を50%明るくする
-                        if (highlightCountries && highlightCountries.length > 0) {
+                        // lightenAllCountriesが有効な場合：すべての国を50%明るくする
+                        if (lightenAllCountries) {
                             color = window.ColorScheme.getLighterColor(color, 0.5);
                         }
                         
