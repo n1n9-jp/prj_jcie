@@ -687,8 +687,8 @@
       "text": {
         "content": "連帯の力",
         "position": {
-          "width": "30%",
-          "horizontal": "right",
+          "width": "80%",
+          "horizontal": "center",
           "vertical": "center"
         }
       },
@@ -716,8 +716,8 @@
       "text": {
         "content": "今後の展望",
         "position": {
-          "width": "30%",
-          "horizontal": "right",
+          "width": "80%",
+          "horizontal": "center",
           "vertical": "center"
         }
       },
