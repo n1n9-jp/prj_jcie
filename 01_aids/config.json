@@ -699,7 +699,7 @@
         "visible": false
       },
       "image": {
-        "src": "https://placehold.co/800x600/3b82f6/ffffff?text=Unity+and+Solidarity",
+        "src": "assets/images/Firefly_A.jpg",
         "alt": "連帯の力を示す画像",
         "visible": true,
         "config": {
