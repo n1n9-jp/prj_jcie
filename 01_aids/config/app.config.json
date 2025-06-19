@@ -1,0 +1,145 @@
+{
+  "name": "Application Configuration",
+  "description": "アプリケーション全体の設定値とマジックナンバーの管理",
+  "version": "1.0.0",
+  
+  "layout": {
+    "header": {
+      "height": 60,
+      "zIndex": 1000
+    },
+    "content": {
+      "maxWidth": 1200,
+      "padding": {
+        "desktop": 32,
+        "tablet": 24,
+        "mobile": 16
+      }
+    },
+    "sticky": {
+      "offset": 60,
+      "zIndex": 100
+    }
+  },
+  
+  "breakpoints": {
+    "mobile": 480,
+    "tablet": 768,
+    "desktop": 1024,
+    "wide": 1200
+  },
+  
+  "spacing": {
+    "xs": 4,
+    "sm": 8,
+    "md": 16,
+    "lg": 24,
+    "xl": 32,
+    "xxl": 48
+  },
+  
+  "typography": {
+    "fontFamilies": {
+      "primary": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", \"Noto Sans JP\", \"Hiragino Kaku Gothic ProN\", \"Hiragino Sans\", Meiryo, sans-serif",
+      "heading": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", \"Noto Sans JP\", \"Hiragino Kaku Gothic ProN\", \"Hiragino Sans\", Meiryo, sans-serif",
+      "serif": "\"Shippori Mincho\", \"Yu Mincho\", \"YuMincho\", \"Hiragino Mincho ProN\", \"Hiragino Mincho Pro\", \"Noto Serif JP\", \"HG Mincho E\", \"MS Mincho\", serif",
+      "mono": "\"SF Mono\", Monaco, \"Cascadia Code\", \"Roboto Mono\", Consolas, \"Courier New\", monospace"
+    },
+    "fontSizes": {
+      "xs": 12,
+      "sm": 14,
+      "base": 16,
+      "lg": 18,
+      "xl": 20,
+      "2xl": 24,
+      "3xl": 30,
+      "4xl": 36,
+      "5xl": 48
+    },
+    "fontWeights": {
+      "normal": 400,
+      "medium": 500,
+      "semibold": 600,
+      "bold": 700
+    },
+    "lineHeights": {
+      "tight": 1.25,
+      "normal": 1.5,
+      "relaxed": 1.625,
+      "loose": 1.75
+    },
+    "letterSpacing": {
+      "tight": -0.025,
+      "normal": 0,
+      "wide": 0.025
+    }
+  },
+  
+  "charts": {
+    "margins": {
+      "top": 20,
+      "right": 20,
+      "bottom": 40,
+      "left": 60
+    },
+    "padding": {
+      "inner": 0.1,
+      "outer": 0.2
+    },
+    "axis": {
+      "tickSize": 6,
+      "tickPadding": 8,
+      "labelOffset": 12
+    },
+    "legend": {
+      "itemHeight": 20,
+      "itemPadding": 10,
+      "symbolSize": 12
+    },
+    "tooltip": {
+      "offset": 10,
+      "padding": 8,
+      "borderRadius": 4
+    },
+    "minSizes": {
+      "width": 300,
+      "height": 200
+    },
+    "maxSizes": {
+      "width": 1200,
+      "height": 800
+    }
+  },
+  
+  "map": {
+    "defaultZoom": 1,
+    "minZoom": 0.5,
+    "maxZoom": 20,
+    "transitionDuration": 750,
+    "focusZoom": 4,
+    "focusPadding": 50
+  },
+  
+  "scroll": {
+    "offset": 0.5,
+    "threshold": 3,
+    "debounce": 100
+  },
+  
+  "zIndex": {
+    "background": -1,
+    "default": 1,
+    "sticky": 10,
+    "dropdown": 100,
+    "modal": 1000,
+    "tooltip": 1050,
+    "notification": 1100
+  },
+  
+  "performance": {
+    "debounceDelay": 100,
+    "throttleDelay": 16,
+    "transitionCleanupDelay": 100,
+    "maxDataPoints": 10000
+  }
+}

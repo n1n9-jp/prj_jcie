@@ -6,7 +6,7 @@
         "content": "エイズ対策の物語",
         "visible": true,
         "position": {
-          "width": "80%",
+          "width": "30%",
           "horizontal": "center",
           "vertical": "center"
         }
@@ -39,7 +39,7 @@
         "content": "はじめに",
         "position": {
           "width": "30%",
-          "horizontal": "right",
+          "horizontal": "center",
           "vertical": "center"
         }
       },

@@ -170,4 +170,26 @@ if (typeof window !== 'undefined') {
         RESPONSIVE_CONFIG,
         FONT_CONFIG
     };
+
+    // 新しい設定システムとの統合ヘルパー
+    window.AppConstants.getConfigValue = function(path, fallback) {
+        if (window.ConfigLoader && window.ConfigLoader.loaded) {
+            return window.ConfigLoader.get(path, fallback);
+        }
+        return fallback;
+    };
+
+    window.AppConstants.getAnimationDuration = function(name) {
+        if (window.ConfigLoader && window.ConfigLoader.loaded) {
+            return window.ConfigLoader.getAnimationDuration(name);
+        }
+        return ANIMATION_CONFIG.DURATION[name.toUpperCase()] || ANIMATION_CONFIG.DURATION.DEFAULT;
+    };
+
+    window.AppConstants.getColor = function(path) {
+        if (window.ConfigLoader && window.ConfigLoader.loaded) {
+            return window.ConfigLoader.getColor(path);
+        }
+        return null;
+    };
 }

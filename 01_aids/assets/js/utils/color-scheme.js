@@ -1,9 +1,18 @@
 /**
  * ColorScheme - コンテンツ全体で統一された色設定
  * 地域名に対して一貫した色を提供
+ * 外部設定ファイルからの色設定を利用
  */
 class ColorScheme {
     constructor() {
+        // 外部設定が利用可能かチェック
+        this.configAvailable = false;
+        this.checkConfigAvailability();
+        
+        // 設定チェックの定期実行（設定が後から読み込まれる場合に対応）
+        if (!this.configAvailable) {
+            setTimeout(() => this.checkConfigAvailability(), 1000);
+        }
         // D3のschemePairedを使用（12色のペアリング）
         this.pairedColors = [
             '#a6cee3', '#1f78b4', '#b2df8a', '#33a02c',
@@ -55,6 +64,29 @@ class ColorScheme {
             '全世界': '世界'
         };
     }
+
+    /**
+     * 外部設定の利用可能性をチェック
+     */
+    checkConfigAvailability() {
+        if (window.ConfigLoader && window.ConfigLoader.loaded) {
+            this.configAvailable = true;
+            console.log('ColorScheme: External config available');
+        }
+    }
+
+    /**
+     * 外部設定から色を取得（フォールバック付き）
+     * @param {string} colorPath - 色のパス（例: 'regions.アジア・太平洋地域'）
+     * @param {string} fallback - フォールバック色
+     * @returns {string} 色コード
+     */
+    getConfigColor(colorPath, fallback) {
+        if (this.configAvailable) {
+            return window.ConfigLoader.getColor(colorPath) || fallback;
+        }
+        return fallback;
+    }
     
     /**
      * 地域名に対応する色を取得
@@ -65,8 +97,13 @@ class ColorScheme {
         // まず標準名を取得（エイリアス解決）
         const standardName = this.getStandardRegionName(regionName);
         
-        // 標準名から色を取得
-        const color = this.regionColorMap[standardName];
+        // 外部設定から色を取得を試行
+        let color = this.getConfigColor(`regions.${standardName}`, null);
+        
+        // 外部設定になければマップから取得
+        if (!color) {
+            color = this.regionColorMap[standardName];
+        }
         
         if (color) {
             return color;

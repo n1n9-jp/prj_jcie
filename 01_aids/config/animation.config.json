@@ -1,0 +1,85 @@
+{
+  "name": "Animation Configuration",
+  "description": "アニメーション時間とイージング設定の統合管理",
+  "version": "1.0.0",
+  
+  "durations": {
+    "instant": 0,
+    "fast": 150,
+    "short": 300,
+    "default": 500,
+    "long": 800,
+    "slow": 1200,
+    "verySlow": 2000
+  },
+  
+  "easings": {
+    "linear": "linear",
+    "ease": "ease",
+    "easeIn": "ease-in",
+    "easeOut": "ease-out",
+    "easeInOut": "ease-in-out",
+    "quadIn": "cubic-bezier(0.550, 0.085, 0.680, 0.530)",
+    "quadOut": "cubic-bezier(0.250, 0.460, 0.450, 0.940)",
+    "quadInOut": "cubic-bezier(0.455, 0.030, 0.515, 0.955)",
+    "cubicIn": "cubic-bezier(0.550, 0.055, 0.675, 0.190)",
+    "cubicOut": "cubic-bezier(0.215, 0.610, 0.355, 1.000)",
+    "cubicInOut": "cubic-bezier(0.645, 0.045, 0.355, 1.000)"
+  },
+  
+  "presets": {
+    "fastSmooth": {
+      "duration": "fast",
+      "easing": "quadOut"
+    },
+    "default": {
+      "duration": "default",
+      "easing": "quadInOut"
+    },
+    "slowSmooth": {
+      "duration": "slow",
+      "easing": "cubicInOut"
+    },
+    "enter": {
+      "duration": "default",
+      "easing": "cubicOut"
+    },
+    "exit": {
+      "duration": "fast",
+      "easing": "cubicIn"
+    }
+  },
+  
+  "transitions": {
+    "fade": {
+      "duration": "default",
+      "easing": "easeInOut"
+    },
+    "slide": {
+      "duration": "long",
+      "easing": "cubicInOut"
+    },
+    "scale": {
+      "duration": "default",
+      "easing": "quadOut"
+    },
+    "chart": {
+      "duration": "default",
+      "easing": "quadInOut"
+    },
+    "map": {
+      "duration": "slow",
+      "easing": "cubicInOut"
+    },
+    "position": {
+      "duration": "default",
+      "easing": "easeInOut"
+    }
+  },
+  
+  "delays": {
+    "stagger": 50,
+    "sequential": 100,
+    "group": 200
+  }
+}

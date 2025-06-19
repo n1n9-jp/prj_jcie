@@ -1,16 +1,30 @@
 /**
  * AnimationConfig - アニメーション設定の共通管理クラス
  * D3.jsのトランジション設定を一元管理
+ * 外部設定ファイルからの値を利用
  */
 class AnimationConfig {
-    // アニメーション速度の定数
+    // アニメーション速度の定数（外部設定でオーバーライド可能）
     static SPEED = {
         INSTANT: 0,
-        FAST: 300,
+        FAST: 150,
         NORMAL: 500,
         SLOW: 1000,
         VERY_SLOW: 2000
     };
+
+    /**
+     * 外部設定からアニメーション速度を取得
+     * @param {string} name - 速度名
+     * @returns {number} ミリ秒
+     */
+    static getSpeed(name) {
+        // ConfigLoaderが利用可能で設定が読み込まれている場合
+        if (window.ConfigLoader && window.ConfigLoader.loaded) {
+            return window.ConfigLoader.getAnimationDuration(name.toLowerCase()) || this.SPEED[name];
+        }
+        return this.SPEED[name] || this.SPEED.NORMAL;
+    }
 
     // イージング関数の定数
     static EASING = {
@@ -26,43 +40,56 @@ class AnimationConfig {
         BACK: d3.easeBack
     };
 
-    // プリセット設定
+    // プリセット設定（外部設定対応）
+    static getPresets() {
+        return {
+            // 高速でスムーズな遷移（UI要素など）
+            FAST_SMOOTH: {
+                duration: this.getSpeed('FAST'),
+                easing: AnimationConfig.EASING.QUAD_OUT
+            },
+            // 通常の遷移（チャート更新など）
+            DEFAULT: {
+                duration: this.getSpeed('NORMAL'),
+                easing: AnimationConfig.EASING.QUAD_IN_OUT
+            },
+            // ゆっくりとした遷移（地図ズームなど）
+            SLOW_SMOOTH: {
+                duration: this.getSpeed('SLOW'),
+                easing: AnimationConfig.EASING.CUBIC_IN_OUT
+            },
+            // エンターアニメーション
+            ENTER: {
+                duration: this.getSpeed('NORMAL'),
+                easing: AnimationConfig.EASING.CUBIC_OUT
+            },
+            // エグジットアニメーション
+            EXIT: {
+                duration: this.getSpeed('FAST'),
+                easing: AnimationConfig.EASING.CUBIC_IN
+            },
+            // バウンス効果
+            BOUNCE: {
+                duration: this.getSpeed('SLOW'),
+                easing: AnimationConfig.EASING.BOUNCE
+            },
+            // 弾性効果
+            ELASTIC: {
+                duration: this.getSpeed('SLOW'),
+                easing: AnimationConfig.EASING.ELASTIC
+            }
+        };
+    }
+
+    // 後方互換性のため旧プリセットも維持
     static PRESETS = {
-        // 高速でスムーズな遷移（UI要素など）
-        FAST_SMOOTH: {
-            duration: AnimationConfig.SPEED.FAST,
-            easing: AnimationConfig.EASING.QUAD_OUT
-        },
-        // 通常の遷移（チャート更新など）
-        DEFAULT: {
-            duration: AnimationConfig.SPEED.NORMAL,
-            easing: AnimationConfig.EASING.QUAD_IN_OUT
-        },
-        // ゆっくりとした遷移（地図ズームなど）
-        SLOW_SMOOTH: {
-            duration: AnimationConfig.SPEED.SLOW,
-            easing: AnimationConfig.EASING.CUBIC_IN_OUT
-        },
-        // エンターアニメーション
-        ENTER: {
-            duration: AnimationConfig.SPEED.NORMAL,
-            easing: AnimationConfig.EASING.CUBIC_OUT
-        },
-        // エグジットアニメーション
-        EXIT: {
-            duration: AnimationConfig.SPEED.FAST,
-            easing: AnimationConfig.EASING.CUBIC_IN
-        },
-        // バウンス効果
-        BOUNCE: {
-            duration: AnimationConfig.SPEED.SLOW,
-            easing: AnimationConfig.EASING.BOUNCE
-        },
-        // 弾性効果
-        ELASTIC: {
-            duration: AnimationConfig.SPEED.SLOW,
-            easing: AnimationConfig.EASING.ELASTIC
-        }
+        FAST_SMOOTH: { duration: 150, easing: d3.easeQuadOut },
+        DEFAULT: { duration: 500, easing: d3.easeQuadInOut },
+        SLOW_SMOOTH: { duration: 1000, easing: d3.easeCubicInOut },
+        ENTER: { duration: 500, easing: d3.easeCubicOut },
+        EXIT: { duration: 150, easing: d3.easeCubicIn },
+        BOUNCE: { duration: 1000, easing: d3.easeBounce },
+        ELASTIC: { duration: 1000, easing: d3.easeElastic }
     };
 
     /**
@@ -76,10 +103,12 @@ class AnimationConfig {
         let config;
         
         if (typeof preset === 'string') {
-            config = AnimationConfig.PRESETS[preset] || AnimationConfig.PRESETS.DEFAULT;
+            // 新しいプリセット取得を試行、フォールバックで旧プリセット
+            const presets = this.getPresets();
+            config = presets[preset] || AnimationConfig.PRESETS[preset] || presets.DEFAULT;
         } else {
             config = {
-                duration: preset.duration || AnimationConfig.SPEED.NORMAL,
+                duration: preset.duration || this.getSpeed('NORMAL'),
                 easing: preset.easing || AnimationConfig.EASING.QUAD_IN_OUT
             };
         }

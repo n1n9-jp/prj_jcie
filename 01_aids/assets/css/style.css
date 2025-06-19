@@ -2,7 +2,7 @@
    Typography System - JCIE Style Inspired
    ================================================== */
 
-/* CSS Variables for Typography */
+/* CSS Variables for Typography, Colors, Animation, and Layout */
 :root {
     /* Font Families */
     --font-family-primary: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
@@ -35,6 +35,85 @@
     --letter-spacing-tight: -0.025em;
     --letter-spacing-normal: 0em;
     --letter-spacing-wide: 0.025em;
+    
+    /* Animation Durations (will be overridden by config loader) */
+    --animation-instant: 0ms;
+    --animation-fast: 150ms;
+    --animation-short: 300ms;
+    --animation-default: 500ms;
+    --animation-long: 800ms;
+    --animation-slow: 1200ms;
+    --animation-very-slow: 2000ms;
+    
+    /* Easing Functions (will be overridden by config loader) */
+    --easing-linear: linear;
+    --easing-ease: ease;
+    --easing-ease-in: ease-in;
+    --easing-ease-out: ease-out;
+    --easing-ease-in-out: ease-in-out;
+    --easing-quad-in: cubic-bezier(0.550, 0.085, 0.680, 0.530);
+    --easing-quad-out: cubic-bezier(0.250, 0.460, 0.450, 0.940);
+    --easing-quad-in-out: cubic-bezier(0.455, 0.030, 0.515, 0.955);
+    --easing-cubic-in: cubic-bezier(0.550, 0.055, 0.675, 0.190);
+    --easing-cubic-out: cubic-bezier(0.215, 0.610, 0.355, 1.000);
+    --easing-cubic-in-out: cubic-bezier(0.645, 0.045, 0.355, 1.000);
+    
+    /* Color System (will be overridden by config loader) */
+    --color-primary-blue: #2563eb;
+    --color-primary-red: #dc2626;
+    --color-primary-green: #059669;
+    --color-primary-orange: #d97706;
+    --color-primary-purple: #7c3aed;
+    --color-primary-cyan: #0891b2;
+    --color-primary-pink: #be185d;
+    --color-primary-lime: #65a30d;
+    
+    --color-text-primary: #1f2937;
+    --color-text-secondary: #374151;
+    --color-text-body: #4b5563;
+    --color-text-light: #6b7280;
+    --color-text-muted: #9ca3af;
+    --color-text-white: #ffffff;
+    
+    --color-background-white: #ffffff;
+    --color-background-light: #f9fafb;
+    --color-background-gray: #f3f4f6;
+    --color-background-dark: #1f2937;
+    
+    --color-border-light: #e5e7eb;
+    --color-border-default: #d1d5db;
+    --color-border-dark: #9ca3af;
+    
+    --color-accent-success: #10b981;
+    --color-accent-info: #3b82f6;
+    --color-accent-warning: #f59e0b;
+    --color-accent-error: #ef4444;
+    
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-default: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    
+    /* Layout (will be overridden by config loader) */
+    --header-height: 60px;
+    --content-max-width: 1200px;
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+    --spacing-xl: 32px;
+    --spacing-xxl: 48px;
+    
+    /* Z-Index (will be overridden by config loader) */
+    --z-background: -1;
+    --z-default: 1;
+    --z-sticky: 10;
+    --z-dropdown: 100;
+    --z-modal: 1000;
+    --z-tooltip: 1050;
+    --z-notification: 1100;
 }
 
 /* Base Typography */
@@ -43,7 +122,7 @@ body {
     font-size: var(--font-size-base);
     line-height: var(--line-height-normal);
     letter-spacing: var(--letter-spacing-normal);
-    color: #374151;
+    color: var(--color-text-secondary);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
@@ -53,7 +132,7 @@ h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-family-heading);
     font-weight: var(--font-weight-bold);
     line-height: var(--line-height-tight);
-    color: #1f2937;
+    color: var(--color-text-primary);
     margin: 0 0 1rem 0;
 }
 
@@ -104,7 +183,7 @@ h6 {
 p {
     font-size: var(--font-size-base);
     line-height: var(--line-height-relaxed);
-    color: #4b5563;
+    color: var(--color-text-body);
     margin: 0 0 1.25rem 0;
 }
 
@@ -112,34 +191,34 @@ p.lead {
     font-size: var(--font-size-lg);
     line-height: var(--line-height-relaxed);
     font-weight: var(--font-weight-normal);
-    color: #374151;
+    color: var(--color-text-secondary);
 }
 
 p.small {
     font-size: var(--font-size-sm);
     line-height: var(--line-height-normal);
-    color: #6b7280;
+    color: var(--color-text-light);
 }
 
 /* Text Utility Classes */
 .text-emphasis {
     font-weight: var(--font-weight-semibold);
-    color: #1f2937;
+    color: var(--color-text-primary);
 }
 
 .text-muted {
-    color: #6b7280;
+    color: var(--color-text-light);
 }
 
 .text-subtle {
-    color: #9ca3af;
+    color: var(--color-text-muted);
 }
 
 /* Lists */
 ul, ol {
     font-size: var(--font-size-base);
     line-height: var(--line-height-relaxed);
-    color: #4b5563;
+    color: var(--color-text-body);
     margin: 0 0 1.25rem 0;
     padding-left: 1.5rem;
 }
@@ -150,9 +229,9 @@ li {
 
 /* Links */
 a {
-    color: #2563eb;
+    color: var(--color-primary-blue);
     text-decoration: none;
-    transition: color 0.2s ease-in-out;
+    transition: color var(--animation-short) var(--easing-ease-in-out);
 }
 
 a:hover {
@@ -186,17 +265,17 @@ a:hover {
 
 /* サイトヘッダー */
 #site-header {
-    height: 60px;
-    background-color: #ffffff;
-    border-bottom: 1px solid #e5e7eb;
-    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+    height: var(--header-height);
+    background-color: var(--color-background-white);
+    border-bottom: 1px solid var(--color-border-light);
+    box-shadow: var(--shadow-sm);
 }
 
 #site-header .site-title h1 {
     font-family: var(--font-family-serif);
     font-size: var(--font-size-lg);
     font-weight: var(--font-weight-semibold);
-    color: #1f2937;
+    color: var(--color-text-primary);
     margin: 0;
     line-height: var(--line-height-tight);
 }
@@ -218,12 +297,12 @@ a:hover {
 
 #site-header .site-nav a {
     text-decoration: none;
-    color: #6b7280;
+    color: var(--color-text-light);
     font-weight: var(--font-weight-medium);
     font-size: var(--font-size-sm);
-    transition: color 0.2s ease;
+    transition: color var(--animation-short) var(--easing-ease);
     display: block;
-    padding: 4px 8px;
+    padding: var(--spacing-xs) var(--spacing-sm);
     position: relative;
 }
 
@@ -411,14 +490,14 @@ a:hover {
     left: 0;
     right: 0;
     bottom: 0;
-    transition: all 0.5s ease-in-out;
-    z-index: 1;
+    transition: all var(--animation-default) var(--easing-ease-in-out);
+    z-index: var(--z-default);
 }
 
 /* 水平位置制御 */
 .positioned-content.content-left {
     justify-content: flex-start !important;
-    padding-left: 2rem;
+    padding-left: var(--spacing-xl);
 }
 
 .positioned-content.content-center {
@@ -427,7 +506,7 @@ a:hover {
 
 .positioned-content.content-right {
     justify-content: flex-end !important;
-    padding-right: 2rem;
+    padding-right: var(--spacing-xl);
 }
 
 /* 垂直位置との組み合わせを明示的に定義 */
@@ -452,7 +531,7 @@ a:hover {
 /* 垂直位置制御 */
 .positioned-content.content-top {
     align-items: flex-start !important;
-    padding-top: 2rem;
+    padding-top: var(--spacing-xl);
 }
 
 .positioned-content.content-middle {
@@ -461,7 +540,7 @@ a:hover {
 
 .positioned-content.content-bottom {
     align-items: flex-end !important;
-    padding-bottom: 2rem;
+    padding-bottom: var(--spacing-xl);
 }
 
 /* 明示的なheightが指定された場合の垂直センタリング */
@@ -472,14 +551,14 @@ a:hover {
 }
 
 .positioned-content.content-top[style*="height"] {
-    top: 2rem !important;
+    top: var(--spacing-xl) !important;
     bottom: auto !important;
     transform: none;
 }
 
 .positioned-content.content-bottom[style*="height"] {
     top: auto !important;
-    bottom: 2rem !important;
+    bottom: var(--spacing-xl) !important;
     transform: none;
 }
 
@@ -543,7 +622,7 @@ a:hover {
     position: absolute;
     top: 0;
     bottom: 0;
-    transition: all 0.5s ease-in-out;
+    transition: all var(--animation-default) var(--easing-ease-in-out);
 }
 
 /* 分割レイアウト用 */
@@ -585,11 +664,11 @@ a:hover {
 
 /* アニメーション強化 */
 .positioned-content.animate-in {
-    animation: slideIn 0.6s ease-out;
+    animation: slideIn var(--animation-long) var(--easing-ease-out);
 }
 
 .positioned-content.animate-out {
-    animation: slideOut 0.4s ease-in;
+    animation: slideOut var(--animation-fast) var(--easing-ease-in);
 }
 
 @keyframes slideIn {

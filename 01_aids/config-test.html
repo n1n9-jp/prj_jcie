@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuration System Test</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px; 
+            background: var(--color-background-light, #f9fafb);
+            color: var(--color-text-primary, #1f2937);
+        }
+        .test-section { 
+            margin-bottom: 30px; 
+            padding: 20px; 
+            border: 1px solid var(--color-border-light, #e5e7eb); 
+            border-radius: 8px;
+            background: var(--color-background-white, #ffffff);
+            box-shadow: var(--shadow-sm, 0 1px 2px 0 rgba(0, 0, 0, 0.05));
+        }
+        .color-box { 
+            display: inline-block; 
+            width: 20px; 
+            height: 20px; 
+            margin-right: 10px; 
+            border: 1px solid var(--color-border-default, #d1d5db);
+            vertical-align: middle;
+        }
+        .config-value { 
+            background: var(--color-background-gray, #f3f4f6); 
+            padding: 4px 8px; 
+            border-radius: 4px; 
+            font-family: monospace; 
+        }
+        .animate-test {
+            width: 100px;
+            height: 30px;
+            background: var(--color-primary-blue, #2563eb);
+            transition: transform var(--animation-default, 500ms) var(--easing-ease-in-out, ease-in-out);
+            cursor: pointer;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+        }
+        .animate-test:hover {
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body>
+    <h1>Configuration System Test</h1>
+    <p>このページは新しい設定システムが正常に動作しているかをテストします。</p>
+
+    <div class="test-section">
+        <h2>1. CSS変数テスト</h2>
+        <p>CSS変数が正しく設定されているかを確認します。</p>
+        <div style="background: var(--color-primary-blue); color: white; padding: 10px; border-radius: 4px;">
+            プライマリカラー（青）を使用した要素
+        </div>
+        <br>
+        <div style="background: var(--color-accent-success); color: white; padding: 10px; border-radius: 4px;">
+            アクセントカラー（成功）を使用した要素
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>2. アニメーション設定テスト</h2>
+        <p>アニメーション時間とイージング関数が正しく設定されているかを確認します。</p>
+        <div class="animate-test" onclick="testAnimation()">Click Me!</div>
+        <p><small>要素をクリックまたはホバーするとアニメーションが実行されます。</small></p>
+    </div>
+
+    <div class="test-section">
+        <h2>3. 設定値取得テスト</h2>
+        <div id="config-test-results">設定読み込み中...</div>
+    </div>
+
+    <div class="test-section">
+        <h2>4. 色設定テスト</h2>
+        <div id="color-test-results">色設定読み込み中...</div>
+    </div>
+
+    <script src="assets/js/utils/config-loader.js"></script>
+    <script src="assets/js/utils/app-constants.js"></script>
+    <script src="assets/js/utils/color-scheme.js"></script>
+    <script src="assets/js/utils/animation-config.js"></script>
+
+    <script>
+        async function runTests() {
+            // 設定読み込みを待つ
+            await window.ConfigLoader.loadAll();
+            
+            // 設定値テスト
+            const configResults = document.getElementById('config-test-results');
+            const colorResults = document.getElementById('color-test-results');
+            
+            let configHtml = '<h3>設定値一覧:</h3><ul>';
+            
+            // アニメーション設定
+            configHtml += `<li>アニメーション - デフォルト時間: <span class="config-value">${window.ConfigLoader.getAnimationDuration('default')}ms</span></li>`;
+            configHtml += `<li>アニメーション - 高速時間: <span class="config-value">${window.ConfigLoader.getAnimationDuration('fast')}ms</span></li>`;
+            
+            // レイアウト設定
+            configHtml += `<li>ヘッダー高さ: <span class="config-value">${window.ConfigLoader.get('app.layout.header.height')}px</span></li>`;
+            configHtml += `<li>コンテンツ最大幅: <span class="config-value">${window.ConfigLoader.get('app.layout.content.maxWidth')}px</span></li>`;
+            
+            // ブレークポイント
+            configHtml += `<li>モバイルブレークポイント: <span class="config-value">${window.ConfigLoader.getBreakpoint('mobile')}px</span></li>`;
+            
+            configHtml += '</ul>';
+            configResults.innerHTML = configHtml;
+            
+            // 色設定テスト
+            let colorHtml = '<h3>色設定:</h3><ul>';
+            
+            const testColors = [
+                { name: 'プライマリブルー', path: 'primary.blue' },
+                { name: 'テキストプライマリ', path: 'text.primary' },
+                { name: 'バックグラウンドライト', path: 'background.light' },
+                { name: 'アクセント成功', path: 'accent.success' }
+            ];
+            
+            testColors.forEach(color => {
+                const colorValue = window.ConfigLoader.getColor(color.path);
+                colorHtml += `<li><span class="color-box" style="background-color: ${colorValue}"></span>${color.name}: <span class="config-value">${colorValue}</span></li>`;
+            });
+            
+            colorHtml += '</ul>';
+            
+            // 地域色テスト
+            colorHtml += '<h3>地域色:</h3><ul>';
+            const testRegions = ['アジア・太平洋地域', '東部・南部アフリカ', '西部・中部アフリカ'];
+            testRegions.forEach(region => {
+                const regionColor = window.ColorScheme.getColorForRegion(region);
+                colorHtml += `<li><span class="color-box" style="background-color: ${regionColor}"></span>${region}: <span class="config-value">${regionColor}</span></li>`;
+            });
+            
+            colorHtml += '</ul>';
+            colorResults.innerHTML = colorHtml;
+        }
+        
+        function testAnimation() {
+            const element = document.querySelector('.animate-test');
+            element.style.transform = 'rotate(360deg) scale(1.2)';
+            
+            setTimeout(() => {
+                element.style.transform = '';
+            }, parseInt(getComputedStyle(document.documentElement).getPropertyValue('--animation-default')) || 500);
+        }
+        
+        // ページ読み込み後にテスト実行
+        document.addEventListener('DOMContentLoaded', runTests);
+    </script>
+</body>
+</html>
