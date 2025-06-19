@@ -45,15 +45,7 @@ class MapManager {
      * @returns {string} 日本語の国名
      */
     getCountryNameJapanese(countryEn) {
-        const countryMapping = {
-            'Nigeria': 'ナイジェリア',
-            'Malawi': 'マラウイ',
-            'Kenya': 'ケニア',
-            'Belize': 'ベリーズ',
-            'United States of America': 'アメリカ',
-            'Philippines': 'フィリピン'
-        };
-        return countryMapping[countryEn] || countryEn;
+        return window.AppConstants?.getCountryNameJapanese(countryEn) || countryEn;
     }
 
     /**
@@ -329,10 +321,10 @@ class MapManager {
                                 if (region) {
                                     return window.ColorScheme.getRegionColor(region); // ハイライト国は地域色
                                 } else {
-                                    return '#3b82f6'; // 地域不明のハイライト国はデフォルトのハイライト色
+                                    return window.AppConstants?.APP_COLORS?.ACCENT?.INFO || '#3b82f6'; // 地域不明のハイライト国は情報色
                                 }
                             } else {
-                                return '#f3f4f6'; // ハイライト国以外は薄いグレー
+                                return window.AppConstants?.APP_COLORS?.BACKGROUND?.GRAY || '#f3f4f6'; // ハイライト国以外は薄いグレー
                             }
                         }
                         
@@ -340,7 +332,7 @@ class MapManager {
                             // targetRegionsが指定されている場合、対象地域のみ色を付ける
                             if (config.targetRegions && config.targetRegions.length > 0) {
                                 if (!config.targetRegions.includes(region)) {
-                                    return '#f3f4f6'; // 対象外の地域は薄いグレー
+                                    return window.AppConstants?.APP_COLORS?.BACKGROUND?.GRAY || '#f3f4f6'; // 対象外の地域は薄いグレー
                                 }
                             }
                             
@@ -370,26 +362,26 @@ class MapManager {
                     
                     // 地域色が設定されていない場合のみハイライト色を適用
                     if (highlightCountries.includes(countryName)) {
-                        return '#3b82f6';
+                        return window.AppConstants?.APP_COLORS?.ACCENT?.INFO || '#3b82f6';
                     }
                     
                     // デフォルト色（未分類）
-                    return '#d1d5db';
+                    return window.AppConstants?.APP_COLORS?.BACKGROUND?.LIGHT || '#d1d5db';
                 })
                 .style('stroke', d => {
                     const countryName = d.properties.NAME || d.properties.name || d.properties.NAME_EN;
                     
                     // 地域色適用時は境界を強調（ハイライト国も含む）
                     if (config.useRegionColors) {
-                        return '#ccc';
+                        return window.AppConstants?.APP_COLORS?.ANNOTATIONS?.BORDER || '#ccc';
                     }
                     
                     // 地域色が無効な場合のみハイライト色を適用
                     if (highlightCountries.includes(countryName)) {
-                        return '#1d4ed8';
+                        return window.AppConstants?.APP_COLORS?.ACCENT?.INFO || '#1d4ed8';
                     }
                     
-                    return '#fff';
+                    return window.AppConstants?.APP_COLORS?.TEXT?.WHITE || '#fff';
                 })
                 .style('stroke-width', d => {
                     const countryName = d.properties.NAME || d.properties.name || d.properties.NAME_EN;
@@ -446,9 +438,9 @@ class MapManager {
                 .attr('y', d => this.projection([d.longitude, d.latitude])[1] - 10)
                 .attr('text-anchor', 'middle')
                 .attr('font-size', '16px')
-                .attr('fill', '#1f2937')
+                .attr('fill', window.AppConstants?.APP_COLORS?.TEXT?.PRIMARY || '#1f2937')
                 .attr('font-weight', 'bold')
-                .attr('font-family', '"Shippori Mincho", "Yu Mincho", "YuMincho", "Hiragino Mincho ProN", "Hiragino Mincho Pro", "Noto Serif JP", "HG Mincho E", "MS Mincho", serif')
+                .attr('font-family', window.AppConstants?.FONT_CONFIG?.FAMILIES?.SERIF || '"Shippori Mincho", "Yu Mincho", "YuMincho", "Hiragino Mincho ProN", "Hiragino Mincho Pro", "Noto Serif JP", "HG Mincho E", "MS Mincho", serif')
                 .text(d => this.getCountryNameJapanese(d.country))
                 .style('opacity', 0)
                 .transition()
@@ -573,9 +565,9 @@ class MapManager {
                 .attr('y', d => this.projection([d.longitude, d.latitude])[1] - 10)
                 .attr('text-anchor', 'middle')
                 .attr('font-size', '16px')
-                .attr('fill', '#1f2937')
+                .attr('fill', window.AppConstants?.APP_COLORS?.TEXT?.PRIMARY || '#1f2937')
                 .attr('font-weight', 'bold')
-                .attr('font-family', '"Shippori Mincho", "Yu Mincho", "YuMincho", "Hiragino Mincho ProN", "Hiragino Mincho Pro", "Noto Serif JP", "HG Mincho E", "MS Mincho", serif')
+                .attr('font-family', window.AppConstants?.FONT_CONFIG?.FAMILIES?.SERIF || '"Shippori Mincho", "Yu Mincho", "YuMincho", "Hiragino Mincho ProN", "Hiragino Mincho Pro", "Noto Serif JP", "HG Mincho E", "MS Mincho", serif')
                 .text(d => this.getCountryNameJapanese(d.country))
                 .style('opacity', 0)
                 .transition()
@@ -828,8 +820,8 @@ class MapManager {
                     return coords ? coords[1] : 0;
                 })
                 .attr('r', 0)
-                .style('fill', '#ef4444')
-                .style('stroke', '#fff')
+                .style('fill', window.AppConstants?.APP_COLORS?.ACCENT?.ERROR || '#ef4444')
+                .style('stroke', window.AppConstants?.APP_COLORS?.TEXT?.WHITE || '#fff')
                 .style('stroke-width', 2)
                 .transition()
                 .duration(window.AppDefaults?.animation?.shortDuration || 500)
@@ -852,9 +844,9 @@ class MapManager {
                 })
                 .attr('text-anchor', 'middle')
                 .attr('font-size', '16px')
-                .attr('fill', '#1f2937')
+                .attr('fill', window.AppConstants?.APP_COLORS?.TEXT?.PRIMARY || '#1f2937')
                 .attr('font-weight', 'bold')
-                .attr('font-family', '"Shippori Mincho", "Yu Mincho", "YuMincho", "Hiragino Mincho ProN", "Hiragino Mincho Pro", "Noto Serif JP", "HG Mincho E", "MS Mincho", serif')
+                .attr('font-family', window.AppConstants?.FONT_CONFIG?.FAMILIES?.SERIF || '"Shippori Mincho", "Yu Mincho", "YuMincho", "Hiragino Mincho ProN", "Hiragino Mincho Pro", "Noto Serif JP", "HG Mincho E", "MS Mincho", serif')
                 .text(d => this.getCountryNameJapanese(d.country))
                 .style('opacity', 0)
                 .transition()
@@ -1013,7 +1005,7 @@ class MapManager {
             })
             .attr('r', 0)
             .style('fill', d => this.getCityColor(d))
-            .style('stroke', '#fff')
+            .style('stroke', window.AppConstants?.APP_COLORS?.TEXT?.WHITE || '#fff')
             .style('stroke-width', 2)
             .style('opacity', 0);
         
@@ -1041,7 +1033,7 @@ class MapManager {
                 return coords ? coords[1] - (d.style.size + 5) : 0;
             })
             .attr('text-anchor', 'middle')
-            .attr('font-size', '11px')
+            .attr('font-size', '14px')
             .attr('fill', '#1f2937')
             .attr('font-weight', 'bold')
             .attr('font-family', '"Shippori Mincho", "Yu Mincho", "YuMincho", "Hiragino Mincho ProN", "Hiragino Mincho Pro", "Noto Serif JP", "HG Mincho E", "MS Mincho", serif')
@@ -1189,9 +1181,9 @@ class MapManager {
                         }
                     }
                     
-                    return '#d1d5db';
+                    return window.AppConstants?.APP_COLORS?.BACKGROUND?.LIGHT || '#d1d5db';
                 })
-                .style('stroke', this.currentView && this.currentView.useRegionColors ? '#ccc' : '#fff')
+                .style('stroke', this.currentView && this.currentView.useRegionColors ? window.AppConstants?.APP_COLORS?.ANNOTATIONS?.BORDER || '#ccc' : window.AppConstants?.APP_COLORS?.TEXT?.WHITE || '#fff')
                 .style('stroke-width', this.currentView && this.currentView.useRegionColors ? 0.75 : 0.5)
                 .style('opacity', 0)
                 .transition()
@@ -1278,7 +1270,7 @@ class MapManager {
                             
                             return '#d1d5db';
                         })
-                        .style('stroke', this.currentView && this.currentView.useRegionColors ? '#ccc' : '#fff')
+                        .style('stroke', this.currentView && this.currentView.useRegionColors ? window.AppConstants?.APP_COLORS?.ANNOTATIONS?.BORDER || '#ccc' : window.AppConstants?.APP_COLORS?.TEXT?.WHITE || '#fff')
                         .style('stroke-width', this.currentView && this.currentView.useRegionColors ? '0.75' : '0.5');
                 };
             })
@@ -1335,7 +1327,7 @@ class MapManager {
             .attr('cy', coords[1])
             .attr('r', 0)
             .style('fill', markerColor)
-            .style('stroke', '#fff')
+            .style('stroke', window.AppConstants?.APP_COLORS?.TEXT?.WHITE || '#fff')
             .style('stroke-width', 3)
             .style('opacity', 0)
             .transition()
@@ -1350,7 +1342,7 @@ class MapManager {
             .attr('x', coords[0])
             .attr('y', coords[1] - (city.style.size * 1.5 + 8))
             .attr('text-anchor', 'middle')
-            .attr('font-size', '16px')
+            .attr('font-size', '18px')
             .attr('font-weight', 'bold')
             .attr('font-family', '"Shippori Mincho", "Yu Mincho", "YuMincho", "Hiragino Mincho ProN", "Hiragino Mincho Pro", "Noto Serif JP", "HG Mincho E", "MS Mincho", serif')
             .attr('fill', '#1f2937')
@@ -1391,7 +1383,7 @@ class MapManager {
      */
     getCityColor(city) {
         if (!city || !city.country) {
-            return '#808080'; // フォールバック色
+            return window.AppConstants?.APP_COLORS?.ANNOTATIONS?.LINE || '#808080'; // フォールバック色
         }
         
         // 地域色機能が利用可能かチェック
@@ -1403,7 +1395,7 @@ class MapManager {
         }
         
         // フォールバック：元のstyle.colorまたはデフォルト色
-        return city.style?.color || '#808080';
+        return city.style?.color || window.AppConstants?.APP_COLORS?.ANNOTATIONS?.LINE || '#808080';
     }
 
     /**
@@ -1498,7 +1490,7 @@ class MapManager {
                 .attr('orient', 'auto')
                 .append('path')
                 .attr('d', 'M0,-5L10,0L0,5')
-                .attr('fill', '#999999')
+                .attr('fill', window.AppConstants?.APP_COLORS?.ANNOTATIONS?.LINE || '#999999')
                 .attr('stroke', 'none');
         }
 
@@ -1528,7 +1520,7 @@ class MapManager {
                 .attr('class', `spreading-flow ${flow.id}`)
                 .attr('d', pathData)
                 .attr('fill', 'none')
-                .attr('stroke', '#999999')
+                .attr('stroke', window.AppConstants?.APP_COLORS?.ANNOTATIONS?.LINE || '#999999')
                 .attr('stroke-width', 3)
                 .attr('stroke-dasharray', '5,5')
                 .style('opacity', 0);
@@ -1539,7 +1531,7 @@ class MapManager {
             path.attr('stroke-dasharray', totalLength + ' ' + totalLength)
                 .attr('stroke-dashoffset', totalLength)
                 .transition()
-                .duration(1200)
+                .duration(window.AppConstants?.ANIMATION_CONFIG?.DURATION?.SLOW || 1200)
                 .delay(flow.delay + 100) // さらに早いタイミングで表示
                 .ease(d3.easeQuadOut)
                 .attr('stroke-dashoffset', 0)

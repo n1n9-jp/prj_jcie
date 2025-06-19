@@ -869,8 +869,8 @@ class PieChartRenderer extends BaseManager {
                     // ポイント注釈
                     annotationElement.append('circle')
                         .attr('r', style.radius || 5)
-                        .attr('fill', style.color || '#ff6b6b')
-                        .attr('stroke', style.strokeColor || '#fff')
+                        .attr('fill', style.color || window.AppConstants?.APP_COLORS?.ANNOTATIONS?.POINT || '#ff6b6b')
+                        .attr('stroke', style.strokeColor || window.AppConstants?.APP_COLORS?.ANNOTATIONS?.STROKE || '#fff')
                         .attr('stroke-width', style.strokeWidth || 2);
                     break;
                     
@@ -894,7 +894,7 @@ class PieChartRenderer extends BaseManager {
                             .attr('width', bbox.width + 4)
                             .attr('height', bbox.height + 4)
                             .attr('fill', style.backgroundColor || 'rgba(255, 255, 255, 0.8)')
-                            .attr('stroke', style.borderColor || '#ccc')
+                            .attr('stroke', style.borderColor || window.AppConstants?.APP_COLORS?.ANNOTATIONS?.BORDER || '#ccc')
                             .attr('stroke-width', 0.5)
                             .attr('rx', 2);
                     }

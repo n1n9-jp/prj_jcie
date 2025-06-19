@@ -175,15 +175,7 @@ class ScrollytellingApp {
      * @returns {string} 日本語の国名
      */
     getCountryNameJapanese(countryEn) {
-        const countryMapping = {
-            'Nigeria': 'ナイジェリア',
-            'Malawi': 'マラウイ',
-            'Kenya': 'ケニア',
-            'Belize': 'ベリーズ',
-            'United States of America': 'アメリカ',
-            'Philippines': 'フィリピン'
-        };
-        return countryMapping[countryEn] || countryEn;
+        return window.AppConstants?.getCountryNameJapanese(countryEn) || countryEn;
     }
 
     /**

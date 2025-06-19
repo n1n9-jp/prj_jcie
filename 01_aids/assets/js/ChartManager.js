@@ -640,7 +640,7 @@ class ChartManager extends BaseManager {
             .attr('y', height - 5) // チャートグループの下端から5px上
             .attr('text-anchor', 'start')
             .attr('font-size', '10px')
-            .attr('fill', '#888')
+            .attr('fill', window.AppConstants?.APP_COLORS?.TEXT?.LIGHT || '#888')
             .text(`出典: ${dataSource}`);
     }
 
@@ -677,7 +677,7 @@ class ChartManager extends BaseManager {
             seriesField = 'series',
             multiSeries = true,
             yRange,
-            colors = ['#2563eb', '#dc2626', '#059669', '#d97706', '#7c3aed']
+            colors = window.AppConstants?.APP_COLORS?.PRIMARY_PALETTE || ['#2563eb', '#dc2626', '#059669', '#d97706', '#7c3aed']
         } = config;
         
         if (!data || data.length === 0) {
@@ -782,7 +782,7 @@ class ChartManager extends BaseManager {
                     .attr('y', 0)
                     .attr('dy', '0.35em')
                     .attr('font-size', '12px')
-                    .attr('fill', '#333')
+                    .attr('fill', window.AppConstants?.APP_COLORS?.TEXT?.PRIMARY || '#333')
                     .text(series.name);
             });
         }
