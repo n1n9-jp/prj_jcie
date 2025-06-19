@@ -152,6 +152,7 @@
           "multiSeries": true,
           "title": "新規HIV感染者数の推移（1990-1998年）",
           "dataSource": "Our World in Data",
+          "legendType": "inline",
           "filter": {
             "type": "range",
             "field": "year",
@@ -213,6 +214,7 @@
           "multiSeries": true,
           "title": "新規HIV感染者数の推移（全期間）",
           "dataSource": "Our World in Data",
+          "legendType": "inline",
           "yRange": [0, 4000000],
           "animation": {
             "mode": "progressive",
@@ -276,6 +278,7 @@
           "multiSeries": true,
           "title": "エイズ関連死亡者数の推移",
           "dataSource": "Our World in Data",
+          "legendType": "inline",
           "yRange": [0, 4000000],
           "animation": {
             "mode": "progressive",
@@ -592,7 +595,8 @@
               "seriesField": "series",
               "dataSource": "UNAIDS epidemiological estimates, 2024",
               "yRange": [0, 500000],
-              "multiSeries": true
+              "multiSeries": true,
+              "legendType": "inline"
             }
           },
           {
@@ -608,7 +612,8 @@
               "seriesField": "series",
               "dataSource": "UNAIDS epidemiological estimates, 2024",
               "yRange": [0, 500000],
-              "multiSeries": true
+              "multiSeries": true,
+              "legendType": "inline"
             }
           }
         ]

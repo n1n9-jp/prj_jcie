@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>色の診断</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+    <h1>色の診断ページ</h1>
+    <div id="test-results"></div>
+    
+    <!-- 必要なスクリプトを順番に読み込み -->
+    <script src="assets/js/utils/config-loader.js"></script>
+    <script src="assets/js/utils/app-constants.js"></script>
+    <script src="assets/js/utils/color-scheme.js"></script>
+    <script src="assets/js/utils/country-region-mapping.js"></script>
+    
+    <script>
+        // デバッグ関数
+        async function diagnoseColors() {
+            const results = document.getElementById('test-results');
+            
+            // 1. 基本的なオブジェクトの存在確認
+            results.innerHTML += '<h2>1. 基本オブジェクト確認</h2>';
+            results.innerHTML += `<p>window.AppConstants: ${!!window.AppConstants}</p>`;
+            results.innerHTML += `<p>window.ColorScheme: ${!!window.ColorScheme}</p>`;
+            results.innerHTML += `<p>window.ConfigLoader: ${!!window.ConfigLoader}</p>`;
+            results.innerHTML += `<p>window.CountryRegionMapping: ${!!window.CountryRegionMapping}</p>`;
+            
+            // 2. 設定読み込み待機
+            results.innerHTML += '<h2>2. 設定読み込み待機</h2>';
+            
+            // ConfigLoaderが利用可能になるまで待機
+            let attempts = 0;
+            while (!window.ConfigLoader && attempts < 10) {
+                await new Promise(resolve => setTimeout(resolve, 500));
+                attempts++;
+            }
+            
+            if (window.ConfigLoader) {
+                results.innerHTML += '<p>ConfigLoader読み込み完了</p>';
+                
+                // 設定ファイルの読み込み完了まで待機
+                attempts = 0;
+                while (!window.ConfigLoader.isReady() && attempts < 20) {
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    attempts++;
+                }
+                
+                results.innerHTML += `<p>ConfigLoader準備状態: ${window.ConfigLoader.isReady()}</p>`;
+            }
+            
+            // 3. ColorSchemeのテスト
+            results.innerHTML += '<h2>3. ColorScheme テスト</h2>';
+            
+            if (window.ColorScheme) {
+                const colorScheme = new ColorScheme();
+                
+                // 地域のテスト
+                const testRegions = [
+                    'アジア・太平洋地域',
+                    '東部・南部アフリカ',
+                    '西部・中部アフリカ',
+                    '東ヨーロッパ・中央アジア'
+                ];
+                
+                testRegions.forEach(region => {
+                    const color = colorScheme.getRegionColor(region);
+                    const colorBox = `<span style="display:inline-block;width:20px;height:20px;background-color:${color};border:1px solid #000;margin-right:10px;"></span>`;
+                    results.innerHTML += `<p>${colorBox}${region}: ${color}</p>`;
+                });
+                
+                // 4. デバッグ情報
+                results.innerHTML += '<h2>4. デバッグ情報</h2>';
+                
+                if (window.debugColorScheme) {
+                    results.innerHTML += '<p>debugColorSchemeが利用可能</p>';
+                    try {
+                        window.debugColorScheme.logMappings();
+                        results.innerHTML += '<p>ログ出力完了（コンソール確認）</p>';
+                    } catch (e) {
+                        results.innerHTML += `<p>エラー: ${e.message}</p>`;
+                    }
+                } else {
+                    results.innerHTML += '<p>debugColorSchemeが利用不可</p>';
+                }
+            } else {
+                results.innerHTML += '<p>❌ ColorSchemeが読み込まれていません</p>';
+            }
+            
+            // 5. チャートでの実際の色取得テスト
+            results.innerHTML += '<h2>5. チャート色取得テスト</h2>';
+            
+            // サンプルの系列データ
+            const sampleSeries = [
+                { name: 'アジア・太平洋地域' },
+                { name: '東部・南部アフリカ' },
+                { name: '西部・中部アフリカ' }
+            ];
+            
+            const sampleConfig = {
+                multiSeries: true,
+                useUnifiedColors: true
+            };
+            
+            if (window.LineChartRenderer) {
+                try {
+                    const renderer = new LineChartRenderer('#test');
+                    const colorScale = renderer.createColorScale(sampleSeries, sampleConfig);
+                    
+                    sampleSeries.forEach(series => {
+                        const color = colorScale(series.name);
+                        const colorBox = `<span style="display:inline-block;width:20px;height:20px;background-color:${color};border:1px solid #000;margin-right:10px;"></span>`;
+                        results.innerHTML += `<p>${colorBox}チャート色 ${series.name}: ${color}</p>`;
+                    });
+                } catch (e) {
+                    results.innerHTML += `<p>❌ チャート色取得エラー: ${e.message}</p>`;
+                }
+            } else {
+                results.innerHTML += '<p>❌ LineChartRendererが読み込まれていません</p>';
+            }
+        }
+        
+        // ページ読み込み後に診断実行
+        window.addEventListener('load', () => {
+            setTimeout(diagnoseColors, 1000);
+        });
+    </script>
+</body>
+</html>

@@ -189,6 +189,13 @@ class ScrollytellingApp {
      */
     initManagers() {
         console.log('Initializing managers...');
+        
+        // ColorSchemeを初期化
+        if (!window.colorScheme && window.ColorScheme) {
+            window.colorScheme = new ColorScheme();
+            console.log('ColorScheme initialized');
+        }
+        
         this.chartManager = new ChartManager('#chart');
         this.mapManager = new MapManager('#map-container');
         this.imageManager = new ImageManager('#image-container');

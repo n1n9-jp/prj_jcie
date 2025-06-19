@@ -12,6 +12,8 @@ class ColorScheme {
         // 設定チェックの定期実行（設定が後から読み込まれる場合に対応）
         if (!this.configAvailable) {
             setTimeout(() => this.checkConfigAvailability(), 1000);
+            setTimeout(() => this.checkConfigAvailability(), 3000);
+            setTimeout(() => this.checkConfigAvailability(), 5000);
         }
         // D3のschemePairedを使用（12色のペアリング）
         this.pairedColors = [
@@ -20,14 +22,12 @@ class ColorScheme {
             '#cab2d6', '#6a3d9a', '#ffff99', '#b15928'
         ];
         
-        // 地域名と色のマッピング（頻度順に配色）
+        // 地域名と色のマッピング（theme.config.jsonと完全一致）
         this.regionColorMap = {
-            // 最頻出地域（明確で区別しやすい色）
+            // 現在のCSVデータで使用されている地域名
             'アジア・太平洋地域': '#1f78b4',           // 青
-            '東部・南部アフリカ': '#33a02c',           // 緑
+            '東部・南部アフリカ': '#33a02c',           // 緑  
             '西部・中部アフリカ': '#e31a1c',           // 赤
-            
-            // 頻出地域
             '中東・北アフリカ': '#ff7f00',             // オレンジ
             '東ヨーロッパ・中央アジア': '#6a3d9a',       // 紫
             '中南米（ラテンアメリカ）': '#fb9a99',        // 薄いピンク
@@ -51,16 +51,22 @@ class ColorScheme {
         
         // 別名（ファイル間の表記揺れ）を標準名にマッピング
         this.regionAliases = {
-            // エイリアス: 標準名
+            // 古いapp-constants.jsの表記 -> 新しい標準名
+            'サハラ以南アフリカ': '東部・南部アフリカ',
             '東・南部アフリカ': '東部・南部アフリカ',
             '東部および南部アフリカ': '東部・南部アフリカ',
             '西部および中央アフリカ': '西部・中部アフリカ',
+            '東欧・中央アジア': '東ヨーロッパ・中央アジア',
+            'ラテンアメリカ・カリブ海地域': '中南米（ラテンアメリカ）',
+            
+            // その他のエイリアス
             'アジア太平洋': 'アジア・太平洋地域',
             'ラテンアメリカ': '中南米（ラテンアメリカ）',
-            '東欧・中央アジア': '東ヨーロッパ・中央アジア',
             '西欧・中欧・北アメリカ': '西・中央ヨーロッパおよび北米',
             'カリブ海沿岸': 'カリブ海地域',
-            'カリブ海地域': 'カリブ海地域', // CSVファイルの表記
+            
+            // 同一表記確認（設定で確実性を保つ）
+            'カリブ海地域': 'カリブ海地域',
             '全世界': '世界'
         };
     }
@@ -72,6 +78,16 @@ class ColorScheme {
         if (window.ConfigLoader && window.ConfigLoader.loaded) {
             this.configAvailable = true;
             console.log('ColorScheme: External config available');
+            
+            // テーマ設定が正しく読み込まれているかテスト
+            const testColor = window.ConfigLoader.getColor('regions.アジア・太平洋地域');
+            if (testColor) {
+                console.log('ColorScheme: Theme color test successful:', testColor);
+            } else {
+                console.warn('ColorScheme: Theme colors not loaded properly');
+            }
+        } else {
+            console.log('ColorScheme: External config not available yet');
         }
     }
 
@@ -83,8 +99,13 @@ class ColorScheme {
      */
     getConfigColor(colorPath, fallback) {
         if (this.configAvailable) {
-            return window.ConfigLoader.getColor(colorPath) || fallback;
+            const color = window.ConfigLoader.getColor(colorPath);
+            if (color) {
+                console.log(`ColorScheme: Got color from config for ${colorPath}: ${color}`);
+                return color;
+            }
         }
+        console.log(`ColorScheme: Using fallback color for ${colorPath}: ${fallback}`);
         return fallback;
     }
     
@@ -94,24 +115,34 @@ class ColorScheme {
      * @returns {string} 色コード
      */
     getColorForRegion(regionName) {
-        // まず標準名を取得（エイリアス解決）
-        const standardName = this.getStandardRegionName(regionName);
-        
-        // 外部設定から色を取得を試行
-        let color = this.getConfigColor(`regions.${standardName}`, null);
-        
-        // 外部設定になければマップから取得
-        if (!color) {
-            color = this.regionColorMap[standardName];
+        if (!regionName) {
+            console.warn('ColorScheme: Empty region name provided');
+            return this.getFallbackColor('Unknown');
         }
         
+        // まず標準名を取得（エイリアス解決）
+        const standardName = this.getStandardRegionName(regionName);
+        console.log(`ColorScheme: Mapping ${regionName} -> ${standardName}`);
+        
+        // まず内部マップから取得（確実に動作する）
+        let color = this.regionColorMap[standardName];
         if (color) {
+            console.log(`ColorScheme: Using internal mapping for ${standardName}: ${color}`);
+            return color;
+        }
+        
+        // 外部設定から色を取得を試行（二次的）
+        color = this.getConfigColor(`regions.${standardName}`, null);
+        if (color) {
+            console.log(`ColorScheme: Using external config for ${standardName}: ${color}`);
             return color;
         }
         
         // 未知の地域の場合はフォールバック色を使用
-        console.warn(`Unknown region: ${regionName} (standard: ${standardName}). Using fallback color.`);
-        return this.getFallbackColor(regionName);
+        console.warn(`ColorScheme: Unknown region: ${regionName} (standard: ${standardName}). Using fallback color.`);
+        const fallbackColor = this.getFallbackColor(regionName);
+        console.log(`ColorScheme: Fallback color for ${regionName}: ${fallbackColor}`);
+        return fallbackColor;
     }
     
     /**
@@ -182,21 +213,26 @@ class ColorScheme {
      * @returns {Array<string>} 色配列
      */
     generateColorsForChart(data, config) {
+        console.log('ColorScheme: generateColorsForChart called', { dataLength: data.length, config });
+        
         // 系列フィールドを取得
         const seriesField = config.seriesField || 'series';
+        console.log(`ColorScheme: Using seriesField: ${seriesField}`);
         
         // 単一系列の場合の処理
         if (config.multiSeries === false || config.seriesName) {
             const seriesName = config.seriesName || 'Data';
+            console.log(`ColorScheme: Single series mode, using seriesName: ${seriesName}`);
             return this.getColorsForRegions([seriesName]);
         }
         
         // データから一意の系列名を抽出
         const uniqueSeries = [...new Set(data.map(d => d[seriesField]))].filter(name => name !== undefined && name !== null);
+        console.log(`ColorScheme: Extracted unique series: ${JSON.stringify(uniqueSeries)}`);
         
         // データが空または系列名が取得できない場合のフォールバック
         if (uniqueSeries.length === 0) {
-            console.warn('No valid series names found in data, using fallback color');
+            console.warn('ColorScheme: No valid series names found in data, using fallback color');
             return [this.getFallbackColor('Unknown')];
         }
         
@@ -212,8 +248,12 @@ class ColorScheme {
             return standardA.localeCompare(standardB, 'ja');
         });
         
+        console.log(`ColorScheme: Sorted series: ${JSON.stringify(uniqueSeries)}`);
+        
         // 地域名に基づいて統一色配列を生成
-        return this.getColorsForRegions(uniqueSeries);
+        const colors = this.getColorsForRegions(uniqueSeries);
+        console.log(`ColorScheme: Generated colors: ${JSON.stringify(colors)}`);
+        return colors;
     }
     
     /**
@@ -222,7 +262,10 @@ class ColorScheme {
      * @returns {string} 色コード
      */
     getRegionColor(regionName) {
-        return this.getColorForRegion(regionName);
+        console.log(`getRegionColor called with: "${regionName}"`);
+        const result = this.getColorForRegion(regionName);
+        console.log(`getRegionColor returning: "${result}"`);
+        return result;
     }
     
     /**
@@ -272,5 +315,27 @@ window.debugColorScheme = {
     getColor: (regionName) => window.ColorScheme.getColorForRegion(regionName),
     getColors: (regionNames) => window.ColorScheme.getColorsForRegions(regionNames),
     logMappings: () => window.ColorScheme.logColorMappings(),
-    getType: (regionName) => window.ColorScheme.getRegionType(regionName)
+    getType: (regionName) => window.ColorScheme.getRegionType(regionName),
+    testRegions: () => {
+        const testRegions = [
+            'アジア・太平洋地域',
+            '東部・南部アフリカ', 
+            '西部・中部アフリカ',
+            '中東・北アフリカ',
+            '東ヨーロッパ・中央アジア',
+            '中南米（ラテンアメリカ）',
+            '西・中央ヨーロッパおよび北米',
+            'カリブ海地域',
+            '世界'
+        ];
+        console.log('=== Color Mapping Test ===');
+        testRegions.forEach(region => {
+            const color = window.ColorScheme.getColorForRegion(region);
+            console.log(`${region}: ${color}`);
+        });
+        return testRegions.map(region => ({
+            region,
+            color: window.ColorScheme.getColorForRegion(region)
+        }));
+    }
 };

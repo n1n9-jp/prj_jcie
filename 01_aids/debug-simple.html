@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>簡単な色診断</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+    <h1>色診断</h1>
+    <div id="results"></div>
+    
+    <!-- 最小限のスクリプト読み込み -->
+    <script src="assets/js/utils/app-constants.js"></script>
+    <script src="assets/js/utils/color-scheme.js"></script>
+    
+    <script>
+        function test() {
+            const results = document.getElementById('results');
+            
+            // AppConstants確認
+            results.innerHTML += `<p>AppConstants: ${!!window.AppConstants}</p>`;
+            if (window.AppConstants) {
+                results.innerHTML += `<p>APP_COLORS: ${!!window.AppConstants.APP_COLORS}</p>`;
+                if (window.AppConstants.APP_COLORS && window.AppConstants.APP_COLORS.REGIONS) {
+                    results.innerHTML += `<p>REGIONS: ${Object.keys(window.AppConstants.APP_COLORS.REGIONS)}</p>`;
+                }
+            }
+            
+            // ColorScheme確認
+            results.innerHTML += `<p>ColorScheme: ${!!window.ColorScheme}</p>`;
+            if (window.ColorScheme) {
+                try {
+                    const colorScheme = new ColorScheme();
+                    const testColor = colorScheme.getRegionColor('アジア・太平洋地域');
+                    results.innerHTML += `<p>アジア・太平洋地域の色: ${testColor}</p>`;
+                    
+                    // 色ボックス表示
+                    const colorBox = document.createElement('div');
+                    colorBox.style.width = '50px';
+                    colorBox.style.height = '50px';
+                    colorBox.style.backgroundColor = testColor;
+                    colorBox.style.border = '1px solid #000';
+                    colorBox.style.display = 'inline-block';
+                    colorBox.style.marginLeft = '10px';
+                    results.appendChild(colorBox);
+                    
+                } catch (e) {
+                    results.innerHTML += `<p>エラー: ${e.message}</p>`;
+                    console.error('ColorScheme test error:', e);
+                }
+            }
+        }
+        
+        // DOMロード後に実行
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(test, 100);
+        });
+    </script>
+</body>
+</html>

@@ -223,9 +223,8 @@ class LineChartRenderer extends BaseManager {
             .y(d => newYScale(+d[yField]))
             .curve(d3.curveMonotoneX);
 
-        // 色スケール
-        const colorScale = d3.scaleOrdinal(config.colors || d3.schemeCategory10)
-            .domain(newSeries.map(d => d.name));
+        // 色スケール - 地域別カラースキームを使用
+        const colorScale = this.createColorScale(newSeries, config);
 
         // ChartTransitionsを使用してEnter/Update/Exitパターンを適用
         const seriesUpdateResult = ChartTransitions.applyEnterUpdateExit(
@@ -630,19 +629,7 @@ class LineChartRenderer extends BaseManager {
             .range([innerHeight, 0]);
 
         // D3標準のカラースケール：地域名から直接色を取得
-        let colorScale;
-        if (config.colors && config.colors.length > 0 && config.multiSeries === false) {
-            // 単一系列の明示色
-            colorScale = d3.scaleOrdinal(config.colors).domain(series.map(d => d.name));
-        } else if (window.ColorScheme && config.useUnifiedColors !== false) {
-            // 統一カラースキーム：地域名→色の直接マッピング
-            colorScale = d3.scaleOrdinal()
-                .domain(series.map(s => s.name))
-                .range(series.map(s => window.ColorScheme.getRegionColor(s.name)));
-        } else {
-            // フォールバック
-            colorScale = d3.scaleOrdinal(colors).domain(series.map(d => d.name));
-        }
+        const colorScale = this.createColorScale(series, config);
 
         // 単位情報を分析
         let unitInfo = { xAxis: {}, yAxis: {} };
@@ -755,9 +742,23 @@ class LineChartRenderer extends BaseManager {
             this.renderProgressiveAnimation(seriesGroups, series, line, xScale, yScale, xField, yField, colorScale, config);
         }
 
+        // プログレッシブアニメーション完了後にインラインラベルを追加
+        if (hasProgressiveAnimation && config.legendType === 'inline' && series.length > 1) {
+            const animationDuration = config.animation?.duration || 3000;
+            setTimeout(() => {
+                this.addInlineLabelsWithAnimation(g, series, colorScale, { xScale, yScale, width: innerWidth, height: innerHeight, isYearData, xField, yField });
+            }, animationDuration + 500); // アニメーション完了後500ms待機
+        }
+
         // レジェンドを追加（複数系列の場合のみ）
         if (series.length > 1) {
-            this.addLegend(svg, series, colorScale, width, height);
+            const legendType = config.legendType || 'traditional';
+            if (legendType === 'inline' && !hasProgressiveAnimation) {
+                // プログレッシブアニメーションがない場合はすぐに表示
+                this.addInlineLabels(g, series, colorScale, { xScale, yScale, width: innerWidth, height: innerHeight, isYearData, xField, yField });
+            } else if (legendType === 'traditional') {
+                this.addLegend(svg, series, colorScale, width, height);
+            }
         }
 
         // 注釈（アノテーション）を描画
@@ -823,19 +824,7 @@ class LineChartRenderer extends BaseManager {
             .range([height, 0]);
 
         // D3標準のカラースケール：地域名から直接色を取得
-        let colorScale;
-        if (config.colors && config.colors.length > 0 && config.multiSeries === false) {
-            // 単一系列の明示色
-            colorScale = d3.scaleOrdinal(config.colors).domain(series.map(d => d.name));
-        } else if (window.ColorScheme && config.useUnifiedColors !== false) {
-            // 統一カラースキーム：地域名→色の直接マッピング
-            colorScale = d3.scaleOrdinal()
-                .domain(series.map(s => s.name))
-                .range(series.map(s => window.ColorScheme.getRegionColor(s.name)));
-        } else {
-            // フォールバック
-            colorScale = d3.scaleOrdinal(colors).domain(series.map(d => d.name));
-        }
+        const colorScale = this.createColorScale(series, config);
 
         // 単位情報を分析
         let unitInfo = { xAxis: {}, yAxis: {} };
@@ -922,7 +911,12 @@ class LineChartRenderer extends BaseManager {
 
         // コンパクトなレジェンドを追加（複数系列の場合のみ）
         if (series.length > 1) {
-            this.addCompactLegend(g, series, colorScale, width, height);
+            const legendType = config.legendType || 'traditional';
+            if (legendType === 'inline') {
+                this.addInlineLabels(g, series, colorScale, { xScale, yScale, width, height, isYearData, xField, yField });
+            } else {
+                this.addCompactLegend(g, series, colorScale, width, height);
+            }
         }
     }
 
@@ -1191,6 +1185,443 @@ class LineChartRenderer extends BaseManager {
                 textElement.append('title').text(text);
             }
         });
+    }
+
+    /**
+     * インライン（線末）ラベルを追加
+     * @param {d3.Selection} g - グラフのメインg要素
+     * @param {Array} series - 系列データ
+     * @param {Function} colorScale - 色スケール
+     * @param {Object} context - コンテキスト（スケール、サイズ等）
+     */
+    addInlineLabels(g, series, colorScale, context) {
+        if (!series || series.length <= 1) return;
+        
+        const { xScale, yScale, width, height, isYearData, xField, yField } = context;
+        
+        // インライン設定のデフォルト値（重複回避を強化）
+        const inlineConfig = {
+            fontSize: '12px',
+            fontFamily: 'var(--font-family-serif), "Shippori Mincho", serif',
+            offsetX: 20, // オフセットをさらに増加
+            offsetY: 4,
+            minDistance: 35, // ラベル間最小距離をさらに拡大
+            useLabeler: true,
+            enableLeaderLines: true,
+            leaderLineLength: 40, // 引き出し線をさらに長く
+            maxLabelWidth: width * 0.3, // 最大ラベル幅をさらに拡大
+            responsiveThreshold: 600, // この幅以下では従来の凡例にフォールバック
+            verticalSpacing: 30, // 垂直方向の最小間隔を拡大
+            allowExtendedPlacement: true, // チャート外への配置を許可
+            maxExtensionWidth: 120 // チャート右端からの最大拡張幅
+        };
+
+        // 小画面の場合は従来の凡例を使用
+        if (window.innerWidth < inlineConfig.responsiveThreshold) {
+            console.log('LineChartRenderer: Screen too small for inline labels, using traditional legend');
+            this.addCompactLegend(g, series, colorScale, width, height);
+            return;
+        }
+
+        // 各系列の最後のデータポイントを取得
+        const endPoints = series.map(seriesData => {
+            const lastPoint = seriesData.values[seriesData.values.length - 1];
+            if (!lastPoint) return null;
+
+            const x = isYearData ? xScale(+lastPoint[xField]) : xScale(new Date(lastPoint[xField]));
+            const y = yScale(+lastPoint[yField]);
+            
+            return {
+                name: seriesData.name,
+                x: x,
+                y: y,
+                color: colorScale(seriesData.name),
+                originalX: x,
+                originalY: y
+            };
+        }).filter(point => point !== null);
+
+        if (endPoints.length === 0) {
+            console.warn('LineChartRenderer: No valid end points found for inline labels');
+            return;
+        }
+
+        // ラベルの初期位置を計算
+        const labels = endPoints.map(point => {
+            const labelText = window.TextMeasurement 
+                ? window.TextMeasurement.truncateText(point.name, inlineConfig.maxLabelWidth, { 
+                    fontSize: inlineConfig.fontSize,
+                    fontFamily: inlineConfig.fontFamily
+                })
+                : point.name;
+
+            const labelWidth = window.TextMeasurement 
+                ? window.TextMeasurement.measureTextWidth(labelText, {
+                    fontSize: inlineConfig.fontSize,
+                    fontFamily: inlineConfig.fontFamily
+                })
+                : labelText.length * 8;
+
+            const labelHeight = window.TextMeasurement 
+                ? window.TextMeasurement.measureTextHeight(labelText, {
+                    fontSize: inlineConfig.fontSize,
+                    fontFamily: inlineConfig.fontFamily
+                })
+                : 14;
+
+            // より積極的な初期位置設定で重複を事前に避ける
+            const baseX = point.x + inlineConfig.offsetX;
+            const adjustedX = Math.min(baseX, width + (inlineConfig.maxExtensionWidth || 100) - labelWidth - 5);
+            
+            return {
+                x: adjustedX,
+                y: point.y + inlineConfig.offsetY,
+                width: labelWidth,
+                height: labelHeight,
+                text: labelText,
+                color: point.color,
+                anchorX: point.x,
+                anchorY: point.y,
+                originalName: point.name
+            };
+        });
+
+        // D3-Labelerを使用して重複を回避
+        if (inlineConfig.useLabeler && window.d3 && window.d3.labeler) {
+            this.optimizeLabelPositions(labels, width, height, inlineConfig);
+        } else {
+            // D3-Labelerが利用できない場合は簡易的な重複回避
+            this.applySimpleCollisionAvoidance(labels, inlineConfig);
+        }
+
+        // ラベルグループを作成
+        const labelGroup = g.append('g')
+            .attr('class', 'inline-labels');
+
+        // 引き出し線を描画（必要な場合）
+        if (inlineConfig.enableLeaderLines) {
+            this.addLeaderLines(labelGroup, labels);
+        }
+
+        // ラベルを描画
+        this.renderInlineLabels(labelGroup, labels, inlineConfig);
+    }
+
+    /**
+     * アニメーション付きでインラインラベルを追加
+     * @param {d3.Selection} g - グラフのメインg要素
+     * @param {Array} series - 系列データ
+     * @param {Function} colorScale - 色スケール
+     * @param {Object} context - コンテキスト（スケール、サイズ等）
+     */
+    addInlineLabelsWithAnimation(g, series, colorScale, context) {
+        // まず通常のインラインラベル追加処理を実行
+        this.addInlineLabels(g, series, colorScale, context);
+        
+        // アニメーションを適用
+        const labelGroup = g.select('.inline-labels');
+        if (labelGroup.empty()) return;
+        
+        // ラベルテキストのエントリーアニメーション
+        labelGroup.selectAll('.inline-label')
+            .style('opacity', 0)
+            .style('transform', 'translateX(-15px)')
+            .transition()
+            .duration(600)
+            .delay((d, i) => i * 150) // 各ラベルを順次表示
+            .ease(d3.easeBackOut.overshoot(1.2))
+            .style('opacity', 1)
+            .style('transform', 'translateX(0px)');
+        
+        // 背景の段階的表示
+        labelGroup.selectAll('rect')
+            .style('opacity', 0)
+            .transition()
+            .duration(400)
+            .delay((d, i) => i * 150 + 200) // テキストより少し遅れて表示
+            .ease(d3.easeQuadOut)
+            .style('opacity', 0.9);
+        
+        // 引き出し線の段階的表示
+        labelGroup.selectAll('.leader-line')
+            .style('opacity', 0)
+            .style('stroke-dasharray', '0,100')
+            .transition()
+            .duration(800)
+            .delay((d, i) => i * 150 + 300)
+            .ease(d3.easeQuadInOut)
+            .style('opacity', 0.7)
+            .style('stroke-dasharray', '2,2');
+        
+        console.log('LineChartRenderer: Inline labels added with animation');
+    }
+
+    /**
+     * D3-Labelerを使用してラベル位置を最適化
+     * @param {Array} labels - ラベル配列
+     * @param {number} width - グラフ幅
+     * @param {number} height - グラフ高さ
+     * @param {Object} config - インライン設定
+     */
+    optimizeLabelPositions(labels, width, height, config) {
+        try {
+            // アンカーポイント（線の終点）
+            const anchors = labels.map(label => ({
+                x: label.anchorX,
+                y: label.anchorY,
+                r: 8 // アンカーポイントの半径をさらに拡大
+            }));
+
+            // ラベルの初期配置を改善：重複を事前に避ける
+            this.preProcessLabelPositions(labels, config);
+
+            // D3-Labelerを実行（より強力な設定）
+            const labeler = d3.labeler()
+                .label(labels)
+                .anchor(anchors)
+                .width(width + 150) // チャート幅を右にさらに拡張
+                .height(height + 100) // 高さも拡張して配置余地を増やす
+                .start(1000); // 最適化のイテレーション数を大幅増加
+
+            console.log('LineChartRenderer: D3-Labeler optimization completed with', labels.length, 'labels');
+            
+            // 後処理：チャート範囲外に出たラベルを調整
+            this.postProcessLabelPositions(labels, width, height, config);
+            
+            // 最適化後の位置情報をログ出力
+            labels.forEach((label, i) => {
+                console.log(`Label ${i}: ${label.text} at (${Math.round(label.x)}, ${Math.round(label.y)})`);
+            });
+            
+        } catch (error) {
+            console.warn('LineChartRenderer: D3-Labeler optimization failed:', error);
+            // フォールバックとして簡易重複回避を実行
+            this.applySimpleCollisionAvoidance(labels, config);
+        }
+    }
+
+    /**
+     * ラベル位置の前処理：事前に重複しやすい配置を避ける
+     * @param {Array} labels - ラベル配列
+     * @param {Object} config - インライン設定
+     */
+    preProcessLabelPositions(labels, config) {
+        // Y座標でソート
+        const sortedLabels = [...labels].sort((a, b) => a.y - b.y);
+        
+        // 重複している場合は垂直方向に散らす
+        for (let i = 1; i < sortedLabels.length; i++) {
+            const current = sortedLabels[i];
+            const previous = sortedLabels[i - 1];
+            
+            const verticalDistance = Math.abs(current.y - previous.y);
+            if (verticalDistance < config.verticalSpacing) {
+                // 重複を避けるために位置を調整
+                const adjustment = config.verticalSpacing - verticalDistance;
+                if (current.y > previous.y) {
+                    current.y += adjustment;
+                } else {
+                    current.y -= adjustment;
+                }
+            }
+        }
+    }
+
+    /**
+     * ラベル位置の後処理：チャート範囲外のラベルを調整
+     * @param {Array} labels - ラベル配列
+     * @param {number} width - グラフ幅
+     * @param {number} height - グラフ高さ
+     * @param {Object} config - インライン設定
+     */
+    postProcessLabelPositions(labels, width, height, config) {
+        labels.forEach(label => {
+            // X座標の調整：拡張配置を考慮
+            const maxExtension = config.allowExtendedPlacement 
+                ? (config.maxExtensionWidth || 120) 
+                : 50; // デフォルトの小さな拡張
+            const maxX = width + maxExtension - label.width - 5;
+            
+            if (label.x > maxX) {
+                label.x = maxX;
+            }
+            
+            // 最小X位置の制限（チャート内の最低位置）
+            const minX = Math.max(width * 0.7, width - 50); // チャート幅の70%位置または右端から50px
+            if (label.x < minX) {
+                label.x = minX;
+            }
+            
+            // Y座標の調整：ラベルがチャートの上下端を超えないように
+            const minY = label.height / 2 + 5;
+            const maxY = height - label.height / 2 - 5;
+            
+            if (label.y < minY) {
+                label.y = minY;
+            } else if (label.y > maxY) {
+                label.y = maxY;
+            }
+        });
+    }
+
+    /**
+     * 簡易的な重複回避アルゴリズム（D3-Labelerが利用できない場合のフォールバック）
+     * @param {Array} labels - ラベル配列
+     * @param {Object} config - インライン設定
+     */
+    applySimpleCollisionAvoidance(labels, config) {
+        console.log('LineChartRenderer: Applying simple collision avoidance for', labels.length, 'labels');
+        
+        // Y座標でソートして上から順に配置
+        const sortedLabels = [...labels].sort((a, b) => a.anchorY - b.anchorY);
+        
+        for (let i = 0; i < sortedLabels.length; i++) {
+            const currentLabel = sortedLabels[i];
+            
+            // 他のラベルとの重複をチェック
+            for (let j = 0; j < i; j++) {
+                const otherLabel = sortedLabels[j];
+                
+                if (this.isLabelsOverlapping(currentLabel, otherLabel, config.minDistance)) {
+                    // 重複している場合は位置を調整
+                    this.adjustLabelPosition(currentLabel, otherLabel, config);
+                }
+            }
+        }
+        
+        console.log('LineChartRenderer: Simple collision avoidance completed');
+    }
+
+    /**
+     * 2つのラベルが重複しているかチェック
+     * @param {Object} label1 - ラベル1
+     * @param {Object} label2 - ラベル2  
+     * @param {number} minDistance - 最小距離
+     * @returns {boolean} 重複しているかどうか
+     */
+    isLabelsOverlapping(label1, label2, minDistance) {
+        const dx = Math.abs(label1.x - label2.x);
+        const dy = Math.abs(label1.y - label2.y);
+        
+        const horizontalOverlap = dx < (label1.width + label2.width) / 2 + minDistance;
+        const verticalOverlap = dy < (label1.height + label2.height) / 2 + minDistance;
+        
+        return horizontalOverlap && verticalOverlap;
+    }
+
+    /**
+     * ラベル位置を調整して重複を解消
+     * @param {Object} currentLabel - 調整対象のラベル
+     * @param {Object} otherLabel - 重複している他のラベル
+     * @param {Object} config - インライン設定
+     */
+    adjustLabelPosition(currentLabel, otherLabel, config) {
+        const dy = currentLabel.y - otherLabel.y;
+        const requiredVerticalSpace = (currentLabel.height + otherLabel.height) / 2 + config.verticalSpacing;
+        
+        if (Math.abs(dy) < requiredVerticalSpace) {
+            // 垂直方向に移動
+            if (dy >= 0) {
+                // currentLabelが下にある場合は、さらに下に移動
+                currentLabel.y = otherLabel.y + requiredVerticalSpace;
+            } else {
+                // currentLabelが上にある場合は、さらに上に移動
+                currentLabel.y = otherLabel.y - requiredVerticalSpace;
+            }
+        }
+        
+        // X方向の調整：引き出し線を長くして右に移動
+        const dx = currentLabel.x - otherLabel.x;
+        if (Math.abs(dx) < config.minDistance) {
+            currentLabel.x = Math.max(currentLabel.x, otherLabel.x + config.minDistance + currentLabel.width);
+        }
+    }
+
+    /**
+     * 引き出し線を追加
+     * @param {d3.Selection} labelGroup - ラベルグループ
+     * @param {Array} labels - ラベル配列
+     */
+    addLeaderLines(labelGroup, labels) {
+        const leaderLines = labelGroup.selectAll('.leader-line')
+            .data(labels)
+            .enter()
+            .append('line')
+            .attr('class', 'leader-line')
+            .attr('x1', d => d.anchorX)
+            .attr('y1', d => d.anchorY)
+            .attr('x2', d => d.x)
+            .attr('y2', d => d.y)
+            .attr('stroke', d => d.color)
+            .attr('stroke-width', 1)
+            .attr('stroke-dasharray', '2,2')
+            .attr('opacity', 0.7)
+            .style('pointer-events', 'none');
+
+        // 引き出し線が短い場合は非表示
+        leaderLines.style('display', d => {
+            const dx = d.x - d.anchorX;
+            const dy = d.y - d.anchorY;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            return distance < 10 ? 'none' : 'block';
+        });
+    }
+
+    /**
+     * インラインラベルを描画
+     * @param {d3.Selection} labelGroup - ラベルグループ
+     * @param {Array} labels - ラベル配列
+     * @param {Object} config - 設定
+     */
+    renderInlineLabels(labelGroup, labels, config) {
+        const labelTexts = labelGroup.selectAll('.inline-label')
+            .data(labels)
+            .enter()
+            .append('text')
+            .attr('class', 'inline-label')
+            .attr('x', d => d.x)
+            .attr('y', d => d.y)
+            .attr('dy', '0.35em')
+            .attr('font-size', config.fontSize)
+            .attr('font-family', config.fontFamily)
+            .attr('font-weight', 'bold')
+            .attr('fill', d => d.color)
+            .text(d => d.text)
+            .style('pointer-events', 'none');
+
+        // ラベルの背景を追加（可読性向上）
+        labelTexts.each(function(d) {
+            const textElement = d3.select(this);
+            let bbox;
+            
+            try {
+                bbox = this.getBBox();
+            } catch (error) {
+                // getBBoxが失敗した場合のフォールバック
+                bbox = {
+                    x: d.x - d.width / 2,
+                    y: d.y - d.height / 2,
+                    width: d.width,
+                    height: d.height
+                };
+            }
+
+            labelGroup.insert('rect', '.inline-label')
+                .attr('x', bbox.x - 2)
+                .attr('y', bbox.y - 2)
+                .attr('width', bbox.width + 4)
+                .attr('height', bbox.height + 4)
+                .attr('fill', 'rgba(255, 255, 255, 0.9)')
+                .attr('stroke', d.color)
+                .attr('stroke-width', 0.5)
+                .attr('rx', 2)
+                .style('pointer-events', 'none');
+        });
+
+        // ツールチップを追加（省略されたテキストの場合）
+        labelTexts.filter(d => d.text !== d.originalName)
+            .append('title')
+            .text(d => d.originalName);
     }
 
     /**
@@ -1527,6 +1958,51 @@ class LineChartRenderer extends BaseManager {
                 self.animationTimers.push(pointTimer);
             });
         });
+    }
+
+    /**
+     * 地域別カラースキームを使用した色スケールを作成
+     * @param {Array} series - 系列データ
+     * @param {Object} config - 設定オブジェクト
+     * @returns {Function} D3カラースケール
+     */
+    createColorScale(series, config) {
+        console.log('LineChartRenderer: Creating color scale for series', series.map(s => s.name));
+        console.log('LineChartRenderer: Config:', config);
+        console.log('LineChartRenderer: ColorScheme available:', !!window.ColorScheme);
+        console.log('LineChartRenderer: colorScheme instance available:', !!window.colorScheme);
+        
+        if (config.colors && config.colors.length > 0 && config.multiSeries === false) {
+            // 単一系列の明示色
+            console.log('LineChartRenderer: Using explicit config colors for single series', config.colors);
+            return d3.scaleOrdinal(config.colors).domain(series.map(d => d.name));
+        } else if (window.ColorScheme && config.useUnifiedColors !== false) {
+            // 統一カラースキーム：地域名→色の直接マッピング
+            console.log('LineChartRenderer: Using unified color scheme for series', series.map(s => s.name));
+            
+            // ColorSchemeインスタンスを取得または作成
+            let colorScheme = window.colorScheme;
+            if (!colorScheme) {
+                console.log('LineChartRenderer: Creating new ColorScheme instance');
+                colorScheme = new ColorScheme();
+                window.colorScheme = colorScheme;
+            }
+            
+            const regionColors = series.map(s => {
+                const color = colorScheme.getRegionColor(s.name);
+                console.log(`LineChartRenderer: ${s.name} -> ${color}`);
+                return color;
+            });
+            return d3.scaleOrdinal()
+                .domain(series.map(s => s.name))
+                .range(regionColors);
+        } else {
+            // フォールバック
+            const colors = config.colors || window.AppConstants?.APP_COLORS?.PRIMARY_PALETTE || d3.schemeCategory10;
+            console.log('LineChartRenderer: Using fallback colors', colors);
+            console.log('LineChartRenderer: Reason for fallback - ColorScheme available:', !!window.ColorScheme, 'useUnifiedColors:', config.useUnifiedColors);
+            return d3.scaleOrdinal(colors).domain(series.map(d => d.name));
+        }
     }
 
     /**

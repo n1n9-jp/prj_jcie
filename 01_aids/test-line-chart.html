@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="assets/js/utils/app-constants.js"></script>
+    <script src="assets/js/utils/base-manager.js"></script>
+    <script src="assets/js/utils/color-scheme.js"></script>
+    <script src="assets/js/line-chart-renderer.js"></script>
+</head>
+<body>
+    <h1>折れ線グラフ直接テスト</h1>
+    <div id="chart"></div>
+    
+    <script>
+        async function testLineChart() {
+            // ColorScheme初期化
+            window.colorScheme = new ColorScheme();
+            
+            // 実際のCSVデータを読み込み
+            const data = await d3.csv('data/trend_new_infections_normalized.csv');
+            console.log('データ読み込み完了:', data.length, 'レコード');
+            console.log('最初の5レコード:', data.slice(0, 5));
+            
+            // 系列名を確認
+            const seriesNames = [...new Set(data.map(d => d.series))];
+            console.log('系列名:', seriesNames);
+            
+            // 各系列の色を確認
+            seriesNames.forEach(series => {
+                const color = window.colorScheme.getRegionColor(series);
+                console.log(`${series} -> ${color}`);
+                document.body.innerHTML += `<p>${series}: <span style="color:${color}">■</span> ${color}</p>`;
+            });
+            
+            // LineChartRendererで色スケールテスト
+            const renderer = new LineChartRenderer('#chart');
+            const seriesData = seriesNames.map(name => ({ name }));
+            const config = { multiSeries: true };
+            
+            console.log('=== createColorScale テスト ===');
+            const colorScale = renderer.createColorScale(seriesData, config);
+            
+            seriesNames.forEach(series => {
+                const scaledColor = colorScale(series);
+                console.log(`D3 ColorScale: ${series} -> ${scaledColor}`);
+                document.body.innerHTML += `<p>D3: ${series}: <span style="color:${scaledColor}">■</span> ${scaledColor}</p>`;
+            });
+        }
+        
+        // テスト実行
+        setTimeout(testLineChart, 500);
+    </script>
+</body>
+</html>
