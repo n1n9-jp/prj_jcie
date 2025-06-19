@@ -1493,7 +1493,7 @@ class MapManager {
                 .attr('orient', 'auto')
                 .append('path')
                 .attr('d', 'M0,-5L10,0L0,5')
-                .attr('fill', '#ef4444')
+                .attr('fill', '#999999')
                 .attr('stroke', 'none');
         }
 
@@ -1523,7 +1523,7 @@ class MapManager {
                 .attr('class', `spreading-flow ${flow.id}`)
                 .attr('d', pathData)
                 .attr('fill', 'none')
-                .attr('stroke', '#ef4444')
+                .attr('stroke', '#999999')
                 .attr('stroke-width', 3)
                 .attr('stroke-dasharray', '5,5')
                 .style('opacity', 0);
