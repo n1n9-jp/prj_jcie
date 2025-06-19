@@ -453,7 +453,7 @@ class PositionManager {
                 horizontal: 'center',
                 vertical: 'center',
                 width: 'auto',
-                maxWidth: '500px',
+                maxWidth: 'none',
                 padding: '2rem'
             }
         };
@@ -488,7 +488,7 @@ class PositionManager {
             horizontal = 'center',
             vertical = 'center',
             width = 'auto',
-            maxWidth = '500px',
+            maxWidth = 'none',
             padding = '2rem',
             margin = null,
             textAlign = 'left'  // 矩形内のテキスト揃え（矩形位置とは独立）
