@@ -6,6 +6,83 @@
 - 作業者の許可なく、コンテンツ内容を書き換えてはいけない。
 - 作業者の許可なく、git commitやgit pushした内容を取り消してはいけない。
 
+## 【重要】Step管理における注意事項
+
+### Step増減時の必須確認事項
+**Step の追加・削除・番号変更を行う際は、以下を必ず同時に確認・修正すること：**
+
+1. **config.json の steps 配列**
+   - 配列のインデックス（0ベース）と HTML の data-step 属性の対応関係
+   - 削除されたstepのインデックスによる後続stepへの影響
+   - 各step設定の整合性確認
+
+2. **index.html の data-step 属性**
+   - `<div class="step" data-step="N">` の連番確認
+   - 欠番や重複がないことの確認
+   - 特にフッター表示step（通常は最終step）の番号
+
+3. **JavaScript コードでの step 参照**
+   - `document.querySelector('[data-step="N"]')` での参照箇所
+   - 特に `renderFooter()` 関数内のフッター挿入先指定
+   - 都市ステップ生成における開始step番号
+   - step範囲を指定している処理
+
+### 具体的なチェックポイント
+
+#### config.json 確認事項
+- steps配列の要素数とHTMLのstep要素数が一致
+- 各stepのid属性が正しい形式（"step0", "step1", ...）
+- 最終stepにfooter設定がある場合、対応するHTMLのdata-step値
+
+#### index.html 確認事項  
+- data-step属性が0から連番で設定されている
+- 欠番（例：step5が削除されて step4 → step6）がない
+- 重複番号がない
+- フッタ表示用のstepが正しく設定されている
+
+#### JavaScript コード確認事項
+- `main.js` の `renderFooter()` 関数：
+  ```javascript
+  const stepElement = document.querySelector('[data-step="24"]');
+  ```
+  この「24」が実際の最終step番号と一致していること
+
+- 都市ステップ生成における開始番号：
+  ```javascript
+  // 都市ステップは動的に生成されます（step10-16）
+  ```
+  コメントと実際の生成範囲が一致していること
+
+### Step削除時の手順
+1. **config.json から該当stepを削除**
+2. **index.html から該当のstep要素を削除**  
+3. **後続stepの番号を詰める（config.json の id と index.html の data-step 両方）**
+4. **JavaScript コード内のstep参照を更新**
+5. **動作確認（特にフッター表示とスクロール遷移）**
+
+### Step追加時の手順
+1. **追加位置を決定**
+2. **config.json に新step設定を挿入**
+3. **index.html に新step要素を挿入**
+4. **後続stepの番号を調整（config.json の id と index.html の data-step 両方）**
+5. **JavaScript コード内のstep参照を更新**
+6. **動作確認**
+
+### 過去の問題事例
+- step8, 9削除時に後続stepの番号調整が不完全
+- フッター表示step番号の更新漏れ
+- HTMLとJSONの同期漏れによるインデックス不整合
+- 都市ステップ範囲の不整合
+
+### デバッグ方法
+step関連の問題が発生した場合：
+1. ブラウザの開発者ツールでHTMLのdata-step属性を確認
+2. config.jsonのsteps配列の要素数と各stepのidを確認  
+3. JavaScript コンソールでstep参照エラーがないか確認
+4. scrollama.jsのステップ検出が正常に動作しているか確認
+
+**この注意事項を必ず作業前に確認し、HTML・JSON・JavaScriptの3ファイルを同期して修正すること。**
+
 ## 概要
 スクロールに応じてテキスト、チャート、地図が連動して表示・変化するWebコンテンツを作成する。汎用的な実装とし、テーマ特有の機能は含まない。
 
