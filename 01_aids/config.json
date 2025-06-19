@@ -6,8 +6,8 @@
         "content": "エイズ対策の物語",
         "visible": true,
         "position": {
-          "width": "30%",
-          "horizontal": "right",
+          "width": "80%",
+          "horizontal": "center",
           "vertical": "center"
         }
       },
