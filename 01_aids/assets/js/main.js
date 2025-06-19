@@ -322,6 +322,11 @@ class ScrollytellingApp {
             pubsub.publish(EVENTS.IMAGE_UPDATE, stepConfig.image);
         }
 
+        // フッター更新
+        if (stepConfig.footer) {
+            this.renderFooter(stepConfig.footer);
+        }
+
         // コンテンツポジション設定を適用
         this.applyStepPositioning(stepConfig, index);
         
@@ -442,6 +447,74 @@ class ScrollytellingApp {
                 errorDiv.parentNode.removeChild(errorDiv);
             }
         }, 5000);
+    }
+
+    /**
+     * フッターを描画
+     * @param {Object} footerConfig - フッター設定
+     */
+    renderFooter(footerConfig) {
+        if (!footerConfig.visible) {
+            return;
+        }
+
+        const stepElement = document.querySelector('[data-step="25"]');
+        if (!stepElement) {
+            console.warn('Footer step element not found');
+            return;
+        }
+
+        // 既存のフッター要素を削除
+        const existingFooter = stepElement.querySelector('.site-footer');
+        if (existingFooter) {
+            existingFooter.remove();
+        }
+
+        // フッター要素を作成
+        const footer = document.createElement('footer');
+        footer.className = 'site-footer';
+        
+        footer.innerHTML = `
+            <div class="footer-container">
+                <div class="footer-content">
+                    <div class="footer-section">
+                        <div class="footer-logo">
+                            <img src="assets/images/jcie_logo_white.png" alt="公益財団法人 日本国際交流センター">
+                        </div>
+                        <p class="footer-tagline">世界と日本をつなぐ民間外交のフロントランナー</p>
+                    </div>
+
+                    <div class="footer-section">
+                        <div class="footer-address">
+                            〒107-0052 東京都港区赤坂1丁目1番12号 明産溜池ビル 7F
+                        </div>
+                        <div class="footer-contact">
+                            <div class="contact-item">
+                                <span>TEL</span>03-6277-7811
+                            </div>
+                            <div class="contact-item">
+                                <span>FAX</span>03-6277-6712
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="footer-section">
+                        <ul class="footer-links">
+                            <li><a href="https://jcie.or.jp/inquiry.html">お問い合わせ</a></li>
+                            <li><a href="https://jcie.or.jp/aboutus/overview.html#link02">アクセス</a></li>
+                            <li><a href="https://jcie.or.jp/privacy.html">個人情報保護方針</a></li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="footer-copyright">
+                    © 2024 Japan Center for International Exchange. All rights reserved.
+                </div>
+            </div>
+        `;
+
+        stepElement.appendChild(footer);
+        console.log('Footer rendered successfully');
     }
 
     /**

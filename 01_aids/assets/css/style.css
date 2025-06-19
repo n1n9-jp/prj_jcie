@@ -912,3 +912,131 @@ html {
 .step.text-hidden {
     /* 必要に応じて追加のスタイル調整 */
 }
+
+/* フッタースタイル */
+.site-footer {
+    background-color: rgb(118, 80, 127);
+    color: #ffffff;
+    padding: 3rem 0 2rem 0;
+    margin-top: 0;
+    min-height: 100vh;
+    width: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    width: 100%;
+}
+
+.footer-content {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 1.5rem 4rem;
+    align-items: start;
+}
+
+.footer-section h3 {
+    font-family: var(--font-family-serif);
+    font-size: 1.25rem;
+    font-weight: var(--font-weight-bold);
+    margin: 0 0 1rem 0;
+    color: #ffffff;
+}
+
+.footer-logo {
+    margin-bottom: 1rem;
+}
+
+.footer-logo img {
+    height: auto;
+    max-width: 200px;
+    filter: brightness(0) invert(1);
+}
+
+.footer-tagline {
+    font-size: 0.875rem;
+    color: #d1d5db;
+    margin: 0.5rem 0 0 0;
+    font-style: italic;
+}
+
+.footer-address {
+    font-size: 0.875rem;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+    color: #e5e7eb;
+    white-space: nowrap;
+}
+
+.footer-contact {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.contact-item {
+    font-size: 0.875rem;
+    color: #e5e7eb;
+    white-space: nowrap;
+}
+
+.contact-item span {
+    font-weight: var(--font-weight-medium);
+    color: #ffffff;
+    margin-right: 0.25rem;
+}
+
+.footer-links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.footer-links li {
+    margin-bottom: 0.5rem;
+}
+
+.footer-links a {
+    color: #e5e7eb;
+    text-decoration: none;
+    font-size: 0.875rem;
+    transition: color 0.2s ease;
+}
+
+.footer-links a:hover {
+    color: #ffffff;
+}
+
+.footer-copyright {
+    border-top: 1px solid #374151;
+    margin-top: 2rem;
+    padding-top: 1rem;
+    text-align: center;
+    font-size: 0.75rem;
+    color: #9ca3af;
+}
+
+/* レスポンシブデザイン - フッター */
+@media (max-width: 768px) {
+    .footer-content {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .footer-contact {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .footer-container {
+        padding: 0 1rem;
+    }
+    
+    .site-footer {
+        padding: 2rem 0 1.5rem 0;
+    }
+}
