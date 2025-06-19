@@ -91,6 +91,7 @@ class MapManager {
                 return;
             }
             
+            
             if (this.geoData) {
                 // 地図が既に描画されているかチェック
                 if (!this.svg || this.svg.selectAll('.map-country').empty()) {
@@ -1098,14 +1099,17 @@ class MapManager {
             this.visibleCities = [];
             this.singleCityMode = true;
             
-            // 初回の場合は地図を初期化、2回目以降は平行移動
-            if (!this.mapInitialized || !this.svg) {
+            // 既存の地図がある場合（world-overviewなどから遷移）は、スムーズにアニメーション
+            if (this.svg && this.projection && this.geoData) {
+                console.log('MapManager: Animating from existing map to city:', targetCity.name);
+                // 既存の地図を使ってスムーズにトランジション
+                this.animateToCity(targetCity);
+                this.mapInitialized = true;
+            } else {
+                // 初回の場合のみ地図を初期化
                 console.log('MapManager: Initializing single city map...');
                 this.initializeSingleCityMap(targetCity);
                 this.mapInitialized = true;
-            } else {
-                console.log('MapManager: Animating to new city:', targetCity.name);
-                this.animateToCity(targetCity);
             }
             
             this.currentCity = targetCity;
@@ -1202,9 +1206,11 @@ class MapManager {
      * @param {Object} targetCity - 移動先の都市データ
      */
     animateToCity(targetCity) {
-        if (!this.projection || !this.svg || !this.currentCity) return;
+        if (!this.projection || !this.svg) return;
         
-        console.log(`Animating from ${this.currentCity.name} to ${targetCity.name}`);
+        // currentCityがない場合（world-overviewからの遷移）でも動作するように
+        const fromName = this.currentCity ? this.currentCity.name : 'world view';
+        console.log(`Animating from ${fromName} to ${targetCity.name}`);
         
         // 現在の投影設定を取得
         const currentCenter = this.projection.center();
@@ -1221,10 +1227,16 @@ class MapManager {
         
         // アニメーション完了後に色を適用するため、ここでは削除
         
+        // world-overviewからの遷移の場合は長めのトランジション時間を設定
+        const isFromWorldView = !this.currentCity;
+        const transitionDuration = isFromWorldView 
+            ? (window.AppDefaults?.animation?.chartTransitionDuration || 1000) * 2.5
+            : (window.AppDefaults?.animation?.chartTransitionDuration || 1000) * 1.5;
+        
         // 地図のアニメーション
         this.svg
             .transition()
-            .duration((window.AppDefaults?.animation?.chartTransitionDuration || 1000) * 1.5)
+            .duration(transitionDuration)
             .ease(d3.easeCubicInOut)
             .tween('projection', () => {
                 const interpolateCenter = d3.interpolate(currentCenter, targetCenter);
@@ -1538,6 +1550,7 @@ class MapManager {
 
         console.log('MapManager: Spreading arrows animation started');
     }
+
 
     /**
      * 破棄処理（BaseManagerをオーバーライド）
