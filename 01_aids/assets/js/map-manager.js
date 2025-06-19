@@ -40,6 +40,23 @@ class MapManager {
     }
 
     /**
+     * 国名を日本語に変換
+     * @param {string} countryEn - 英語の国名
+     * @returns {string} 日本語の国名
+     */
+    getCountryNameJapanese(countryEn) {
+        const countryMapping = {
+            'Nigeria': 'ナイジェリア',
+            'Malawi': 'マラウイ',
+            'Kenya': 'ケニア',
+            'Belize': 'ベリーズ',
+            'United States of America': 'アメリカ',
+            'Philippines': 'フィリピン'
+        };
+        return countryMapping[countryEn] || countryEn;
+    }
+
+    /**
      * 地図を更新する
      * @param {Object} mapData - 地図データとオプション
      */
@@ -430,7 +447,7 @@ class MapManager {
                 .attr('font-size', '12px')
                 .attr('fill', '#1f2937')
                 .attr('font-weight', 'bold')
-                .text(d => d.name)
+                .text(d => this.getCountryNameJapanese(d.country))
                 .style('opacity', 0)
                 .transition()
                 .duration(window.AppDefaults?.animation?.shortDuration || 500)
@@ -556,7 +573,7 @@ class MapManager {
                 .attr('font-size', '12px')
                 .attr('fill', '#1f2937')
                 .attr('font-weight', 'bold')
-                .text(d => d.name)
+                .text(d => this.getCountryNameJapanese(d.country))
                 .style('opacity', 0)
                 .transition()
                 .duration(window.AppDefaults?.animation?.defaultDuration || 300)
@@ -834,7 +851,7 @@ class MapManager {
                 .attr('font-size', '12px')
                 .attr('fill', '#1f2937')
                 .attr('font-weight', 'bold')
-                .text(d => d.name)
+                .text(d => this.getCountryNameJapanese(d.country))
                 .style('opacity', 0)
                 .transition()
                 .duration(window.AppDefaults?.animation?.shortDuration || 500)
@@ -1024,7 +1041,7 @@ class MapManager {
             .attr('fill', '#1f2937')
             .attr('font-weight', 'bold')
             .style('opacity', 0)
-            .text(d => d.name);
+            .text(d => this.getCountryNameJapanese(d.country));
         
         enteringLabels
             .transition()
@@ -1321,7 +1338,7 @@ class MapManager {
             .attr('font-weight', 'bold')
             .attr('fill', '#1f2937')
             .style('opacity', 0)
-            .text(city.name)
+            .text(this.getCountryNameJapanese(city.country))
             .transition()
             .duration((window.AppDefaults?.animation?.shortDuration || 500) * 1.2)
             .delay(400)

@@ -147,8 +147,8 @@ class ScrollytellingApp {
                         </p>
                         <div class="mt-4 pt-4 border-t border-gray-200">
                             <p class="text-sm text-gray-600">
-                                <span class="font-semibold">${city.name}</span> 
-                                (${city.nameEn}), ${city.country}
+                                <span class="font-semibold">${this.getCountryNameJapanese(city.country)}</span> 
+                                (${city.country})
                             </p>
                         </div>
                         ${city.data.url ? `
@@ -167,6 +167,23 @@ class ScrollytellingApp {
         });
         
         console.log(`Generated ${citiesData.cities.length} city steps`);
+    }
+
+    /**
+     * 国名を日本語に変換
+     * @param {string} countryEn - 英語の国名
+     * @returns {string} 日本語の国名
+     */
+    getCountryNameJapanese(countryEn) {
+        const countryMapping = {
+            'Nigeria': 'ナイジェリア',
+            'Malawi': 'マラウイ',
+            'Kenya': 'ケニア',
+            'Belize': 'ベリーズ',
+            'United States of America': 'アメリカ',
+            'Philippines': 'フィリピン'
+        };
+        return countryMapping[countryEn] || countryEn;
     }
 
     /**
