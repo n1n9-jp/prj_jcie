@@ -722,25 +722,7 @@
         }
       },
       "chart": {
-        "type": "line",
-        "dataFile": "data/trend_エイズ対策の資金不足.csv",
-        "visible": true,
-        "position": {
-          "horizontal": "left",
-          "vertical": "center",
-          "width": "70%",
-          "height": "100%"
-        },
-        "config": {
-          "widthPercent": 70,
-          "heightPercent": 100,
-          "xField": "year",
-          "yField": "value",
-          "seriesField": "series",
-          "multiSeries": true,
-          "title": "エイズ対策資金の必要額と実績の推移",
-          "dataSource": "Global Fund / Kaiser Family Foundation"
-        }
+        "visible": false
       },
       "map": {
         "visible": false
