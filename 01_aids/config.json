@@ -18,7 +18,7 @@
         "visible": false
       },
       "image": {
-        "src": "https://placehold.co/800x600/1f2937/ffffff?text=AIDS+Story",
+        "src": "https://placehold.co/800x600/10b981/ffffff?text=Cover",
         "alt": "エイズ対策の物語の導入画像",
         "visible": true,
         "position": {
@@ -50,7 +50,19 @@
         "visible": false
       },
       "image": {
-        "visible": false
+        "src": "assets/images/aids-3.jpeg",
+        "alt": "エイズ対策の物語の導入画像",
+        "visible": true,
+        "position": {
+          "horizontal": "center",
+          "vertical": "center",
+          "width": "100%",
+          "height": "100%"
+        },
+        "config": {
+          "opacity": 0.9,
+          "objectFit": "cover"
+        }
       }
     },
     {
@@ -676,7 +688,7 @@
           "multiSeries": false,
           "seriesName": "PrEP利用者数",
           "colors": ["#3b82f6"],
-          "title": "PrEP（曝露前予防投与）利用者数の推移"
+          "title": "PrEP（曝露前予防投与）利用者数の推移",
           "dataSource": "Global PrEP Tracker / UNAIDS"
         }
       },
@@ -717,7 +729,7 @@
           "yearRange": [2000, 2025],
           "seriesField": "series",
           "multiSeries": true,
-          "title": "エイズ対策資金の推移（資金源別）"
+          "title": "エイズ対策資金の推移（資金源別）",
           "dataSource": "Global Fund / Kaiser Family Foundation"
         }
       },
@@ -784,7 +796,7 @@
           "yField": "value",
           "seriesField": "series",
           "multiSeries": true,
-          "title": "エイズ対策資金の必要額と実績の推移"
+          "title": "エイズ対策資金の必要額と実績の推移",
           "dataSource": "Global Fund / Kaiser Family Foundation"
         }
       },
