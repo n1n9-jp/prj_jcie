@@ -475,14 +475,21 @@ class ScrollytellingApp {
             return;
         }
 
-        const stepElement = document.querySelector('[data-step="25"]');
+        const stepElement = document.querySelector('[data-step="24"]');
         if (!stepElement) {
             console.warn('Footer step element not found');
             return;
         }
 
+        // step24の子要素（コンテナdiv）を取得
+        const containerDiv = stepElement.querySelector('div');
+        if (!containerDiv) {
+            console.warn('Footer container div not found');
+            return;
+        }
+
         // 既存のフッター要素を削除
-        const existingFooter = stepElement.querySelector('.site-footer');
+        const existingFooter = containerDiv.querySelector('.site-footer');
         if (existingFooter) {
             existingFooter.remove();
         }
@@ -526,7 +533,7 @@ class ScrollytellingApp {
             </div>
         `;
 
-        stepElement.appendChild(footer);
+        containerDiv.appendChild(footer);
         console.log('Footer rendered successfully');
     }
 
