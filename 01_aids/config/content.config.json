@@ -237,7 +237,7 @@
             {
               "type": "verticalLine",
               "year": 1995,
-              "label": "1995年：「多剤併用療法」（HAART）が導入",
+              "label": "1990年代後半：「多剤併用療法」（HAART）が導入",
               "position": "top-right"
             }
           ]
@@ -403,6 +403,12 @@
               "type": "horizontalLine",
               "value": 35.2,
               "label": "最も感染率の高いサハラ以南アフリカ地域での母子間感染率",
+              "position": "right"
+            },
+            {
+              "type": "verticalLine",
+              "year": 1995,
+              "label": "1995年",
               "position": "right"
             }
           ]
