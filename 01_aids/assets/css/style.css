@@ -1167,3 +1167,111 @@ html {
         padding: 2rem 0 1.5rem 0;
     }
 }
+
+/* ====================================
+   インライン（線末）ラベルスタイル
+   ==================================== */
+
+/* インラインラベルグループ */
+.inline-labels {
+    pointer-events: none;
+}
+
+/* ラベルテキスト */
+.inline-label {
+    font-family: var(--font-family-serif) !important;
+    font-weight: var(--font-weight-bold) !important;
+    font-size: var(--font-size-sm) !important;
+    text-shadow: 0 0 3px rgba(255, 255, 255, 0.8);
+    pointer-events: none;
+    transition: opacity var(--animation-short) var(--easing-ease);
+}
+
+/* 引き出し線 */
+.leader-line {
+    opacity: 0.7;
+    stroke-dasharray: 2,2;
+    pointer-events: none;
+    transition: opacity var(--animation-short) var(--easing-ease);
+}
+
+/* ラベル背景 */
+.inline-labels rect {
+    opacity: 0.9;
+    transition: opacity var(--animation-short) var(--easing-ease);
+    rx: 3;
+    ry: 3;
+}
+
+/* アニメーション状態 */
+.inline-label.entering {
+    opacity: 0;
+    transform: translateX(-10px);
+}
+
+.inline-label.entered {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.inline-label.exiting {
+    opacity: 0;
+    transform: translateX(10px);
+}
+
+/* ホバー状態（デスクトップ用） */
+@media (hover: hover) {
+    .inline-labels:hover .leader-line {
+        opacity: 1;
+    }
+    
+    .inline-labels:hover rect {
+        opacity: 1;
+    }
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+    .inline-label {
+        font-size: var(--font-size-xs) !important;
+    }
+    
+    .inline-labels rect {
+        opacity: 0.95; /* モバイルでは背景をより強調 */
+    }
+    
+    .leader-line {
+        stroke-width: 1.5;
+    }
+}
+
+@media (max-width: 480px) {
+    .inline-label {
+        font-size: 10px !important;
+    }
+    
+    .leader-line {
+        display: none; /* 非常に小さい画面では引き出し線を非表示 */
+    }
+}
+
+/* ダークモード対応（将来的な拡張用） */
+@media (prefers-color-scheme: dark) {
+    .inline-label {
+        text-shadow: 0 0 3px rgba(0, 0, 0, 0.8);
+    }
+    
+    .inline-labels rect {
+        fill: rgba(0, 0, 0, 0.9);
+        stroke: var(--color-primary);
+    }
+}
+
+/* アクセシビリティ対応 */
+@media (prefers-reduced-motion: reduce) {
+    .inline-label,
+    .leader-line,
+    .inline-labels rect {
+        transition: none !important;
+    }
+}

@@ -1199,21 +1199,22 @@ class LineChartRenderer extends BaseManager {
         
         const { xScale, yScale, width, height, isYearData, xField, yField } = context;
         
-        // インライン設定のデフォルト値（重複回避を強化）
+        // インライン設定のデフォルト値（D3-Labelerに最適化）
         const inlineConfig = {
             fontSize: '12px',
             fontFamily: 'var(--font-family-serif), "Shippori Mincho", serif',
-            offsetX: 20, // オフセットをさらに増加
-            offsetY: 4,
-            minDistance: 35, // ラベル間最小距離をさらに拡大
+            offsetX: 15, // 適度なオフセット
+            offsetY: 0, // D3-Labelerが垂直位置を制御するため0に
+            minDistance: 20, // D3-Labelerの重複検出で十分
             useLabeler: true,
             enableLeaderLines: true,
-            leaderLineLength: 40, // 引き出し線をさらに長く
-            maxLabelWidth: width * 0.3, // 最大ラベル幅をさらに拡大
+            leaderLineLength: 30, // 適度な長さ
+            maxLabelWidth: width * 0.3, // 最大ラベル幅
             responsiveThreshold: 600, // この幅以下では従来の凡例にフォールバック
-            verticalSpacing: 30, // 垂直方向の最小間隔を拡大
+            verticalSpacing: 25, // 垂直方向の最小間隔（前処理用）
             allowExtendedPlacement: true, // チャート外への配置を許可
-            maxExtensionWidth: 120 // チャート右端からの最大拡張幅
+            maxExtensionWidth: 100, // チャート右端からの最大拡張幅
+            labelPadding: 3 // ラベル周りの余白
         };
 
         // 小画面の場合は従来の凡例を使用
@@ -1273,26 +1274,23 @@ class LineChartRenderer extends BaseManager {
             const baseX = point.x + inlineConfig.offsetX;
             const adjustedX = Math.min(baseX, width + (inlineConfig.maxExtensionWidth || 100) - labelWidth - 5);
             
+            // D3-Labelerはy座標をラベルの下端として扱うことに注意
             return {
                 x: adjustedX,
-                y: point.y + inlineConfig.offsetY,
+                y: point.y + labelHeight / 2, // ラベルの下端位置に調整
                 width: labelWidth,
                 height: labelHeight,
                 text: labelText,
                 color: point.color,
                 anchorX: point.x,
                 anchorY: point.y,
-                originalName: point.name
+                originalName: point.name,
+                centerY: point.y // 元の中心Y座標を保持
             };
         });
 
-        // D3-Labelerを使用して重複を回避
-        if (inlineConfig.useLabeler && window.d3 && window.d3.labeler) {
-            this.optimizeLabelPositions(labels, width, height, inlineConfig);
-        } else {
-            // D3-Labelerが利用できない場合は簡易的な重複回避
-            this.applySimpleCollisionAvoidance(labels, inlineConfig);
-        }
+        // シンプルで確実な重複回避を使用
+        this.applyDeterministicLabelPlacement(labels, width, height, inlineConfig);
 
         // ラベルグループを作成
         const labelGroup = g.append('g')
@@ -1365,36 +1363,58 @@ class LineChartRenderer extends BaseManager {
      */
     optimizeLabelPositions(labels, width, height, config) {
         try {
+            // D3-Labelerの存在確認
+            if (!window.d3 || !window.d3.labeler) {
+                console.error('LineChartRenderer: D3-Labeler is not loaded!');
+                this.applySimpleCollisionAvoidance(labels, config);
+                return;
+            }
+
             // アンカーポイント（線の終点）
             const anchors = labels.map(label => ({
                 x: label.anchorX,
                 y: label.anchorY,
-                r: 8 // アンカーポイントの半径をさらに拡大
+                r: 5 // 適度な半径
             }));
 
             // ラベルの初期配置を改善：重複を事前に避ける
             this.preProcessLabelPositions(labels, config);
 
-            // D3-Labelerを実行（より強力な設定）
+            // デバッグ：初期位置を記録
+            console.log('LineChartRenderer: Before D3-Labeler optimization:');
+            const beforePositions = labels.map(label => ({
+                text: label.text,
+                x: label.x,
+                y: label.y
+            }));
+            beforePositions.forEach((pos, i) => {
+                console.log(`  Label ${i} "${pos.text}": x=${Math.round(pos.x)}, y=${Math.round(pos.y)}`);
+            });
+
+            // D3-Labelerを実行（座標系を正しく設定）
             const labeler = d3.labeler()
                 .label(labels)
                 .anchor(anchors)
-                .width(width + 150) // チャート幅を右にさらに拡張
-                .height(height + 100) // 高さも拡張して配置余地を増やす
-                .start(1000); // 最適化のイテレーション数を大幅増加
+                .width(width + 150) // チャート幅を右に拡張
+                .height(height + 50) // 高さも少し拡張
+                .start(1000); // イテレーション数
 
-            console.log('LineChartRenderer: D3-Labeler optimization completed with', labels.length, 'labels');
+            console.log('LineChartRenderer: D3-Labeler executed');
+
+            // デバッグ：最適化後の位置を確認
+            console.log('LineChartRenderer: After D3-Labeler optimization:');
+            labels.forEach((label, i) => {
+                const before = beforePositions[i];
+                const moved = Math.abs(label.x - before.x) > 1 || Math.abs(label.y - before.y) > 1;
+                console.log(`  Label ${i} "${label.text}": x=${Math.round(label.x)}, y=${Math.round(label.y)} ${moved ? '(MOVED)' : '(NOT MOVED)'}`);
+            });
             
             // 後処理：チャート範囲外に出たラベルを調整
             this.postProcessLabelPositions(labels, width, height, config);
             
-            // 最適化後の位置情報をログ出力
-            labels.forEach((label, i) => {
-                console.log(`Label ${i}: ${label.text} at (${Math.round(label.x)}, ${Math.round(label.y)})`);
-            });
-            
         } catch (error) {
-            console.warn('LineChartRenderer: D3-Labeler optimization failed:', error);
+            console.error('LineChartRenderer: D3-Labeler optimization failed:', error);
+            console.error(error.stack);
             // フォールバックとして簡易重複回避を実行
             this.applySimpleCollisionAvoidance(labels, config);
         }
@@ -1406,25 +1426,18 @@ class LineChartRenderer extends BaseManager {
      * @param {Object} config - インライン設定
      */
     preProcessLabelPositions(labels, config) {
-        // Y座標でソート
-        const sortedLabels = [...labels].sort((a, b) => a.y - b.y);
+        // Y座標でソート（D3-Labelerのy座標は下端なので調整）
+        const sortedLabels = [...labels].sort((a, b) => (a.y - a.height) - (b.y - b.height));
         
-        // 重複している場合は垂直方向に散らす
-        for (let i = 1; i < sortedLabels.length; i++) {
-            const current = sortedLabels[i];
-            const previous = sortedLabels[i - 1];
+        // 初期配置を少し散らして、D3-Labelerの作業を助ける
+        sortedLabels.forEach((label, index) => {
+            // 軽微なランダム化で初期位置を微調整（D3-Labelerが最適化しやすくする）
+            label.x += (Math.random() - 0.5) * 10;
+            label.y += (Math.random() - 0.5) * 5;
             
-            const verticalDistance = Math.abs(current.y - previous.y);
-            if (verticalDistance < config.verticalSpacing) {
-                // 重複を避けるために位置を調整
-                const adjustment = config.verticalSpacing - verticalDistance;
-                if (current.y > previous.y) {
-                    current.y += adjustment;
-                } else {
-                    current.y -= adjustment;
-                }
-            }
-        }
+            // 中心座標を更新
+            label.centerY = label.y - label.height / 2;
+        });
     }
 
     /**
@@ -1465,7 +1478,95 @@ class LineChartRenderer extends BaseManager {
     }
 
     /**
-     * 簡易的な重複回避アルゴリズム（D3-Labelerが利用できない場合のフォールバック）
+     * 確実で理解しやすい重複回避アルゴリズム
+     * @param {Array} labels - ラベル配列
+     * @param {number} width - チャート幅
+     * @param {number} height - チャート高さ
+     * @param {Object} config - インライン設定
+     */
+    applyDeterministicLabelPlacement(labels, width, height, config) {
+        console.log('LineChartRenderer: Applying deterministic label placement for', labels.length, 'labels');
+        
+        // アンカーY座標でソート（上から下へ）
+        const sortedLabels = [...labels].sort((a, b) => a.anchorY - b.anchorY);
+        
+        // 利用可能なY座標範囲を計算
+        const minY = 20; // 上端マージン
+        const maxY = height - 20; // 下端マージン
+        const availableHeight = maxY - minY;
+        
+        // ラベル間の最小間隔
+        const minSpacing = 25;
+        const labelCount = sortedLabels.length;
+        
+        // 必要な総高さ
+        const totalLabelHeight = sortedLabels.reduce((sum, label) => sum + label.height, 0);
+        const totalSpacing = (labelCount - 1) * minSpacing;
+        const requiredHeight = totalLabelHeight + totalSpacing;
+        
+        console.log(`Available height: ${availableHeight}, Required height: ${requiredHeight}`);
+        
+        if (requiredHeight <= availableHeight) {
+            // 十分なスペースがある場合：等間隔で配置
+            this.distributeLabelsEvenly(sortedLabels, minY, maxY, minSpacing);
+        } else {
+            // スペースが不足している場合：圧縮配置
+            this.distributeLabelsCompressed(sortedLabels, minY, maxY);
+        }
+        
+        // X座標を調整（階段状配置で視覚的分離）
+        this.adjustXPositions(sortedLabels, width, config);
+        
+        console.log('LineChartRenderer: Label placement completed');
+        sortedLabels.forEach((label, i) => {
+            console.log(`  ${i}: "${label.text}" at (${Math.round(label.x)}, ${Math.round(label.y)})`);
+        });
+    }
+
+    /**
+     * ラベルを等間隔で配置
+     */
+    distributeLabelsEvenly(labels, minY, maxY, minSpacing) {
+        let currentY = minY;
+        
+        labels.forEach((label, index) => {
+            label.y = currentY + label.height / 2; // ラベル中心位置
+            currentY += label.height + minSpacing;
+        });
+    }
+
+    /**
+     * ラベルを圧縮して配置
+     */
+    distributeLabelsCompressed(labels, minY, maxY) {
+        const availableHeight = maxY - minY;
+        const totalLabelHeight = labels.reduce((sum, label) => sum + label.height, 0);
+        const spacingPerGap = Math.max(5, (availableHeight - totalLabelHeight) / (labels.length - 1));
+        
+        let currentY = minY;
+        labels.forEach((label, index) => {
+            label.y = currentY + label.height / 2; // ラベル中心位置
+            currentY += label.height + spacingPerGap;
+        });
+    }
+
+    /**
+     * X座標を階段状に調整
+     */
+    adjustXPositions(labels, width, config) {
+        const baseX = width * 0.85; // チャート右端から少し左
+        const maxExtension = config.maxExtensionWidth || 100;
+        const staggerStep = 15; // 階段の段差
+        
+        labels.forEach((label, index) => {
+            // 階段状に配置（3段階のパターンを繰り返し）
+            const staggerOffset = (index % 3) * staggerStep;
+            label.x = Math.min(baseX + staggerOffset, width + maxExtension - label.width - 10);
+        });
+    }
+
+    /**
+     * 簡易的な重複回避アルゴリズム（フォールバック）
      * @param {Array} labels - ラベル配列
      * @param {Object} config - インライン設定
      */
@@ -1500,11 +1601,25 @@ class LineChartRenderer extends BaseManager {
      * @returns {boolean} 重複しているかどうか
      */
     isLabelsOverlapping(label1, label2, minDistance) {
-        const dx = Math.abs(label1.x - label2.x);
-        const dy = Math.abs(label1.y - label2.y);
+        // ラベルの境界ボックスを計算（パディングを含む）
+        const padding = 5;
+        const box1 = {
+            left: label1.x - padding,
+            right: label1.x + label1.width + padding,
+            top: label1.y - label1.height / 2 - padding,
+            bottom: label1.y + label1.height / 2 + padding
+        };
         
-        const horizontalOverlap = dx < (label1.width + label2.width) / 2 + minDistance;
-        const verticalOverlap = dy < (label1.height + label2.height) / 2 + minDistance;
+        const box2 = {
+            left: label2.x - padding,
+            right: label2.x + label2.width + padding,
+            top: label2.y - label2.height / 2 - padding,
+            bottom: label2.y + label2.height / 2 + padding
+        };
+        
+        // より厳格な重複チェック
+        const horizontalOverlap = box1.right + minDistance > box2.left && box1.left < box2.right + minDistance;
+        const verticalOverlap = box1.bottom + minDistance > box2.top && box1.top < box2.bottom + minDistance;
         
         return horizontalOverlap && verticalOverlap;
     }
@@ -1551,6 +1666,7 @@ class LineChartRenderer extends BaseManager {
             .attr('x1', d => d.anchorX)
             .attr('y1', d => d.anchorY)
             .attr('x2', d => d.x)
+            // 新しいアルゴリズムではyは既にラベルの中心位置
             .attr('y2', d => d.y)
             .attr('stroke', d => d.color)
             .attr('stroke-width', 1)
@@ -1580,6 +1696,7 @@ class LineChartRenderer extends BaseManager {
             .append('text')
             .attr('class', 'inline-label')
             .attr('x', d => d.x)
+            // 新しいアルゴリズムではyは既にラベルの中心位置
             .attr('y', d => d.y)
             .attr('dy', '0.35em')
             .attr('font-size', config.fontSize)
