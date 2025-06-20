@@ -65,6 +65,16 @@ class ImageManager {
      */
     hide() {
         this.container.classed('visible', false);
+        
+        // step0の背景画像もクリア
+        const step0BgContainer = d3.select('#step0-bg-container');
+        if (!step0BgContainer.empty()) {
+            step0BgContainer.selectAll('img')
+                .transition()
+                .duration(300)
+                .style('opacity', 0)
+                .remove();
+        }
     }
 
     /**
@@ -79,10 +89,41 @@ class ImageManager {
             height = 'auto',
             position = 'center',
             opacity = 1,
-            objectFit = 'contain'
+            objectFit = 'contain',
+            specialMode = null
         } = config;
 
-        // 画像の設定
+        // step0の特別処理
+        if (specialMode === 'step0-background') {
+            const step0BgContainer = d3.select('#step0-bg-container');
+            if (!step0BgContainer.empty()) {
+                // 既存の画像を削除
+                step0BgContainer.selectAll('img').remove();
+                
+                // 新しい画像を作成
+                const bgImage = step0BgContainer.append('img')
+                    .attr('src', src)
+                    .attr('alt', alt)
+                    .style('position', 'absolute')
+                    .style('top', '0')
+                    .style('left', '0')
+                    .style('width', '100%')
+                    .style('height', '100%')
+                    .style('object-fit', 'cover')
+                    .style('opacity', 0);
+                
+                // フェードイン
+                bgImage.transition()
+                    .duration(500)
+                    .style('opacity', opacity);
+                
+                // 通常のimage-containerは非表示
+                this.container.classed('visible', false);
+                return;
+            }
+        }
+
+        // 通常の画像処理
         this.image
             .attr('src', src)
             .attr('alt', alt)

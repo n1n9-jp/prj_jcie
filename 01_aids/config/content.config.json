@@ -3,13 +3,8 @@
     {
       "id": "step0",
       "text": {
-        "content": "冒頭のダミーステップ",
-        "visible": true,
-        "position": {
-          "width": "30%",
-          "horizontal": "center",
-          "vertical": "center"
-        }
+        "content": "",
+        "visible": false
       },
       "chart": {
         "visible": false
@@ -19,7 +14,7 @@
       },
       "image": {
         "src": "assets/images/Firefly_A.jpg",
-        "alt": "冒頭のダミー画像",
+        "alt": "オープニング背景画像",
         "visible": true,
         "position": {
           "horizontal": "center",
@@ -28,8 +23,9 @@
           "height": "100%"
         },
         "config": {
-          "opacity": 0.8,
-          "objectFit": "cover"
+          "opacity": 1.0,
+          "objectFit": "cover",
+          "specialMode": "step0-background"
         }
       }
     },
