@@ -754,8 +754,9 @@
           "xField": "year",
           "yField": "value",
           "xAxisLabel": "年",
-          "yAxisLabel": "資金（十億）",
+          "yAxisLabel": "資金（十億ドル）",
           "yearRange": [2000, 2025],
+          "yRange": [0, 35000000000],
           "seriesField": "series",
           "multiSeries": true,
           "title": "エイズ対策資金の推移（資金源別）",
@@ -765,7 +766,15 @@
             "mode": "progressive",
             "duration": 3000,
             "stepDelay": 150
-          }
+          },
+          "annotations": [
+            {
+              "type": "horizontalLine",
+              "value": 29300000000,
+              "label": "エイズの終結に向けた軌道に乗せるために必要とされる資金",
+              "position": "top-left"
+            }
+          ]
         }
       },
       "map": {
