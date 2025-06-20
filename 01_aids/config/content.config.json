@@ -176,12 +176,20 @@
           "xField": "year",
           "yField": "value",
           "xAxisLabel": "年",
-          "yAxisLabel": "感染者数（百万人）",
+          "yAxisLabel": "感染者数（万人）",
           "seriesField": "series",
           "multiSeries": true,
           "title": "新規HIV感染者数の推移（1990-1998年）",
           "dataSource": "Our World in Data",
           "legendType": "inline",
+          "yAxisFormat": {
+            "type": "japanese",
+            "decimals": 0,
+            "units": {
+              "億": 100000000,
+              "万": 10000
+            }
+          },
           "filter": {
             "type": "range",
             "field": "year",
@@ -243,13 +251,21 @@
           "xField": "year",
           "yField": "value",
           "xAxisLabel": "年",
-          "yAxisLabel": "感染者数（百万人）",
+          "yAxisLabel": "感染者数（万人）",
           "yearRange": [1980, 2025],
           "seriesField": "series",
           "multiSeries": true,
           "title": "新規HIV感染者数の推移（全期間）",
           "dataSource": "Our World in Data",
           "legendType": "inline",
+          "yAxisFormat": {
+            "type": "japanese",
+            "decimals": 0,
+            "units": {
+              "億": 100000000,
+              "万": 10000
+            }
+          },
           "yRange": [0, 4000000],
           "animation": {
             "mode": "progressive",
@@ -307,13 +323,21 @@
           "xField": "year",
           "yField": "value",
           "xAxisLabel": "年",
-          "yAxisLabel": "死者数（百万人）",
+          "yAxisLabel": "死者数（万人）",
           "yearRange": [1998, 2022],
           "seriesField": "series",
           "multiSeries": true,
           "title": "エイズ関連死亡者数の推移",
           "dataSource": "Our World in Data",
           "legendType": "inline",
+          "yAxisFormat": {
+            "type": "japanese",
+            "decimals": 0,
+            "units": {
+              "億": 100000000,
+              "万": 10000
+            }
+          },
           "yRange": [0, 4000000],
           "animation": {
             "mode": "progressive",
@@ -649,11 +673,19 @@
               "heightPercent": 100,
               "xField": "year",
               "yField": "value",
+              "yAxisLabel": "新規感染者数（人）",
               "seriesField": "series",
               "dataSource": "UNAIDS epidemiological estimates, 2024",
               "yRange": [0, 500000],
               "multiSeries": true,
-              "legendType": "inline"
+              "legendType": "inline",
+              "yAxisFormat": {
+                "type": "japanese",
+                "decimals": 0,
+                "units": {
+                  "万": 10000
+                }
+              }
             }
           },
           {
@@ -666,11 +698,19 @@
               "heightPercent": 100,
               "xField": "year",
               "yField": "value",
+              "yAxisLabel": "新規感染者数（人）",
               "seriesField": "series",
               "dataSource": "UNAIDS epidemiological estimates, 2024",
               "yRange": [0, 500000],
               "multiSeries": true,
-              "legendType": "inline"
+              "legendType": "inline",
+              "yAxisFormat": {
+                "type": "japanese",
+                "decimals": 0,
+                "units": {
+                  "万": 10000
+                }
+              }
             }
           }
         ]
@@ -708,12 +748,20 @@
           "xField": "year",
           "yField": "value",
           "xAxisLabel": "年",
-          "yAxisLabel": "PrEP利用者数",
+          "yAxisLabel": "PrEP利用者数（万人）",
           "multiSeries": false,
           "seriesName": "PrEP利用者数",
           "colors": ["#3b82f6"],
           "title": "PrEP（曝露前予防投与）利用者数の推移",
           "dataSource": "UNAIDS",
+          "yAxisFormat": {
+            "type": "japanese",
+            "decimals": 0,
+            "units": {
+              "億": 100000000,
+              "万": 10000
+            }
+          },
           "animation": {
             "mode": "progressive",
             "duration": 2500,
@@ -754,7 +802,7 @@
           "xField": "year",
           "yField": "value",
           "xAxisLabel": "年",
-          "yAxisLabel": "資金（十億ドル）",
+          "yAxisLabel": "資金（億ドル）",
           "yearRange": [2000, 2025],
           "yRange": [0, 35000000000],
           "seriesField": "series",
@@ -762,6 +810,12 @@
           "title": "エイズ対策資金の推移（資金源別）",
           "dataSource": "Global Fund / Kaiser Family Foundation",
           "legendType": "inline",
+          "yAxisFormat": {
+            "type": "custom",
+            "format": ".0f",
+            "divisor": 100000000,
+            "suffix": "億ドル"
+          },
           "animation": {
             "mode": "progressive",
             "duration": 3000,

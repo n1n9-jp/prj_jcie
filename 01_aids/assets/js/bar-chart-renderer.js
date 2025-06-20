@@ -15,6 +15,72 @@ class BarChartRenderer extends BaseManager {
     }
 
     /**
+     * Y軸の値をフォーマットする
+     * @param {number} value - フォーマットする値
+     * @param {Object} formatConfig - フォーマット設定
+     * @returns {string} フォーマットされた文字列
+     */
+    formatYAxisValue(value, formatConfig) {
+        if (!formatConfig) {
+            // デフォルトのD3フォーマット
+            return d3.format('.2s')(value);
+        }
+
+        switch (formatConfig.type) {
+            case 'billion':
+                return (value / 1e9).toFixed(formatConfig.decimals || 1) + (formatConfig.suffix || '');
+            
+            case 'million':
+                return (value / 1e6).toFixed(formatConfig.decimals || 1) + (formatConfig.suffix || '');
+            
+            case 'thousand':
+                return (value / 1e3).toFixed(formatConfig.decimals || 1) + (formatConfig.suffix || '');
+            
+            case 'percentage':
+                return value.toFixed(formatConfig.decimals || 1) + '%';
+            
+            case 'japanese':
+                return this.formatJapaneseNumber(value, formatConfig);
+            
+            case 'custom':
+                let customValue = value;
+                if (formatConfig.divisor) {
+                    customValue = value / formatConfig.divisor;
+                }
+                const formatted = d3.format(formatConfig.format || '.2s')(customValue);
+                return (formatConfig.prefix || '') + formatted + (formatConfig.suffix || '');
+            
+            case 'fixed':
+                return value.toFixed(formatConfig.decimals || 0) + (formatConfig.suffix || '');
+            
+            default:
+                return d3.format('.2s')(value);
+        }
+    }
+
+    /**
+     * 日本語形式の数値フォーマット
+     * @param {number} value - フォーマットする値
+     * @param {Object} config - 設定
+     * @returns {string} フォーマットされた文字列
+     */
+    formatJapaneseNumber(value, config) {
+        const units = config.units || {
+            '兆': 1e12,
+            '億': 1e8,
+            '万': 1e4
+        };
+
+        for (const [unit, divisor] of Object.entries(units).sort((a, b) => b[1] - a[1])) {
+            if (Math.abs(value) >= divisor) {
+                return (value / divisor).toFixed(config.decimals ?? 1) + unit;
+            }
+        }
+        
+        return value.toFixed(config.decimals || 0);
+    }
+
+    /**
      * イベントリスナーを設定
      */
     setupEventListeners() {
@@ -196,7 +262,8 @@ class BarChartRenderer extends BaseManager {
 
         // ChartTransitionsを使用して軸を更新
         const newXAxis = d3.axisBottom(newXScale);
-        const newYAxis = d3.axisLeft(newYScale);
+        const newYAxis = d3.axisLeft(newYScale)
+            .tickFormat(d => this.formatYAxisValue(d, config.yAxisFormat));
 
         const transitionConfig = {
             chartType: 'bar',
@@ -450,17 +517,33 @@ class BarChartRenderer extends BaseManager {
             unitInfo = ChartLayoutHelper.analyzeUnits(filteredData, config);
         }
 
-        // 軸を描画（単位情報を使ったフォーマッターを使用）
+        // 軸を描画（カスタムフォーマット優先、ChartLayoutHelper、D3デフォルトの順）
         let xAxis, yAxis;
-        if (window.ChartLayoutHelper) {
-            const xFormatter = (value) => ChartLayoutHelper.formatAxisWithUnits(value, unitInfo.xAxis);
-            const yFormatter = (value) => ChartLayoutHelper.formatAxisWithUnits(value, unitInfo.yAxis);
-            
-            xAxis = d3.axisBottom(xScale);
-            yAxis = d3.axisLeft(yScale).tickFormat(yFormatter);
+        
+        // Y軸フォーマッターを決定（優先順位：カスタム > ChartLayoutHelper > D3デフォルト）
+        let yFormatter;
+        if (config.yAxisFormat) {
+            // カスタムフォーマットが指定されている場合
+            yFormatter = (value) => this.formatYAxisValue(value, config.yAxisFormat);
+        } else if (window.ChartLayoutHelper) {
+            // ChartLayoutHelperが利用可能な場合
+            yFormatter = (value) => ChartLayoutHelper.formatAxisWithUnits(value, unitInfo.yAxis);
         } else {
-            xAxis = d3.axisBottom(xScale);
-            yAxis = d3.axisLeft(yScale);
+            // デフォルト（D3の標準フォーマット）
+            yFormatter = null; // D3のデフォルトを使用
+        }
+        
+        xAxis = d3.axisBottom(xScale);
+        yAxis = yFormatter 
+            ? d3.axisLeft(yScale).tickFormat(yFormatter)
+            : d3.axisLeft(yScale);
+        
+        // X軸フォーマッター（将来の拡張用）
+        if (window.ChartLayoutHelper && !config.xAxisFormat) {
+            const xFormatter = (value) => ChartLayoutHelper.formatAxisWithUnits(value, unitInfo.xAxis);
+            if (xAxis) {
+                xAxis.tickFormat(xFormatter);
+            }
         }
 
         g.append('g')
