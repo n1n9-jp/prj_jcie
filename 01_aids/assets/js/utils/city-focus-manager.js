@@ -157,11 +157,11 @@ class CityFocusManager {
             .append('circle')
             .attr('class', markerClass)
             .attr('cx', d => {
-                const coords = CoordinateHelper.safeProjection(projection, [d.longitude, d.latitude]);
+                const coords = MapProjectionHelper.safeProjection(projection, [d.longitude, d.latitude]);
                 return coords[0];
             })
             .attr('cy', d => {
-                const coords = CoordinateHelper.safeProjection(projection, [d.longitude, d.latitude]);
+                const coords = MapProjectionHelper.safeProjection(projection, [d.longitude, d.latitude]);
                 return coords[1];
             })
             .attr('r', 0);
@@ -216,11 +216,11 @@ class CityFocusManager {
             .append('text')
             .attr('class', labelClass)
             .attr('x', d => {
-                const coords = CoordinateHelper.safeProjection(projection, [d.longitude, d.latitude]);
+                const coords = MapProjectionHelper.safeProjection(projection, [d.longitude, d.latitude]);
                 return coords[0];
             })
             .attr('y', d => {
-                const coords = CoordinateHelper.safeProjection(projection, [d.longitude, d.latitude]);
+                const coords = MapProjectionHelper.safeProjection(projection, [d.longitude, d.latitude]);
                 const offset = d.style?.size ? d.style.size + 5 : 15;
                 return coords[1] - offset;
             })
@@ -260,11 +260,11 @@ class CityFocusManager {
             .append('circle')
             .attr('class', 'timeline-city')
             .attr('cx', d => {
-                const coords = CoordinateHelper.safeProjection(projection, [d.longitude, d.latitude]);
+                const coords = MapProjectionHelper.safeProjection(projection, [d.longitude, d.latitude]);
                 return coords[0];
             })
             .attr('cy', d => {
-                const coords = CoordinateHelper.safeProjection(projection, [d.longitude, d.latitude]);
+                const coords = MapProjectionHelper.safeProjection(projection, [d.longitude, d.latitude]);
                 return coords[1];
             })
             .attr('r', 0)
@@ -286,11 +286,11 @@ class CityFocusManager {
             .append('text')
             .attr('class', 'timeline-label')
             .attr('x', d => {
-                const coords = CoordinateHelper.safeProjection(projection, [d.longitude, d.latitude]);
+                const coords = MapProjectionHelper.safeProjection(projection, [d.longitude, d.latitude]);
                 return coords[0];
             })
             .attr('y', d => {
-                const coords = CoordinateHelper.safeProjection(projection, [d.longitude, d.latitude]);
+                const coords = MapProjectionHelper.safeProjection(projection, [d.longitude, d.latitude]);
                 return coords[1] - (d.style?.size || 6) - 5;
             })
             .style('opacity', 0)
@@ -323,7 +323,7 @@ class CityFocusManager {
      * @param {Function} projection - プロジェクション関数
      */
     showSingleCityMarker(mapGroup, city, projection) {
-        const coords = CoordinateHelper.safeProjection(projection, [city.longitude, city.latitude]);
+        const coords = MapProjectionHelper.safeProjection(projection, [city.longitude, city.latitude]);
         
         if (!coords) {
             console.error('Failed to project city coordinates:', city);

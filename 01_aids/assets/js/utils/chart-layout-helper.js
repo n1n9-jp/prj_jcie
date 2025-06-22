@@ -1,8 +1,69 @@
 /**
  * ChartLayoutHelper - チャートレイアウトとマージン計算のユーティリティクラス
  * データに基づいた動的マージン計算、軸ラベルの最適化などを提供
+ * DataHelperの必要機能を統合（2024年6月）
  */
 class ChartLayoutHelper {
+    
+    /**
+     * 型安全な数値変換（DataHelperより統合）
+     * @param {*} value - 変換する値
+     * @param {number} fallback - フォールバック値
+     * @returns {number} 数値
+     */
+    static safeNumericConversion(value, fallback = 0) {
+        // null, undefined の場合
+        if (value == null) {
+            return fallback;
+        }
+
+        // 既に数値の場合
+        if (typeof value === 'number') {
+            return isNaN(value) ? fallback : value;
+        }
+
+        // 文字列の場合の変換
+        if (typeof value === 'string') {
+            // 空文字列
+            if (value.trim() === '') {
+                return fallback;
+            }
+
+            // カンマ区切りの数値を処理
+            const cleanValue = value.replace(/,/g, '');
+            const numValue = parseFloat(cleanValue);
+            return isNaN(numValue) ? fallback : numValue;
+        }
+
+        // その他の型
+        const numValue = Number(value);
+        return isNaN(numValue) ? fallback : numValue;
+    }
+
+    /**
+     * 年データの判定（DataHelperより統合）
+     * @param {Array} data - データ配列
+     * @param {string} field - フィールド名
+     * @returns {boolean} 年データかどうか
+     */
+    static isYearData(data, field) {
+        if (!Array.isArray(data) || data.length === 0) {
+            return false;
+        }
+
+        // サンプルを取得して年の範囲をチェック
+        const sampleSize = Math.min(data.length, 10);
+        const values = data.slice(0, sampleSize)
+            .map(d => this.safeNumericConversion(d[field]))
+            .filter(v => !isNaN(v));
+
+        if (values.length === 0) {
+            return false;
+        }
+
+        // 年の妥当な範囲（1900-2100）をチェック
+        return values.every(v => v >= 1900 && v <= 2100 && Number.isInteger(v));
+    }
     /**
      * データに基づいてマージンを動的に計算する
      * @param {Array} data - チャートデータ
@@ -90,12 +151,12 @@ class ChartLayoutHelper {
         const { xField = 'year', yField = 'value', seriesField = 'series' } = config;
         
         // Y軸の値を収集
-        const yValues = data.map(d => DataHelper.safeNumericConversion(d[yField])).filter(v => !isNaN(v));
+        const yValues = data.map(d => this.safeNumericConversion(d[yField])).filter(v => !isNaN(v));
         const maxValue = Math.max(...yValues, 0);
         const minValue = Math.min(...yValues, 0);
 
         // X軸の値を収集
-        const xValues = data.map(d => DataHelper.safeNumericConversion(d[xField])).filter(v => !isNaN(v));
+        const xValues = data.map(d => this.safeNumericConversion(d[xField])).filter(v => !isNaN(v));
         const xRange = xValues.length > 0 ? Math.max(...xValues) - Math.min(...xValues) : 0;
 
         // 系列名を収集
@@ -317,8 +378,8 @@ class ChartLayoutHelper {
         }
 
         // データから単位を推測
-        const yValues = data.map(d => DataHelper.safeNumericConversion(d[yField])).filter(v => !isNaN(v));
-        const xValues = data.map(d => DataHelper.safeNumericConversion(d[xField])).filter(v => !isNaN(v));
+        const yValues = data.map(d => this.safeNumericConversion(d[yField])).filter(v => !isNaN(v));
+        const xValues = data.map(d => this.safeNumericConversion(d[xField])).filter(v => !isNaN(v));
         
         const maxY = Math.max(...yValues, 0);
         const minY = Math.min(...yValues, 0);
@@ -326,7 +387,7 @@ class ChartLayoutHelper {
         const minX = Math.min(...xValues, 0);
 
         // X軸の単位判定（年度データの場合）
-        const isYearData = DataHelper.isYearData(data, xField);
+        const isYearData = this.isYearData(data, xField);
         const xAxisUnit = {
             label: isYearData ? '年' : '数値',
             suffix: '',

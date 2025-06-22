@@ -135,10 +135,8 @@ class ChartTransitions {
                 easing: customConfig.easing || defaultConfig.easing
             };
             
-            // アダプティブスピード調整
-            if (window.AnimationConfig?.getAdaptiveSpeed) {
-                config.duration = window.AnimationConfig.getAdaptiveSpeed(config.duration);
-            }
+            // 設定ファイルからの速度調整
+            config.duration = this.getSpeed(config.duration);
             
             return d3.transition()
                 .duration(config.duration)

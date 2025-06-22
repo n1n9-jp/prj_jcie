@@ -103,22 +103,22 @@ class MapProjectionHelper {
         // 都市マーカーを更新
         svg.selectAll('.map-city, .timeline-city, .single-city-marker')
             .attr('cx', d => {
-                const coords = CoordinateHelper.safeProjection(projection, [d.longitude, d.latitude]);
+                const coords = MapProjectionHelper.safeProjection(projection, [d.longitude, d.latitude]);
                 return coords[0];
             })
             .attr('cy', d => {
-                const coords = CoordinateHelper.safeProjection(projection, [d.longitude, d.latitude]);
+                const coords = MapProjectionHelper.safeProjection(projection, [d.longitude, d.latitude]);
                 return coords[1];
             });
         
         // 都市ラベルを更新
         svg.selectAll('.city-label, .timeline-label, .single-city-label')
             .attr('x', d => {
-                const coords = CoordinateHelper.safeProjection(projection, [d.longitude, d.latitude]);
+                const coords = MapProjectionHelper.safeProjection(projection, [d.longitude, d.latitude]);
                 return coords[0];
             })
             .attr('y', d => {
-                const coords = CoordinateHelper.safeProjection(projection, [d.longitude, d.latitude]);
+                const coords = MapProjectionHelper.safeProjection(projection, [d.longitude, d.latitude]);
                 const offset = d.style?.size ? d.style.size + 5 : 15;
                 return coords[1] - offset;
             });
@@ -133,7 +133,7 @@ class MapProjectionHelper {
      * @returns {Array} 画面座標 [x, y]
      */
     static projectCoordinate(projection, longitude, latitude, fallback = [0, 0]) {
-        return CoordinateHelper.safeProjection(projection, [longitude, latitude], fallback);
+        return MapProjectionHelper.safeProjection(projection, [longitude, latitude], fallback);
     }
 
     /**
