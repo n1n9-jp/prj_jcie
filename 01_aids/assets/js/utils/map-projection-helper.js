@@ -1,6 +1,7 @@
 /**
  * MapProjectionHelper - 地図プロジェクションと座標変換のユーティリティクラス
  * D3.jsの地理的プロジェクションに関する共通処理を提供
+ * CoordinateHelperの機能を統合（2024年6月）
  */
 class MapProjectionHelper {
     /**
@@ -232,7 +233,7 @@ class MapProjectionHelper {
                 if (coords && coords[0] && Array.isArray(coords[0])) {
                     coords[0].forEach(coord => {
                         if (Array.isArray(coord) && coord.length >= 2) {
-                            const projected = CoordinateHelper.safeProjection(projection, coord);
+                            const projected = this.safeProjection(projection, coord);
                             coordinates.push(projected);
                         }
                     });
@@ -240,7 +241,109 @@ class MapProjectionHelper {
             }
         });
 
-        return CoordinateHelper.calculateBounds(coordinates);
+        return this.calculateBounds(coordinates);
+    }
+
+    /**
+     * 安全な座標プロジェクション変換（CoordinateHelperより統合）
+     * @param {Function} projection - D3のプロジェクション関数
+     * @param {Array} coordinates - [経度, 緯度]の配列
+     * @param {Array} fallback - 変換失敗時のフォールバック座標
+     * @returns {Array} 変換された座標 [x, y]
+     */
+    static safeProjection(projection, coordinates, fallback = [0, 0]) {
+        try {
+            if (!projection || !coordinates || coordinates.length < 2) {
+                return fallback;
+            }
+            
+            const [longitude, latitude] = coordinates;
+            
+            // 有効な座標値の範囲チェック
+            if (isNaN(longitude) || isNaN(latitude) ||
+                longitude < -180 || longitude > 180 ||
+                latitude < -90 || latitude > 90) {
+                console.warn('Invalid coordinates:', coordinates);
+                return fallback;
+            }
+            
+            const result = projection(coordinates);
+            return result || fallback;
+            
+        } catch (error) {
+            console.warn('Projection failed:', error);
+            return fallback;
+        }
+    }
+
+    /**
+     * 座標配列の境界矩形計算（CoordinateHelperより統合）
+     * @param {Array} coordinates - 座標配列
+     * @returns {Object} 境界矩形 {minX, maxX, minY, maxY}
+     */
+    static calculateBounds(coordinates) {
+        if (!Array.isArray(coordinates) || coordinates.length === 0) {
+            return { minX: 0, maxX: 0, minY: 0, maxY: 0, width: 0, height: 0 };
+        }
+
+        let minX = Infinity, maxX = -Infinity;
+        let minY = Infinity, maxY = -Infinity;
+
+        coordinates.forEach(coord => {
+            if (Array.isArray(coord) && coord.length >= 2) {
+                const [x, y] = coord;
+                if (!isNaN(x) && !isNaN(y)) {
+                    minX = Math.min(minX, x);
+                    maxX = Math.max(maxX, x);
+                    minY = Math.min(minY, y);
+                    maxY = Math.max(maxY, y);
+                }
+            }
+        });
+
+        // 有効な座標が見つからない場合のフォールバック
+        if (minX === Infinity) {
+            return { minX: 0, maxX: 0, minY: 0, maxY: 0, width: 0, height: 0 };
+        }
+
+        return {
+            minX,
+            maxX,
+            minY,
+            maxY,
+            width: maxX - minX,
+            height: maxY - minY
+        };
+    }
+
+    /**
+     * 中心点計算（CoordinateHelperより統合）
+     * @param {Array} coordinates - 座標配列
+     * @returns {Array} 中心座標 [x, y]
+     */
+    static calculateCentroid(coordinates) {
+        if (!Array.isArray(coordinates) || coordinates.length === 0) {
+            return [0, 0];
+        }
+
+        let totalX = 0, totalY = 0, validCount = 0;
+
+        coordinates.forEach(coord => {
+            if (Array.isArray(coord) && coord.length >= 2) {
+                const [x, y] = coord;
+                if (!isNaN(x) && !isNaN(y)) {
+                    totalX += x;
+                    totalY += y;
+                    validCount++;
+                }
+            }
+        });
+
+        if (validCount === 0) {
+            return [0, 0];
+        }
+
+        return [totalX / validCount, totalY / validCount];
     }
 
     /**

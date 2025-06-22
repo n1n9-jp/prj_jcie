@@ -1,9 +1,64 @@
 /**
  * ChartTransitions - 統一されたチャート用トランジション管理クラス
  * 全てのチャートレンダラーで共通のトランジションロジックを提供
+ * AnimationConfigの機能を統合（2024年6月）
  */
 class ChartTransitions {
     
+    /**
+     * 外部設定からアニメーション速度を取得（AnimationConfigより統合）
+     * @param {string} name - 速度名
+     * @returns {number} ミリ秒
+     */
+    static getSpeed(name) {
+        // ConfigLoaderが利用可能で設定が読み込まれている場合
+        if (window.ConfigLoader && window.ConfigLoader.loaded) {
+            const config = window.ConfigLoader.mergedConfig;
+            if (config?.animation?.durations) {
+                const speedName = name.toLowerCase();
+                return config.animation.durations[speedName] || this.CONFIG.DURATION[name];
+            }
+        }
+        return this.CONFIG.DURATION[name] || this.CONFIG.DURATION.NORMAL;
+    }
+
+    /**
+     * 外部設定からイージング関数を取得（AnimationConfigより統合）
+     * @param {string} name - イージング名
+     * @returns {Function} D3イージング関数
+     */
+    static getEasing(name) {
+        // ConfigLoaderが利用可能で設定が読み込まれている場合
+        if (window.ConfigLoader && window.ConfigLoader.loaded) {
+            const config = window.ConfigLoader.mergedConfig;
+            if (config?.animation?.easings) {
+                const easingName = name.toLowerCase();
+                const easingValue = config.animation.easings[easingName];
+                if (easingValue && typeof easingValue === 'string') {
+                    // CSS文字列をD3イージング関数に変換
+                    return this._cssEasingToD3(easingValue);
+                }
+            }
+        }
+        return this.CONFIG.EASING[name] || this.CONFIG.EASING.QUAD_OUT;
+    }
+
+    /**
+     * CSS文字列をD3イージング関数に変換
+     * @param {string} cssEasing - CSS文字列
+     * @returns {Function} D3イージング関数
+     */
+    static _cssEasingToD3(cssEasing) {
+        const easingMap = {
+            'linear': d3.easeLinear,
+            'ease': d3.easeCubic,
+            'ease-in': d3.easeCubicIn,
+            'ease-out': d3.easeCubicOut,
+            'ease-in-out': d3.easeCubicInOut
+        };
+        return easingMap[cssEasing] || d3.easeCubicOut;
+    }
+
     /**
      * 共通のトランジション設定を定義
      */
