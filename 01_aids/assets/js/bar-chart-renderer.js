@@ -108,7 +108,6 @@ class BarChartRenderer extends BaseManager {
             this.svg &&
             config.dataFile === this.config?.dataFile) {
             
-            console.log(`Updating bar chart with transition mode (direction: ${direction || 'unknown'})`);
             this.updateChartWithTransition(data, config, direction);
             return;
         }
@@ -176,7 +175,6 @@ class BarChartRenderer extends BaseManager {
             
             if (config.widthPercent) {
                 actualWidth = window.innerWidth * (config.widthPercent / 100);
-                console.log(`BarChartRenderer: widthPercent=${config.widthPercent}%, actualWidth=${actualWidth}px (window.innerWidth=${window.innerWidth}px)`);
             }
             if (config.heightPercent) {
                 actualHeight = window.innerHeight * (config.heightPercent / 100);
@@ -350,7 +348,6 @@ class BarChartRenderer extends BaseManager {
             }
         );
 
-            console.log(`Bar chart updated with transition: ${data.length} bars displayed`);
         } catch (error) {
             console.error('BarChartRenderer: Error during transition update:', error);
             if (window.ErrorHandler) {
@@ -476,7 +473,6 @@ class BarChartRenderer extends BaseManager {
         let filteredData = data;
         if (config.filter) {
             filteredData = this.applyFilter(data, config.filter);
-            console.log(`Filter applied to bar chart: ${data.length} -> ${filteredData.length} records`);
         }
         
         const svg = this.svg;
@@ -999,7 +995,6 @@ class BarChartRenderer extends BaseManager {
      */
     resize() {
         if (this.currentChart && this.data && this.config) {
-            console.log('BarChartRenderer: Resizing chart');
             this.renderChart(this.currentChart, this.data, this.config);
         }
     }

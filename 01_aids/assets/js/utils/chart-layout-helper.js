@@ -507,10 +507,6 @@ class ChartLayoutHelper {
         };
         
         // デバッグ用ログ
-        console.log('analyzeUnits result for dataFile:', dataFile);
-        console.log('xAxisUnit:', xAxisUnit);
-        console.log('yAxisUnit:', yAxisUnit);
-        console.log('maxY:', maxY, 'minY:', minY);
         
         return result;
     }
@@ -718,7 +714,6 @@ class ChartLayoutHelper {
      */
     static calculateLegendLayout(seriesNames, chartWidth, chartHeight) {
         if (!seriesNames || seriesNames.length <= 1) {
-            console.log('calculateLegendLayout: Not showing legend (no series or single series)');
             return { show: false };
         }
 
@@ -729,15 +724,9 @@ class ChartLayoutHelper {
         const estimatedItemWidth = maxTextWidth + 40; // 実測テキスト幅 + アイコン + 余白
         const itemHeight = 20;
 
-        console.log('calculateLegendLayout: seriesNames:', seriesNames);
-        console.log('calculateLegendLayout: maxTextWidth:', maxTextWidth);
-        console.log('calculateLegendLayout: estimatedItemWidth:', estimatedItemWidth);
-        console.log('calculateLegendLayout: chartWidth:', chartWidth, 'chartHeight:', chartHeight);
 
         // 横置きが可能かチェック
         const totalHorizontalWidth = seriesNames.length * estimatedItemWidth;
-        console.log('calculateLegendLayout: totalHorizontalWidth:', totalHorizontalWidth);
-        console.log('calculateLegendLayout: 80% of chartWidth:', chartWidth * 0.8);
         
         if (totalHorizontalWidth <= chartWidth * 0.8) {
             const layout = {
@@ -748,7 +737,6 @@ class ChartLayoutHelper {
                 itemHeight: itemHeight,
                 totalHeight: itemHeight + 20
             };
-            console.log('calculateLegendLayout: Using horizontal layout:', layout);
             return layout;
         }
 
@@ -762,7 +750,6 @@ class ChartLayoutHelper {
             totalWidth: estimatedItemWidth + 20,
             totalHeight: seriesNames.length * itemHeight
         };
-        console.log('calculateLegendLayout: Using vertical layout:', layout);
         return layout;
     }
 

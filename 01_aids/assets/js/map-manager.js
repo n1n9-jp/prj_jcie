@@ -56,20 +56,15 @@ class MapManager extends BaseManager {
      * @param {Object} mapData - 地図データとオプション
      */
     updateMap(mapData) {
-        console.log('MapManager: updateMap called with:', mapData);
         
         const { center, zoom, visible, data, highlightCountries = [], cities = [], mode, citiesFile, cityId, useRegionColors = false, lightenNonVisited = false, lightenAllCountries = false, targetRegions = [], width = 800, height = 600, widthPercent, heightPercent, aspectRatio, showSpreadingArrows = false } = mapData;
         
         // 地図更新の最初に拡散矢印の状態をチェック
         if (!showSpreadingArrows) {
-            console.log('MapManager: Clearing spreading arrows at start of updateMap');
             this.clearSpreadingArrows();
         }
         
         this.currentView = { center, zoom, highlightCountries, cities, mode, citiesFile, cityId, useRegionColors, lightenNonVisited, lightenAllCountries, targetRegions };
-        console.log('MapManager: Current view set to:', this.currentView);
-        console.log('MapManager: Map visible:', visible);
-        console.log('MapManager: GeoData available:', !!this.geoData);
 
         if (visible) {
             this.show();
@@ -90,17 +85,14 @@ class MapManager extends BaseManager {
             if (this.geoData) {
                 // 地図が既に描画されているかチェック
                 if (!this.svg || this.svg.selectAll('.map-country').empty()) {
-                    console.log('MapManager: Initial map rendering...');
                     this.renderMap(this.geoData, { center, zoom, highlightCountries, cities, useRegionColors, lightenNonVisited, lightenAllCountries, targetRegions, width, height, widthPercent, heightPercent, aspectRatio, showSpreadingArrows, mode });
                 } else {
-                    console.log('MapManager: Updating existing map...');
                     this.updateExistingMap({ center, zoom, highlightCountries, cities, useRegionColors, lightenNonVisited, lightenAllCountries, targetRegions, width, height, widthPercent, heightPercent, aspectRatio, showSpreadingArrows, mode });
                 }
             } else {
                 console.error('MapManager: No geo data available for rendering');
             }
         } else {
-            console.log('MapManager: Hiding map');
             this.hide();
         }
     }
@@ -109,22 +101,18 @@ class MapManager extends BaseManager {
      * 地図コンテナを表示
      */
     show() {
-        console.log('MapManager: Showing map container');
         this.container.classed('visible', true);
-        console.log('MapManager: Container classes after show:', this.container.attr('class'));
     }
 
     /**
      * 地図コンテナを非表示
      */
     hide() {
-        console.log('MapManager: Hiding map container');
         this.container.classed('visible', false);
         
         // 地図非表示時は拡散矢印も即座にクリア
         this.clearSpreadingArrows();
         
-        console.log('MapManager: Container classes after hide:', this.container.attr('class'));
     }
 
     /**
@@ -132,17 +120,10 @@ class MapManager extends BaseManager {
      * @param {Object} topoData - TopoJSONデータ
      */
     setGeoData(topoData) {
-        console.log('MapManager: Setting geo data...');
-        console.log('TopoJSON input:', topoData);
-        console.log('TopoJSON type:', topoData?.type);
-        console.log('TopoJSON objects:', topoData?.objects);
         
         // TopoJSONをGeoJSONに変換
         if (topoData && topoData.objects && topoData.objects.countries) {
-            console.log('Converting TopoJSON to GeoJSON...');
             this.geoData = topojson.feature(topoData, topoData.objects.countries);
-            console.log('GeoJSON result:', this.geoData);
-            console.log('GeoJSON features count:', this.geoData?.features?.length);
         } else {
             console.error('Invalid TopoJSON data structure');
             console.error('Expected: topoData.objects.countries');
@@ -155,9 +136,6 @@ class MapManager extends BaseManager {
      * SVG要素を初期化（レスポンシブ対応）
      */
     initSVG(config = {}) {
-        console.log('MapManager: initSVG called with config:', config);
-        console.log('MapManager: Container:', this.container);
-        console.log('MapManager: Container node:', this.container.node());
         
         // 地図専用のレスポンシブサイズ計算
         let responsiveSize;
@@ -179,7 +157,6 @@ class MapManager extends BaseManager {
             }
             
             responsiveSize = { width, height };
-            console.log('MapManager: Container-based responsive size:', responsiveSize, 'from container:', {containerWidth, containerHeight});
         } else if (window.SVGHelper) {
             responsiveSize = SVGHelper.getResponsiveSize(this.container, {
                 defaultWidth: config.width || 800,
@@ -195,7 +172,6 @@ class MapManager extends BaseManager {
         }
         
         const { width, height } = responsiveSize;
-        console.log('MapManager: Calculated responsive size:', { width, height });
         
         this.container.selectAll('*').remove();
         
@@ -226,8 +202,6 @@ class MapManager extends BaseManager {
                 .style('height', '100%');
         }
             
-        console.log('MapManager: SVG created:', this.svg);
-        console.log('MapManager: SVG node:', this.svg.node());
 
         // ズーム機能を追加
         const zoom = d3.zoom()
@@ -248,9 +222,6 @@ class MapManager extends BaseManager {
      * @param {Object} config - 設定オプション
      */
     renderMap(geoData, config = {}) {
-        console.log('MapManager: renderMap called');
-        console.log('renderMap geoData:', geoData);
-        console.log('renderMap config:', config);
         
         // 再描画時は既存の拡散矢印を即座にクリア
         this.clearSpreadingArrows();
@@ -268,10 +239,8 @@ class MapManager extends BaseManager {
             mode = null
         } = config;
         
-        console.log('renderMap parameters:', { center, zoom, config });
         
         const svg = this.initSVG(config);
-        console.log('SVG initialized:', svg);
         
         // 現在のSVGサイズを取得
         const actualSize = SVGHelper.getActualSize(svg);
@@ -286,16 +255,12 @@ class MapManager extends BaseManager {
             .translate([svgWidth / 2, svgHeight / 2]);
             
         this.path = d3.geoPath().projection(this.projection);
-        console.log('Projection and path initialized');
 
         // 地図グループを作成
         const mapGroup = svg.append('g').attr('class', 'map-group');
-        console.log('Map group created');
 
         // 国境を描画
         if (geoData && geoData.features) {
-            console.log('Drawing countries, features count:', geoData.features.length);
-            console.log('First feature sample:', geoData.features[0]);
             
             const paths = mapGroup.selectAll('.map-country')
                 .data(geoData.features)
@@ -408,14 +373,12 @@ class MapManager extends BaseManager {
                 })
                 .style('opacity', 0);
                 
-            console.log('Country paths created:', paths.size());
             
             paths.transition()
                 .duration(window.AppDefaults?.animation?.shortDuration || 500)
                 .delay((d, i) => i * 10)
                 .style('opacity', 1);
                 
-            console.log('Country paths transition started');
         } else {
             console.error('No geoData or geoData.features available for drawing');
             console.error('geoData:', geoData);
@@ -608,11 +571,9 @@ class MapManager extends BaseManager {
             mode = null
         } = config;
 
-        console.log('MapManager: updateExistingMap called with:', config);
 
         // 最優先で拡散矢印の状態を処理（アニメーション前に実行）
         if (!showSpreadingArrows) {
-            console.log('MapManager: Clearing spreading arrows immediately');
             this.clearSpreadingArrows();
         }
 
@@ -627,8 +588,6 @@ class MapManager extends BaseManager {
         const scaleMultiplier = (mode === 'single-city') ? 1.0 : 1.5; // 都市モードでは拡大なし
         const targetScale = zoom * 150 * scaleMultiplier;
 
-        console.log('Transition from:', { center: currentCenter, scale: currentScale });
-        console.log('Transition to:', { center, scale: targetScale });
 
         // アニメーション開始前に既存の都市マーカー・ラベルを削除
         const mapGroup = this.svg.select('.map-group');
@@ -875,24 +834,18 @@ class MapManager extends BaseManager {
      */
     async initCitiesTimeline(citiesFile) {
         try {
-            console.log('MapManager: Initializing cities timeline with:', citiesFile);
             
             // 都市データを読み込み
             if (!this.citiesTimelineData) {
-                console.log('MapManager: Loading cities data from:', citiesFile);
                 this.citiesTimelineData = await d3.json(citiesFile);
-                console.log('MapManager: Cities timeline data loaded:', this.citiesTimelineData);
-                console.log('MapManager: Cities count:', this.citiesTimelineData?.cities?.length);
             }
             
             this.timelineMode = true;
             this.visibleCities = [];
             
-            console.log('MapManager: Timeline mode activated. GeoData available:', !!this.geoData);
             
             // 基本地図を描画
             if (this.geoData) {
-                console.log('MapManager: Rendering timeline map...');
                 this.renderTimelineMap();
             } else {
                 console.error('MapManager: Cannot render timeline map - no geo data');
@@ -942,7 +895,6 @@ class MapManager extends BaseManager {
                 .style('opacity', 1);
         }
         
-        console.log('Timeline map rendered, ready for city progression');
     }
 
     /**
@@ -951,12 +903,10 @@ class MapManager extends BaseManager {
      */
     handleMapProgress(progressData) {
         if (!this.timelineMode || !this.citiesTimelineData) {
-            console.log('MapManager: Progress ignored - timeline mode:', this.timelineMode, 'data:', !!this.citiesTimelineData);
             return;
         }
         
         const { progress, direction, config } = progressData;
-        console.log('MapManager: Handling progress:', progress * 100 + '%', 'direction:', direction);
         
         // より緩やかな都市表示のために進行度を調整
         // 進行度を二乗してゆっくりスタート、速く終了のカーブにする
@@ -985,8 +935,6 @@ class MapManager extends BaseManager {
             
         const targetCities = orderedCities.slice(0, targetCityCount);
         
-        console.log(`MapManager: Showing ${targetCities.length} of ${totalCities} cities`);
-        console.log('MapManager: Target cities:', targetCities.map(c => c.name));
         
         this.updateTimelineCities(targetCities);
     }
@@ -1084,13 +1032,10 @@ class MapManager extends BaseManager {
      */
     async handleSingleCityMode(citiesFile, cityId) {
         try {
-            console.log('MapManager: Handling single city mode:', cityId);
             
             // 都市データを読み込み
             if (!this.citiesTimelineData) {
-                console.log('MapManager: Loading cities data from:', citiesFile);
                 this.citiesTimelineData = await d3.json(citiesFile);
-                console.log('MapManager: Cities data loaded for single city mode');
             }
             
             // 指定された都市を検索
@@ -1101,7 +1046,6 @@ class MapManager extends BaseManager {
                 return;
             }
             
-            console.log('MapManager: Found target city:', targetCity);
             
             // タイムラインモードをリセット
             this.timelineMode = false;
@@ -1110,13 +1054,11 @@ class MapManager extends BaseManager {
             
             // 既存の地図がある場合（world-overviewなどから遷移）は、スムーズにアニメーション
             if (this.svg && this.projection && this.geoData) {
-                console.log('MapManager: Animating from existing map to city:', targetCity.name);
                 // 既存の地図を使ってスムーズにトランジション
                 this.animateToCity(targetCity);
                 this.mapInitialized = true;
             } else {
                 // 初回の場合のみ地図を初期化
-                console.log('MapManager: Initializing single city map...');
                 this.initializeSingleCityMap(targetCity);
                 this.mapInitialized = true;
             }
@@ -1142,8 +1084,6 @@ class MapManager extends BaseManager {
         const viewBoxWidth = parseFloat(viewBox[2]);
         const viewBoxHeight = parseFloat(viewBox[3]);
         
-        console.log('initializeSingleCityMap - ViewBox size:', { viewBoxWidth, viewBoxHeight });
-        console.log('initializeSingleCityMap - Target city:', targetCity.name, { longitude: targetCity.longitude, latitude: targetCity.latitude });
         
         // 投影法を設定（都市モードでは元スケール、viewBoxサイズを使用）
         this.projection = d3.geoNaturalEarth1()
@@ -1207,7 +1147,6 @@ class MapManager extends BaseManager {
         // 初回都市マーカーを表示
         this.showCityMarker(targetCity);
         
-        console.log('Single city map initialized for:', targetCity.name);
     }
 
     /**
@@ -1219,7 +1158,6 @@ class MapManager extends BaseManager {
         
         // currentCityがない場合（world-overviewからの遷移）でも動作するように
         const fromName = this.currentCity ? this.currentCity.name : 'world view';
-        console.log(`Animating from ${fromName} to ${targetCity.name}`);
         
         // 現在の投影設定を取得
         const currentCenter = this.projection.center();
@@ -1289,7 +1227,6 @@ class MapManager extends BaseManager {
             })
             .on('end', () => {
                 // アニメーション完了後に新しい都市マーカーを表示
-                console.log('Map animation completed, showing new city marker');
                 this.showCityMarker(targetCity);
             });
     }
@@ -1299,10 +1236,6 @@ class MapManager extends BaseManager {
      * @param {Object} city - 都市データ
      */
     showCityMarker(city) {
-        console.log('ShowCityMarker called for:', city.name);
-        console.log('City coordinates:', { longitude: city.longitude, latitude: city.latitude });
-        console.log('Projection center:', this.projection.center());
-        console.log('Projection scale:', this.projection.scale());
         
         // SVGのviewBoxサイズを取得
         const viewBox = this.svg.attr('viewBox').split(' ');
@@ -1318,11 +1251,9 @@ class MapManager extends BaseManager {
         if (isCityCenter) {
             // 都市が中心の場合は、強制的に画面中央に配置
             coords = [viewBoxWidth / 2, viewBoxHeight / 2];
-            console.log('Using center coordinates for city:', coords);
         } else {
             // 通常の投影計算
             coords = this.projection([city.longitude, city.latitude]);
-            console.log('Projected coordinates:', coords);
         }
         
         if (!coords) {
@@ -1381,7 +1312,6 @@ class MapManager extends BaseManager {
         const geoInfoContainer = document.getElementById(`geographic-info-${stepId}`);
         
         if (!geoInfoContainer) {
-            console.log('Geographic info container not found for step:', stepId);
             return;
         }
         
@@ -1448,7 +1378,6 @@ class MapManager extends BaseManager {
             this.svg.selectAll('.spreading-flow').interrupt().remove();
             this.svg.selectAll('#spreading-arrow').remove();
             
-            console.log('MapManager: Spreading arrows completely cleared');
         }
     }
 
@@ -1457,7 +1386,6 @@ class MapManager extends BaseManager {
      * @param {d3.Selection} mapGroup - 地図グループ要素
      */
     drawSpreadingArrows(mapGroup) {
-        console.log('MapManager: Drawing spreading arrows');
         
         // アメリカから各地域への拡散データ（概念的座標）
         const spreadingFlows = [
@@ -1555,10 +1483,8 @@ class MapManager extends BaseManager {
                 });
 
 
-            console.log(`Spreading arrow ${flow.id} added:`, { fromCoords, toCoords, delay: flow.delay });
         });
 
-        console.log('MapManager: Spreading arrows animation started');
     }
 
 

@@ -26,8 +26,6 @@ class ChartManager extends BaseManager {
         // トランジション管理
         this.transitionManager = null;
         
-        console.log('ChartManager initialized with container:', actualContainerId);
-        console.log('ChartManager: Initial renderers state:', this.renderers);
         
         // Now that all properties are set up, call init
         this.init();
@@ -37,17 +35,13 @@ class ChartManager extends BaseManager {
      * 初期化処理
      */
     init() {
-        console.log('ChartManager: Starting init()...');
-        console.log('ChartManager: Renderers before super.init():', this.renderers);
         
         super.init();
         
-        console.log('ChartManager: Renderers after super.init():', this.renderers);
         
         this.initializeRenderers();
         this.initializeTransitionManager();
         
-        console.log('ChartManager: Init complete. Final renderers state:', this.renderers);
     }
 
     /**
@@ -58,7 +52,6 @@ class ChartManager extends BaseManager {
         
         // チャート更新イベント
         pubsub.subscribe(EVENTS.CHART_UPDATE, (data) => {
-            console.log('ChartManager: Received CHART_UPDATE event', data);
             this.updateChart(data);
         });
     }
@@ -67,7 +60,6 @@ class ChartManager extends BaseManager {
      * 専門化されたレンダラーを初期化
      */
     initializeRenderers() {
-        console.log('ChartManager: Starting renderer initialization...');
         
         // renderersオブジェクトが存在しない場合は初期化
         if (!this.renderers) {
@@ -80,22 +72,13 @@ class ChartManager extends BaseManager {
         }
         
         const containerId = this.container.node().id ? `#${this.container.node().id}` : '.chart-container';
-        console.log('ChartManager: Using container ID:', containerId);
         
-        // グローバルで利用可能なレンダラークラスを確認
-        console.log('Available renderer classes:', {
-            LineChartRenderer: !!window.LineChartRenderer,
-            BarChartRenderer: !!window.BarChartRenderer,
-            PieChartRenderer: !!window.PieChartRenderer,
-            GridChartRenderer: !!window.GridChartRenderer
-        });
+        // レンダラークラスの確認ログは削除済み
         
         try {
             // LineChartRenderer
             if (window.LineChartRenderer) {
                 this.renderers.line = new LineChartRenderer(containerId);
-                console.log('✓ LineChartRenderer initialized successfully');
-                console.log('LineChartRenderer has renderLineChartInGroup:', !!this.renderers.line.renderLineChartInGroup);
             } else {
                 console.error('✗ LineChartRenderer not available in window');
             }
@@ -103,7 +86,6 @@ class ChartManager extends BaseManager {
             // BarChartRenderer
             if (window.BarChartRenderer) {
                 this.renderers.bar = new BarChartRenderer(containerId);
-                console.log('✓ BarChartRenderer initialized successfully');
             } else {
                 console.error('✗ BarChartRenderer not available in window');
             }
@@ -111,7 +93,6 @@ class ChartManager extends BaseManager {
             // PieChartRenderer
             if (window.PieChartRenderer) {
                 this.renderers.pie = new PieChartRenderer(containerId);
-                console.log('✓ PieChartRenderer initialized successfully');
             } else {
                 console.error('✗ PieChartRenderer not available in window');
             }
@@ -119,7 +100,6 @@ class ChartManager extends BaseManager {
             // GridChartRenderer
             if (window.GridChartRenderer) {
                 this.renderers.grid = new GridChartRenderer(containerId);
-                console.log('✓ GridChartRenderer initialized successfully');
             } else {
                 console.error('✗ GridChartRenderer not available in window');
             }
@@ -137,7 +117,6 @@ class ChartManager extends BaseManager {
         
         // 初期化結果のサマリー
         const initializedRenderers = Object.keys(this.renderers).filter(key => this.renderers[key] !== null);
-        console.log(`ChartManager: Renderer initialization complete. Available renderers: [${initializedRenderers.join(', ')}]`);
         
         if (initializedRenderers.length === 0) {
             console.error('ChartManager: WARNING - No renderers were successfully initialized!');
@@ -150,7 +129,6 @@ class ChartManager extends BaseManager {
     initializeTransitionManager() {
         if (window.ChartTransitions) {
             this.transitionManager = ChartTransitions;
-            console.log('ChartTransitions available for coordination');
         } else {
             console.warn('ChartTransitions not available, transitions may be less smooth');
         }
@@ -233,7 +211,6 @@ class ChartManager extends BaseManager {
             // レンダラーに処理を委譲
             renderer.updateChart(chartData);
             
-            console.log(`ChartManager: Delegated ${type} chart to ${renderer.constructor.name}`);
         } else {
             console.warn(`ChartManager: No renderer available for chart type: ${type}`);
             this.handleFallback(chartData);
@@ -245,7 +222,6 @@ class ChartManager extends BaseManager {
      * @param {Object} chartData - チャートデータ
      */
     handleDualLayout(chartData) {
-        console.log('ChartManager: Handling dual layout', chartData);
         
         // 全レンダラーを非表示
         this.hideAllRenderers();
@@ -274,7 +250,6 @@ class ChartManager extends BaseManager {
      * @param {Object} chartData - チャートデータ
      */
     handleTripleLayout(chartData) {
-        console.log('ChartManager: Handling triple layout');
         
         // 全レンダラーを非表示
         this.hideAllRenderers();
@@ -294,7 +269,6 @@ class ChartManager extends BaseManager {
      * @param {Object} chartData - チャートデータ
      */
     handleGridLayout(chartData) {
-        console.log('ChartManager: Handling grid layout');
         
         // GridChartRendererに委譲
         const gridRenderer = this.renderers.grid;
@@ -341,18 +315,11 @@ class ChartManager extends BaseManager {
      * @returns {Object|null} レンダラーインスタンス
      */
     getRenderer(type) {
-        console.log(`ChartManager: Getting renderer for type '${type}'`);
-        console.log('Current renderers state:', this.renderers);
-        console.log('Renderers object type:', typeof this.renderers);
-        console.log('Is renderers array?', Array.isArray(this.renderers));
         
         const renderer = this.renderers[type];
         if (!renderer) {
             console.warn(`ChartManager: No renderer available for type: ${type}`);
-            console.log('Available renderer keys:', Object.keys(this.renderers));
-            console.log('Available renderer values:', Object.values(this.renderers));
         } else {
-            console.log(`ChartManager: Found renderer for ${type}:`, renderer.constructor.name);
         }
         return renderer;
     }
@@ -387,7 +354,6 @@ class ChartManager extends BaseManager {
      * @param {Object} chartData - チャートデータ
      */
     renderDualLayout(chartData) {
-        console.log('ChartManager: Rendering dual layout');
         const { charts } = chartData;
         
         if (!charts || !Array.isArray(charts)) {
@@ -663,7 +629,6 @@ class ChartManager extends BaseManager {
             }
         } else {
             console.warn('ChartManager: LineChartRenderer.renderLineChartInGroup not available');
-            console.log('Available renderer methods:', this.renderers.line ? Object.getOwnPropertyNames(Object.getPrototypeOf(this.renderers.line)) : 'No line renderer');
             
             // フォールバック: 基本的な線グラフを直接描画
             this.fallbackLineChartInGroup(g, data, config);
@@ -674,7 +639,6 @@ class ChartManager extends BaseManager {
      * LineChartRendererが利用できない場合のフォールバック
      */
     fallbackLineChartInGroup(g, data, config) {
-        console.log('ChartManager: Using fallback line chart rendering');
         
         const { 
             width, 
@@ -709,7 +673,6 @@ class ChartManager extends BaseManager {
             }];
         }
         
-        console.log('Series data:', seriesData);
         
         // スケール設定
         const allValues = seriesData.flatMap(s => s.values);

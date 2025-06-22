@@ -83,8 +83,6 @@ class ConfigLoader {
             this.loaded = true;
             
             if (this.configs.environment?.debug?.showConfigLoading) {
-                console.log('All configurations loaded successfully', this.configs);
-                console.log('Merged configuration:', this.mergedConfig);
             }
             
             return this.mergedConfig;

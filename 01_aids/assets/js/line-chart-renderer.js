@@ -109,7 +109,6 @@ class LineChartRenderer extends BaseManager {
             this.svg &&
             config.dataFile === this.config?.dataFile) {
             
-            console.log(`Updating chart with transition mode (direction: ${direction || 'unknown'})`);
             this.updateChartWithTransition(data, config, direction);
             return;
         }
@@ -171,7 +170,6 @@ class LineChartRenderer extends BaseManager {
             
             if (config.widthPercent) {
                 actualWidth = window.innerWidth * (config.widthPercent / 100);
-                console.log(`LineChartRenderer: widthPercent=${config.widthPercent}%, actualWidth=${actualWidth}px (window.innerWidth=${window.innerWidth}px)`);
             }
             if (config.heightPercent) {
                 actualHeight = window.innerHeight * (config.heightPercent / 100);
@@ -351,7 +349,6 @@ class LineChartRenderer extends BaseManager {
             const currentSeriesData = newSeries.find(s => s.name === seriesData.name) || seriesData;
             const currentValues = currentSeriesData.values;
             
-            console.log(`Series ${seriesData.name}: Using ${currentValues.length} data points for both line and circles`);
             
             // Object Constancy: 一意キーで各データポイントを追跡
             const dataWithKeys = currentValues.map(v => ({
@@ -364,7 +361,6 @@ class LineChartRenderer extends BaseManager {
             self.updateSeriesWithDiff(group, currentSeriesData, newXScale, newYScale, newLine, colorScale, transitionDuration);
         });
 
-        console.log(`Chart updated with transition: ${data.length} records displayed`);
     }
 
     /**
@@ -383,7 +379,6 @@ class LineChartRenderer extends BaseManager {
         const toAdd = newValues.filter(d => !oldKeys.has(d[this.config?.xField || 'year']));
         const toRemove = oldValues.filter(d => !newKeys.has(d[this.config?.xField || 'year']));
         
-        console.log(`Series ${newSeriesData.name}: +${toAdd.length} -${toRemove.length}`);
         
         // 現在表示中のデータ
         let currentDisplayData = [...oldValues];
@@ -600,7 +595,6 @@ class LineChartRenderer extends BaseManager {
         let filteredData = data;
         if (config.filter) {
             filteredData = this.applyFilter(data, config.filter);
-            console.log(`Filter applied: ${data.length} -> ${filteredData.length} records`);
         }
         
         if (config.multiSeries === false) {
@@ -1121,7 +1115,6 @@ class LineChartRenderer extends BaseManager {
         if (window.ChartLayoutHelper) {
             const seriesNames = series.map(s => s.name);
             legendLayout = ChartLayoutHelper.calculateLegendLayout(seriesNames, width, height);
-            console.log('ChartLayoutHelper legend layout:', legendLayout);
         } else {
             // フォールバック：従来の固定レイアウト
             legendLayout = {
@@ -1136,7 +1129,6 @@ class LineChartRenderer extends BaseManager {
         
         // bottomポジションが問題を起こしている場合は強制的にrightに変更
         if (legendLayout.position === 'bottom') {
-            console.log('Forcing legend position from bottom to right to avoid overflow');
             legendLayout.position = 'right';
             legendLayout.orientation = 'vertical';
         }
@@ -1159,7 +1151,6 @@ class LineChartRenderer extends BaseManager {
             legendY = 20;
         }
         
-        console.log('Legend position:', { x: legendX, y: legendY, width, height, position: legendLayout.position });
         
         legend.attr('transform', `translate(${legendX}, ${legendY})`);
         
@@ -1364,7 +1355,6 @@ class LineChartRenderer extends BaseManager {
 
         // 小画面の場合は従来の凡例を使用
         if (window.innerWidth < inlineConfig.responsiveThreshold) {
-            console.log('LineChartRenderer: Screen too small for inline labels, using traditional legend');
             this.addCompactLegend(g, series, colorScale, width, height);
             return;
         }
@@ -1558,7 +1548,6 @@ class LineChartRenderer extends BaseManager {
      * @param {Object} config - デュアルレイアウト設定
      */
     applyDualLayoutPlacement(labels, width, height, config) {
-        console.log('LineChartRenderer: Applying dual layout placement for', labels.length, 'labels');
         
         // Y座標でソート
         const sortedLabels = [...labels].sort((a, b) => a.anchorY - b.anchorY);
@@ -1594,7 +1583,6 @@ class LineChartRenderer extends BaseManager {
             label.x = Math.min(targetX, width + config.maxExtensionWidth - label.width - 5);
         });
         
-        console.log('LineChartRenderer: Dual layout placement completed with upward offset');
     }
     
     /**
@@ -1683,7 +1671,6 @@ class LineChartRenderer extends BaseManager {
             .style('opacity', 0.7)
             .style('stroke-dasharray', '2,2');
         
-        console.log('LineChartRenderer: Inline labels added with animation');
     }
 
     /**
@@ -1713,14 +1700,12 @@ class LineChartRenderer extends BaseManager {
             this.preProcessLabelPositions(labels, config);
 
             // デバッグ：初期位置を記録
-            console.log('LineChartRenderer: Before D3-Labeler optimization:');
             const beforePositions = labels.map(label => ({
                 text: label.text,
                 x: label.x,
                 y: label.y
             }));
             beforePositions.forEach((pos, i) => {
-                console.log(`  Label ${i} "${pos.text}": x=${Math.round(pos.x)}, y=${Math.round(pos.y)}`);
             });
 
             // D3-Labelerを実行（座標系を正しく設定）
@@ -1731,14 +1716,11 @@ class LineChartRenderer extends BaseManager {
                 .height(height + 50) // 高さも少し拡張
                 .start(1000); // イテレーション数
 
-            console.log('LineChartRenderer: D3-Labeler executed');
 
             // デバッグ：最適化後の位置を確認
-            console.log('LineChartRenderer: After D3-Labeler optimization:');
             labels.forEach((label, i) => {
                 const before = beforePositions[i];
                 const moved = Math.abs(label.x - before.x) > 1 || Math.abs(label.y - before.y) > 1;
-                console.log(`  Label ${i} "${label.text}": x=${Math.round(label.x)}, y=${Math.round(label.y)} ${moved ? '(MOVED)' : '(NOT MOVED)'}`);
             });
             
             // 後処理：チャート範囲外に出たラベルを調整
@@ -1817,7 +1799,6 @@ class LineChartRenderer extends BaseManager {
      * @param {Object} config - インライン設定
      */
     applyDeterministicLabelPlacement(labels, width, height, config) {
-        console.log('LineChartRenderer: Applying deterministic label placement for', labels.length, 'labels');
         
         // アンカーY座標でソート（上から下へ）
         const sortedLabels = [...labels].sort((a, b) => a.anchorY - b.anchorY);
@@ -1837,9 +1818,7 @@ class LineChartRenderer extends BaseManager {
         // X座標を調整（より右寄りで統一された配置）
         this.adjustXPositionsImproved(sortedLabels, width, config);
         
-        console.log('LineChartRenderer: Label placement completed');
         sortedLabels.forEach((label, i) => {
-            console.log(`  ${i}: "${label.text}" at (${Math.round(label.x)}, ${Math.round(label.y)})`);
         });
     }
 
@@ -1873,7 +1852,6 @@ class LineChartRenderer extends BaseManager {
             currentY += label.height + minSpacing;
         });
         
-        console.log(`Centered distribution: chartCenter=${chartCenter}, startY=${actualStartY}, requiredHeight=${requiredHeight}`);
     }
 
     /**
@@ -1889,7 +1867,6 @@ class LineChartRenderer extends BaseManager {
             label.x = Math.min(baseX, width + maxExtension - label.width - 10);
         });
         
-        console.log(`Improved X positioning: baseX=${baseX}, width=${width}`);
     }
 
     /**
@@ -1940,7 +1917,6 @@ class LineChartRenderer extends BaseManager {
      * @param {Object} config - インライン設定
      */
     applySimpleCollisionAvoidance(labels, config) {
-        console.log('LineChartRenderer: Applying simple collision avoidance for', labels.length, 'labels');
         
         // Y座標でソートして上から順に配置
         const sortedLabels = [...labels].sort((a, b) => a.anchorY - b.anchorY);
@@ -1959,7 +1935,6 @@ class LineChartRenderer extends BaseManager {
             }
         }
         
-        console.log('LineChartRenderer: Simple collision avoidance completed');
     }
 
     /**
@@ -2116,7 +2091,6 @@ class LineChartRenderer extends BaseManager {
     renderAnnotations(g, annotations, context) {
         if (!annotations || annotations.length === 0) return;
         
-        console.log('LineChartRenderer: Rendering annotations:', annotations);
         const { xScale, yScale, width, height, isYearData, xField, yField } = context;
         
         // スケールが存在しない場合は処理をスキップ
@@ -2334,7 +2308,6 @@ class LineChartRenderer extends BaseManager {
      * @param {Object} config - 設定
      */
     renderProgressiveAnimation(seriesGroups, series, line, xScale, yScale, xField, yField, colorScale, config) {
-        console.log('LineChartRenderer: Starting progressive animation');
         
         const animationConfig = config.animation || {};
         const totalDuration = animationConfig.duration || 3000;
@@ -2349,7 +2322,6 @@ class LineChartRenderer extends BaseManager {
         });
         const sortedYears = Array.from(allYears).sort((a, b) => a - b);
         
-        console.log('LineChartRenderer: Progressive animation years:', sortedYears);
         
         // 既存のすべてのアニメーションタイマーをクリア
         this.clearAllAnimationTimers();
@@ -2453,30 +2425,22 @@ class LineChartRenderer extends BaseManager {
      * @returns {Function} D3カラースケール
      */
     createColorScale(series, config) {
-        console.log('LineChartRenderer: Creating color scale for series', series.map(s => s.name));
-        console.log('LineChartRenderer: Config:', config);
-        console.log('LineChartRenderer: ColorScheme available:', !!window.ColorScheme);
-        console.log('LineChartRenderer: colorScheme instance available:', !!window.colorScheme);
         
         if (config.colors && config.colors.length > 0 && config.multiSeries === false) {
             // 単一系列の明示色
-            console.log('LineChartRenderer: Using explicit config colors for single series', config.colors);
             return d3.scaleOrdinal(config.colors).domain(series.map(d => d.name));
         } else if (window.ColorScheme && config.useUnifiedColors !== false) {
             // 統一カラースキーム：地域名→色の直接マッピング
-            console.log('LineChartRenderer: Using unified color scheme for series', series.map(s => s.name));
             
             // ColorSchemeインスタンスを取得または作成
             let colorScheme = window.colorScheme;
             if (!colorScheme) {
-                console.log('LineChartRenderer: Creating new ColorScheme instance');
                 colorScheme = new ColorScheme();
                 window.colorScheme = colorScheme;
             }
             
             const regionColors = series.map(s => {
                 const color = colorScheme.getRegionColor(s.name);
-                console.log(`LineChartRenderer: ${s.name} -> ${color}`);
                 return color;
             });
             return d3.scaleOrdinal()
@@ -2485,8 +2449,6 @@ class LineChartRenderer extends BaseManager {
         } else {
             // フォールバック
             const colors = config.colors || window.AppConstants?.APP_COLORS?.PRIMARY_PALETTE || d3.schemeCategory10;
-            console.log('LineChartRenderer: Using fallback colors', colors);
-            console.log('LineChartRenderer: Reason for fallback - ColorScheme available:', !!window.ColorScheme, 'useUnifiedColors:', config.useUnifiedColors);
             return d3.scaleOrdinal(colors).domain(series.map(d => d.name));
         }
     }
@@ -2497,7 +2459,6 @@ class LineChartRenderer extends BaseManager {
     clearAllAnimationTimers() {
         this.animationTimers.forEach(timer => clearTimeout(timer));
         this.animationTimers = [];
-        console.log('LineChartRenderer: Cleared all animation timers');
     }
 
     /**
@@ -2505,7 +2466,6 @@ class LineChartRenderer extends BaseManager {
      */
     resize() {
         if (this.currentChart && this.data && this.config) {
-            console.log('LineChartRenderer: Resizing chart');
             this.renderChart(this.currentChart, this.data, this.config);
         }
     }

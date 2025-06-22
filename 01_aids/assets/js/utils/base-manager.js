@@ -86,7 +86,6 @@ class BaseManager {
      */
     resize() {
         // 子クラスでオーバーライド
-        console.log(`${this.constructor.name}: resize() called`);
     }
 
     /**
@@ -273,7 +272,6 @@ class BaseManager {
         this.clearContainer();
         
         // イベントリスナーの削除（pubsubでは自動的に処理される）
-        console.log(`${this.constructor.name} destroyed`);
     }
 }
 

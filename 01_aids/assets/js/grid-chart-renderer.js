@@ -130,7 +130,6 @@ class GridChartRenderer extends BaseManager {
         try {
             // データを適切な形式に変換
             const gridData = this.transformToGridData(data, mergedConfig);
-            console.log('Grid data:', gridData);
             
             // 全体のサイズを計算（行間スペーシングを含む）
             const totalWidth = columns * chartWidth;
@@ -326,7 +325,6 @@ class GridChartRenderer extends BaseManager {
         const result = [];
         const regions = [];
         
-        console.log('Raw data for transformation:', data);
         
         try {
             data.forEach(row => {
@@ -388,7 +386,6 @@ class GridChartRenderer extends BaseManager {
                 result.push(regionData.child);
             });
             
-            console.log('Transformed grid data:', result);
             return result;
         } catch (error) {
             console.error('GridChartRenderer: Error transforming data:', error);
@@ -533,7 +530,6 @@ class GridChartRenderer extends BaseManager {
      */
     resize() {
         if (this.currentChart && this.data && this.config) {
-            console.log('GridChartRenderer: Resizing chart');
             
             // レスポンシブレイアウトを再計算
             const responsiveConfig = this.calculateResponsiveLayout(this.config);
@@ -551,7 +547,6 @@ class GridChartRenderer extends BaseManager {
      */
     updateChartWithTransition(data, config, direction = 'down') {
         // 将来の拡張: グリッドチャートのスムーズな更新機能
-        console.log('GridChartRenderer: Transition update not yet implemented for grid charts');
         
         // 現状は通常の再描画を実行
         this.renderGridChart(data, config);

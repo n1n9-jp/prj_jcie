@@ -42,7 +42,6 @@ class PieChartRenderer extends BaseManager {
             this.svg &&
             config.dataFile === this.config?.dataFile) {
             
-            console.log(`Updating pie chart with transition mode (direction: ${direction || 'unknown'})`);
             this.updateChartWithTransition(data, config, direction);
             return;
         }
@@ -110,7 +109,6 @@ class PieChartRenderer extends BaseManager {
             
             if (config.widthPercent) {
                 actualWidth = window.innerWidth * (config.widthPercent / 100);
-                console.log(`PieChartRenderer: widthPercent=${config.widthPercent}%, actualWidth=${actualWidth}px (window.innerWidth=${window.innerWidth}px)`);
             }
             if (config.heightPercent) {
                 actualHeight = window.innerHeight * (config.heightPercent / 100);
@@ -241,7 +239,6 @@ class PieChartRenderer extends BaseManager {
                 }
             );
 
-            console.log(`Pie chart updated with transition: ${data.length} slices displayed`);
         } catch (error) {
             console.error('PieChartRenderer: Error during transition update:', error);
             if (window.ErrorHandler) {
@@ -367,7 +364,6 @@ class PieChartRenderer extends BaseManager {
         let filteredData = data;
         if (config.filter) {
             filteredData = this.applyFilter(data, config.filter);
-            console.log(`Filter applied to pie chart: ${data.length} -> ${filteredData.length} records`);
         }
         
         const svg = this.svg;
@@ -483,11 +479,9 @@ class PieChartRenderer extends BaseManager {
      * @param {Array} charts - チャート設定配列（3つ）
      */
     renderTripleChart(charts) {
-        console.log('PieChartRenderer: renderTripleChart called with:', charts);
         const containerNode = this.container.node();
         const containerWidth = containerNode.clientWidth;
         const containerHeight = containerNode.clientHeight;
-        console.log('PieChartRenderer: Container dimensions:', { containerWidth, containerHeight });
         
         // 全体のSVGサイズを計算
         const totalWidth = Math.min(containerWidth * 0.95, 1200);
@@ -516,10 +510,8 @@ class PieChartRenderer extends BaseManager {
      * Triple layout内で単一の円グラフを描画
      */
     renderSinglePieChartInTriple(svg, chartConfig, layout) {
-        console.log('PieChartRenderer: renderSinglePieChartInTriple called with:', { chartConfig, layout });
         const { data, config, title } = chartConfig;
         const { x, y, width, height } = layout;
-        console.log('PieChartRenderer: Data for pie chart:', data);
         
         const radius = Math.min(width, height - 80) / 2; // タイトル分を除く
         
@@ -926,7 +918,6 @@ class PieChartRenderer extends BaseManager {
      */
     resize() {
         if (this.currentChart && this.data && this.config) {
-            console.log('PieChartRenderer: Resizing chart');
             this.renderChart(this.currentChart, this.data, this.config);
         }
     }

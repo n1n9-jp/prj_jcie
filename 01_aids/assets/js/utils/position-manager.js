@@ -33,14 +33,7 @@ class PositionManager {
             debugMode = false
         } = options;
 
-        if (debugMode) {
-            console.log('PositionManager: Applying position config:', positionConfig);
-            console.log('PositionManager: Container before:', {
-                id: container.id,
-                classes: Array.from(container.classList),
-                justifyContent: window.getComputedStyle(container).justifyContent
-            });
-        }
+        // Debug mode information (removed for performance)
 
         // 基本クラスをリセット
         this.resetContainerClasses(container);
@@ -53,13 +46,7 @@ class PositionManager {
         container.classList.add(horizontalClass);
         container.classList.add(verticalClass);
         
-        if (debugMode) {
-            console.log('PositionManager: Added classes:', {
-                horizontal: horizontalClass,
-                vertical: verticalClass,
-                allClasses: Array.from(container.classList)
-            });
-        }
+        // Debug information for position classes (removed for performance)
 
         // レスポンシブクラスを追加
         if (responsive) {
@@ -98,31 +85,7 @@ class PositionManager {
             this.applyResponsiveAdjustments(container, positionConfig);
         }
 
-        if (debugMode) {
-            const computedStyle = window.getComputedStyle(container);
-            console.log('PositionManager: Container after:', {
-                id: container.id,
-                classes: Array.from(container.classList),
-                display: computedStyle.display,
-                justifyContent: computedStyle.justifyContent,
-                alignItems: computedStyle.alignItems,
-                position: computedStyle.position,
-                width: computedStyle.width,
-                height: computedStyle.height
-            });
-            
-            // 子要素（SVG）の情報も出力
-            const svg = container.querySelector('svg');
-            if (svg) {
-                const svgStyle = window.getComputedStyle(svg);
-                console.log('PositionManager: SVG element:', {
-                    width: svg.getAttribute('width') || svgStyle.width,
-                    height: svg.getAttribute('height') || svgStyle.height,
-                    viewBox: svg.getAttribute('viewBox'),
-                    display: svgStyle.display
-                });
-            }
-        }
+        // Debug information for final container styles and SVG elements (removed for performance)
     }
 
     /**
@@ -499,9 +462,7 @@ class PositionManager {
             debugMode = false
         } = options;
 
-        if (debugMode) {
-            console.log('PositionManager: Applying text position config:', positionConfig);
-        }
+        // Debug mode information (removed for performance)
 
         // ステップ要素のクラスをリセット
         this.resetTextClasses(stepElement);
@@ -518,12 +479,7 @@ class PositionManager {
         const textContainer = stepElement.querySelector('.max-w-lg, .text-content, div[class*="bg-white"]');
         const parentContainer = stepElement.querySelector('.w-full.min-h-screen.flex.items-center');
         
-        if (debugMode) {
-            console.log('PositionManager: stepElement found:', stepElement);
-            console.log('PositionManager: textContainer found:', textContainer);
-            console.log('PositionManager: parentContainer found:', parentContainer);
-            console.log('PositionManager: textContainer classes before:', textContainer ? Array.from(textContainer.classList) : 'not found');
-        }
+        // Debug mode text container information (removed for performance)
         
         if (textContainer && parentContainer) {
             // 親要素のFlexboxで白い矩形の位置を制御
@@ -535,22 +491,16 @@ class PositionManager {
                     parentContainer.classList.add('justify-end');
                     textContainer.classList.remove('mx-auto');
                     textContainer.classList.add('mr-0', 'ml-auto');
-                    if (debugMode) console.log('Applied RIGHT positioning to white container');
                     break;
                 case 'left':
                     parentContainer.classList.add('justify-start');
                     textContainer.classList.remove('mx-auto');
                     textContainer.classList.add('ml-0', 'mr-auto');
-                    if (debugMode) {
-                console.log('Applied LEFT positioning to white container');
-                console.log('Parent container classes after LEFT:', Array.from(parentContainer.classList));
-                console.log('Text container classes after LEFT:', Array.from(textContainer.classList));
-            }
+                    // Debug information for left positioning (removed for performance)
                     break;
                 default:
                     parentContainer.classList.add('justify-center');
                     textContainer.classList.add('mx-auto');
-                    if (debugMode) console.log('Applied CENTER positioning to white container');
                     break;
             }
             
@@ -568,13 +518,7 @@ class PositionManager {
             this.applyTextResponsiveAdjustments(stepElement, positionConfig);
         }
 
-        if (debugMode) {
-            console.log('PositionManager: Text positioning applied:', {
-                step: stepElement.getAttribute('data-step'),
-                classes: Array.from(stepElement.classList),
-                textContainer: textContainer
-            });
-        }
+        // Debug information for text position applied (removed for performance)
     }
 
     /**
@@ -702,23 +646,8 @@ class PositionManager {
     static debugPosition(container, positionConfig) {
         if (!container) return;
 
-        const rect = container.getBoundingClientRect();
-        const computedStyle = window.getComputedStyle(container);
-
-        console.group('PositionManager Debug Info');
-        console.log('Container:', container);
-        console.log('Position Config:', positionConfig);
-        console.log('Computed Styles:', {
-            position: computedStyle.position,
-            left: computedStyle.left,
-            top: computedStyle.top,
-            width: computedStyle.width,
-            height: computedStyle.height,
-            transform: computedStyle.transform
-        });
-        console.log('Bounding Rect:', rect);
-        console.log('Classes:', Array.from(container.classList));
-        console.groupEnd();
+        // Debug position information (removed for performance)
+        // Previously contained container getBoundingClientRect and computed styles logging
     }
 }
 

@@ -22,9 +22,7 @@ class CityFocusManager {
         }
 
         return ErrorHandler.wrapAsync(async () => {
-            console.log('CityFocusManager: Loading cities data from:', citiesFile);
             this.citiesTimelineData = await d3.json(citiesFile);
-            console.log('CityFocusManager: Cities data loaded:', this.citiesTimelineData);
             return this.citiesTimelineData;
         }, 'CityFocusManager.loadCitiesData', {
             type: ErrorHandler.ERROR_TYPES.DATA_LOAD,
@@ -50,7 +48,6 @@ class CityFocusManager {
             this.visibleCities = [];
             this.currentCity = null;
             
-            console.log('CityFocusManager: Timeline mode initialized');
             
         } catch (error) {
             ErrorHandler.handle(error, 'CityFocusManager.initializeTimelineMode', {
@@ -82,7 +79,6 @@ class CityFocusManager {
             this.visibleCities = [];
             this.currentCity = targetCity;
             
-            console.log('CityFocusManager: Single city mode initialized for:', targetCity.name);
             return targetCity;
             
         } catch (error) {
@@ -373,7 +369,6 @@ class CityFocusManager {
         const geoInfoContainer = document.getElementById(`geographic-info-${stepId}`);
         
         if (!geoInfoContainer) {
-            console.log('Geographic info container not found for step:', stepId);
             return;
         }
         

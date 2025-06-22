@@ -33,7 +33,6 @@ class ScrollytellingApp {
             // リサイズイベントを設定
             this.initResizeHandler();
             
-            console.log('Scrollytelling app initialized successfully');
             
         } catch (error) {
             console.error('Failed to initialize app:', error);
@@ -46,7 +45,6 @@ class ScrollytellingApp {
      */
     async loadData() {
         try {
-            console.log('Starting data loading...');
             
             // 新しい設定システムを使用して設定を読み込む
             await window.ConfigLoader.loadAll();
@@ -54,13 +52,9 @@ class ScrollytellingApp {
             
             // デバッグ情報を出力
             const env = window.ConfigLoader.getEnvironment();
-            console.log('Environment detected:', env.type);
-            console.log('Config loaded via new system:', config);
-            console.log('Debug mode:', window.ConfigLoader.isDebugMode());
             
             // cities-timeline.jsonを読み込む
             const citiesData = await d3.json('data/cities-timeline.json');
-            console.log('Cities timeline data loaded:', citiesData);
             
             // 設定から必要なデータファイルを抽出
             const dataFiles = new Set();
@@ -82,7 +76,6 @@ class ScrollytellingApp {
                 }
             });
             
-            console.log('Data files to load:', Array.from(dataFiles));
             
             // 動的にデータファイルを読み込む
             const dataPromises = [
@@ -97,7 +90,6 @@ class ScrollytellingApp {
             const csvData = {};
             Array.from(dataFiles).forEach((file, index) => {
                 csvData[file] = dataResults[index];
-                console.log(`Loaded ${file}:`, dataResults[index].slice(0, 2));
             });
             
             this.config = config;
@@ -172,7 +164,6 @@ class ScrollytellingApp {
             container.appendChild(stepDiv);
         });
         
-        console.log(`Generated ${citiesData.cities.length} city steps`);
     }
 
     /**
@@ -188,12 +179,10 @@ class ScrollytellingApp {
      * マネージャーを初期化
      */
     initManagers() {
-        console.log('Initializing managers...');
         
         // ColorSchemeを初期化
         if (!window.colorScheme && window.ColorScheme) {
             window.colorScheme = new ColorScheme();
-            console.log('ColorScheme initialized');
         }
         
         this.chartManager = new ChartManager('#chart');
@@ -201,10 +190,7 @@ class ScrollytellingApp {
         this.imageManager = new ImageManager('#image-container');
         
         // 地図データを設定
-        console.log('Setting geo data...');
-        console.log('Map data available:', !!this.data.map);
         if (this.data.map) {
-            console.log('Calling mapManager.setGeoData()');
             this.mapManager.setGeoData(this.data.map);
         } else {
             console.error('No map data available for setting geo data');
@@ -248,17 +234,10 @@ class ScrollytellingApp {
             return;
         }
 
-        console.log(`Entering step ${index} (direction: ${direction})`, stepConfig);
 
         // step18の詳細デバッグ（stepConfig.idで判定）
         if (stepConfig.id === 'step18') {
-            console.log('=== STEP 18 DEBUG ===');
-            console.log('Step index:', index);
-            console.log('Step config:', stepConfig);
-            console.log('Chart config:', stepConfig.chart);
-            console.log('Chart layout:', stepConfig.chart?.layout);
-            console.log('Chart charts:', stepConfig.chart?.charts);
-            console.log('Chart visible:', stepConfig.chart?.visible);
+            // Debug information for step18 (removed for performance)
         }
 
         // チャート更新
@@ -306,7 +285,6 @@ class ScrollytellingApp {
                         if (nextStepConfig?.chart?.dataFile === stepConfig.chart.dataFile &&
                             nextStepConfig?.chart?.updateMode === 'transition') {
                             updateMode = 'transition';
-                            console.log(`Using transition mode for reverse scroll from step ${index + 1} to ${index}`);
                         }
                     }
                     
@@ -326,17 +304,13 @@ class ScrollytellingApp {
 
         // 地図更新
         if (stepConfig.map) {
-            console.log('Step has map config:', stepConfig.map);
             const mapData = {
                 ...stepConfig.map,
                 data: this.data.map
             };
-            console.log('Publishing MAP_UPDATE event with data:', mapData);
-            console.log('Map data available:', !!this.data.map);
-            console.log('Map data type:', this.data.map?.type);
             pubsub.publish(EVENTS.MAP_UPDATE, mapData);
         } else {
-            console.log('Step has no map config');
+            // Map configuration not found
         }
 
         // 画像更新
@@ -366,7 +340,6 @@ class ScrollytellingApp {
     handleStepExit(response) {
         const { index, direction } = response;
         
-        console.log(`Exiting step ${index}`);
         
         // ステップ退出イベントを発行
         pubsub.publish(EVENTS.STEP_EXIT, { index, direction });
@@ -381,15 +354,12 @@ class ScrollytellingApp {
         const stepConfig = this.config?.steps?.[index];
         
         if (!stepConfig) {
-            console.log('Main: No step config for index', index);
             return;
         }
 
-        console.log(`Main: Step ${index} progress: ${(progress * 100).toFixed(1)}%, direction: ${direction}`);
 
         // 都市タイムラインモードの場合のみ進行度イベントを発行
         if (stepConfig.map?.mode === "cities-timeline") {
-            console.log(`Main: Publishing MAP_PROGRESS for cities timeline`);
             pubsub.publish(EVENTS.MAP_PROGRESS, {
                 progress: progress,
                 direction: direction,
@@ -411,15 +381,11 @@ class ScrollytellingApp {
         // 新しいデータ構造から指定されたファイルのデータを取得
         if (dataFile && this.data.csv && this.data.csv[dataFile]) {
             const data = this.data.csv[dataFile];
-            console.log(`Returning data for ${dataFile}: ${data.length} records`);
-            if (dataFile.includes('africa_young')) {
-                console.log('Sample data for', dataFile, ':', data.slice(0, 3));
-            }
+            // Special handling for africa_young data files (debug info removed)
             return data;
         }
         
         console.warn(`Data file not found: ${dataFile}`);
-        console.log('Available data files:', Object.keys(this.data.csv || {}));
         return [];
     }
 
@@ -441,7 +407,7 @@ class ScrollytellingApp {
      * リサイズ処理
      */
     handleResize() {
-        console.log('Window resized');
+        // Handle window resize events
         
         // スクローラーをリサイズ
         if (this.scroller) {
@@ -539,7 +505,6 @@ class ScrollytellingApp {
         `;
 
         containerDiv.appendChild(footer);
-        console.log('Footer rendered successfully');
     }
 
     /**
@@ -624,21 +589,8 @@ class ScrollytellingApp {
             debugMode: true  // チャートのデバッグモードを有効化
         });
 
-        console.log(`Applied chart positioning for step ${stepIndex}:`, positionConfig);
         
-        // デバッグ用：実際のコンテナクラスとスタイルを確認
-        const computedStyle = window.getComputedStyle(container);
-        console.log(`Chart-container classes:`, Array.from(container.classList));
-        console.log(`Chart-container styles:`, {
-            position: container.style.position,
-            display: computedStyle.display,
-            justifyContent: computedStyle.justifyContent,
-            alignItems: computedStyle.alignItems,
-            width: container.style.width,
-            height: container.style.height,
-            top: computedStyle.top,
-            left: computedStyle.left
-        });
+        // Debug information removed for performance
     }
 
     /**
@@ -672,7 +624,6 @@ class ScrollytellingApp {
             debugMode: false
         });
 
-        console.log(`Applied map positioning for step ${stepIndex}:`, positionConfig);
     }
 
     /**
@@ -706,19 +657,8 @@ class ScrollytellingApp {
             debugMode: false
         });
 
-        console.log(`Applied image positioning for step ${stepIndex}:`, positionConfig);
         
-        // デバッグ用：実際の要素スタイルを確認
-        const imgElement = container.querySelector('#image');
-        if (imgElement) {
-            console.log(`Image element styles:`, {
-                containerWidth: container.style.width,
-                containerHeight: container.style.height,
-                imgWidth: imgElement.style.width,
-                imgHeight: imgElement.style.height,
-                objectFit: imgElement.style.objectFit
-            });
-        }
+        // Debug information for image element styles (removed for performance)
     }
 
     /**
@@ -756,7 +696,7 @@ class ScrollytellingApp {
 
         // 複数コンテンツが表示される場合の調整
         if (visibleContents.length > 1) {
-            console.log(`Adjusting multi-content layout for step ${stepIndex}:`, visibleContents.map(c => c.type));
+            // Multiple content layout adjustment
 
             // z-indexの調整
             visibleContents.forEach((content, index) => {
@@ -826,14 +766,13 @@ class ScrollytellingApp {
 
         // テキストの表示/非表示をチェック
         if (stepConfig.text && stepConfig.text.visible === false) {
-            console.log(`Text is hidden for step ${stepIndex}, removing text box`);
             this.hideTextBox(stepElement);
             return;
         }
 
         // テキストポジション設定があるかチェック
         if (stepConfig.text && stepConfig.text.position) {
-            console.log(`Applying text positioning for step ${stepIndex}:`, stepConfig.text.position);
+            // Text position configuration found
 
             // ポジション設定を取得・マージ
             const positionConfig = PositionManager.mergePositionConfig(
@@ -861,7 +800,6 @@ class ScrollytellingApp {
                 debugMode: true // デバッグモードを有効に
             });
 
-            console.log(`Applied text positioning for step ${stepIndex}:`, positionConfig);
         } else {
             // テキストポジション設定がない場合はデフォルト（中央）
             this.resetTextPosition(stepElement);
@@ -947,7 +885,6 @@ class ScrollytellingApp {
             this.resetTextPosition(step);
         });
 
-        console.log('All content and text positions reset to default');
     }
 
     /**
@@ -958,7 +895,7 @@ class ScrollytellingApp {
             return;
         }
 
-        console.log('Pre-applying text positions to prevent flickering...');
+        // Pre-apply text positions to prevent flickering
         
         this.config.steps.forEach((stepConfig, stepIndex) => {
             if (stepConfig.text && stepConfig.text.visible === false) {
@@ -997,10 +934,9 @@ class ScrollytellingApp {
             container.style.display = 'none';
         });
         
-        // デバッグ用にクラスを追加
+        // Add debug class for hidden text
         stepElement.classList.add('text-hidden');
         
-        console.log('Text box hidden for step:', stepElement.getAttribute('data-step'));
     }
 
     /**
@@ -1016,10 +952,9 @@ class ScrollytellingApp {
             container.style.display = '';
         });
         
-        // デバッグ用クラスを削除
+        // Remove debug class for visible text
         stepElement.classList.remove('text-hidden');
         
-        console.log('Text box shown for step:', stepElement.getAttribute('data-step'));
     }
 
 
@@ -1040,10 +975,8 @@ window.debugScrollytelling = {
     
     // ステップを手動でトリガー
     triggerStep: (index) => {
-        console.log(`Debug: Triggering step ${index}`);
         const stepConfig = window.app?.config?.steps?.[index];
         if (stepConfig) {
-            console.log(`Debug: Step config found:`, stepConfig);
             window.app.handleStepEnter({ index, direction: 'down' });
         } else {
             console.error(`Debug: No step config found for index ${index}`);
@@ -1052,7 +985,6 @@ window.debugScrollytelling = {
     
     // 地図を表示するステップ（step2）をトリガー
     showMap: () => {
-        console.log('Debug: Showing map (triggering step 2)');
         window.debugScrollytelling.triggerStep(2);
     },
     
@@ -1069,31 +1001,23 @@ window.debugScrollytelling = {
     
     // 地図を手動で更新
     updateMap: (center = [0, 0], zoom = 1, visible = true) => {
-        console.log('Debug: Manual map update:', { center, zoom, visible });
         const mapData = {
             center,
             zoom,
             visible,
             data: window.app?.data?.map
         };
-        console.log('Debug: Map data being sent:', mapData);
         pubsub.publish(EVENTS.MAP_UPDATE, mapData);
     },
     
     // 地図マネージャーの状態を確認
     checkMapManager: () => {
         const mapManager = window.app?.mapManager;
-        console.log('Debug: Map manager:', mapManager);
-        console.log('Debug: Geo data:', mapManager?.geoData);
-        console.log('Debug: Current view:', mapManager?.currentView);
         return mapManager;
     },
     
     // データ読み込み状況を確認
     checkDataLoading: () => {
-        console.log('Debug: App data:', window.app?.data);
-        console.log('Debug: Map data type:', window.app?.data?.map?.type);
-        console.log('Debug: Map objects:', window.app?.data?.map?.objects);
         return window.app?.data;
     }
 };
