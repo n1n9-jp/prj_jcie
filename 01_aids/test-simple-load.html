@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Load Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .status { padding: 10px; margin: 5px 0; border-radius: 3px; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .loading { background: #fff3cd; color: #856404; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Simple Load Test</h1>
+    <div id="status" class="status loading">JavaScript読み込み中...</div>
+    
+    <!-- 感染症設定 -->
+    <script>
+        window.DISEASE_TYPE = 'aids';
+        console.log('✅ DISEASE_TYPE set:', window.DISEASE_TYPE);
+        
+        function updateStatus(message, type = 'loading') {
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = message;
+            statusDiv.className = `status ${type}`;
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+        
+        // スクリプト読み込み成功・失敗を監視
+        function addScriptWithStatus(src, name) {
+            return new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = src;
+                script.onload = () => {
+                    console.log(`✅ ${name} loaded successfully`);
+                    resolve();
+                };
+                script.onerror = (error) => {
+                    console.error(`❌ ${name} failed to load:`, error);
+                    console.error(`   Path: ${src}`);
+                    reject(new Error(`Failed to load ${name}`));
+                };
+                document.head.appendChild(script);
+            });
+        }
+        
+        async function loadScripts() {
+            try {
+                updateStatus('Step 1: disease-config.js 読み込み中...');
+                await addScriptWithStatus('../shared/assets/js/config/disease-config.js', 'disease-config.js');
+                
+                updateStatus('Step 2: DiseaseDetector確認中...');
+                if (window.DiseaseDetector) {
+                    console.log('✅ DiseaseDetector available');
+                    console.log('   Disease type:', window.DiseaseDetector.getDiseaseType());
+                } else {
+                    throw new Error('DiseaseDetector not available');
+                }
+                
+                updateStatus('Step 3: config-loader.js 読み込み中...');
+                await addScriptWithStatus('../shared/assets/js/utils/config-loader.js', 'config-loader.js');
+                
+                updateStatus('Step 4: ConfigLoader確認中...');
+                if (window.ConfigLoader) {
+                    console.log('✅ ConfigLoader available');
+                } else {
+                    throw new Error('ConfigLoader not available');
+                }
+                
+                updateStatus('✅ 全てのスクリプトが正常に読み込まれました！', 'success');
+                
+            } catch (error) {
+                updateStatus(`❌ エラー: ${error.message}`, 'error');
+                console.error('Script loading failed:', error);
+            }
+        }
+        
+        // ページ読み込み完了後に実行
+        window.addEventListener('load', loadScripts);
+    </script>
+</body>
+</html>

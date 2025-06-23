@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shared Integration Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; border-radius: 5px; }
+        .result { margin: 10px 0; padding: 10px; background: #f0f0f0; border-radius: 3px; }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        .loading { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+        .color-preview { width: 100px; height: 30px; border: 1px solid #000; margin: 5px 0; display: inline-block; }
+        .file-list { max-height: 200px; overflow-y: auto; background: #f8f9fa; padding: 10px; border-radius: 3px; }
+        .console-output { max-height: 150px; overflow-y: auto; background: #2d3748; color: #e2e8f0; padding: 10px; border-radius: 3px; font-family: monospace; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Shared System Integration Test</h1>
+    <p>新しいshared/構造での統合テスト</p>
+    
+    <div class="test-section">
+        <h2>1. ファイル読み込み確認</h2>
+        <div id="file-loading-result" class="result loading">テスト中...</div>
+        <div id="file-list" class="file-list"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>2. 感染症システム統合</h2>
+        <div id="disease-system-result" class="result loading">テスト中...</div>
+    </div>
+    
+    <div class="test-section">
+        <h2>3. ConfigLoader統合</h2>
+        <div id="config-loader-result" class="result loading">テスト中...</div>
+    </div>
+    
+    <div class="test-section">
+        <h2>4. データ読み込み確認</h2>
+        <div id="data-loading-result" class="result loading">テスト中...</div>
+    </div>
+    
+    <div class="test-section">
+        <h2>5. CSS変数・テーマ適用</h2>
+        <div id="css-theme-result" class="result loading">テスト中...</div>
+        <div>
+            プライマリ: <div class="color-preview" id="primary-preview"></div>
+            セカンダリ: <div class="color-preview" id="secondary-preview"></div>
+            アクセント: <div class="color-preview" id="accent-preview"></div>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>6. Manager Classes動作確認</h2>
+        <div id="managers-result" class="result loading">テスト中...</div>
+    </div>
+    
+    <div class="test-section">
+        <h2>7. コンソールログ</h2>
+        <div id="console-output" class="console-output"></div>
+    </div>
+
+    <!-- 感染症設定 -->
+    <script>
+        window.DISEASE_TYPE = 'aids';
+        
+        // コンソールログキャプチャ
+        const originalConsole = {
+            log: console.log,
+            warn: console.warn,
+            error: console.error
+        };
+        
+        const consoleOutput = [];
+        ['log', 'warn', 'error'].forEach(method => {
+            console[method] = function(...args) {
+                consoleOutput.push(`[${method.toUpperCase()}] ${args.join(' ')}`);
+                originalConsole[method].apply(console, args);
+                updateConsoleDisplay();
+            };
+        });
+        
+        function updateConsoleDisplay() {
+            const output = document.getElementById('console-output');
+            output.innerHTML = consoleOutput.slice(-20).join('\n');
+            output.scrollTop = output.scrollHeight;
+        }
+    </script>
+    
+    <!-- Shared System -->
+    <script src="../shared/assets/js/config/disease-config.js"></script>
+    <script src="../shared/assets/js/utils/config-loader.js"></script>
+    <script src="../shared/assets/js/config/defaults.js"></script>
+    
+    <!-- Core Utilities -->
+    <script src="../shared/assets/js/utils/app-constants.js"></script>
+    <script src="../shared/assets/js/utils/base-manager.js"></script>
+    <script src="../shared/assets/js/utils/error-handler.js"></script>
+    <script src="../shared/assets/js/pubsub.js"></script>
+    
+    <!-- Test Manager -->
+    <script src="../shared/assets/js/chart-manager.js"></script>
+    
+    <script>
+        async function runIntegrationTests() {
+            let allTestsPassed = true;
+            
+            // 1. ファイル読み込み確認 (修正版)
+            try {
+                const allScripts = Array.from(document.scripts);
+                const sharedScripts = allScripts.filter(s => s.src && s.src.includes('../shared/'));
+                
+                // より詳細なスクリプト情報
+                const scriptDetails = allScripts.map(s => ({
+                    src: s.src || '(inline)',
+                    isShared: s.src && s.src.includes('../shared/'),
+                    fileName: s.src ? s.src.split('/').pop() : '(inline)'
+                }));
+                
+                // 期待されるsharedファイル
+                const expectedSharedFiles = [
+                    'disease-config.js',
+                    'config-loader.js', 
+                    'defaults.js',
+                    'app-constants.js',
+                    'base-manager.js',
+                    'error-handler.js',
+                    'pubsub.js',
+                    'chart-manager.js'
+                ];
+                
+                // グローバルオブジェクト存在確認
+                const globalObjects = {
+                    'DISEASE_TYPE': window.DISEASE_TYPE,
+                    'DiseaseDetector': !!window.DiseaseDetector,
+                    'DISEASE_CONFIG': !!window.DISEASE_CONFIG,
+                    'ConfigLoader': !!window.ConfigLoader,
+                    'PubSub': !!window.pubsub,
+                    'BaseManager': !!window.BaseManager,
+                    'ChartManager': !!window.ChartManager
+                };
+                
+                const loadedGlobals = Object.values(globalObjects).filter(Boolean).length;
+                
+                // デバッグ情報
+                console.log('🔍 Enhanced Script Debug:');
+                console.log('Total scripts:', allScripts.length);
+                console.log('Shared scripts detected:', sharedScripts.length);
+                console.log('Global objects loaded:', loadedGlobals);
+                console.log('Script details:', scriptDetails);
+                
+                // 詳細表示
+                const fileListHtml = `
+                    <strong>スクリプト詳細 (${allScripts.length}個):</strong><br>
+                    ${scriptDetails.map(s => `${s.isShared ? '✅' : '📄'} ${s.fileName} - ${s.src}`).join('<br>')}<br><br>
+                    <strong>期待ファイル:</strong><br>
+                    ${expectedSharedFiles.join(', ')}<br><br>
+                    <strong>グローバルオブジェクト (${loadedGlobals}/7):</strong><br>
+                    ${Object.entries(globalObjects).map(([key, value]) => `${value ? '✅' : '❌'} ${key}`).join('<br>')}
+                `;
+                document.getElementById('file-list').innerHTML = fileListHtml;
+                
+                // 成功判定: スクリプト数またはグローバルオブジェクト数で判定
+                if (sharedScripts.length >= 4 || loadedGlobals >= 6) {
+                    document.getElementById('file-loading-result').innerHTML = 
+                        `✅ 成功: ファイル読み込み確認<br>
+                        検出方法: Shared scripts = ${sharedScripts.length}, Globals = ${loadedGlobals}<br>
+                        判定: ${sharedScripts.length >= 4 ? 'スクリプト数' : 'グローバル数'}により成功`;
+                    document.getElementById('file-loading-result').className = 'result success';
+                } else {
+                    throw new Error(`両方とも不足 - Scripts: ${sharedScripts.length}/4, Globals: ${loadedGlobals}/6`);
+                }
+            } catch (error) {
+                document.getElementById('file-loading-result').innerHTML = 
+                    `❌ 失敗: ${error.message}`;
+                document.getElementById('file-loading-result').className = 'result error';
+                allTestsPassed = false;
+            }
+            
+            // 2. 感染症システム統合
+            try {
+                if (window.DiseaseDetector && window.DISEASE_CONFIG) {
+                    const diseaseType = window.DiseaseDetector.getDiseaseType();
+                    const diseaseConfig = window.DiseaseDetector.getDiseaseConfig();
+                    
+                    document.getElementById('disease-system-result').innerHTML = 
+                        `✅ 成功: 感染症システム統合完了<br>
+                        タイプ: ${diseaseType}<br>
+                        名前: ${diseaseConfig.name}<br>
+                        カラー: ${diseaseConfig.color.primary}`;
+                    document.getElementById('disease-system-result').className = 'result success';
+                } else {
+                    throw new Error('DiseaseDetector または DISEASE_CONFIG が利用できません');
+                }
+            } catch (error) {
+                document.getElementById('disease-system-result').innerHTML = 
+                    `❌ 失敗: ${error.message}`;
+                document.getElementById('disease-system-result').className = 'result error';
+                allTestsPassed = false;
+            }
+            
+            // 3. ConfigLoader統合
+            try {
+                await window.ConfigLoader.loadAll();
+                const legacyConfig = window.ConfigLoader.getLegacyCompatibleConfig();
+                const diseaseConfig = window.ConfigLoader.getDiseaseConfig();
+                
+                document.getElementById('config-loader-result').innerHTML = 
+                    `✅ 成功: ConfigLoader統合完了<br>
+                    Steps: ${legacyConfig.steps?.length || 0}個<br>
+                    感染症統合: ${diseaseConfig ? '✅' : '❌'}`;
+                document.getElementById('config-loader-result').className = 'result success';
+            } catch (error) {
+                document.getElementById('config-loader-result').innerHTML = 
+                    `❌ 失敗: ${error.message}`;
+                document.getElementById('config-loader-result').className = 'result error';
+                allTestsPassed = false;
+            }
+            
+            // 4. データ読み込み確認
+            try {
+                const testDataPath = window.ConfigLoader.resolveDataPath('cities-timeline.json');
+                const response = await fetch(testDataPath);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('data-loading-result').innerHTML = 
+                        `✅ 成功: データ読み込み確認<br>
+                        パス: ${testDataPath}<br>
+                        都市数: ${data.cities?.length || 0}個`;
+                    document.getElementById('data-loading-result').className = 'result success';
+                } else {
+                    throw new Error(`HTTP ${response.status}: ${testDataPath}`);
+                }
+            } catch (error) {
+                document.getElementById('data-loading-result').innerHTML = 
+                    `❌ 失敗: ${error.message}`;
+                document.getElementById('data-loading-result').className = 'result error';
+                allTestsPassed = false;
+            }
+            
+            // 5. CSS変数・テーマ適用
+            try {
+                const root = getComputedStyle(document.documentElement);
+                const primaryColor = root.getPropertyValue('--disease-color-primary').trim();
+                const secondaryColor = root.getPropertyValue('--disease-color-secondary').trim();
+                const accentColor = root.getPropertyValue('--disease-color-accent').trim();
+                
+                document.getElementById('primary-preview').style.backgroundColor = primaryColor;
+                document.getElementById('secondary-preview').style.backgroundColor = secondaryColor;
+                document.getElementById('accent-preview').style.backgroundColor = accentColor;
+                
+                if (primaryColor && secondaryColor && accentColor) {
+                    document.getElementById('css-theme-result').innerHTML = 
+                        `✅ 成功: CSS変数適用完了<br>
+                        Primary: ${primaryColor}<br>
+                        Secondary: ${secondaryColor}<br>
+                        Accent: ${accentColor}`;
+                    document.getElementById('css-theme-result').className = 'result success';
+                } else {
+                    throw new Error('CSS変数が正しく設定されていません');
+                }
+            } catch (error) {
+                document.getElementById('css-theme-result').innerHTML = 
+                    `❌ 失敗: ${error.message}`;
+                document.getElementById('css-theme-result').className = 'result error';
+                allTestsPassed = false;
+            }
+            
+            // 6. Manager Classes動作確認
+            try {
+                const managersAvailable = {
+                    ChartManager: !!window.ChartManager,
+                    BaseManager: !!window.BaseManager,
+                    PubSub: !!window.pubsub,
+                    ErrorHandler: !!window.ErrorHandler
+                };
+                
+                const availableCount = Object.values(managersAvailable).filter(Boolean).length;
+                
+                if (availableCount >= 3) {
+                    document.getElementById('managers-result').innerHTML = 
+                        `✅ 成功: Manager Classes利用可能<br>
+                        ${Object.entries(managersAvailable)
+                            .map(([name, available]) => `${name}: ${available ? '✅' : '❌'}`)
+                            .join('<br>')}`;
+                    document.getElementById('managers-result').className = 'result success';
+                } else {
+                    throw new Error(`利用可能Manager: ${availableCount}/4`);
+                }
+            } catch (error) {
+                document.getElementById('managers-result').innerHTML = 
+                    `❌ 失敗: ${error.message}`;
+                document.getElementById('managers-result').className = 'result error';
+                allTestsPassed = false;
+            }
+            
+            // 総合結果
+            if (allTestsPassed) {
+                document.title = '✅ All Tests Passed - Shared Integration Test';
+                console.log('🎉 全統合テスト成功！フェーズ2完了！');
+            } else {
+                document.title = '❌ Some Tests Failed - Shared Integration Test';
+                console.log('⚠️ 一部統合テスト失敗。要修正。');
+            }
+        }
+        
+        // テスト実行
+        window.addEventListener('load', () => {
+            setTimeout(runIntegrationTests, 1000);
+        });
+    </script>
+</body>
+</html>

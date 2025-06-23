@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Access Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .result { margin: 10px 0; padding: 10px; border-radius: 3px; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+    </style>
+</head>
+<body>
+    <h1>🔍 File Access Test</h1>
+    <div id="test-results"></div>
+    
+    <script>
+        async function testFileAccess() {
+            const filesToTest = [
+                '../shared/assets/js/config/disease-config.js',
+                '../shared/assets/js/utils/config-loader.js',
+                '../shared/assets/js/config/defaults.js',
+                '../shared/assets/js/pubsub.js',
+                '../shared/assets/js/main.js'
+            ];
+            
+            const results = [];
+            
+            for (const file of filesToTest) {
+                try {
+                    const response = await fetch(file);
+                    if (response.ok) {
+                        const content = await response.text();
+                        results.push({
+                            file,
+                            status: 'success',
+                            size: content.length,
+                            message: `✅ 成功 (${content.length} bytes)`
+                        });
+                    } else {
+                        results.push({
+                            file,
+                            status: 'error',
+                            message: `❌ HTTP ${response.status}`
+                        });
+                    }
+                } catch (error) {
+                    results.push({
+                        file,
+                        status: 'error',
+                        message: `❌ エラー: ${error.message}`
+                    });
+                }
+            }
+            
+            // 結果表示
+            const resultsHtml = results.map(result => `
+                <div class="result ${result.status}">
+                    <strong>${result.file}</strong><br>
+                    ${result.message}
+                </div>
+            `).join('');
+            
+            document.getElementById('test-results').innerHTML = resultsHtml;
+            
+            // サマリー
+            const successCount = results.filter(r => r.status === 'success').length;
+            const summary = `<div class="result info">
+                <strong>サマリー: ${successCount}/${results.length} ファイル成功</strong>
+            </div>`;
+            
+            document.getElementById('test-results').insertAdjacentHTML('afterbegin', summary);
+        }
+        
+        window.addEventListener('load', testFileAccess);
+    </script>
+</body>
+</html>
