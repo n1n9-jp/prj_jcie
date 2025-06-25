@@ -361,28 +361,34 @@ class ChartManager extends BaseManager {
     }
 
     /**
-     * デュアルレイアウトを描画（従来のロジック）
+     * デュアルレイアウトを描画（統一版）
      * @param {Object} chartData - チャートデータ
      */
     renderDualLayout(chartData) {
-        const { charts } = chartData;
+        const { charts, position } = chartData;
         
         if (!charts || !Array.isArray(charts)) {
             console.error('ChartManager: Invalid charts array for dual layout', charts);
             return;
         }
         
-        // コンテナをクリアしてSVGを作成
+        // コンテナをクリアしてSVGを作成（スタイル操作を削除）
         this.clearContainer();
-        const svg = this.createLayoutSVG('dual');
+        
+        // CSSクラスベースの位置制御に統一
+        if (position) {
+            this.applyPositionClasses(position);
+        }
+        
+        const svg = this.createLayoutSVG('dual', chartData);
         
         if (!svg) {
             console.error('ChartManager: Failed to create SVG for dual layout');
             return;
         }
         
-        // レイアウト計算
-        const layout = this.calculateDualLayout();
+        // レイアウト計算（position設定を考慮）
+        const layout = this.calculateDualLayout(position);
         
         // 各チャートを描画
         charts.forEach((chartConfig, index) => {
@@ -425,29 +431,40 @@ class ChartManager extends BaseManager {
     }
 
     /**
-     * レイアウト用のSVGを作成
+     * レイアウト用のSVGを作成（position設定対応版）
      * @param {string} layoutType - レイアウトタイプ
+     * @param {Object} chartData - チャートデータ（position設定含む）
      * @returns {d3.Selection} SVG要素
      */
-    createLayoutSVG(layoutType) {
+    createLayoutSVG(layoutType, chartData = {}) {
         const containerNode = this.container.node();
         const containerWidth = containerNode.clientWidth || 800;
         const containerHeight = containerNode.clientHeight || 600;
         
         let totalWidth, totalHeight;
         
-        switch (layoutType) {
-            case 'dual':
-                totalWidth = Math.min(containerWidth * 0.9, 1000);
-                totalHeight = Math.min(containerHeight * 0.8, 500);
-                break;
-            case 'triple':
-                totalWidth = Math.min(containerWidth * 0.95, 1200);
-                totalHeight = Math.min(containerHeight * 0.8, 500);
-                break;
-            default:
-                totalWidth = 800;
-                totalHeight = 600;
+        // position設定からサイズを計算
+        const position = chartData.position || {};
+        
+        if (position.width && position.height) {
+            // position設定で明示的にサイズが指定されている場合
+            totalWidth = this.calculateDimensionFromPosition(position.width, containerWidth, 'width');
+            totalHeight = this.calculateDimensionFromPosition(position.height, containerHeight, 'height');
+        } else {
+            // 従来のデフォルト計算
+            switch (layoutType) {
+                case 'dual':
+                    totalWidth = Math.min(containerWidth * 0.9, 1000);
+                    totalHeight = Math.min(containerHeight * 0.8, 500);
+                    break;
+                case 'triple':
+                    totalWidth = Math.min(containerWidth * 0.95, 1200);
+                    totalHeight = Math.min(containerHeight * 0.8, 500);
+                    break;
+                default:
+                    totalWidth = 800;
+                    totalHeight = 600;
+            }
         }
         
         // SVGHelperを使用してSVGを作成
@@ -467,16 +484,27 @@ class ChartManager extends BaseManager {
     }
 
     /**
-     * デュアルレイアウトの寸法を計算
+     * デュアルレイアウトの寸法を計算（position設定対応版）
+     * @param {Object} position - position設定
      * @returns {Object} レイアウト情報
      */
-    calculateDualLayout() {
+    calculateDualLayout(position = {}) {
         const containerNode = this.container.node();
         const containerWidth = containerNode.clientWidth || 800;
         const containerHeight = containerNode.clientHeight || 600;
         
-        const totalWidth = Math.min(containerWidth * 0.9, 1000);
-        const totalHeight = Math.min(containerHeight * 0.8, 500);
+        let totalWidth, totalHeight;
+        
+        if (position.width && position.height) {
+            // position設定で明示的にサイズが指定されている場合
+            totalWidth = this.calculateDimensionFromPosition(position.width, containerWidth, 'width');
+            totalHeight = this.calculateDimensionFromPosition(position.height, containerHeight, 'height');
+        } else {
+            // 従来のデフォルト計算
+            totalWidth = Math.min(containerWidth * 0.9, 1000);
+            totalHeight = Math.min(containerHeight * 0.8, 500);
+        }
+        
         const spacing = 40;
         const marginTop = 40;
         
@@ -864,6 +892,83 @@ class ChartManager extends BaseManager {
             }
         } catch (error) {
             console.warn('ChartManager: Error coordinating transition:', error);
+        }
+    }
+
+    /**
+     * position設定から実際の寸法を計算
+     * @param {string|number} value - position設定値（"100%", "70%", 500等）
+     * @param {number} containerSize - コンテナサイズ
+     * @param {string} dimension - "width" または "height"
+     * @returns {number} 計算された寸法
+     */
+    calculateDimensionFromPosition(value, containerSize, dimension) {
+        if (typeof value === 'number') {
+            return value;
+        }
+        
+        if (typeof value === 'string') {
+            if (value.endsWith('%')) {
+                const percentage = parseFloat(value) / 100;
+                if (dimension === 'width') {
+                    return containerSize * percentage;
+                } else if (dimension === 'height') {
+                    return window.innerHeight * percentage;
+                }
+            } else if (value.endsWith('px')) {
+                return parseFloat(value);
+            } else if (value.endsWith('vh')) {
+                return window.innerHeight * parseFloat(value) / 100;
+            } else if (value.endsWith('vw')) {
+                return window.innerWidth * parseFloat(value) / 100;
+            }
+        }
+        
+        // デフォルト値
+        return dimension === 'width' ? containerSize : 400;
+    }
+
+    /**
+     * position設定をCSSクラスとして適用（統一システム）
+     * @param {Object} position - position設定
+     */
+    applyPositionClasses(position) {
+        const containerElement = this.container.node();
+        
+        // 既存のposition関連クラスを削除
+        containerElement.classList.remove(
+            'chart-position-center-v', 'chart-position-top-v', 'chart-position-bottom-v',
+            'chart-position-center-h', 'chart-position-left-h', 'chart-position-right-h'
+        );
+        
+        // 垂直位置クラスを追加
+        if (position.vertical) {
+            switch (position.vertical) {
+                case 'center':
+                    containerElement.classList.add('chart-position-center-v');
+                    break;
+                case 'top':
+                    containerElement.classList.add('chart-position-top-v');
+                    break;
+                case 'bottom':
+                    containerElement.classList.add('chart-position-bottom-v');
+                    break;
+            }
+        }
+        
+        // 水平位置クラスを追加
+        if (position.horizontal) {
+            switch (position.horizontal) {
+                case 'center':
+                    containerElement.classList.add('chart-position-center-h');
+                    break;
+                case 'left':
+                    containerElement.classList.add('chart-position-left-h');
+                    break;
+                case 'right':
+                    containerElement.classList.add('chart-position-right-h');
+                    break;
+            }
         }
     }
 

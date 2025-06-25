@@ -261,6 +261,40 @@
     pointer-events: auto;
 }
 
+/* ==================================================
+   統一チャート位置制御システム
+   ================================================== */
+
+/* 垂直位置制御 */
+#chart-container.chart-position-center-v {
+    align-items: center !important;
+}
+
+#chart-container.chart-position-top-v {
+    align-items: flex-start !important;
+    padding-top: 2rem !important;
+}
+
+#chart-container.chart-position-bottom-v {
+    align-items: flex-end !important;
+    padding-bottom: 2rem !important;
+}
+
+/* 水平位置制御 */
+#chart-container.chart-position-center-h {
+    justify-content: center !important;
+}
+
+#chart-container.chart-position-left-h {
+    justify-content: flex-start !important;
+    padding-left: 2rem !important;
+}
+
+#chart-container.chart-position-right-h {
+    justify-content: flex-end !important;
+    padding-right: 2rem !important;
+}
+
 /* スクロールテキストエリア */
 #scrolly-text {
     position: relative;
