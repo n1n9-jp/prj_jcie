@@ -241,12 +241,14 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    opacity: 1;
+    opacity: 0;
     transition: opacity var(--animation-default) var(--easing-ease-in-out);
+    pointer-events: none;
 }
 
 #chart-container.visible {
     opacity: 1;
+    pointer-events: auto;
 }
 
 /* 地図コンテナのスタイル */
@@ -259,8 +261,14 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    opacity: 1;
+    opacity: 0;
     transition: opacity var(--animation-default) var(--easing-ease-in-out);
+    pointer-events: none;
+}
+
+#map-container.visible {
+    opacity: 1;
+    pointer-events: auto;
 }
 
 /* 画像コンテナのスタイル */
