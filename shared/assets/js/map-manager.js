@@ -57,7 +57,12 @@ class MapManager extends BaseManager {
      */
     updateMap(mapData) {
         
-        const { center, zoom, visible, data, highlightCountries = [], cities = [], mode, citiesFile, cityId, useRegionColors = false, lightenNonVisited = false, lightenAllCountries = false, targetRegions = [], width = 800, height = 600, widthPercent, heightPercent, aspectRatio, showSpreadingArrows = false } = mapData;
+        const { center, zoom, visible, data, highlightCountries = [], cities = [], mode, citiesFile, cityId, useRegionColors = false, lightenNonVisited = false, lightenAllCountries = false, targetRegions = [], width = 800, height = 600, widthPercent, heightPercent, aspectRatio, showSpreadingArrows = false, position } = mapData;
+        
+        // BaseManagerの統一position処理を適用
+        if (position) {
+            this.applyPositionSettings(position);
+        }
         
         // 地図更新の最初に拡散矢印の状態をチェック
         if (!showSpreadingArrows) {

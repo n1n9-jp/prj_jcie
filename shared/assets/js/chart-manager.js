@@ -375,9 +375,9 @@ class ChartManager extends BaseManager {
         // コンテナをクリアしてSVGを作成（スタイル操作を削除）
         this.clearContainer();
         
-        // CSSクラスベースの位置制御に統一
+        // BaseManagerの統一position処理を使用
         if (position) {
-            this.applyPositionClasses(position);
+            this.applyPositionSettings(position);
         }
         
         const svg = this.createLayoutSVG('dual', chartData);
@@ -928,49 +928,6 @@ class ChartManager extends BaseManager {
         return dimension === 'width' ? containerSize : 400;
     }
 
-    /**
-     * position設定をCSSクラスとして適用（統一システム）
-     * @param {Object} position - position設定
-     */
-    applyPositionClasses(position) {
-        const containerElement = this.container.node();
-        
-        // 既存のposition関連クラスを削除
-        containerElement.classList.remove(
-            'chart-position-center-v', 'chart-position-top-v', 'chart-position-bottom-v',
-            'chart-position-center-h', 'chart-position-left-h', 'chart-position-right-h'
-        );
-        
-        // 垂直位置クラスを追加
-        if (position.vertical) {
-            switch (position.vertical) {
-                case 'center':
-                    containerElement.classList.add('chart-position-center-v');
-                    break;
-                case 'top':
-                    containerElement.classList.add('chart-position-top-v');
-                    break;
-                case 'bottom':
-                    containerElement.classList.add('chart-position-bottom-v');
-                    break;
-            }
-        }
-        
-        // 水平位置クラスを追加
-        if (position.horizontal) {
-            switch (position.horizontal) {
-                case 'center':
-                    containerElement.classList.add('chart-position-center-h');
-                    break;
-                case 'left':
-                    containerElement.classList.add('chart-position-left-h');
-                    break;
-                case 'right':
-                    containerElement.classList.add('chart-position-right-h');
-                    break;
-            }
-        }
-    }
 
     /**
      * リサイズ処理

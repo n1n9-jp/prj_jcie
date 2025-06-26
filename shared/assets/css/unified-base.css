@@ -262,37 +262,62 @@
 }
 
 /* ==================================================
-   統一チャート位置制御システム
+   統一position制御システム - 全Manager共通
    ================================================== */
 
-/* 垂直位置制御 */
-#chart-container.chart-position-center-v {
+/* 垂直位置制御 - 全コンテナ対応 */
+#chart-container.position-center-v,
+#map-container.position-center-v,
+#image-container.position-center-v {
     align-items: center !important;
 }
 
-#chart-container.chart-position-top-v {
+#chart-container.position-top-v,
+#map-container.position-top-v,
+#image-container.position-top-v {
     align-items: flex-start !important;
     padding-top: 2rem !important;
 }
 
-#chart-container.chart-position-bottom-v {
+#chart-container.position-bottom-v,
+#map-container.position-bottom-v,
+#image-container.position-bottom-v {
     align-items: flex-end !important;
     padding-bottom: 2rem !important;
 }
 
-/* 水平位置制御 */
-#chart-container.chart-position-center-h {
+/* 水平位置制御 - 全コンテナ対応 */
+#chart-container.position-center-h,
+#map-container.position-center-h,
+#image-container.position-center-h {
     justify-content: center !important;
 }
 
-#chart-container.chart-position-left-h {
+#chart-container.position-left-h,
+#map-container.position-left-h,
+#image-container.position-left-h {
     justify-content: flex-start !important;
     padding-left: 2rem !important;
 }
 
-#chart-container.chart-position-right-h {
+#chart-container.position-right-h,
+#map-container.position-right-h,
+#image-container.position-right-h {
     justify-content: flex-end !important;
     padding-right: 2rem !important;
+}
+
+/* サイズ制御 - CSS変数ベース */
+#chart-container[style*="--position-width"],
+#map-container[style*="--position-width"],
+#image-container[style*="--position-width"] {
+    width: var(--position-width) !important;
+}
+
+#chart-container[style*="--position-height"],
+#map-container[style*="--position-height"],
+#image-container[style*="--position-height"] {
+    height: var(--position-height) !important;
 }
 
 /* スクロールテキストエリア */

@@ -89,6 +89,99 @@ class BaseManager {
     }
 
     /**
+     * 統一position処理システム - 全Managerクラス共通
+     * @param {Object} positionConfig - position設定
+     */
+    applyPositionSettings(positionConfig) {
+        if (!positionConfig) return;
+        
+        const containerElement = this.container.node();
+        if (!containerElement) return;
+        
+        // 既存のposition関連クラスを削除
+        this.clearPositionClasses();
+        
+        // 垂直位置クラスを適用
+        if (positionConfig.vertical) {
+            switch (positionConfig.vertical) {
+                case 'center':
+                    containerElement.classList.add('position-center-v');
+                    break;
+                case 'top':
+                    containerElement.classList.add('position-top-v');
+                    break;
+                case 'bottom':
+                    containerElement.classList.add('position-bottom-v');
+                    break;
+            }
+        }
+        
+        // 水平位置クラスを適用
+        if (positionConfig.horizontal) {
+            switch (positionConfig.horizontal) {
+                case 'center':
+                    containerElement.classList.add('position-center-h');
+                    break;
+                case 'left':
+                    containerElement.classList.add('position-left-h');
+                    break;
+                case 'right':
+                    containerElement.classList.add('position-right-h');
+                    break;
+            }
+        }
+        
+        // サイズ設定をCSS変数として適用
+        if (positionConfig.width) {
+            containerElement.style.setProperty('--position-width', this.normalizeSize(positionConfig.width));
+        }
+        if (positionConfig.height) {
+            containerElement.style.setProperty('--position-height', this.normalizeSize(positionConfig.height));
+        }
+    }
+
+    /**
+     * position関連CSSクラスをクリア
+     */
+    clearPositionClasses() {
+        const containerElement = this.container.node();
+        if (!containerElement) return;
+        
+        const positionClasses = [
+            'position-center-v', 'position-top-v', 'position-bottom-v',
+            'position-center-h', 'position-left-h', 'position-right-h'
+        ];
+        
+        containerElement.classList.remove(...positionClasses);
+        
+        // CSS変数もクリア
+        containerElement.style.removeProperty('--position-width');
+        containerElement.style.removeProperty('--position-height');
+    }
+
+    /**
+     * サイズ値を正規化
+     * @param {string|number} value - サイズ値
+     * @returns {string} 正規化されたサイズ値
+     */
+    normalizeSize(value) {
+        if (typeof value === 'number') {
+            return `${value}px`;
+        }
+        if (typeof value === 'string') {
+            // 既に単位が含まれている場合はそのまま返す
+            if (value.match(/(%|px|em|rem|vh|vw|vmin|vmax)$/)) {
+                return value;
+            }
+            // 数値のみの場合はpxを追加
+            if (!isNaN(parseFloat(value))) {
+                return `${value}px`;
+            }
+        }
+        return value;
+    }
+
+    /**
      * 設定値のデフォルト処理
      * @param {Object} defaultConfig - デフォルト設定
      * @param {Object} userConfig - ユーザー設定

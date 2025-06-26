@@ -39,16 +39,9 @@ class ImageManager extends BaseManager {
             this.show();
             this.loadImage(src, alt, config);
             
-            // 位置設定を適用（main.jsでも適用されるが、確実にするため）
-            if (position && window.PositionManager) {
-                const container = document.getElementById('image-container');
-                if (container) {
-                    const positionConfig = PositionManager.mergePositionConfig(position, 'image');
-                    PositionManager.applyPosition(container, positionConfig, {
-                        responsive: true,
-                        debugMode: false
-                    });
-                }
+            // BaseManagerの統一position処理を適用
+            if (position) {
+                this.applyPositionSettings(position);
             }
         } else {
             this.hide();
