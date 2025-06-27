@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "configFiles": {
-    "content": "content.config.json",
+    "content": "content.json",
     "settings": "settings.config.json",
     "app": "app.config.json",
     "theme": "theme.config.json",

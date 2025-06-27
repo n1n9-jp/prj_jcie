@@ -1,25 +1,25 @@
 {
   "timeline": {
-    "title": "グローバルファンド エイズ対策の物語",
-    "description": "世界各地で活動する人々の物語をたどる旅"
+    "title": "マラリア対策の物語",
+    "description": "世界各地でマラリアと闘う人々の取り組みをたどる旅"
   },
   "cities": [
     {
-      "id": "lagos",
-      "name": "ラゴス",
-      "nameEn": "Lagos",
-      "country": "Nigeria",
-      "latitude": 6.5244,
-      "longitude": 3.3792,
+      "id": "elsalvador",
+      "name": "エルサルバドル",
+      "nameEn": "El Salvador",
+      "country": "El Salvador",
+      "latitude": 13.7942,
+      "longitude": -88.8965,
       "order": 1,
       "data": {
-        "title": "ムリカットの物語",
-        "url": "https://fgfj.jcie.or.jp/news/2022-11-30_globalfund_20th-anniversary-film-episode3/",
-        "thumbnail": "aids_nigeria.jpg",
-        "description": "未来へ命と想いを繋ぐ メンターマザー"
+        "title": "エルサルバドルの成功物語",
+        "url": "",
+        "thumbnail": "",
+        "description": "1950年代から国をあげて対策を始め、2021年にWHOからマラリア撲滅認定を受けた中米の国。感染者数を約9割減らすことに成功しました。"
       },
       "style": {
-        "color": "#ff6b6b",
+        "color": "#f4a620",
         "size": 8
       },
       "transitions": {
@@ -29,153 +29,53 @@
       }
     },
     {
-      "id": "lilongwe",
-      "name": "リロングウェ",
-      "nameEn": "Lilongwe",
-      "country": "Malawi",
-      "latitude": -13.9626,
-      "longitude": 33.7741,
+      "id": "niger",
+      "name": "ニジェール",
+      "nameEn": "Niger",
+      "country": "Niger",
+      "latitude": 17.6078,
+      "longitude": 8.0817,
       "order": 2,
       "data": {
-        "title": "闘うマラウイの女性達",
-        "url": "https://www.youtube.com/watch?v=Z2LoukbqIH8",
-        "thumbnail": "aids_malawi.jpg",
-        "description": "今なお続くHIVへの差別・偏見と闘うマラウイの女性達"
+        "title": "ニジェールの課題",
+        "url": "",
+        "thumbnail": "",
+        "description": "2000年のアブジャ宣言後、様々な対策を講じたものの、感染件数が逆に4倍に増加してしまった西アフリカの国。マラリア対策の困難さを物語っています。"
       },
       "style": {
-        "color": "#4ecdc4",
+        "color": "#e85555",
         "size": 7
       },
       "transitions": {
         "distanceFromPrevious": 3500,
         "scrollHeight": "150vh",
         "routeType": "flight",
-        "crossedFeatures": ["Central Africa", "East Africa"]
+        "crossedFeatures": ["Atlantic Ocean", "West Africa"]
       }
     },
     {
-      "id": "nairobi",
-      "name": "ナイロビ",
-      "nameEn": "Nairobi",
-      "country": "Kenya",
-      "latitude": -1.2921,
-      "longitude": 36.8219,
+      "id": "myanmar",
+      "name": "ミャンマー",
+      "nameEn": "Myanmar",
+      "country": "Myanmar",
+      "latitude": 21.9162,
+      "longitude": 95.9560,
       "order": 3,
       "data": {
-        "title": "ローズマリーの物語",
-        "url": "https://www.youtube.com/watch?v=eTvkmWYVHqc",
-        "thumbnail": "aids_kenya_1.jpg",
-        "description": "コロナ禍でも命を救いたいとの情熱は衰えない"
+        "title": "ミャンマーの挑戦",
+        "url": "",
+        "thumbnail": "",
+        "description": "東南アジアで薬剤耐性マラリアの問題に直面している国。アルテミシニン耐性の拡散を防ぐための国際的な取り組みが続けられています。"
       },
       "style": {
-        "color": "#45b7d1",
-        "size": 7
-      },
-      "transitions": {
-        "distanceFromPrevious": 1500,
-        "scrollHeight": "120vh",
-        "routeType": "flight",
-        "crossedFeatures": ["Tanzania", "Kenya Highlands"]
-      }
-    },
-    {
-      "id": "belmopan",
-      "name": "ベルモパン",
-      "nameEn": "Belmopan",
-      "country": "Belize",
-      "latitude": 17.2514,
-      "longitude": -88.7590,
-      "order": 4,
-      "data": {
-        "title": "エリカ・カステヤノスの物語",
-        "url": "https://globe.asahi.com/article/13886312",
-        "thumbnail": "aids_belize.jpg",
-        "description": "夢を叶えたトランスジェンダーのHIV活動家"
-      },
-      "style": {
-        "color": "#f7d794",
-        "size": 6
-      },
-      "transitions": {
-        "distanceFromPrevious": 14000,
-        "scrollHeight": "200vh",
-        "routeType": "flight",
-        "crossedFeatures": ["Indian Ocean", "Arabian Sea", "Middle East", "Atlantic Ocean", "Caribbean Sea"]
-      }
-    },
-    {
-      "id": "washington",
-      "name": "ワシントンD.C.",
-      "nameEn": "Washington D.C.",
-      "country": "United States of America",
-      "latitude": 38.9072,
-      "longitude": -77.0369,
-      "order": 5,
-      "data": {
-        "title": "マーク・ダイブル（支援者）の物語",
-        "url": "https://globe.asahi.com/article/14279191",
-        "thumbnail": "aids_america.jpg",
-        "description": "アフリカを絶望から希望へと変えたエイズ対策　30年の歩みを振り返る"
-      },
-      "style": {
-        "color": "#ff9ff3",
-        "size": 7
-      },
-      "transitions": {
-        "distanceFromPrevious": 2500,
-        "scrollHeight": "130vh",
-        "routeType": "flight",
-        "crossedFeatures": ["Gulf of Mexico", "United States"]
-      }
-    },
-    {
-      "id": "nairobi2",
-      "name": "ナイロビ",
-      "nameEn": "Nairobi",
-      "country": "Kenya",
-      "latitude": -1.2921,
-      "longitude": 36.8219,
-      "order": 6,
-      "data": {
-        "title": "モーリーン・ムレンガの物語",
-        "url": "https://globe.asahi.com/article/14338985",
-        "thumbnail": "aids_kenya_2.jpg",
-        "description": "妊娠4カ月でHIV感染が発覚　余命2年の宣告から聖火ランナーになるまで"
-      },
-      "style": {
-        "color": "#54a0ff",
-        "size": 7
-      },
-      "transitions": {
-        "distanceFromPrevious": 11000,
-        "scrollHeight": "180vh",
-        "routeType": "flight",
-        "crossedFeatures": ["Atlantic Ocean", "Africa"]
-      }
-    },
-    {
-      "id": "manila",
-      "name": "マニラ",
-      "nameEn": "Manila",
-      "country": "Philippines",
-      "latitude": 14.5995,
-      "longitude": 120.9842,
-      "order": 7,
-      "data": {
-        "title": "ジェフリー・アカバの物語",
-        "url": "https://globe.asahi.com/article/14405967",
-        "thumbnail": "aids_philippines.jpg",
-        "description": "HIV啓発するはずの自分が感染　ゲイの男性が感じた負い目と教訓「自分も人間」"
-      },
-      "style": {
-        "color": "#2ed573",
+        "color": "#3bb8b0",
         "size": 7
       },
       "transitions": {
         "distanceFromPrevious": 8500,
         "scrollHeight": "170vh",
         "routeType": "flight",
-        "crossedFeatures": ["Indian Ocean", "Southeast Asia", "South China Sea"]
+        "crossedFeatures": ["Indian Ocean", "Southeast Asia"]
       }
     }
   ]

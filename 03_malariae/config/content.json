@@ -54,7 +54,7 @@
       },
       "image": {
         "src": "https://placehold.co/600x400/EEE/31343C",
-        "alt": "画像説明",
+        "alt": "step1",
         "visible": true,
         "config": {
           "width": "100%",
@@ -109,7 +109,7 @@
       },
       "image": {
         "src": "https://placehold.co/600x400/EEE/31343C",
-        "alt": "特に重症化しやすく死亡率も高い熱帯熱マラリア",
+        "alt": "step3",
         "visible": true,
         "config": {
           "width": "100%",
@@ -191,7 +191,7 @@
       },
       "image": {
         "src": "https://placehold.co/600x400/EEE/31343C",
-        "alt": "画像説明",
+        "alt": "step6",
         "visible": true,
         "config": {
           "width": "100%",
@@ -219,7 +219,7 @@
       },
       "image": {
         "src": "https://placehold.co/600x400/EEE/31343C",
-        "alt": "画像説明",
+        "alt": "step7",
         "visible": true,
         "config": {
           "width": "100%",
@@ -247,7 +247,7 @@
       },
       "image": {
         "src": "https://placehold.co/600x400/EEE/31343C",
-        "alt": "画像説明",
+        "alt": "step8",
         "visible": true,
         "config": {
           "width": "100%",
@@ -275,7 +275,7 @@
       },
       "image": {
         "src": "https://placehold.co/600x400/EEE/31343C",
-        "alt": "画像説明",
+        "alt": "step9",
         "visible": true,
         "config": {
           "width": "100%",
@@ -303,7 +303,7 @@
       },
       "image": {
         "src": "https://placehold.co/600x400/EEE/31343C",
-        "alt": "画像説明",
+        "alt": "step10",
         "visible": true,
         "config": {
           "width": "100%",
@@ -331,7 +331,7 @@
       },
       "image": {
         "src": "https://placehold.co/600x400/EEE/31343C",
-        "alt": "画像説明",
+        "alt": "step11",
         "visible": true,
         "config": {
           "width": "100%",
@@ -359,7 +359,7 @@
       },
       "image": {
         "src": "https://placehold.co/600x400/EEE/31343C",
-        "alt": "画像説明",
+        "alt": "step12",
         "visible": true,
         "config": {
           "width": "100%",
@@ -414,7 +414,7 @@
       },
       "image": {
         "src": "https://placehold.co/600x400/EEE/31343C",
-        "alt": "画像説明",
+        "alt": "step14",
         "visible": true,
         "config": {
           "width": "100%",
@@ -442,7 +442,7 @@
       },
       "image": {
         "src": "https://placehold.co/600x400/EEE/31343C",
-        "alt": "画像説明",
+        "alt": "step15",
         "visible": true,
         "config": {
           "width": "100%",
@@ -524,7 +524,7 @@
       },
       "image": {
         "src": "https://placehold.co/600x400/EEE/31343C",
-        "alt": "画像説明",
+        "alt": "step18",
         "visible": true,
         "config": {
           "width": "100%",
@@ -552,7 +552,7 @@
       },
       "image": {
         "src": "https://placehold.co/600x400/EEE/31343C",
-        "alt": "画像説明",
+        "alt": "step19",
         "visible": true,
         "config": {
           "width": "100%",
@@ -591,11 +591,11 @@
     {
       "id": "step21",
       "text": {
-        "content": "ステップ21のテキスト",
+        "content": "このように、サハラ砂漠より南のアフリカ地域では、今もマラリアの完全な撲滅には至っておらず、対策の強化が求められています。",
         "visible": true,
         "position": {
           "width": "30%",
-          "horizontal": "right",
+          "horizontal": "center",
           "vertical": "center"
         }
       },
@@ -603,27 +603,27 @@
         "visible": false
       },
       "map": {
-        "visible": true,
-        "mode": "single-city",
-        "citiesFile": "data/cities-timeline.json",
-        "cityId": "lagos",
-        "center": [3.4, 6.5],
-        "zoom": 10,
-        "widthPercent": 100,
-        "heightPercent": 100
+        "visible": false
       },
       "image": {
-        "visible": false
+        "src": "https://placehold.co/600x400/EEE/31343C",
+        "alt": "step19",
+        "visible": true,
+        "config": {
+          "width": "100%",
+          "height": "100%",
+          "objectFit": "cover"
+        }
       }
     },
     {
       "id": "step22",
       "text": {
-        "content": "世界全体でのマラリア対策",
+        "content": "世界全体での取り組み",
         "visible": true,
         "position": {
           "width": "60%",
-          "horizontal": "center",
+          "horizontal": "center", 
           "vertical": "center"
         }
       },
@@ -637,7 +637,7 @@
         "mode": "world-overview",
         "cities": [],
         "useRegionColors": true,
-        "lightenNonVisited": true,
+        "lightenAllCountries": true,
         "widthPercent": 100,
         "heightPercent": 100
       },
@@ -648,7 +648,7 @@
     {
       "id": "step23",
       "text": {
-        "content": "ナイロビでの取り組み",
+        "content": "エルサルバドル",
         "visible": true,
         "position": {
           "width": "30%",
@@ -662,7 +662,7 @@
       "map": {
         "visible": true,
         "mode": "single-city",
-        "cityId": "nairobi",
+        "cityId": "elsalvador",
         "citiesFile": "data/cities-timeline.json",
         "useRegionColors": true,
         "lightenNonVisited": true,
@@ -676,11 +676,11 @@
     {
       "id": "step24",
       "text": {
-        "content": "キンシャサでの取り組み",
+        "content": "ニジェール",
         "visible": true,
         "position": {
           "width": "30%",
-          "horizontal": "right",
+          "horizontal": "left",
           "vertical": "center"
         }
       },
@@ -690,7 +690,7 @@
       "map": {
         "visible": true,
         "mode": "single-city",
-        "cityId": "kinshasa",
+        "cityId": "niger",
         "citiesFile": "data/cities-timeline.json",
         "useRegionColors": true,
         "lightenNonVisited": true,
@@ -704,11 +704,11 @@
     {
       "id": "step25",
       "text": {
-        "content": "ムンバイでの取り組み",
+        "content": "ミャンマー",
         "visible": true,
         "position": {
           "width": "30%",
-          "horizontal": "center",
+          "horizontal": "left",
           "vertical": "center"
         }
       },
@@ -718,7 +718,7 @@
       "map": {
         "visible": true,
         "mode": "single-city",
-        "cityId": "mumbai",
+        "cityId": "myanmar",
         "citiesFile": "data/cities-timeline.json",
         "useRegionColors": true,
         "lightenNonVisited": true,
@@ -732,7 +732,7 @@
     {
       "id": "step26",
       "text": {
-        "content": "ステップ26のテキスト",
+        "content": "",
         "visible": true,
         "position": {
           "width": "30%",
@@ -748,7 +748,7 @@
       },
       "image": {
         "src": "https://placehold.co/600x400/EEE/31343C",
-        "alt": "画像説明",
+        "alt": "step26",
         "visible": true,
         "config": {
           "width": "100%",
@@ -760,13 +760,8 @@
     {
       "id": "step27",
       "text": {
-        "content": "ステップ27のテキスト",
-        "visible": true,
-        "position": {
-          "width": "30%",
-          "horizontal": "center",
-          "vertical": "center"
-        }
+        "content": "",
+        "visible": false
       },
       "chart": {
         "visible": false
@@ -776,33 +771,31 @@
       },
       "image": {
         "src": "https://placehold.co/600x400/EEE/31343C",
-        "alt": "画像説明",
+        "alt": "step27",
         "visible": true,
         "config": {
           "width": "100%",
           "height": "100%",
           "objectFit": "cover"
         }
+      },
+      "footer": {
+        "visible": true
       }
     },
     {
       "id": "step28",
       "text": {
-        "content": "ステップ28のテキスト",
-        "visible": true,
-        "position": {
-          "width": "30%",
-          "horizontal": "right",
-          "vertical": "center"
-        }
+        "content": "",
+        "visible": false
       },
       "chart": {
         "type": "line",
         "dataFile": "data/sample-line-data.csv",
         "visible": true,
         "config": {
-          "widthPercent": 100,
-          "height": 500
+          "widthPercent": 80,
+          "height": 400
         }
       },
       "map": {
@@ -815,13 +808,8 @@
     {
       "id": "step29",
       "text": {
-        "content": "ステップ29のテキスト",
-        "visible": true,
-        "position": {
-          "width": "30%",
-          "horizontal": "center",
-          "vertical": "center"
-        }
+        "content": "",
+        "visible": false
       },
       "chart": {
         "visible": false
@@ -831,7 +819,7 @@
       },
       "image": {
         "src": "https://placehold.co/600x400/EEE/31343C",
-        "alt": "画像説明",
+        "alt": "step29",
         "visible": true,
         "config": {
           "width": "100%",
@@ -843,13 +831,8 @@
     {
       "id": "step30",
       "text": {
-        "content": "ステップ30のテキスト",
-        "visible": true,
-        "position": {
-          "width": "30%",
-          "horizontal": "center",
-          "vertical": "center"
-        }
+        "content": "",
+        "visible": false
       },
       "chart": {
         "visible": false
@@ -859,7 +842,7 @@
       },
       "image": {
         "src": "https://placehold.co/600x400/EEE/31343C",
-        "alt": "画像説明",
+        "alt": "step30",
         "visible": true,
         "config": {
           "width": "100%",
@@ -871,13 +854,8 @@
     {
       "id": "step31",
       "text": {
-        "content": "ステップ31のテキスト",
-        "visible": true,
-        "position": {
-          "width": "30%",
-          "horizontal": "center",
-          "vertical": "center"
-        }
+        "content": "",
+        "visible": false
       },
       "chart": {
         "visible": false
@@ -887,7 +865,7 @@
       },
       "image": {
         "src": "https://placehold.co/600x400/EEE/31343C",
-        "alt": "画像説明",
+        "alt": "step31",
         "visible": true,
         "config": {
           "width": "100%",

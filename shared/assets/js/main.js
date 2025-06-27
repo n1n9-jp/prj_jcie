@@ -123,18 +123,21 @@ class ScrollytellingApp {
             return;
         }
         
-        // 感染症タイプを確認して都市ステップ生成を制御
+        // 感染症タイプを確認して都市ステップの開始番号を決定
         const diseaseType = window.DISEASE_TYPE || this.detectDiseaseFromURL();
         
-        // マラリアでは都市ステップを生成しない（HTMLで直接記述済み）
-        if (diseaseType === 'malariae') {
-            console.log('Malaria: Skipping city steps generation (using HTML-defined steps)');
-            return;
-        }
+        // 感染症別の都市ステップ開始番号
+        const cityStepStart = {
+            'aids': 11,        // AIDS: step11から開始
+            'tuberculosis': 11, // 結核: step11から開始
+            'malariae': 23     // マラリア: step23から開始
+        };
         
-        // 都市データから動的にHTMLを生成（AIDS、結核用）
+        const startStep = cityStepStart[diseaseType] || 11;
+        
+        // 都市データから動的にHTMLを生成（全感染症対応）
         citiesData.cities.forEach((city, index) => {
-            const stepIndex = 11 + index; // step11から開始
+            const stepIndex = startStep + index;
             const stepDiv = document.createElement('div');
             if (!stepDiv) {
                 console.error('Failed to create step element');
@@ -142,6 +145,54 @@ class ScrollytellingApp {
             }
             stepDiv.className = 'step';
             stepDiv.setAttribute('data-step', stepIndex.toString());
+            
+            // 都市ステップの設定をconfigに追加
+            const cityStepConfig = {
+                id: `step${stepIndex}`,
+                text: {
+                    content: city.data.title,
+                    visible: true,
+                    position: {
+                        width: "30%",
+                        horizontal: "center",
+                        vertical: "center"
+                    }
+                },
+                chart: {
+                    visible: false
+                },
+                map: {
+                    visible: true,
+                    mode: "single-city",
+                    cityId: city.id,
+                    center: [city.longitude, city.latitude],
+                    zoom: 6,
+                    citiesFile: "data/cities-timeline.json",
+                    useRegionColors: true,
+                    lightenNonVisited: true,
+                    widthPercent: 100,
+                    heightPercent: 100
+                },
+                image: {
+                    visible: false
+                }
+            };
+            
+            // configに都市ステップを追加
+            if (this.config && this.config.steps) {
+                console.log(`🔧 Adding dynamic city step ${stepIndex} for ${city.id}:`, cityStepConfig);
+                
+                // 既存の同じstepがあるかチェック
+                const existingStepIndex = this.config.steps.findIndex(step => step.id === `step${stepIndex}`);
+                if (existingStepIndex !== -1) {
+                    console.log(`⚠️ Replacing existing step${stepIndex} with dynamic config`);
+                    this.config.steps[existingStepIndex] = cityStepConfig;
+                } else {
+                    this.config.steps.push(cityStepConfig);
+                }
+                
+                console.log(`📋 Total steps after adding: ${this.config.steps.length}`);
+            }
             
             try {
                 stepDiv.innerHTML = `
@@ -248,6 +299,8 @@ class ScrollytellingApp {
         const { index, direction } = response;
         const stepConfig = this.config?.steps?.[index];
         
+        console.log(`[SCROLLAMA DEBUG] Step detected: index=${index}, stepId=${stepConfig?.id || 'undefined'}, direction=${direction}`);
+        
         if (!stepConfig) {
             console.warn(`No config found for step ${index}`);
             return;
@@ -327,6 +380,7 @@ class ScrollytellingApp {
                 ...stepConfig.map,
                 data: this.data.map
             };
+            
             pubsub.publish(EVENTS.MAP_UPDATE, mapData);
         } else {
             // 地図設定がない場合は明示的に非表示にする
@@ -490,8 +544,8 @@ class ScrollytellingApp {
         // 3. 感染症別フォールバック値
         const diseaseType = window.DISEASE_TYPE || this.detectDiseaseFromURL();
         const diseaseFooterSteps = {
-            'aids': '25',           // 01_aids
-            'malariae': '32',       // 03_malariae  
+            'aids': '25',           // 01_aids: step11-17(7都市) + step25(フッター)
+            'malariae': '32',       // 03_malariae: step22-26(5都市) + step32(フッター)
             'tuberculosis': '30'    // 02_tuberculosis（仮値、将来調整予定）
         };
         
