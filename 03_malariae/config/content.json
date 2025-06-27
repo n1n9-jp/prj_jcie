@@ -75,13 +75,34 @@
         }
       },
       "chart": {
-        "type": "line",
-        "dataFile": "data/sample-line-data.csv",
+        "layout": "dual",
         "visible": true,
-        "config": {
-          "widthPercent": 100,
-          "height": 400
-        }
+        "charts": [
+          {
+            "type": "pie",
+            "dataFile": "data/step2_地域別感染者死者の割合.csv",
+            "config": {
+              "title": "マラリア感染者の地域別割合",
+              "valueField": "感染者_世界全体に占める割合",
+              "labelField": "エリア",
+              "width": 400,
+              "height": 400,
+              "parsePercentage": true
+            }
+          },
+          {
+            "type": "pie",
+            "dataFile": "data/step2_地域別感染者死者の割合.csv", 
+            "config": {
+              "title": "マラリア死者の地域別割合",
+              "valueField": "死者_世界全体に占める割合",
+              "labelField": "エリア",
+              "width": 400,
+              "height": 400,
+              "parsePercentage": true
+            }
+          }
+        ]
       },
       "map": {
         "visible": false
@@ -125,7 +146,7 @@
         "visible": true,
         "position": {
           "width": "30%",
-          "horizontal": "left",
+          "horizontal": "right",
           "vertical": "center"
         }
       },
@@ -458,7 +479,7 @@
         "visible": true,
         "position": {
           "width": "30%",
-          "horizontal": "left",
+          "horizontal": "right",
           "vertical": "center"
         }
       },
@@ -568,7 +589,7 @@
         "visible": true,
         "position": {
           "width": "30%",
-          "horizontal": "left",
+          "horizontal": "right",
           "vertical": "center"
         }
       },
@@ -784,7 +805,12 @@
       "id": "step28",
       "text": {
         "content": "",
-        "visible": false
+        "visible": false,
+        "position": {
+          "width": "30%",
+          "horizontal": "right",
+          "vertical": "center"
+        }
       },
       "chart": {
         "type": "line",
