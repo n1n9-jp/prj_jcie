@@ -2,7 +2,7 @@
 
 ## 概要
 
-エイズ対策スクロールテリングアプリケーションの設定ファイルを機能別・環境別に分割し、保守性と柔軟性を向上させるシステムです。
+スクロールテリングアプリケーション（AIDS・結核・マラリア対応）の設定ファイルを機能別・環境別に分割し、保守性と柔軟性を向上させるシステムです。論理名ステップ管理システムと統合して動作します。
 
 ## ファイル構造
 
@@ -225,3 +225,111 @@ console.log('Environment:', window.ConfigLoader.getEnvironment());
 // 個別設定ファイルを確認
 console.log('Content config:', window.ConfigLoader.getConfigByType('content'));
 ```
+
+## 論理名ステップ管理システムとの統合
+
+### 統合アーキテクチャ
+
+設定ファイル分割システムと論理名ステップ管理システムは連携して動作します：
+
+```javascript
+// 1. 設定ファイル読み込み
+await window.ConfigLoader.loadAll();
+const config = window.ConfigLoader.getLegacyCompatibleConfig();
+
+// 2. 論理名システム初期化
+// STEP_DEFINITIONS と DISEASE_STEP_CONFIG が自動読み込み
+
+// 3. ステップマッピング計算
+const footerIndex = StepMapper.getIndex('footer');
+const cityRange = StepMapper.getCityStepsRange();
+```
+
+### content.config.json の論理名対応
+
+```json
+{
+  "steps": [
+    {
+      "id": "opening",
+      "text": { "content": "", "visible": false },
+      "image": {
+        "src": "assets/images/Firefly_A.jpg",
+        "visible": true,
+        "config": { "specialMode": "opening-background" }
+      }
+    },
+    {
+      "id": "city-episodes-0",
+      "text": { "content": "ラゴスの物語" },
+      "map": { "center": [6.5244, 3.3792], "zoom": 10 }
+    }
+  ]
+}
+```
+
+### 動的ステップ生成との連携
+
+```javascript
+// ConfigLoader から取得した設定に基づく動的ステップ生成
+const config = window.ConfigLoader.getLegacyCompatibleConfig();
+const cityStepsStart = StepMapper.getIndex('city-episodes-start');
+
+citiesData.forEach((city, index) => {
+    const stepId = `city-episodes-${index}`;
+    const cityStepConfig = {
+        id: stepId,
+        text: { content: city.story },
+        map: { center: city.coordinates }
+    };
+    
+    // 設定に動的ステップを追加
+    config.steps.push(cityStepConfig);
+});
+```
+
+### 環境別設定での論理名システム対応
+
+```json
+// environment/development.json
+{
+  "debug": {
+    "stepMapper": true,
+    "showLogicalNames": true
+  },
+  "stepSystem": {
+    "validateMappings": true,
+    "debugPrintOnLoad": true
+  }
+}
+```
+
+### 統合されたデバッグ機能
+
+```javascript
+// 統合デバッグ情報
+if (window.ConfigLoader.isDebugMode()) {
+    // 設定システムの状態
+    console.log('Config System:', window.ConfigLoader.getDebugInfo());
+    
+    // 論理名システムの状態
+    StepMapper.debugPrintMappings();
+    
+    // 設定検証
+    StepMapper.validateConfiguration();
+}
+```
+
+## 今後の拡張（更新版）
+
+### マルチ感染症対応
+- 感染症別設定ファイルの自動切り替え
+- DISEASE_STEP_CONFIG との完全統合
+- 感染症横断でのコンテンツ管理
+
+### 設定システム拡張
+- 論理名ベースの条件付きステップ表示
+- ステップ間依存関係の設定化
+- ユーザー進行状況の論理名ベース管理
+
+この統合により、設定管理とステップ管理の両方が大幅に効率化され、開発・保守作業の生産性が向上します。
