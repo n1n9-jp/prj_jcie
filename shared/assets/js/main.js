@@ -419,8 +419,10 @@ class ScrollytellingApp {
 
         // 画像更新
         if (stepConfig.image) {
+            console.log(`📸 Publishing IMAGE_UPDATE for ${stepLogicalName}:`, stepConfig.image);
             pubsub.publish(EVENTS.IMAGE_UPDATE, stepConfig.image);
         } else {
+            console.log(`📸 No image config found for ${stepLogicalName}, hiding image`);
             // 画像設定がない場合は明示的に非表示にする
             pubsub.publish(EVENTS.IMAGE_UPDATE, { visible: false });
         }
