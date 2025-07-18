@@ -320,7 +320,7 @@ class ScrollytellingApp {
                     ...stepConfig.chart,
                     charts: stepConfig.chart.charts.map(chartConfig => ({
                         ...chartConfig,
-                        data: this.getChartData('line', chartConfig.dataFile)
+                        data: this.getChartData(chartConfig.type || 'line', chartConfig.dataFile)
                     }))
                 };
                 pubsub.publish(EVENTS.CHART_UPDATE, dualChartData);

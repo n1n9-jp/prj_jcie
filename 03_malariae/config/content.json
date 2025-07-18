@@ -15,9 +15,6 @@
       "chart": {
         "visible": false
       },
-      "map": {
-        "visible": false
-      },
       "image": {
         "src": "https://placehold.co/600x400/EEE/31343C",
         "alt": "マラリアとの闘い（仮画像）",
@@ -77,29 +74,35 @@
       "chart": {
         "layout": "dual",
         "visible": true,
+        "position": {
+          "horizontal": "left",
+          "vertical": "center",
+          "width": "70%",
+          "height": "100%"
+        },
         "charts": [
           {
             "type": "pie",
             "dataFile": "data/step2_地域別感染者死者の割合.csv",
+            "position": "left",
             "config": {
               "title": "マラリア感染者の地域別割合",
               "valueField": "感染者_世界全体に占める割合",
               "labelField": "エリア",
-              "width": 400,
-              "height": 400,
-              "parsePercentage": true
+              "widthPercent": 70,
+              "heightPercent": 100,
             }
           },
           {
             "type": "pie",
             "dataFile": "data/step2_地域別感染者死者の割合.csv", 
+            "position": "right",
             "config": {
               "title": "マラリア死者の地域別割合",
               "valueField": "死者_世界全体に占める割合",
               "labelField": "エリア",
-              "width": 400,
-              "height": 400,
-              "parsePercentage": true
+              "widthPercent": 70,
+              "heightPercent": 100,
             }
           }
         ]

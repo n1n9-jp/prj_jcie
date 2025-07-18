@@ -237,12 +237,19 @@ class ChartManager extends BaseManager {
         // コンテナを確実に表示する
         this.show();
         
-        // chart-containerも確実に表示する
+        // chart-containerも確実に表示し、既存SVGも復元
         const chartContainer = document.getElementById('chart-container');
         if (chartContainer) {
             chartContainer.classList.add('visible');
             chartContainer.style.display = 'block';
             chartContainer.style.opacity = '1';
+        }
+        
+        // 既存SVGがある場合は再表示
+        if (this.chartElement && !this.chartElement.empty()) {
+            this.chartElement.selectAll('svg')
+                .style('opacity', 1)
+                .style('pointer-events', 'auto');
         }
         
         this.renderDualLayout(chartData);
@@ -375,8 +382,11 @@ class ChartManager extends BaseManager {
             return;
         }
         
-        // コンテナをクリアしてSVGを作成（スタイル操作を削除）
-        this.clearChartContainer();
+        // 既存のSVGがあるかチェックし、再利用または新規作成
+        if (!this.chartElement.select('svg').empty()) {
+            // 既存SVGをクリア（削除ではなく内容のみクリア）
+            this.chartElement.select('svg').selectAll('*').remove();
+        }
         
         // BaseManagerの統一position処理を使用
         if (position) {
@@ -467,11 +477,11 @@ class ChartManager extends BaseManager {
             switch (layoutType) {
                 case 'dual':
                     totalWidth = Math.min(containerWidth * 0.9, 1000);
-                    totalHeight = Math.min(containerHeight * 0.8, 500);
+                    totalHeight = Math.max(Math.min(containerHeight * 0.8, 600), 400); // 最小高さ400px
                     break;
                 case 'triple':
                     totalWidth = Math.min(containerWidth * 0.95, 1200);
-                    totalHeight = Math.min(containerHeight * 0.8, 500);
+                    totalHeight = Math.max(Math.min(containerHeight * 0.8, 500), 400); // 最小高さ400px
                     break;
                 default:
                     totalWidth = 800;
@@ -514,17 +524,20 @@ class ChartManager extends BaseManager {
         } else {
             // 従来のデフォルト計算
             totalWidth = Math.min(containerWidth * 0.9, 1000);
-            totalHeight = Math.min(containerHeight * 0.8, 500);
+            totalHeight = Math.max(Math.min(containerHeight * 0.8, 600), 400); // 最小高さ400px確保
         }
         
         const spacing = 40;
         const marginTop = 40;
         
+        const chartWidth = Math.max((totalWidth - spacing) / 2, 300); // 最小幅300px
+        const chartHeight = Math.max(totalHeight - marginTop - 20, 300); // 最小高さ300px
+        
         return {
             totalWidth,
             totalHeight,
-            chartWidth: (totalWidth - spacing) / 2,
-            chartHeight: totalHeight - marginTop - 20,
+            chartWidth,
+            chartHeight,
             spacing,
             marginTop
         };
@@ -578,18 +591,17 @@ class ChartManager extends BaseManager {
             chartGroup.append('text')
                 .attr('class', 'chart-title')
                 .attr('x', width / 2)
-                .attr('y', -10)
+                .attr('y', 20) // より見やすい位置に調整
                 .attr('text-anchor', 'middle')
                 .attr('fill', window.AppDefaults?.colors?.text?.primary || '#333')
                 .style('font-family', 'var(--font-family-serif)')
-                .style('font-size', 'var(--font-size-base)')
-                .style('font-weight', 'var(--font-weight-bold)')
+                .style('font-size', '14px') // フォントサイズを明示
+                .style('font-weight', 'bold')
                 .text(title);
         }
         
         // チャートタイプに基づいて適切なレンダリング関数を呼び出し
-        // Dual layoutの場合は明示的にline chartとして扱う
-        const chartType = config.type || 'line';
+        const chartType = chartConfig.type || config.type || 'line';
         
         // マージンを計算
         let margin;
@@ -604,15 +616,27 @@ class ChartManager extends BaseManager {
             margin = config.margin || { top: 20, right: 20, bottom: 40, left: 50 };
         }
         
-        // チャート描画エリア
-        const g = chartGroup.append('g')
-            .attr('transform', `translate(${margin.left}, ${margin.top})`);
-        
         // チャートタイプ別に描画
+        const innerWidth = width - margin.left - margin.right;
+        const innerHeight = height - margin.top - margin.bottom;
+        
+        // チャート描画エリア（座標系をチャートタイプに応じて設定）
+        let g;
+        if (chartType === 'pie') {
+            // 極座標系：円グラフの中心を描画領域の中央に配置
+            g = chartGroup.append('g')
+                .attr('transform', `translate(${margin.left + innerWidth / 2}, ${margin.top + innerHeight / 2})`);
+        } else {
+            // 直交座標系：従来通りマージン適用後の左上を原点に設定
+            g = chartGroup.append('g')
+                .attr('transform', `translate(${margin.left}, ${margin.top})`);
+        }
+        
         const adjustedConfig = {
             ...config,
-            width: width - margin.left - margin.right,
-            height: height - margin.top - margin.bottom,
+            width: innerWidth,
+            height: innerHeight,
+            radius: Math.min(innerWidth, innerHeight) / 2 - 20, // 円グラフ用のradius設定
             margin: { top: 0, right: 0, bottom: 0, left: 0 }
         };
         
@@ -998,11 +1022,14 @@ class ChartManager extends BaseManager {
     }
 
     /**
-     * チャート専用のコンテナクリア処理
+     * チャート専用のコンテナクリア処理（SVG削除ではなく非表示）
      */
     clearChartContainer() {
         if (this.chartElement && !this.chartElement.empty()) {
-            this.chartElement.selectAll('*').remove();
+            // SVGを削除せず、opacity制御で非表示にする
+            this.chartElement.selectAll('svg')
+                .style('opacity', 0)
+                .style('pointer-events', 'none');
         }
     }
 

@@ -515,6 +515,7 @@ class PieChartRenderer extends BaseManager {
         
         const radius = Math.min(width, height - 80) / 2; // タイトル分を除く
         
+        
         // チャートグループを作成
         const chartGroup = svg.append('g')
             .attr('transform', `translate(${x}, ${y})`);
@@ -547,12 +548,20 @@ class PieChartRenderer extends BaseManager {
     renderPieChartInGroup(g, data, config) {
         const { radius, labelField = 'label', valueField = 'value', colors = d3.schemeCategory10 } = config;
         
+        // 値変換関数（パーセンテージ対応）
+        const parseValue = (value) => {
+            if (typeof value === 'string' && value.includes('%')) {
+                return parseFloat(value.replace('%', ''));
+            }
+            return +value;
+        };
+        
         // データの合計を計算
-        const total = data.reduce((sum, d) => sum + (+d[valueField]), 0);
+        const total = data.reduce((sum, d) => sum + parseValue(d[valueField]), 0);
         
         // パイ生成器
         const pie = d3.pie()
-            .value(d => +d[valueField])
+            .value(d => parseValue(d[valueField]))
             .sort(null);
         
         // アーク生成器
@@ -578,6 +587,11 @@ class PieChartRenderer extends BaseManager {
             chartColors = config.colors;
         }
         
+        // デフォルトカラーパレットを確保（より明確に区別可能な色）
+        if (!chartColors || chartColors.length === 0) {
+            chartColors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f'];
+        }
+        
         const colorScale = d3.scaleOrdinal(chartColors)
             .domain(data.map(d => d[labelField]));
         
@@ -593,15 +607,21 @@ class PieChartRenderer extends BaseManager {
         
         slices.append('path')
             .attr('class', 'pie-slice')
-            .attr('d', arc)
             .attr('fill', d => colorScale(d.data[labelField]))
             .attr('stroke', window.AppDefaults?.colors?.text?.white || '#fff')
             .attr('stroke-width', window.AppDefaults?.strokeWidth?.normal || 1)
             .style('opacity', 0)
+            .attr('d', arc) // パスデータを設定
             .transition()
             .duration(500)
             .delay((d, i) => i * 100)
             .style('opacity', 1);
+        
+        // radiusの値チェック
+        if (!radius || isNaN(radius) || radius <= 0) {
+            console.warn('Invalid radius for pie chart labels:', radius);
+            return;
+        }
         
         // ラベルを追加
         const labelArc = d3.arc()
@@ -632,9 +652,9 @@ class PieChartRenderer extends BaseManager {
             .attr('font-size', '11px')
             .attr('fill', window.AppDefaults?.colors?.text?.secondary || '#666')
             .text(d => {
-                // 実際のパーセンテージを計算
-                const percentage = (d.data[valueField] / total * 100).toFixed(1);
-                return `${percentage}%`;
+                // parseValueを使って正しい値を取得
+                const value = parseValue(d.data[valueField]);
+                return `${value}%`;
             });
         
         // ラベルグループをフェードイン
