@@ -407,6 +407,7 @@ class ScrollytellingApp {
                     
                     const chartData = {
                         ...stepConfig.chart,
+                        ...stepConfig.chart.config, // configの内容もトップレベルにマージ
                         data: this.getChartData(stepConfig.chart.type, stepConfig.chart.dataFile),
                         updateMode: updateMode,
                         direction: direction // スクロール方向を追加
