@@ -143,7 +143,7 @@
         "useRegionColors": true,
         "lightenAllCountries": true,
         "targetRegions": ["西・中央ヨーロッパおよび北米", "アジア・太平洋地域", "東部・南部アフリカ", "西部・中部アフリカ"],
-        "showSpreadingArrows": true
+        "showSpreadingArrows": false
       },
       "image": {
         "visible": false
