@@ -207,16 +207,26 @@
         }
       },
       "chart": {
-        "type": "line",
-        "dataFile": "data/世界の感染者数と死者数の推移_transformed.csv",
+        "layout": "grid",
         "visible": true,
+        "position": {
+          "horizontal": "center",
+          "vertical": "center",
+          "width": "100%",
+          "height": "100%"
+        },
         "config": {
-          "widthPercent": 100,
-          "height": 500,
-          "xField": "年",
-          "yField": "value",
-          "seriesField": "series",
-          "multiSeries": true
+          "dataFile": "data/地域別-感染者数と死者数.csv",
+          "columns": 3,
+          "rows": 2,
+          "chartType": "pie",
+          "chartWidth": 180,
+          "chartHeight": 180,
+          "rowSpacing": 40,
+          "labelField": "地域",
+          "valueField": "感染者の割合",
+          "title": "地域別マラリア感染者分布",
+          "dataSource": "WHO World malaria report 2024"
         }
       },
       "map": {
