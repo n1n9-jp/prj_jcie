@@ -665,6 +665,7 @@
         "charts": [
           {
             "id": "women",
+            "type": "line",
             "title": "若年女性（15-24歳）",
             "dataFile": "data/trend_africa_young_woman_normalized.csv",
             "position": "left",
@@ -690,6 +691,7 @@
           },
           {
             "id": "men",
+            "type": "line",
             "title": "若年男性（15-24歳）",
             "dataFile": "data/trend_africa_young_man_normalized.csv",
             "position": "right",

@@ -446,10 +446,10 @@ class ScrollytellingApp {
         }
 
         // コンテンツポジション設定を適用
-        this.applyStepPositioning(stepConfig, index);
+        this.applyStepPositioning(stepConfig, stepLogicalName);
         
         // テキストポジション設定を適用
-        this.applyTextPositioning(stepConfig, index);
+        this.applyTextPositioning(stepConfig, stepLogicalName);
 
         // ステップ進入イベントを発行
         pubsub.publish(EVENTS.STEP_ENTER, { index, direction, config: stepConfig });
@@ -718,9 +718,9 @@ class ScrollytellingApp {
     /**
      * ステップのコンテンツポジション設定を適用
      * @param {Object} stepConfig - ステップ設定
-     * @param {number} stepIndex - ステップインデックス
+     * @param {string} stepLogicalName - ステップの論理名
      */
-    applyStepPositioning(stepConfig, stepIndex) {
+    applyStepPositioning(stepConfig, stepLogicalName) {
         if (!window.PositionManager) {
             console.warn('PositionManager not available, skipping positioning');
             return;
@@ -728,7 +728,7 @@ class ScrollytellingApp {
 
         // チャートポジション設定
         if (stepConfig.chart && stepConfig.chart.visible !== false) {
-            this.applyChartPositioning(stepConfig.chart, stepIndex);
+            this.applyChartPositioning(stepConfig.chart, stepLogicalName);
         } else {
             // チャートが存在しないまたは非表示の場合、chart-containerと#chartを非表示にする
             const chartContainer = document.getElementById('chart-container');
@@ -743,24 +743,24 @@ class ScrollytellingApp {
 
         // 地図ポジション設定
         if (stepConfig.map && stepConfig.map.visible !== false) {
-            this.applyMapPositioning(stepConfig.map, stepIndex);
+            this.applyMapPositioning(stepConfig.map, stepLogicalName);
         }
 
         // 画像ポジション設定
         if (stepConfig.image && stepConfig.image.visible !== false) {
-            this.applyImagePositioning(stepConfig.image, stepIndex);
+            this.applyImagePositioning(stepConfig.image, stepLogicalName);
         }
 
         // 複数コンテンツの場合の調整
-        this.adjustMultiContentPositioning(stepConfig, stepIndex);
+        this.adjustMultiContentPositioning(stepConfig, stepLogicalName);
     }
 
     /**
      * チャートのポジション設定を適用
      * @param {Object} chartConfig - チャート設定
-     * @param {number} stepIndex - ステップインデックス
+     * @param {string} stepLogicalName - ステップの論理名
      */
-    applyChartPositioning(chartConfig, stepIndex) {
+    applyChartPositioning(chartConfig, stepLogicalName) {
         const container = document.getElementById('chart-container');
         if (!container) {
             console.warn('Chart container not found');
@@ -804,9 +804,9 @@ class ScrollytellingApp {
     /**
      * 地図のポジション設定を適用
      * @param {Object} mapConfig - 地図設定
-     * @param {number} stepIndex - ステップインデックス
+     * @param {string} stepLogicalName - ステップの論理名
      */
-    applyMapPositioning(mapConfig, stepIndex) {
+    applyMapPositioning(mapConfig, stepLogicalName) {
         const container = document.getElementById('map-container');
         if (!container) {
             console.warn('Map container not found');
@@ -837,9 +837,9 @@ class ScrollytellingApp {
     /**
      * 画像のポジション設定を適用
      * @param {Object} imageConfig - 画像設定
-     * @param {number} stepIndex - ステップインデックス
+     * @param {string} stepLogicalName - ステップの論理名
      */
-    applyImagePositioning(imageConfig, stepIndex) {
+    applyImagePositioning(imageConfig, stepLogicalName) {
         const container = document.getElementById('image-container');
         if (!container) {
             console.warn('Image container not found');
@@ -872,9 +872,9 @@ class ScrollytellingApp {
     /**
      * 複数コンテンツの位置調整
      * @param {Object} stepConfig - ステップ設定
-     * @param {number} stepIndex - ステップインデックス
+     * @param {string} stepLogicalName - ステップの論理名
      */
-    adjustMultiContentPositioning(stepConfig, stepIndex) {
+    adjustMultiContentPositioning(stepConfig, stepLogicalName) {
         const visibleContents = [];
 
         // 表示されているコンテンツを収集
@@ -954,26 +954,26 @@ class ScrollytellingApp {
     /**
      * テキストのポジション設定を適用
      * @param {Object} stepConfig - ステップ設定
-     * @param {number} stepIndex - ステップインデックス
+     * @param {string} stepLogicalName - ステップの論理名
      */
-    applyTextPositioning(stepConfig, stepIndex) {
+    applyTextPositioning(stepConfig, stepLogicalName) {
         if (!window.PositionManager) {
             console.warn('PositionManager not available, skipping text positioning');
             return;
         }
 
         // step0（表紙）は特別な構造なのでテキストポジショニングを適用しない
-        if (stepConfig.id === 'step0' || stepIndex === 0) {
+        if (stepConfig.id === 'step0' || stepLogicalName === 'step0') {
             return;
         }
 
         // 現在のステップ要素を取得
         let stepElement = document.querySelector(`[data-step="${stepConfig.id}"]`) ||
                          document.querySelector(`[data-step="${stepConfig.id.replace(/^step/, '')}"]`) ||
-                         document.querySelector(`[data-step="${stepIndex}"]`);
+                         document.querySelector(`[data-step="${stepLogicalName}"]`);
         
         if (!stepElement) {
-            console.warn(`Step element not found for step ${stepConfig.id} (index ${stepIndex})`);
+            console.warn(`Step element not found for step ${stepConfig.id} (logical name: ${stepLogicalName})`);
             return;
         }
 
@@ -1127,7 +1127,7 @@ class ScrollytellingApp {
                 
                 if (stepElement) {
                     // フルのテキストポジションを適用（白い矩形の位置制御も含む）
-                    this.applyTextPositioning(stepConfig, stepIndex);
+                    this.applyTextPositioning(stepConfig, stepConfig.id);
                 }
             }
         });

@@ -129,12 +129,12 @@ class PositionManager {
     static getHorizontalClass(horizontal) {
         switch (horizontal.toLowerCase()) {
             case 'left':
-                return 'content-left';
+                return 'justify-start';
             case 'right':
-                return 'content-right';
+                return 'justify-end';
             case 'center':
             default:
-                return 'content-center';
+                return 'justify-center';
         }
     }
 
@@ -146,13 +146,13 @@ class PositionManager {
     static getVerticalClass(vertical) {
         switch (vertical.toLowerCase()) {
             case 'top':
-                return 'content-top';
+                return 'items-start';
             case 'bottom':
-                return 'content-bottom';
+                return 'items-end';
             case 'center':
             case 'middle':
             default:
-                return 'content-middle';
+                return 'items-center';
         }
     }
 

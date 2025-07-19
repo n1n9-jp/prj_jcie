@@ -279,7 +279,6 @@ class ChartManager extends BaseManager {
      * @param {Object} chartData - チャートデータ
      */
     handleGridLayout(chartData) {
-        console.log('ChartManager: handleGridLayout called with:', chartData);
         
         // GridChartRendererに委譲
         const gridRenderer = this.renderers.grid;
@@ -299,7 +298,6 @@ class ChartManager extends BaseManager {
                 }
             };
             
-            console.log('ChartManager: Passing enhanced data to GridChartRenderer:', enhancedChartData);
             gridRenderer.updateChart(enhancedChartData);
         } else {
             console.warn('ChartManager: GridChartRenderer not available');
@@ -390,14 +388,11 @@ class ChartManager extends BaseManager {
         
         // BaseManagerの統一position処理を使用
         if (position) {
-            console.log('ChartManager: Applying position settings for dual layout:', position);
             this.applyPositionSettings(position);
             
             // デバッグ: 適用されたクラスを確認
             const containerElement = this.container.node();
             if (containerElement) {
-                console.log('ChartManager: Container classes after position application:', containerElement.className);
-                console.log('ChartManager: Container computed styles:', window.getComputedStyle(containerElement).alignItems);
             }
         }
         
@@ -411,44 +406,103 @@ class ChartManager extends BaseManager {
         // レイアウト計算（position設定を考慮）
         const layout = this.calculateDualLayout(position);
         
-        // 各チャートを描画
-        charts.forEach((chartConfig, index) => {
-            const chartLayout = {
-                x: index * (layout.chartWidth + layout.spacing),
-                y: layout.marginTop,
-                width: layout.chartWidth,
-                height: layout.chartHeight
-            };
-            
-            this.renderSingleChartInLayout(svg, chartConfig, chartLayout);
-        });
+        // 各チャートのデータを読み込んでから描画
+        this.loadChartsDataAndRender(svg, charts, layout);
     }
 
     /**
-     * トリプルレイアウトを描画（従来のロジック）
+     * チャートのデータを読み込んでから描画
+     * @param {d3.Selection} svg - SVG要素
+     * @param {Array} charts - チャート設定配列
+     * @param {Object} layout - レイアウト情報
+     */
+    async loadChartsDataAndRender(svg, charts, layout) {
+        try {
+            // 各チャートのデータを並列で読み込み
+            const dataPromises = charts.map(async (chartConfig, index) => {
+                
+                if (chartConfig.dataFile) {
+                    // dataFileが指定されている場合はCSVを読み込み
+                    const dataPath = window.ConfigLoader ? 
+                        window.ConfigLoader.resolveDataPath(chartConfig.dataFile) : 
+                        chartConfig.dataFile;
+                    
+                    
+                    try {
+                        const data = await d3.csv(dataPath);
+                        return { ...chartConfig, data };
+                    } catch (csvError) {
+                        console.error(`ChartManager: CSV loading error for chart ${index}:`, csvError);
+                        console.error(`ChartManager: Failed path:`, dataPath);
+                        return { ...chartConfig, data: [] };
+                    }
+                } else if (chartConfig.data) {
+                    // データが直接指定されている場合はそのまま使用
+                    return chartConfig;
+                } else {
+                    console.warn('ChartManager: No data or dataFile specified for chart:', chartConfig);
+                    return { ...chartConfig, data: [] };
+                }
+            });
+            
+            const chartsWithData = await Promise.all(dataPromises);
+            
+            // データが読み込まれたチャートを描画
+            chartsWithData.forEach((chartConfig, index) => {
+                const chartLayout = {
+                    x: index * (layout.chartWidth + layout.spacing),
+                    y: layout.marginTop,
+                    width: layout.chartWidth,
+                    height: layout.chartHeight
+                };
+                
+                
+                this.renderSingleChartInLayout(svg, chartConfig, chartLayout);
+            });
+            
+        } catch (error) {
+            console.error('ChartManager: Error in loadChartsDataAndRender:', error);
+            console.error('ChartManager: Error stack:', error.stack);
+            console.error('ChartManager: Charts that failed:', charts);
+            
+            if (window.ErrorHandler) {
+                ErrorHandler.handle(error, 'ChartManager.loadChartsDataAndRender', {
+                    type: ErrorHandler.ERROR_TYPES.DATA_LOAD,
+                    severity: ErrorHandler.SEVERITY.HIGH,
+                    context: { charts }
+                });
+            } else {
+                console.error('ChartManager: ErrorHandler not available');
+            }
+        }
+    }
+
+    /**
+     * トリプルレイアウトを描画（統一版）
      * @param {Object} chartData - チャートデータ
      */
     renderTripleLayout(chartData) {
         const { charts } = chartData;
         
+        if (!charts || !Array.isArray(charts)) {
+            console.error('ChartManager: Invalid charts array for triple layout', charts);
+            return;
+        }
+        
         // コンテナをクリアしてSVGを作成
         this.clearChartContainer();
         const svg = this.createLayoutSVG('triple');
         
+        if (!svg) {
+            console.error('ChartManager: Failed to create SVG for triple layout');
+            return;
+        }
+        
         // レイアウト計算
         const layout = this.calculateTripleLayout();
         
-        // 各チャートを描画
-        charts.forEach((chartConfig, index) => {
-            const chartLayout = {
-                x: index * (layout.chartWidth + layout.spacing),
-                y: layout.marginTop,
-                width: layout.chartWidth,
-                height: layout.chartHeight
-            };
-            
-            this.renderSingleChartInLayout(svg, chartConfig, chartLayout);
-        });
+        // 各チャートのデータを読み込んでから描画
+        this.loadChartsDataAndRender(svg, charts, layout);
     }
 
     /**
@@ -641,6 +695,7 @@ class ChartManager extends BaseManager {
         };
         
         try {
+            
             switch (chartType) {
                 case 'line':
                     this.renderLineChartInGroup(g, data, adjustedConfig);
@@ -689,6 +744,7 @@ class ChartManager extends BaseManager {
      * グループ内で折れ線グラフを描画（LineChartRendererのロジックを使用）
      */
     renderLineChartInGroup(g, data, config) {
+        
         if (this.renderers.line && typeof this.renderers.line.renderLineChartInGroup === 'function') {
             try {
                 // デュアルレイアウトのフラグを追加
@@ -701,9 +757,12 @@ class ChartManager extends BaseManager {
                 this.renderers.line.renderLineChartInGroup(g, data, configWithDualFlag);
             } catch (error) {
                 console.error('ChartManager: Error calling LineChartRenderer.renderLineChartInGroup:', error);
+                console.error('ChartManager: Error stack:', error.stack);
             }
         } else {
             console.warn('ChartManager: LineChartRenderer.renderLineChartInGroup not available');
+            console.warn('ChartManager: Available renderers:', Object.keys(this.renderers || {}));
+            console.warn('ChartManager: Line renderer type:', typeof this.renderers?.line);
             
             // フォールバック: 基本的な線グラフを直接描画
             this.fallbackLineChartInGroup(g, data, config);
