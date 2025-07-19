@@ -23,7 +23,8 @@ class GridChartRenderer extends BaseManager {
         
         // グリッドチャート特有のイベント
         pubsub.subscribe(EVENTS.CHART_UPDATE, (data) => {
-            if (data.layout === 'grid') {
+            // 厳密なチェック：grid layoutが明示的に指定されている場合のみ処理
+            if (data && data.layout === 'grid' && data.visible !== false) {
                 this.updateChart(data);
             }
         });
@@ -36,10 +37,14 @@ class GridChartRenderer extends BaseManager {
     updateChart(chartData) {
         const { layout, data, config, visible } = chartData;
         
-        console.log('GridChartRenderer.updateChart called with layout:', layout, 'visible:', visible);
-        
+        // 厳密なチェック：grid layout以外は処理しない
         if (layout !== 'grid') {
-            console.warn(`GridChartRenderer: Unsupported layout: ${layout}`);
+            return; // ワーニングも表示しないように変更
+        }
+        
+        // グリッドレイアウトの必須設定をチェック
+        if (!config || (!config.columns && !config.rows)) {
+            console.warn('GridChartRenderer: Grid layout requires columns/rows configuration');
             return;
         }
 

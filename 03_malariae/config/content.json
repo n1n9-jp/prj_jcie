@@ -72,40 +72,7 @@
         }
       },
       "chart": {
-        "layout": "dual",
-        "visible": true,
-        "position": {
-          "horizontal": "left",
-          "vertical": "center",
-          "width": "70%",
-          "height": "100%"
-        },
-        "charts": [
-          {
-            "type": "pie",
-            "dataFile": "data/地域別-感染者数と死者数.csv",
-            "position": "left",
-            "config": {
-              "title": "マラリア感染者の地域別割合",
-              "valueField": "感染者の割合",
-              "labelField": "地域",
-              "widthPercent": 70,
-              "heightPercent": 100
-            }
-          },
-          {
-            "type": "pie",
-            "dataFile": "data/地域別-感染者数と死者数.csv", 
-            "position": "right",
-            "config": {
-              "title": "マラリア死者の地域別割合",
-              "valueField": "死亡者の割合",
-              "labelField": "地域",
-              "widthPercent": 70,
-              "heightPercent": 100
-            }
-          }
-        ]
+        "visible": false
       },
       "map": {
         "visible": false
@@ -449,14 +416,30 @@
         }
       },
       "chart": {
-        "type": "pie",
-        "dataFile": "data/地域別-感染者数と死者数.csv",
+        "type": "line",
+        "dataFile": "data/蚊帳の配布数と使っている人の割合_transformed.csv",
         "visible": true,
+        "position": {
+          "horizontal": "left",
+          "vertical": "center",
+          "width": "70%"
+        },
         "config": {
-          "widthPercent": 60,
+          "widthPercent": 70,
           "height": 400,
-          "valueField": "感染者の割合",
-          "labelField": "地域"
+          "title": "蚊帳の配布数と使用率の推移",
+          "xField": "year",
+          "yField": "value",
+          "seriesField": "series",
+          "multiSeries": true,
+          "yAxisLabel": "配布数（万張）/ 使用率（%）",
+          "dataSource": "WHO World malaria report 2024",
+          "legendType": "inline",
+          "yAxisFormat": {
+            "type": "mixed",
+            "decimals": 1
+          },
+          "colors": ["#ff6b35", "#4ecdc4"]
         }
       },
       "map": {
@@ -534,17 +517,7 @@
         }
       },
       "chart": {
-        "type": "line",
-        "dataFile": "data/世界の感染者数と死者数の推移_transformed.csv",
-        "visible": true,
-        "config": {
-          "widthPercent": 70,
-          "height": 400,
-          "xField": "年",
-          "yField": "value",
-          "seriesField": "series",
-          "multiSeries": true
-        }
+        "visible": false
       },
       "map": {
         "visible": false
@@ -565,15 +538,7 @@
         }
       },
       "chart": {
-        "type": "bar",
-        "dataFile": "data/地域別-感染者数と死者数.csv",
-        "visible": true,
-        "config": {
-          "widthPercent": 70,
-          "height": 400,
-          "xField": "地域",
-          "yField": "感染者の割合"
-        }
+        "visible": false
       },
       "map": {
         "visible": false
@@ -650,17 +615,7 @@
         }
       },
       "chart": {
-        "type": "line",
-        "dataFile": "data/世界の感染者数と死者数の推移_transformed.csv",
-        "visible": true,
-        "config": {
-          "widthPercent": 80,
-          "height": 400,
-          "xField": "年",
-          "yField": "value",
-          "seriesField": "series",
-          "multiSeries": true
-        }
+        "visible": false
       },
       "map": {
         "visible": false
@@ -901,17 +856,7 @@
         }
       },
       "chart": {
-        "type": "line",
-        "dataFile": "data/世界の感染者数と死者数の推移_transformed.csv",
-        "visible": true,
-        "config": {
-          "widthPercent": 80,
-          "height": 400,
-          "xField": "年",
-          "yField": "value",
-          "seriesField": "series",
-          "multiSeries": true
-        }
+        "visible": false
       },
       "map": {
         "visible": false
