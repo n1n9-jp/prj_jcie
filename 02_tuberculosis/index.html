@@ -60,7 +60,7 @@
         <!-- スクロール可能なテキストエリア -->
         <div id="scroll-content" class="relative z-10">
             <!-- 各段落のステップ -->
-            <div class="step" data-step="0">
+            <div class="step" data-step="opening">
                 <div class="w-full min-h-screen flex items-center justify-center relative">
                     <!-- 背景画像とオーバーレイ用の特別なコンテナ -->
                     <div class="absolute inset-0 z-0" id="step0-bg-container">
@@ -78,7 +78,7 @@
                 </div>
             </div>
 
-            <div class="step" data-step="1">
+            <div class="step" data-step="intro">
                 <div class="w-full min-h-screen flex items-center">
                     <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
                         <p class="text-gray-700 leading-relaxed">
@@ -88,7 +88,7 @@
                 </div>
             </div>
 
-            <div class="step" data-step="2">
+            <div class="step" data-step="global-burden">
                 <div class="w-full min-h-screen flex items-center">
                     <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
                         <p class="text-gray-700 leading-relaxed">
@@ -98,7 +98,7 @@
                 </div>
             </div>
 
-            <div class="step" data-step="3">
+            <div class="step" data-step="transmission">
                 <div class="w-full min-h-screen flex items-center">
                     <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
                         <h2 class="text-2xl font-bold mb-4">感染はどのように起こる？</h2>
@@ -109,7 +109,7 @@
                 </div>
             </div>
 
-            <div class="step" data-step="4">
+            <div class="step" data-step="infection-vs-disease">
                 <div class="w-full min-h-screen flex items-center">
                     <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
                         <h2 class="text-2xl font-bold mb-4">「感染」と「発病」の違い</h2>
@@ -122,7 +122,7 @@
                 </div>
             </div>
 
-            <div class="step" data-step="5">
+            <div class="step" data-step="historical-impact">
                 <div class="w-full min-h-screen flex items-center">
                     <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
                         <h2 class="text-2xl font-bold mb-4">治療と予防ワクチンの歴史</h2>
@@ -133,7 +133,7 @@
                 </div>
             </div>
 
-            <div class="step" data-step="6">
+            <div class="step" data-step="medical-breakthroughs">
                 <div class="w-full min-h-screen flex items-center">
                     <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
                         <p class="text-gray-700 leading-relaxed">
@@ -143,7 +143,7 @@
                 </div>
             </div>
 
-            <div class="step" data-step="10">
+            <div class="step" data-step="japan-history-1935">
                 <div class="w-full min-h-screen flex items-center justify-center">
                     <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
                         <h2 class="text-2xl font-bold mb-4">日本における結核との闘い</h2>
@@ -154,7 +154,7 @@
                 </div>
             </div>
 
-            <div class="step" data-step="10">
+            <div class="step" data-step="japan-bcg-introduction">
                 <div class="w-full min-h-screen flex items-center justify-center">
                     <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
                         <p class="text-gray-700 leading-relaxed">
@@ -164,7 +164,7 @@
                 </div>
             </div>
 
-            <div class="step" data-step="10">
+            <div class="step" data-step="japan-postwar-improvement">
                 <div class="w-full min-h-screen flex items-center justify-center">
                     <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
                         <p class="text-gray-700 leading-relaxed">
@@ -174,7 +174,7 @@
                 </div>
             </div>
 
-            <div class="step" data-step="10">
+            <div class="step" data-step="japan-current-status">
                 <div class="w-full min-h-screen flex items-center justify-center">
                     <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
                         <p class="text-gray-700 leading-relaxed">
@@ -186,7 +186,7 @@
                 </div>
             </div>
 
-            <div class="step" data-step="10">
+            <div class="step" data-step="global-end-tb-strategy">
                 <div class="w-full min-h-screen flex items-center justify-center">
                     <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
                         <h2 class="text-2xl font-bold mb-4">世界の結核対策と現状</h2>
@@ -199,7 +199,7 @@
                 </div>
             </div>
 
-            <div class="step" data-step="10">
+            <div class="step" data-step="covid-impact">
                 <div class="w-full min-h-screen flex items-center justify-center">
                     <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
                         <p class="text-gray-700 leading-relaxed">
@@ -214,7 +214,7 @@
             <!-- 都市ステップは動的に生成されます（step11-17） -->
             <div id="city-steps-container"></div>
 
-            <div class="step" data-step="19">
+            <div class="step" data-step="drug-resistance">
                 <div class="w-full min-h-screen flex items-center">
                     <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
                         <h2 class="text-2xl font-bold mb-4">今後の課題</h2>
@@ -225,7 +225,7 @@
                 </div>
             </div>
 
-            <div class="step" data-step="20">
+            <div class="step" data-step="funding-shortage">
                 <div class="w-full min-h-screen flex items-center">
                     <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
                         <p class="text-gray-700 leading-relaxed">
@@ -235,7 +235,7 @@
                 </div>
             </div>
 
-            <div class="step" data-step="20">
+            <div class="step" data-step="covid-setback">
                 <div class="w-full min-h-screen flex items-center">
                     <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
                         <p class="text-gray-700 leading-relaxed">
@@ -245,7 +245,7 @@
                 </div>
             </div>
 
-            <div class="step" data-step="20">
+            <div class="step" data-step="drug-development-delay">
                 <div class="w-full min-h-screen flex items-center">
                     <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
                         <p class="text-gray-700 leading-relaxed">
@@ -255,7 +255,7 @@
                 </div>
             </div>
 
-            <div class="step" data-step="20">
+            <div class="step" data-step="comprehensive-approach">
                 <div class="w-full min-h-screen flex items-center">
                     <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
                         <p class="text-gray-700 leading-relaxed">
@@ -265,7 +265,7 @@
                 </div>
             </div>
 
-            <div class="step" data-step="25">
+            <div class="step" data-step="footer">
                 <div class="w-full min-h-screen flex items-center">
                     <!-- フッターコンテンツは main.js で動的に生成される -->
                 </div>

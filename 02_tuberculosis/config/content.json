@@ -1,7 +1,7 @@
 {
   "steps": [
     {
-      "id": "step0",
+      "id": "opening",
       "text": {
         "content": "<div class=\"text-container\"><h1>結核との闘い</h1><div class=\"subtitle\">～データで見る希望と課題～</div></div>",
         "visible": true,
@@ -36,7 +36,7 @@
       }
     },
     {
-      "id": "step1",
+      "id": "intro",
       "chart": {
         "visible": false
       },
@@ -45,7 +45,7 @@
       }
     },
     {
-      "id": "step2",
+      "id": "global-burden",
       "chart": {
         "visible": false
       },
@@ -54,7 +54,7 @@
       }
     },
     {
-      "id": "step3",
+      "id": "transmission",
       "chart": {
         "visible": false
       },
@@ -63,7 +63,7 @@
       }
     },
     {
-      "id": "step4",
+      "id": "infection-vs-disease",
       "chart": {
         "visible": false
       },
@@ -72,7 +72,7 @@
       }
     },
     {
-      "id": "step5",
+      "id": "historical-impact",
       "chart": {
         "visible": true,
         "type": "line",
@@ -100,7 +100,7 @@
       }
     },
     {
-      "id": "step6",
+      "id": "medical-breakthroughs",
       "chart": {
         "visible": false
       },
@@ -109,7 +109,7 @@
       }
     },
     {
-      "id": "step10",
+      "id": "japan-history-1935",
       "chart": {
         "visible": false
       },
@@ -118,7 +118,52 @@
       }
     },
     {
-      "id": "step11",
+      "id": "japan-bcg-introduction",
+      "chart": {
+        "visible": false
+      },
+      "text": {
+        "visible": true
+      }
+    },
+    {
+      "id": "japan-postwar-improvement",
+      "chart": {
+        "visible": false
+      },
+      "text": {
+        "visible": true
+      }
+    },
+    {
+      "id": "japan-current-status",
+      "chart": {
+        "visible": false
+      },
+      "text": {
+        "visible": true
+      }
+    },
+    {
+      "id": "global-end-tb-strategy",
+      "chart": {
+        "visible": false
+      },
+      "text": {
+        "visible": true
+      }
+    },
+    {
+      "id": "covid-impact",
+      "chart": {
+        "visible": false
+      },
+      "text": {
+        "visible": true
+      }
+    },
+    {
+      "id": "city-episodes-start",
       "map": {
         "visible": true,
         "mode": "cities-timeline"
@@ -128,7 +173,7 @@
       }
     },
     {
-      "id": "step12",
+      "id": "city-episodes-1",
       "map": {
         "visible": true,
         "mode": "cities-timeline"
@@ -138,7 +183,7 @@
       }
     },
     {
-      "id": "step13",
+      "id": "city-episodes-2",
       "map": {
         "visible": true,
         "mode": "cities-timeline"
@@ -148,7 +193,7 @@
       }
     },
     {
-      "id": "step19",
+      "id": "drug-resistance",
       "chart": {
         "visible": false
       },
@@ -157,7 +202,7 @@
       }
     },
     {
-      "id": "step20",
+      "id": "funding-shortage",
       "chart": {
         "visible": false
       },
@@ -166,7 +211,34 @@
       }
     },
     {
-      "id": "step25",
+      "id": "covid-setback",
+      "chart": {
+        "visible": false
+      },
+      "text": {
+        "visible": true
+      }
+    },
+    {
+      "id": "drug-development-delay",
+      "chart": {
+        "visible": false
+      },
+      "text": {
+        "visible": true
+      }
+    },
+    {
+      "id": "comprehensive-approach",
+      "chart": {
+        "visible": false
+      },
+      "text": {
+        "visible": true
+      }
+    },
+    {
+      "id": "footer",
       "footer": {
         "visible": true
       },
