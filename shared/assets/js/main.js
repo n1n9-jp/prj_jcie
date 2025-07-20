@@ -179,7 +179,7 @@ class ScrollytellingApp {
                     visible: true,
                     mode: "single-city",
                     cityId: city.id,
-                    center: [city.longitude, city.latitude],
+                    center: city.coordinates ? city.coordinates : [city.longitude, city.latitude],
                     zoom: 6,
                     citiesFile: "data/cities-timeline.json",
                     useRegionColors: true,

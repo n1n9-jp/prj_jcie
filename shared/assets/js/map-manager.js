@@ -407,8 +407,8 @@ class MapManager extends BaseManager {
                 .enter()
                 .append('circle')
                 .attr('class', 'map-city')
-                .attr('cx', d => this.projection([d.longitude, d.latitude])[0])
-                .attr('cy', d => this.projection([d.longitude, d.latitude])[1])
+                .attr('cx', d => this.projection(this.getCityCoordinates(d))[0])
+                .attr('cy', d => this.projection(this.getCityCoordinates(d))[1])
                 .attr('r', 0)
                 .transition()
                 .duration(window.AppDefaults?.animation?.shortDuration || 500)
@@ -421,8 +421,8 @@ class MapManager extends BaseManager {
                 .enter()
                 .append('text')
                 .attr('class', 'city-label')
-                .attr('x', d => this.projection([d.longitude, d.latitude])[0])
-                .attr('y', d => this.projection([d.longitude, d.latitude])[1] - 10)
+                .attr('x', d => this.projection(this.getCityCoordinates(d))[0])
+                .attr('y', d => this.projection(this.getCityCoordinates(d))[1] - 10)
                 .attr('text-anchor', 'middle')
                 .attr('font-size', '16px')
                 .attr('fill', window.AppConstants?.APP_COLORS?.TEXT?.PRIMARY || '#1f2937')
@@ -483,22 +483,22 @@ class MapManager extends BaseManager {
                     // 都市マーカーを更新
                     this.svg.selectAll('.map-city')
                         .attr('cx', d => {
-                            const coords = this.projection([d.longitude, d.latitude]);
+                            const coords = this.projection(this.getCityCoordinates(d));
                             return coords ? coords[0] : 0;
                         })
                         .attr('cy', d => {
-                            const coords = this.projection([d.longitude, d.latitude]);
+                            const coords = this.projection(this.getCityCoordinates(d));
                             return coords ? coords[1] : 0;
                         });
                     
                     // 都市ラベルを更新
                     this.svg.selectAll('.city-label')
                         .attr('x', d => {
-                            const coords = this.projection([d.longitude, d.latitude]);
+                            const coords = this.projection(this.getCityCoordinates(d));
                             return coords ? coords[0] : 0;
                         })
                         .attr('y', d => {
-                            const coords = this.projection([d.longitude, d.latitude]);
+                            const coords = this.projection(this.getCityCoordinates(d));
                             return coords ? coords[1] - 10 : 0;
                         });
                 };
@@ -536,8 +536,8 @@ class MapManager extends BaseManager {
                 .enter()
                 .append('circle')
                 .attr('class', 'map-city')
-                .attr('cx', d => this.projection([d.longitude, d.latitude])[0])
-                .attr('cy', d => this.projection([d.longitude, d.latitude])[1])
+                .attr('cx', d => this.projection(this.getCityCoordinates(d))[0])
+                .attr('cy', d => this.projection(this.getCityCoordinates(d))[1])
                 .attr('r', 0)
                 .transition()
                 .duration(window.AppDefaults?.animation?.defaultDuration || 300)
@@ -548,8 +548,8 @@ class MapManager extends BaseManager {
                 .enter()
                 .append('text')
                 .attr('class', 'city-label')
-                .attr('x', d => this.projection([d.longitude, d.latitude])[0])
-                .attr('y', d => this.projection([d.longitude, d.latitude])[1] - 10)
+                .attr('x', d => this.projection(this.getCityCoordinates(d))[0])
+                .attr('y', d => this.projection(this.getCityCoordinates(d))[1] - 10)
                 .attr('text-anchor', 'middle')
                 .attr('font-size', '16px')
                 .attr('fill', window.AppConstants?.APP_COLORS?.TEXT?.PRIMARY || '#1f2937')
@@ -800,11 +800,11 @@ class MapManager extends BaseManager {
                 .append('circle')
                 .attr('class', 'map-city')
                 .attr('cx', d => {
-                    const coords = this.projection([d.longitude, d.latitude]);
+                    const coords = this.projection(this.getCityCoordinates(d));
                     return coords ? coords[0] : 0;
                 })
                 .attr('cy', d => {
-                    const coords = this.projection([d.longitude, d.latitude]);
+                    const coords = this.projection(this.getCityCoordinates(d));
                     return coords ? coords[1] : 0;
                 })
                 .attr('r', 0)
@@ -823,11 +823,11 @@ class MapManager extends BaseManager {
                 .append('text')
                 .attr('class', 'city-label')
                 .attr('x', d => {
-                    const coords = this.projection([d.longitude, d.latitude]);
+                    const coords = this.projection(this.getCityCoordinates(d));
                     return coords ? coords[0] : 0;
                 })
                 .attr('y', d => {
-                    const coords = this.projection([d.longitude, d.latitude]);
+                    const coords = this.projection(this.getCityCoordinates(d));
                     return coords ? coords[1] - 10 : 0;
                 })
                 .attr('text-anchor', 'middle')
@@ -973,11 +973,11 @@ class MapManager extends BaseManager {
             .append('circle')
             .attr('class', 'timeline-city')
             .attr('cx', d => {
-                const coords = this.projection([d.longitude, d.latitude]);
+                const coords = this.projection(this.getCityCoordinates(d));
                 return coords ? coords[0] : 0;
             })
             .attr('cy', d => {
-                const coords = this.projection([d.longitude, d.latitude]);
+                const coords = this.projection(this.getCityCoordinates(d));
                 return coords ? coords[1] : 0;
             })
             .attr('r', 0)
@@ -1002,11 +1002,11 @@ class MapManager extends BaseManager {
             .append('text')
             .attr('class', 'timeline-label')
             .attr('x', d => {
-                const coords = this.projection([d.longitude, d.latitude]);
+                const coords = this.projection(this.getCityCoordinates(d));
                 return coords ? coords[0] : 0;
             })
             .attr('y', d => {
-                const coords = this.projection([d.longitude, d.latitude]);
+                const coords = this.projection(this.getCityCoordinates(d));
                 return coords ? coords[1] - (d.style.size + 5) : 0;
             })
             .attr('text-anchor', 'middle')
@@ -1104,7 +1104,7 @@ class MapManager extends BaseManager {
         // 投影法を設定（都市モードでは元スケール、viewBoxサイズを使用）
         this.projection = d3.geoNaturalEarth1()
             .scale(400)
-            .center([targetCity.longitude, targetCity.latitude])
+            .center(this.getCityCoordinates(targetCity))
             .translate([viewBoxWidth / 2, viewBoxHeight / 2]);
             
         this.path = d3.geoPath().projection(this.projection);
@@ -1179,7 +1179,7 @@ class MapManager extends BaseManager {
         // 現在の投影設定を取得
         const currentCenter = this.projection.center();
         const currentScale = this.projection.scale();
-        const targetCenter = [targetCity.longitude, targetCity.latitude];
+        const targetCenter = this.getCityCoordinates(targetCity);
         const targetScale = 400; // 固定ズームレベル
         
         // 既存の都市マーカーをフェードアウト
@@ -1262,8 +1262,9 @@ class MapManager extends BaseManager {
         
         // プロジェクションの中心が都市座標と一致している場合、画面中央に配置
         const projectionCenter = this.projection.center();
-        const isCityCenter = Math.abs(projectionCenter[0] - city.longitude) < 0.001 && 
-                            Math.abs(projectionCenter[1] - city.latitude) < 0.001;
+        const cityCoords = this.getCityCoordinates(city);
+        const isCityCenter = Math.abs(projectionCenter[0] - cityCoords[0]) < 0.001 && 
+                            Math.abs(projectionCenter[1] - cityCoords[1]) < 0.001;
         
         let coords;
         if (isCityCenter) {
@@ -1271,7 +1272,7 @@ class MapManager extends BaseManager {
             coords = [viewBoxWidth / 2, viewBoxHeight / 2];
         } else {
             // 通常の投影計算
-            coords = this.projection([city.longitude, city.latitude]);
+            coords = this.projection(cityCoords);
         }
         
         if (!coords) {
@@ -1283,6 +1284,8 @@ class MapManager extends BaseManager {
         
         // 都市マーカーを追加
         const markerColor = this.getCityColor(city);
+        const cityStyle = this.getCityStyle(city);
+        
         mapGroup.append('circle')
             .attr('class', 'single-city-marker')
             .attr('cx', coords[0])
@@ -1295,14 +1298,14 @@ class MapManager extends BaseManager {
             .transition()
             .duration((window.AppDefaults?.animation?.shortDuration || 500) * 1.6)
             .ease(d3.easeBackOut.overshoot(1.7))
-            .attr('r', city.style.size * 1.5)  // 少し大きめに表示
+            .attr('r', cityStyle.size * 1.5)  // 少し大きめに表示
             .style('opacity', 1);
         
         // 都市ラベルを追加
         mapGroup.append('text')
             .attr('class', 'single-city-label')
             .attr('x', coords[0])
-            .attr('y', coords[1] - (city.style.size * 1.5 + 8))
+            .attr('y', coords[1] - (cityStyle.size * 1.5 + 8))
             .attr('text-anchor', 'middle')
             .attr('font-size', '18px')
             .attr('font-weight', 'bold')
@@ -1335,6 +1338,46 @@ class MapManager extends BaseManager {
         
         // 地理的情報を非表示にする
         geoInfoContainer.style.display = 'none';
+    }
+
+    /**
+     * 都市の座標を統一形式で取得（後方互換性対応）
+     * @param {Object} city - 都市データ
+     * @returns {Array} [longitude, latitude] 形式の座標配列
+     */
+    getCityCoordinates(city) {
+        if (!city) {
+            throw new Error('City data is required');
+        }
+        
+        // 新形式: coordinates配列
+        if (city.coordinates && Array.isArray(city.coordinates) && city.coordinates.length === 2) {
+            return city.coordinates;
+        }
+        
+        // 旧形式: latitude/longitude プロパティ
+        if (city.latitude !== undefined && city.longitude !== undefined) {
+            return [city.longitude, city.latitude];
+        }
+        
+        throw new Error(`Invalid city coordinate format for city: ${city.id || 'unknown'}`);
+    }
+
+    /**
+     * 都市のスタイル情報を統一形式で取得（後方互換性対応）
+     * @param {Object} city - 都市データ
+     * @returns {Object} スタイル情報 { size, color }
+     */
+    getCityStyle(city) {
+        if (!city) {
+            return { size: 8, color: null };
+        }
+        
+        const defaultSize = 8;
+        const size = city.style?.size || defaultSize;
+        const color = city.style?.color || null;
+        
+        return { size, color };
     }
 
     /**

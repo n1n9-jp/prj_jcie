@@ -1,34 +1,45 @@
 {
   "cities": [
     {
-      "id": "delhi",
-      "country": "India",
-      "coordinates": [77.209, 28.6139],
+      "id": "indonesia1",
+      "country": "Indonesia",
+      "coordinates": [106.8456, -6.2088],
       "data": {
-        "title": "デリー：結核対策の最前線",
-        "description": "インドの首都デリーでは、人口密度の高さと大気汚染により結核の感染率が高くなっています。しかし、革新的な診断技術の導入により、早期発見・早期治療が進んでいます。",
+        "title": "インドネシア1",
+        "description": "コロナと結核「二正面」強いられた医師　酸素足りず患者の受け入れ断念、夜中に電話も ",
         "thumbnail": "tb_delhi.jpg",
         "url": "#"
       }
     },
     {
-      "id": "jakarta",
-      "country": "Indonesia", 
+      "id": "indonesia2",
+      "country": "Indonesia",
       "coordinates": [106.8456, -6.2088],
       "data": {
-        "title": "ジャカルタ：コミュニティ主導の治療",
-        "description": "インドネシアのジャカルタでは、地域住民が主体となった結核治療支援プログラムが成功を収めています。患者の治療継続率が大幅に改善されました。",
+        "title": "インドネシア2",
+        "description": "【世界結核デー】インドネシアの結核対策を取材して ",
         "thumbnail": "tb_jakarta.jpg",
         "url": "#"
       }
     },
     {
-      "id": "beijing",
-      "country": "China",
-      "coordinates": [116.4074, 39.9042],
+      "id": "vietnam",
+      "country": "Vietnam",
+      "coordinates": [105.8542, 21.0285],
       "data": {
-        "title": "北京：薬剤耐性結核への挑戦",
-        "description": "中国の北京では、薬剤耐性結核の治療に新しい薬剤の組み合わせが試験され、良好な結果を示しています。この取り組みが世界の結核治療に新たな希望をもたらしています。",
+        "title": "ベトナム",
+        "description": "生死をさまよい、今は希望をつなぐ当事者代表へ",
+        "thumbnail": "tb_beijing.jpg",
+        "url": "#"
+      }
+    },
+    {
+      "id": "southafrica",
+      "country": "South Africa",
+      "coordinates": [28.0473, -26.2041],
+      "data": {
+        "title": "南アフリカ",
+        "description": "南アの医師ゾーイ　自らの結核を語る ",
         "thumbnail": "tb_beijing.jpg",
         "url": "#"
       }

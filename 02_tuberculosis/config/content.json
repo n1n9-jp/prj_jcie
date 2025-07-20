@@ -163,10 +163,38 @@
       }
     },
     {
+      "id": "country-episodes",
+      "text": {
+        "visible": true,
+        "position": {
+          "width": "60%",
+          "horizontal": "center",
+          "vertical": "center"
+        }
+      },
+      "map": {
+        "center": [0, 0],
+        "zoom": 1,
+        "visible": true,
+        "mode": "world-overview",
+        "cities": [],
+        "useRegionColors": true,
+        "lightenAllCountries": true,
+        "widthPercent": 100,
+        "heightPercent": 100
+      }
+    },
+    {
       "id": "city-episodes-start",
       "map": {
         "visible": true,
-        "mode": "cities-timeline"
+        "mode": "single-city",
+        "cityId": "indonesia1",
+        "citiesFile": "data/cities-timeline.json",
+        "useRegionColors": true,
+        "lightenNonVisited": true,
+        "widthPercent": 100,
+        "heightPercent": 100
       },
       "text": {
         "visible": false
@@ -176,7 +204,13 @@
       "id": "city-episodes-1",
       "map": {
         "visible": true,
-        "mode": "cities-timeline"
+        "mode": "single-city",
+        "cityId": "indonesia2",
+        "citiesFile": "data/cities-timeline.json",
+        "useRegionColors": true,
+        "lightenNonVisited": true,
+        "widthPercent": 100,
+        "heightPercent": 100
       },
       "text": {
         "visible": false
@@ -186,7 +220,29 @@
       "id": "city-episodes-2",
       "map": {
         "visible": true,
-        "mode": "cities-timeline"
+        "mode": "single-city",
+        "cityId": "vietnam",
+        "citiesFile": "data/cities-timeline.json",
+        "useRegionColors": true,
+        "lightenNonVisited": true,
+        "widthPercent": 100,
+        "heightPercent": 100
+      },
+      "text": {
+        "visible": false
+      }
+    },
+    {
+      "id": "city-episodes-3",
+      "map": {
+        "visible": true,
+        "mode": "single-city",
+        "cityId": "southafrica",
+        "citiesFile": "data/cities-timeline.json",
+        "useRegionColors": true,
+        "lightenNonVisited": true,
+        "widthPercent": 100,
+        "heightPercent": 100
       },
       "text": {
         "visible": false
