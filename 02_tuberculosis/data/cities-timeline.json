@@ -1,47 +1,103 @@
 {
+  "timeline": {
+    "title": "グローバルファンド 結核対策の物語",
+    "description": "世界各地で結核と闘う人々の取り組みをたどる旅"
+  },
   "cities": [
     {
       "id": "indonesia1",
+      "name": "ジャカルタ",
+      "nameEn": "Jakarta",
       "country": "Indonesia",
-      "coordinates": [106.8456, -6.2088],
+      "latitude": -6.2088,
+      "longitude": 106.8456,
+      "order": 1,
       "data": {
         "title": "インドネシア1",
         "description": "コロナと結核「二正面」強いられた医師　酸素足りず患者の受け入れ断念、夜中に電話も ",
-        "thumbnail": "tb_delhi.jpg",
+        "thumbnail": "tb_jakarta.jpg",
         "url": "#"
+      },
+      "style": {
+        "color": "#4ecdc4",
+        "size": 8
+      },
+      "transitions": {
+        "distanceFromPrevious": 0,
+        "scrollHeight": "100vh",
+        "routeType": "start"
       }
     },
     {
       "id": "indonesia2",
+      "name": "ジャカルタ",
+      "nameEn": "Jakarta",
       "country": "Indonesia",
-      "coordinates": [106.8456, -6.2088],
+      "latitude": -6.2088,
+      "longitude": 106.8456,
+      "order": 2,
       "data": {
         "title": "インドネシア2",
         "description": "【世界結核デー】インドネシアの結核対策を取材して ",
         "thumbnail": "tb_jakarta.jpg",
         "url": "#"
+      },
+      "style": {
+        "color": "#4ecdc4",
+        "size": 7
+      },
+      "transitions": {
+        "distanceFromPrevious": 0,
+        "scrollHeight": "100vh",
+        "routeType": "same-location"
       }
     },
     {
       "id": "vietnam",
+      "name": "ハノイ",
+      "nameEn": "Hanoi",
       "country": "Vietnam",
-      "coordinates": [105.8542, 21.0285],
+      "latitude": 21.0285,
+      "longitude": 105.8542,
+      "order": 3,
       "data": {
         "title": "ベトナム",
         "description": "生死をさまよい、今は希望をつなぐ当事者代表へ",
         "thumbnail": "tb_beijing.jpg",
         "url": "#"
+      },
+      "style": {
+        "color": "#4ecdc4",
+        "size": 8
+      },
+      "transitions": {
+        "distanceFromPrevious": 1200,
+        "scrollHeight": "100vh",
+        "routeType": "flight"
       }
     },
     {
       "id": "southafrica",
+      "name": "ヨハネスブルグ",
+      "nameEn": "Johannesburg",
       "country": "South Africa",
-      "coordinates": [28.0473, -26.2041],
+      "latitude": -26.2041,
+      "longitude": 28.0473,
+      "order": 4,
       "data": {
         "title": "南アフリカ",
         "description": "南アの医師ゾーイ　自らの結核を語る ",
         "thumbnail": "tb_beijing.jpg",
         "url": "#"
+      },
+      "style": {
+        "color": "#4ecdc4",
+        "size": 8
+      },
+      "transitions": {
+        "distanceFromPrevious": 8500,
+        "scrollHeight": "100vh",
+        "routeType": "flight"
       }
     }
   ]
