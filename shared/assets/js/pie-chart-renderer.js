@@ -85,7 +85,18 @@ class PieChartRenderer extends BaseManager {
             return;
         }
 
-        const { width, height } = this.getResponsiveSize(config);
+        // レイアウト内かどうかを判定して適切なサイズ計算を選択
+        let width, height;
+        if (config.width && config.height) {
+            // Layout内: ChartManagerが計算したサイズを使用
+            width = config.width;
+            height = config.height;
+        } else {
+            // Single: 従来通りgetResponsiveSize使用
+            const responsiveSize = this.getResponsiveSize(config);
+            width = responsiveSize.width;
+            height = responsiveSize.height;
+        }
         
         // ChartLayoutHelperを使用して動的マージンを計算
         let margin;

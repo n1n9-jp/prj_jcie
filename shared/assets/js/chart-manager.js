@@ -521,7 +521,7 @@ class ChartManager extends BaseManager {
         }
         
         // レイアウト計算
-        const layout = this.calculateTripleLayout();
+        const layout = this.calculateTripleLayout(chartData.position);
         
         // 各チャートのデータを読み込んでから描画
         this.loadChartsDataAndRender(svg, charts, layout);
@@ -580,9 +580,10 @@ class ChartManager extends BaseManager {
                 .attr('viewBox', `0 0 ${totalWidth} ${totalHeight}`);
             
             if (layoutType === 'dual') {
-                // dual layoutでは固定サイズ表示
-                svg.style('width', `${totalWidth}px`)
-                   .style('height', `${totalHeight}px`);
+                // dual layoutでもレスポンシブ表示（コンテナサイズに合わせる）
+                svg.style('width', '100%')
+                   .style('height', 'auto')
+                   .style('max-width', '100%');
             } else {
                 // 通常のレスポンシブ表示
                 svg.style('width', '100%')
@@ -599,25 +600,32 @@ class ChartManager extends BaseManager {
      * @returns {Object} レイアウト情報
      */
     calculateDualLayout(position = {}) {
-        const containerNode = this.container.node();
-        const containerWidth = containerNode.clientWidth || 800;
-        const containerHeight = containerNode.clientHeight || 600;
+        // ビューポートサイズを基準とした制約計算
+        const viewportWidth = window.innerWidth || 1200;
+        const viewportHeight = window.innerHeight || 800;
         
         let totalWidth, totalHeight;
         
         if (position.width && position.height) {
             // position設定で明示的にサイズが指定されている場合
-            totalWidth = this.calculateDimensionFromPosition(position.width, containerWidth, 'width');
-            totalHeight = this.calculateDimensionFromPosition(position.height, containerHeight, 'height');
+            // ビューポートサイズに対する割合で計算
+            totalWidth = this.calculateDimensionFromPosition(position.width, viewportWidth, 'width');
+            totalHeight = this.calculateDimensionFromPosition(position.height, viewportHeight, 'height');
         } else {
-            // 従来のデフォルト計算 - より大きなサイズに変更
-            totalWidth = Math.min(containerWidth * 0.95, 1400); // 幅を拡大
-            totalHeight = Math.max(Math.min(containerHeight * 0.85, 800), 500); // 高さを拡大、最小高さ500px
+            // 従来のデフォルト計算
+            const containerNode = this.container.node();
+            const containerWidth = containerNode.clientWidth || 800;
+            const containerHeight = containerNode.clientHeight || 600;
+            totalWidth = Math.min(containerWidth * 0.95, 1400);
+            totalHeight = Math.max(Math.min(containerHeight * 0.85, 800), 500);
         }
         
-        // dual layout では2つのチャートが収まる十分なサイズを確保
-        totalWidth = Math.max(totalWidth, 1200); // dual layout の最小幅を確保
-        totalHeight = Math.max(totalHeight, 700); // dual layout の最小高さを確保
+        // position制約がない場合のみ最小サイズを確保
+        if (!position.width && !position.height) {
+            // dual layout では2つのチャートが収まる十分なサイズを確保
+            totalWidth = Math.max(totalWidth, 1200); // dual layout の最小幅を確保
+            totalHeight = Math.max(totalHeight, 700); // dual layout の最小高さを確保
+        }
         
         const spacing = 40;
         const marginTop = 40;
@@ -638,15 +646,25 @@ class ChartManager extends BaseManager {
 
     /**
      * トリプルレイアウトの寸法を計算
+     * @param {Object} position - position設定
      * @returns {Object} レイアウト情報
      */
-    calculateTripleLayout() {
+    calculateTripleLayout(position = {}) {
         const containerNode = this.container.node();
         const containerWidth = containerNode.clientWidth || 800;
         const containerHeight = containerNode.clientHeight || 600;
         
-        const totalWidth = Math.min(containerWidth * 0.95, 1200);
-        const totalHeight = Math.min(containerHeight * 0.8, 500);
+        let totalWidth, totalHeight;
+        
+        if (position.width && position.height) {
+            // position設定で明示的にサイズが指定されている場合
+            totalWidth = this.calculateDimensionFromPosition(position.width, containerWidth, 'width');
+            totalHeight = this.calculateDimensionFromPosition(position.height, containerHeight, 'height');
+        } else {
+            // 従来のデフォルト計算
+            totalWidth = Math.min(containerWidth * 0.95, 1200);
+            totalHeight = Math.min(containerHeight * 0.8, 500);
+        }
         const spacing = 30;
         const marginTop = 40;
         
