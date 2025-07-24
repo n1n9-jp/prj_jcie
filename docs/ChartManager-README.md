@@ -1,35 +1,35 @@
-# ChartManager Architecture
+# ChartManager アーキテクチャ
 
-## Overview
+## 概要
 
-The new streamlined ChartManager is a coordinator class that manages specialized chart renderers rather than implementing chart functionality directly. This architecture provides better separation of concerns, maintainability, and extensibility.
+新しくストリームライン化されたChartManagerは、チャート機能を直接実装するのではなく、専門化されたチャートレンダラーを管理する調整役（コーディネーター）クラスです。このアーキテクチャにより、関心の分離、保守性、拡張性が向上しています。
 
-## Architecture
+## アーキテクチャ
 
-### Core Components
+### コアコンポーネント
 
 ```
-ChartManager (Coordinator)
-├── LineChartRenderer
-├── BarChartRenderer  
-├── PieChartRenderer
-└── GridChartRenderer
+ChartManager (調整役)
+├── LineChartRenderer（折れ線グラフ）
+├── BarChartRenderer（棒グラフ）
+├── PieChartRenderer（円グラフ）
+└── GridChartRenderer（グリッドレイアウト）
 ```
 
-### Base Classes
-- **BaseManager**: Common functionality (show/hide, resize, state management)
-- **ChartTransitions**: Unified animation and transition management
+### 基底クラス
+- **BaseManager**: 共通機能（表示/非表示、リサイズ、状態管理）
+- **ChartTransitions**: 統一されたアニメーションとトランジション管理
 
-## New ChartManager Features
+## 新しいChartManagerの機能
 
-### 1. Coordination Pattern
-The new ChartManager acts as a **factory and coordinator** rather than implementing chart logic:
+### 1. コーディネーションパターン
+新しいChartManagerは、チャートロジックを実装するのではなく、**ファクトリーおよびコーディネーター**として機能します：
 
 ```javascript
-// Old approach (monolithic)
+// 旧アプローチ（モノリシック）
 chartManager.renderLineChart(data, config);
 
-// New approach (coordinated)
+// 新アプローチ（コーディネーション）
 chartManager.updateChart({
     type: 'line',
     data: data,
@@ -38,118 +38,118 @@ chartManager.updateChart({
 });
 ```
 
-### 2. Specialized Renderers
-Each chart type has its own dedicated renderer:
+### 2. 専門化されたレンダラー
+各チャートタイプには専用のレンダラーがあります：
 
-- **LineChartRenderer**: Handles line charts and transitions
-- **BarChartRenderer**: Handles bar charts with animations
-- **PieChartRenderer**: Handles pie charts with arc animations
-- **GridChartRenderer**: Handles complex grid layouts
+- **LineChartRenderer**: 折れ線グラフとトランジションを処理
+- **BarChartRenderer**: アニメーション付き棒グラフを処理
+- **PieChartRenderer**: アークアニメーション付き円グラフを処理
+- **GridChartRenderer**: 複雑なグリッドレイアウトを処理
 
-### 3. Layout Management
-Support for multiple layout types:
+### 3. レイアウト管理
+複数のレイアウトタイプをサポート：
 
 ```javascript
-// Single chart
+// 単一チャート
 chartManager.updateChart({
     type: 'line',
     data: data,
     config: config
 });
 
-// Dual layout
+// デュアルレイアウト（2つ並び）
 chartManager.updateChart({
     layout: 'dual',
     charts: [chart1Config, chart2Config]
 });
 
-// Triple layout
+// トリプルレイアウト（3つ並び）
 chartManager.updateChart({
     layout: 'triple', 
     charts: [chart1, chart2, chart3]
 });
 
-// Grid layout
+// グリッドレイアウト
 chartManager.updateChart({
     layout: 'grid',
     config: gridConfig
 });
 ```
 
-### 4. Unified Transitions
-All animations are coordinated through ChartTransitions:
+### 4. 統一されたトランジション
+すべてのアニメーションはChartTransitionsを通じて調整されます：
 
 ```javascript
-// Automatic transition coordination
+// 自動トランジション調整
 chartManager.coordinateTransition('line', 'bar', {
     fadeOutDuration: 300,
     fadeInDuration: 600
 });
 ```
 
-## Public API
+## パブリックAPI
 
-### Core Methods
+### コアメソッド
 
 #### `updateChart(chartData)`
-Main method for updating charts. Automatically routes to appropriate renderer based on `type` or `layout`.
+チャートを更新するメインメソッド。`type`または`layout`に基づいて適切なレンダラーに自動的にルーティングします。
 
-**Parameters:**
+**パラメータ:**
 ```javascript
 {
-    type: 'line' | 'bar' | 'pie',           // For single charts
-    layout: 'dual' | 'triple' | 'grid',    // For multi-chart layouts
-    data: Array,                            // Chart data
-    config: Object,                         // Chart configuration
-    visible: Boolean,                       // Visibility state
-    updateMode: 'transition' | 'redraw',    // Update method
-    direction: 'up' | 'down'                // Scroll direction
+    type: 'line' | 'bar' | 'pie',           // 単一チャートの場合
+    layout: 'dual' | 'triple' | 'grid',    // 複数チャートレイアウトの場合
+    data: Array,                            // チャートデータ
+    config: Object,                         // チャート設定
+    visible: Boolean,                       // 表示状態
+    updateMode: 'transition' | 'redraw',    // 更新方法
+    direction: 'up' | 'down'                // スクロール方向
 }
 ```
 
 #### `show(options)` / `hide(options)`
-Control visibility with transition options.
+トランジションオプション付きで表示状態を制御します。
 
 #### `resize()`
-Handles responsive resizing by delegating to active renderer.
+アクティブなレンダラーに委譲してレスポンシブなリサイズを処理します。
 
-### Renderer Management
+### レンダラー管理
 
 #### `getRenderer(type)`
-Get specific renderer instance.
+特定のレンダラーインスタンスを取得します。
 
 #### `hideInactiveRenderers(activeType)`
-Hide all renderers except the specified type.
+指定されたタイプ以外のすべてのレンダラーを非表示にします。
 
 #### `coordinateTransition(fromType, toType, options)`
-Manage smooth transitions between chart types.
+チャートタイプ間のスムーズなトランジションを管理します。
 
-## Renderer Interfaces
+## レンダラーインターフェース
 
-Each renderer implements a consistent interface:
+各レンダラーは一貫したインターフェースを実装します：
 
-### Required Methods
-- `updateChart(chartData)` - Update the chart
-- `show(options)` - Show with transitions
-- `hide(options)` - Hide with transitions  
-- `resize()` - Handle resize events
+### 必須メソッド
+- `updateChart(chartData)` - チャートを更新
+- `show(options)` - トランジション付きで表示
+- `hide(options)` - トランジション付きで非表示
+- `resize()` - リサイズイベントを処理
 
-### For Layout Support
-- `renderLineChartInGroup(g, data, config)` - Render in specific SVG group
-- `renderBarChartInGroup(g, data, config)` - Render in specific SVG group
-- `renderPieChartInGroup(g, data, config)` - Render in specific SVG group
+### レイアウトサポート用
+- `renderLineChartInGroup(g, data, config)` - 特定のSVGグループ内に描画
+- `renderBarChartInGroup(g, data, config)` - 特定のSVGグループ内に描画
+- `renderPieChartInGroup(g, data, config)` - 特定のSVGグループ内に描画
 
-## Migration Guide
+## 移行ガイド
 
-### From Legacy ChartManager
+### レガシーChartManagerからの移行
 
-#### Before (Legacy)
+#### 移行前（レガシー）
 ```javascript
 const chartManager = new ChartManager('#chart');
 chartManager.renderChart('line', data, config);
 ```
 
-#### After (New)
+#### 移行後（新）
 ```javascript
 const chartManager = new ChartManager('#chart');
 chartManager.updateChart({
@@ -160,21 +160,21 @@ chartManager.updateChart({
 });
 ```
 
-### Backward Compatibility
-- Legacy ChartManager remains available as `LegacyChartManager`
-- Automatic fallback if new ChartManager is not loaded
-- Existing code continues to work without modification
+### 後方互換性
+- レガシーChartManagerは`LegacyChartManager`として利用可能
+- 新しいChartManagerが読み込まれていない場合は自動フォールバック
+- 既存のコードは変更なしで動作継続
 
-## Error Handling
+## エラーハンドリング
 
-### Graceful Degradation
-- Missing renderers trigger fallback display
-- Error messages guide users to load required scripts
-- Validation prevents invalid data from causing crashes
+### グレースフルデグレデーション
+- レンダラーが見つからない場合はフォールバック表示をトリガー
+- エラーメッセージが必要なスクリプトの読み込みをガイド
+- バリデーションによりクラッシュを防止
 
-### Error Context
+### エラーコンテキスト
 ```javascript
-// Automatic error reporting with context
+// コンテキスト付き自動エラー報告
 if (window.ErrorHandler) {
     ErrorHandler.handle(error, 'ChartManager.updateChart', {
         type: ErrorHandler.ERROR_TYPES.RENDER,
@@ -184,32 +184,32 @@ if (window.ErrorHandler) {
 }
 ```
 
-## Performance Benefits
+## パフォーマンスの利点
 
-### Reduced Memory Usage
-- Only active renderers are initialized
-- Inactive renderers are hidden, not destroyed
-- Lazy loading of specialized functionality
+### メモリ使用量の削減
+- アクティブなレンダラーのみが初期化される
+- 非アクティブなレンダラーは破棄されずに非表示
+- 専門機能の遅延読み込み
 
-### Optimized Transitions
-- ChartTransitions provides hardware-accelerated animations
-- Coordinated timing prevents visual conflicts
-- Adaptive duration based on device capabilities
+### 最適化されたトランジション
+- ChartTransitionsがハードウェアアクセラレーションアニメーションを提供
+- 調整されたタイミングにより視覚的な競合を防止
+- デバイス性能に基づく適応的な持続時間
 
-### Better Caching
-- Renderers maintain their own state
-- Transition data is preserved between updates
-- Less DOM manipulation and reflow
+### より良いキャッシング
+- レンダラーが独自の状態を維持
+- 更新間でトランジションデータが保持される
+- DOM操作とリフローの削減
 
-## Debugging
+## デバッグ
 
-### Debug Information
+### デバッグ情報
 ```javascript
-// Get comprehensive debug info
+// 包括的なデバッグ情報を取得
 const debugInfo = chartManager.getDebugInfo();
 console.log(debugInfo);
 
-// Returns:
+// 戻り値:
 {
     className: 'ChartManager',
     isVisible: true,
@@ -226,15 +226,15 @@ console.log(debugInfo);
 }
 ```
 
-### Renderer States
+### レンダラー状態
 ```javascript
-// Check individual renderer states
+// 個別のレンダラー状態を確認
 const states = chartManager.getRendererStates();
 ```
 
-## Integration Examples
+## 統合例
 
-### Basic Line Chart
+### 基本的な折れ線グラフ
 ```javascript
 chartManager.updateChart({
     type: 'line',
@@ -249,18 +249,18 @@ chartManager.updateChart({
 });
 ```
 
-### Dual Layout
+### デュアルレイアウト
 ```javascript
 chartManager.updateChart({
     layout: 'dual',
     charts: [
         {
-            title: 'Trend A',
+            title: 'トレンドA',
             data: dataA,
             config: { type: 'line', xField: 'year', yField: 'value' }
         },
         {
-            title: 'Trend B', 
+            title: 'トレンドB', 
             data: dataB,
             config: { type: 'line', xField: 'year', yField: 'value' }
         }
@@ -269,9 +269,9 @@ chartManager.updateChart({
 });
 ```
 
-### Transition Between Types
+### タイプ間のトランジション
 ```javascript
-// From line chart to bar chart with smooth transition
+// 折れ線グラフから棒グラフへスムーズにトランジション
 chartManager.updateChart({
     type: 'bar',
     data: categoricalData,
@@ -281,29 +281,29 @@ chartManager.updateChart({
 });
 ```
 
-## Future Enhancements
+## 将来の拡張
 
-### Planned Features
-- **Animation Sequences**: Complex multi-step animations
-- **Interactive Coordination**: Synchronized interactions across renderers
-- **Theme Integration**: Unified theming across all chart types
-- **Plugin Architecture**: Third-party renderer registration
+### 計画中の機能
+- **アニメーションシーケンス**: 複雑な多段階アニメーション
+- **インタラクティブな調整**: レンダラー間の同期インタラクション
+- **テーマ統合**: 全チャートタイプで統一されたテーマ設定
+- **プラグインアーキテクチャ**: サードパーティレンダラーの登録
 
-### Extension Points
-- Custom renderer integration
-- Layout pattern extensions
-- Transition effect plugins
-- Data transformation pipelines
+### 拡張ポイント
+- カスタムレンダラー統合
+- レイアウトパターン拡張
+- トランジション効果プラグイン
+- データ変換パイプライン
 
-## Files
+## ファイル
 
-- `ChartManager.js` - New streamlined coordinator class
-- `chart-manager.js` - Legacy implementation (backward compatibility)
-- `LineChartRenderer.js` - Line chart specialization
-- `BarChartRenderer.js` - Bar chart specialization  
-- `PieChartRenderer.js` - Pie chart specialization
-- `GridChartRenderer.js` - Grid layout specialization
-- `utils/ChartTransitions.js` - Unified transition management
-- `utils/base-manager.js` - Common base functionality
+- `ChartManager.js` - 新しいストリームライン化されたコーディネータークラス
+- `chart-manager.js` - レガシー実装（後方互換性）
+- `LineChartRenderer.js` - 折れ線グラフ専門化
+- `BarChartRenderer.js` - 棒グラフ専門化  
+- `PieChartRenderer.js` - 円グラフ専門化
+- `GridChartRenderer.js` - グリッドレイアウト専門化
+- `utils/ChartTransitions.js` - 統一トランジション管理
+- `utils/base-manager.js` - 共通基底機能
 
-The new architecture provides a clean, maintainable foundation for chart management while preserving all existing functionality and ensuring smooth migration paths.
+新しいアーキテクチャは、既存のすべての機能を保持し、スムーズな移行パスを確保しながら、チャート管理のためのクリーンで保守可能な基盤を提供します。
