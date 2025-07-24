@@ -20,7 +20,14 @@ window.ChartFormatterHelper = class ChartFormatterHelper {
                 return d3.format('.0%')(value);
             
             case 'thousands':
-                return d3.format(',')(value);
+                // 日本語の単位を使用
+                if (Math.abs(value) >= 1e8) {
+                    return d3.format('.1f')(value / 1e8) + '億';
+                } else if (Math.abs(value) >= 1e4) {
+                    return d3.format('.0f')(value / 1e4) + '万';
+                } else {
+                    return d3.format(',')(value);
+                }
             
             case 'millions':
                 return d3.format('.1f')(value / 1e6) + 'M';
@@ -30,6 +37,11 @@ window.ChartFormatterHelper = class ChartFormatterHelper {
             
             case 'japanese':
                 return ChartFormatterHelper.formatJapaneseNumber(value, formatConfig);
+            
+            case 'raw':
+                // 生の数値表示（SI接頭辞なし）
+                const decimals = formatConfig.decimals || 0;
+                return d3.format(`,${decimals}f`)(value);
             
             case 'custom':
                 let customValue = value;
