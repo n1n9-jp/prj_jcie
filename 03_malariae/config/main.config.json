@@ -1,11 +1,9 @@
 {
-  "version": "1.0.0",
+  "version": "2.0.0",
+  "description": "Malaria-specific configuration system",
   "configFiles": {
     "content": "content.json",
-    "settings": "settings.config.json",
-    "app": "app.config.json",
-    "theme": "theme.config.json",
-    "animation": "animation.config.json"
+    "appSettings": "app-settings.json"
   },
   "environment": {
     "auto": true,
@@ -14,10 +12,7 @@
   },
   "loadOrder": [
     "environment",
-    "app",
-    "theme", 
-    "animation",
-    "settings",
+    "appSettings",
     "content"
   ],
   "mergeStrategy": {
