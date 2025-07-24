@@ -99,7 +99,7 @@
         "visible": true,
         "type": "line",
         "dataFile": "japan_tb_cases.csv",
-        "title": "日本国内における新規登録結核患者数の推移",
+        "title": "日本国内における結核の新規患者数の推移",
         "config": {
           "widthPercent": 90,
           "heightPercent": 70,
@@ -112,10 +112,15 @@
           "xAxis": {
             "title": "年度"
           },
-          "yAxis": {
-            "title": "新規登録患者数（人）"
+          "yAxisLabel": "新規感染者数（万人）",
+          "yAxisFormat": {
+            "type": "japanese",
+            "decimals": 0,
+            "units": {
+              "万": 10000
+            }
           },
-          "title": "日本国内における新規登録結核患者数の推移",
+          "title": "日本国内における結核の新規患者数の推移",
           "dataSource": "公益財団法人結核予防会結核研究所疫学情報センター"
         }
       },
@@ -129,7 +134,7 @@
         "visible": true,
         "type": "line",
         "dataFile": "japan_tb_cases.csv",
-        "title": "日本国内における新規登録結核患者数の推移",
+        "title": "日本国内における結核の新規患者数の推移",
         "config": {
           "widthPercent": 90,
           "heightPercent": 70,
@@ -142,10 +147,15 @@
           "xAxis": {
             "title": "年度"
           },
-          "yAxis": {
-            "title": "新規登録患者数（人）"
+          "yAxisLabel": "新規感染者数（万人）",
+          "yAxisFormat": {
+            "type": "japanese",
+            "decimals": 0,
+            "units": {
+              "万": 10000
+            }
           },
-          "title": "日本国内における新規登録結核患者数の推移",
+          "title": "日本国内における結核の新規患者数の推移",
           "dataSource": "公益財団法人結核予防会結核研究所疫学情報センター"
         }
       },
@@ -159,7 +169,7 @@
         "visible": true,
         "type": "line",
         "dataFile": "japan_tb_cases.csv",
-        "title": "日本国内における新規登録結核患者数の推移",
+        "title": "日本国内における結核の新規患者数の推移",
         "config": {
           "widthPercent": 90,
           "heightPercent": 70,
@@ -172,10 +182,15 @@
           "xAxis": {
             "title": "年度"
           },
-          "yAxis": {
-            "title": "新規登録患者数（人）"
+          "yAxisLabel": "新規感染者数（万人）",
+          "yAxisFormat": {
+            "type": "japanese",
+            "decimals": 0,
+            "units": {
+              "万": 10000
+            }
           },
-          "title": "日本国内における新規登録結核患者数の推移",
+          "title": "日本国内における結核の新規患者数の推移",
           "dataSource": "公益財団法人結核予防会結核研究所疫学情報センター"
         }
       },
@@ -189,7 +204,7 @@
         "visible": true,
         "type": "line",
         "dataFile": "japan_tb_cases.csv",
-        "title": "日本国内における新規登録結核患者数の推移",
+        "title": "日本国内における結核の新規患者数の推移",
         "config": {
           "widthPercent": 90,
           "heightPercent": 70,
@@ -202,10 +217,15 @@
           "xAxis": {
             "title": "年度"
           },
-          "yAxis": {
-            "title": "新規登録患者数（人）"
+          "yAxisLabel": "新規感染者数（万人）",
+          "yAxisFormat": {
+            "type": "japanese",
+            "decimals": 0,
+            "units": {
+              "万": 10000
+            }
           },
-          "title": "日本国内における新規登録結核患者数の推移",
+          "title": "日本国内における結核の新規患者数の推移",
           "dataSource": "公益財団法人結核予防会結核研究所疫学情報センター"
         }
       },
@@ -241,8 +261,13 @@
           "xAxis": {
             "title": "年"
           },
-          "yAxis": {
-            "title": "感染者数（人）"
+          "yAxisLabel": "新規感染者数（万人）",
+          "yAxisFormat": {
+            "type": "japanese",
+            "decimals": 0,
+            "units": {
+              "万": 10000
+            }
           },
           "title": "結核感染者数の推移",
           "dataSource": "公益財団法人結核予防会結核研究所疫学情報センター"
@@ -271,8 +296,13 @@
           "xAxis": {
             "title": "年"
           },
-          "yAxis": {
-            "title": "死者数（人）"
+          "yAxisLabel": "死亡者数（万人）",
+          "yAxisFormat": {
+            "type": "japanese",
+            "decimals": 0,
+            "units": {
+              "万": 10000
+            }
           },
           "title": "結核による推定死者数の推移",
           "dataSource": "【To Be Delivered】"
@@ -337,9 +367,6 @@
               "xAxis": {
                 "title": "年"
               },
-              "yAxis": {
-                "title": "感染者数（人）"
-              },
               "title": "インドネシアにおける結核感染者数の推移",
               "dataSource": "【To Be Delivered】"
             }
@@ -364,9 +391,6 @@
               },
               "xAxis": {
                 "title": "年"
-              },
-              "yAxis": {
-                "title": "感染者数（人）"
               },
               "title": "ベトナムにおける結核感染者数の推移",
               "dataSource": "【To Be Delivered】"
@@ -397,9 +421,7 @@
           "xAxis": {
             "title": "年"
           },
-          "yAxis": {
-            "title": "予算（10億ドル）"
-          },
+          "yAxisLabel": "予算【単位不明】",
           "xField": "year",
           "seriesField": "series",
           "series": ["国内予算", "国際予算"],
