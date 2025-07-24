@@ -114,7 +114,8 @@
           },
           "yAxis": {
             "title": "新規登録患者数（人）"
-          }
+          },
+          "dataSource": "公益財団法人結核予防会結核研究所疫学情報センター"
         }
       },
       "text": {
@@ -142,7 +143,8 @@
           },
           "yAxis": {
             "title": "新規登録患者数（人）"
-          }
+          },
+          "dataSource": "公益財団法人結核予防会結核研究所疫学情報センター"
         }
       },
       "text": {
@@ -170,7 +172,8 @@
           },
           "yAxis": {
             "title": "新規登録患者数（人）"
-          }
+          },
+          "dataSource": "公益財団法人結核予防会結核研究所疫学情報センター"
         }
       },
       "text": {
@@ -198,7 +201,8 @@
           },
           "yAxis": {
             "title": "新規登録患者数（人）"
-          }
+          },
+          "dataSource": "公益財団法人結核予防会結核研究所疫学情報センター"
         }
       },
       "text": {
@@ -235,7 +239,8 @@
           },
           "yAxis": {
             "title": "感染者数（人）"
-          }
+          },
+          "dataSource": "公益財団法人結核予防会結核研究所疫学情報センター"
         }
       },
       "text": {
@@ -263,7 +268,8 @@
           },
           "yAxis": {
             "title": "死者数（人）"
-          }
+          },
+          "dataSource": "【To Be Delivered】"
         }
       },
       "text": {
@@ -327,7 +333,8 @@
               },
               "yAxis": {
                 "title": "感染者数（人）"
-              }
+              },
+              "dataSource": "【To Be Delivered】"
             }
           },
           {
@@ -353,7 +360,8 @@
               },
               "yAxis": {
                 "title": "感染者数（人）"
-              }
+              },
+              "dataSource": "【To Be Delivered】"
             }
           }
         ]
@@ -365,7 +373,32 @@
     {
       "id": "funding-shortage",
       "chart": {
-        "visible": false
+        "visible": true,
+        "type": "line",
+        "dataFile": "結核対策予算の推移.csv",
+        "title": "結核対策予算の推移",
+        "config": {
+          "widthPercent": 90,
+          "heightPercent": 60,
+          "margin": {
+            "top": 40,
+            "right": 50,
+            "bottom": 60,
+            "left": 80
+          },
+          "xAxis": {
+            "title": "年"
+          },
+          "yAxis": {
+            "title": "予算（10億ドル）"
+          },
+          "xField": "year",
+          "seriesField": "series",
+          "series": ["国内予算", "国際予算"],
+          "colors": ["#ff7f0e", "#2ca02c"],
+          "multiSeries": true,
+          "dataSource": "【To Be Delivered】"
+        }
       },
       "text": {
         "visible": true

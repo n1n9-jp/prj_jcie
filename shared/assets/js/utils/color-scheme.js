@@ -53,6 +53,10 @@ class ColorScheme {
             'Other International': '#9370db',       // ミディアムパープル
             'Domestic Public Private': '#cd853f',   // ペルー
             
+            // 結核対策予算の系列
+            '国内予算': '#ff7f0e',                     // オレンジ
+            '国際予算': '#2ca02c',                     // 緑
+            
             // その他のカテゴリ
             '母子感染': '#ff69b4',                    // ホットピンク（特別なカテゴリ）
             'その他地域': '#d3d3d3',                   // ライトグレー

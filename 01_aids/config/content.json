@@ -438,7 +438,7 @@
           "seriesName": "母子感染率",
           "colors": ["#10b981"],
           "title": "HIV母子感染率の推移（%）",
-          "dataSource": "T.B.D.",
+          "dataSource": "【To Be Delivered】",
           "yRange": [0, 40],
           "animation": {
             "mode": "progressive",
