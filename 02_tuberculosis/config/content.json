@@ -115,6 +115,7 @@
           "yAxis": {
             "title": "新規登録患者数（人）"
           },
+          "title": "日本国内における新規登録結核患者数の推移",
           "dataSource": "公益財団法人結核予防会結核研究所疫学情報センター"
         }
       },
@@ -144,6 +145,7 @@
           "yAxis": {
             "title": "新規登録患者数（人）"
           },
+          "title": "日本国内における新規登録結核患者数の推移",
           "dataSource": "公益財団法人結核予防会結核研究所疫学情報センター"
         }
       },
@@ -173,6 +175,7 @@
           "yAxis": {
             "title": "新規登録患者数（人）"
           },
+          "title": "日本国内における新規登録結核患者数の推移",
           "dataSource": "公益財団法人結核予防会結核研究所疫学情報センター"
         }
       },
@@ -202,6 +205,7 @@
           "yAxis": {
             "title": "新規登録患者数（人）"
           },
+          "title": "日本国内における新規登録結核患者数の推移",
           "dataSource": "公益財団法人結核予防会結核研究所疫学情報センター"
         }
       },
@@ -224,7 +228,7 @@
         "visible": true,
         "type": "line",
         "dataFile": "tb_infections_trend.csv",
-        "title": "結核感染者数（推移）の推移",
+        "title": "結核感染者数の推移",
         "config": {
           "widthPercent": 90,
           "heightPercent": 70,
@@ -240,6 +244,7 @@
           "yAxis": {
             "title": "感染者数（人）"
           },
+          "title": "結核感染者数の推移",
           "dataSource": "公益財団法人結核予防会結核研究所疫学情報センター"
         }
       },
@@ -269,6 +274,7 @@
           "yAxis": {
             "title": "死者数（人）"
           },
+          "title": "結核による推定死者数の推移",
           "dataSource": "【To Be Delivered】"
         }
       },
@@ -334,6 +340,7 @@
               "yAxis": {
                 "title": "感染者数（人）"
               },
+              "title": "インドネシアにおける結核感染者数の推移",
               "dataSource": "【To Be Delivered】"
             }
           },
@@ -361,6 +368,7 @@
               "yAxis": {
                 "title": "感染者数（人）"
               },
+              "title": "ベトナムにおける結核感染者数の推移",
               "dataSource": "【To Be Delivered】"
             }
           }
@@ -397,6 +405,7 @@
           "series": ["国内予算", "国際予算"],
           "colors": ["#ff7f0e", "#2ca02c"],
           "multiSeries": true,
+          "title": "結核対策予算の推移",
           "dataSource": "【To Be Delivered】"
         }
       },
