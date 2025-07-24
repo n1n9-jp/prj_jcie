@@ -1,0 +1,49 @@
+{
+  "app": {
+    "name": "結核との闘い",
+    "version": "1.0.0",
+    "language": "ja"
+  },
+  "ui": {
+    "theme": "tuberculosis",
+    "animations": {
+      "enabled": true,
+      "duration": 800
+    },
+    "responsive": {
+      "enabled": true,
+      "breakpoints": {
+        "mobile": 768,
+        "tablet": 1024,
+        "desktop": 1200
+      }
+    }
+  },
+  "data": {
+    "baseUrl": "data/",
+    "caching": {
+      "enabled": true,
+      "duration": 3600
+    },
+    "formats": {
+      "csv": true,
+      "json": true
+    }
+  },
+  "charts": {
+    "defaultType": "line",
+    "responsive": true,
+    "animations": {
+      "enabled": true,
+      "duration": 1000
+    }
+  },
+  "maps": {
+    "defaultProjection": "naturalEarth1",
+    "responsive": true,
+    "interactions": {
+      "zoom": true,
+      "pan": true
+    }
+  }
+}

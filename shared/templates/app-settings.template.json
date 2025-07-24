@@ -1,17 +1,17 @@
 {
   "metadata": {
     "name": "統一アプリケーション設定",
-    "description": "マラリアコンテンツ用の統一設定ファイル",
+    "description": "全感染症共通の標準設定テンプレート",
     "version": "3.0.0",
-    "disease": "malariae",
-    "diseaseNameJa": "マラリア",
+    "disease": "[DISEASE_ID]",
+    "diseaseNameJa": "[DISEASE_NAME_JA]",
     "lastUpdated": "2024-12-20",
     "templateVersion": "1.0.0"
   },
 
   "app": {
     "info": {
-      "name": "マラリアとの闘い",
+      "name": "[DISEASE_NAME_JA]との闘い",
       "language": "ja",
       "version": "1.0.0",
       "baseUrl": "data/"
@@ -108,9 +108,9 @@
   "design": {
     "colors": {
       "disease": {
-        "primary": "#f4a620",
-        "secondary": "#f6b84a",
-        "accent": "#e89813"
+        "primary": "[DISEASE_PRIMARY_COLOR]",
+        "secondary": "[DISEASE_SECONDARY_COLOR]",
+        "accent": "[DISEASE_ACCENT_COLOR]"
       },
       "system": {
         "primary": {
@@ -150,13 +150,13 @@
         }
       },
       "chart": {
-        "line": ["#f4a620", "#dc2626", "#059669", "#d97706", "#7c3aed", "#0891b2"],
-        "bar": ["#f6b84a", "#ef4444", "#10b981", "#f59e0b", "#8b5cf6", "#06b6d4"],
-        "pie": ["#e89813", "#991b1b", "#047857", "#b45309", "#6d28d9", "#0e7490"],
+        "line": ["#2563eb", "#dc2626", "#059669", "#d97706", "#7c3aed", "#0891b2"],
+        "bar": ["#3b82f6", "#ef4444", "#10b981", "#f59e0b", "#8b5cf6", "#06b6d4"],
+        "pie": ["#1e40af", "#991b1b", "#047857", "#b45309", "#6d28d9", "#0e7490"],
         "map": {
           "default": "#e5e7eb",
-          "hover": "#f4a620",
-          "active": "#e89813",
+          "hover": "#3b82f6",
+          "active": "#1e40af",
           "selected": "#dc2626"
         }
       }
@@ -264,7 +264,7 @@
   },
 
   "ui": {
-    "theme": "malariae",
+    "theme": "[DISEASE_THEME]",
     "animations": {
       "enabled": true,
       "duration": 800
