@@ -674,17 +674,17 @@
         "visible": false
       },
       "map": {
-        "visible": false
+        "visible": true,
+        "center": [35, 30],
+        "zoom": 1.8,
+        "widthPercent": 100,
+        "heightPercent": 100,
+        "useRegionColors": true,
+        "lightenAllCountries": true,
+        "highlightCountries": ["China", "Egypt"]
       },
       "image": {
-        "src": "https://placehold.co/600x400/EEE/31343C",
-        "alt": "step18",
-        "visible": true,
-        "config": {
-          "width": "100%",
-          "height": "100%",
-          "objectFit": "cover"
-        }
+        "visible": false
       }
     },
     {
@@ -702,17 +702,17 @@
         "visible": false
       },
       "map": {
-        "visible": false
+        "visible": true,
+        "center": [8, 13],
+        "zoom": 3.5,
+        "widthPercent": 100,
+        "heightPercent": 100,
+        "useRegionColors": true,
+        "lightenAllCountries": true,
+        "highlightCountries": ["Niger"]
       },
       "image": {
-        "src": "https://placehold.co/600x400/EEE/31343C",
-        "alt": "step19",
-        "visible": true,
-        "config": {
-          "width": "100%",
-          "height": "100%",
-          "objectFit": "cover"
-        }
+        "visible": false
       }
     },
     {
@@ -787,17 +787,17 @@
         "visible": false
       },
       "map": {
-        "visible": false
+        "visible": true,
+        "center": [20, -5],
+        "zoom": 2.2,
+        "widthPercent": 100,
+        "heightPercent": 100,
+        "useRegionColors": true,
+        "lightenAllCountries": true,
+        "targetRegions": ["東部・南部アフリカ", "西部・中部アフリカ"]
       },
       "image": {
-        "src": "https://placehold.co/600x400/EEE/31343C",
-        "alt": "step19",
-        "visible": true,
-        "config": {
-          "width": "100%",
-          "height": "100%",
-          "objectFit": "cover"
-        }
+        "visible": false
       }
     },
     {
