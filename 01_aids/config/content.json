@@ -13,7 +13,7 @@
         "visible": false
       },
       "image": {
-        "src": "assets/images/Firefly_A.jpg",
+        "src": "assets/images/opening.jpg",
         "alt": "オープニング背景画像",
         "visible": true,
         "position": {
@@ -47,7 +47,7 @@
         "visible": false
       },
       "image": {
-        "src": "assets/images/Firefly_C.jpg",
+        "src": "assets/images/intro.jpg",
         "alt": "エイズ対策の物語の導入画像",
         "visible": true,
         "position": {
@@ -79,7 +79,7 @@
         "visible": false
       },
       "image": {
-        "src": "assets/images/Firefly_D.jpg",
+        "src": "assets/images/treatment-progress.jpg",
         "alt": "エイズ対策の物語の導入画像",
         "visible": true,
         "position": {
@@ -857,7 +857,7 @@
         "visible": false
       },
       "image": {
-        "src": "assets/images/Firefly_B.jpg",
+        "src": "assets/images/solidarity-message.jpg",
         "alt": "連帯の力を示す画像",
         "visible": true,
         "config": {
@@ -886,7 +886,7 @@
         "visible": false
       },
       "image": {
-        "src": "assets/images/Firefly_A.jpg",
+        "src": "assets/images/opening.jpg",
         "alt": "連帯の力を示す画像",
         "visible": true,
         "config": {
