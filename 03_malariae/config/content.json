@@ -815,17 +815,18 @@
         "visible": false
       },
       "map": {
-        "visible": false
+        "center": [0, 0],
+        "zoom": 1,
+        "visible": true,
+        "mode": "world-overview",
+        "cities": [],
+        "useRegionColors": true,
+        "lightenAllCountries": true,
+        "widthPercent": 100,
+        "heightPercent": 100
       },
       "image": {
-        "src": "https://placehold.co/600x400/EEE/31343C",
-        "alt": "country-episodes",
-        "visible": true,
-        "config": {
-          "width": "100%",
-          "height": "100%",
-          "objectFit": "cover"
-        }
+        "visible": false
       }
     },
     {
