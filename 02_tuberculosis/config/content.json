@@ -37,64 +37,105 @@
     },
     {
       "id": "intro",
+      "text": {
+        "content": "",
+        "visible": true,
+        "position": {
+          "width": "30%",
+          "horizontal": "center",
+          "vertical": "center"
+        }
+      },
       "chart": {
         "visible": false
-      },
-      "text": {
-        "visible": true
       }
     },
     {
       "id": "global-burden",
+      "text": {
+        "content": "",
+        "visible": true,
+        "position": {
+          "width": "30%",
+          "horizontal": "center",
+          "vertical": "center"
+        }
+      },
       "chart": {
         "visible": false
-      },
-      "text": {
-        "visible": true
       }
     },
     {
       "id": "transmission",
+      "text": {
+        "content": "",
+        "visible": true,
+        "position": {
+          "width": "30%",
+          "horizontal": "center",
+          "vertical": "center"
+        }
+      },
       "chart": {
         "visible": false
-      },
-      "text": {
-        "visible": true
       }
     },
     {
       "id": "infection-vs-disease",
+      "text": {
+        "content": "",
+        "visible": true,
+        "position": {
+          "width": "30%",
+          "horizontal": "center",
+          "vertical": "center"
+        }
+      },
       "chart": {
         "visible": false
-      },
-      "text": {
-        "visible": true
       }
     },
     {
       "id": "historical-impact",
-      "chart": {
-        "visible": false
-      },
       "text": {
+        "content": "",
         "visible": true,
         "position": {
-          "horizontal": "left",
+          "width": "30%",
+          "horizontal": "center",
           "vertical": "center"
         }
+      },
+      "chart": {
+        "visible": false
       }
     },
     {
       "id": "medical-breakthroughs",
+      "text": {
+        "content": "",
+        "visible": true,
+        "position": {
+          "width": "30%",
+          "horizontal": "center",
+          "vertical": "center"
+        }
+      },
       "chart": {
         "visible": false
-      },
-      "text": {
-        "visible": true
       }
     },
     {
       "id": "japan-history-1935",
+      "text": {
+        "content": "エイズの死者数",
+        "position": {
+          "width": "30%",
+          "height": "100%",
+          "horizontal": "right",
+          "vertical": "center"
+        }
+      },
       "chart": {
         "visible": true,
         "type": "line",
@@ -123,13 +164,19 @@
           "title": "日本国内における結核の新規患者数の推移",
           "dataSource": "公益財団法人結核予防会結核研究所疫学情報センター"
         }
-      },
-      "text": {
-        "visible": true
       }
     },
     {
       "id": "japan-bcg-introduction",
+      "text": {
+        "content": "エイズの死者数",
+        "position": {
+          "width": "30%",
+          "height": "100%",
+          "horizontal": "right",
+          "vertical": "center"
+        }
+      },
       "chart": {
         "visible": true,
         "type": "line",
@@ -158,13 +205,19 @@
           "title": "日本国内における結核の新規患者数の推移",
           "dataSource": "公益財団法人結核予防会結核研究所疫学情報センター"
         }
-      },
-      "text": {
-        "visible": true
       }
     },
     {
       "id": "japan-postwar-improvement",
+      "text": {
+        "content": "エイズの死者数",
+        "position": {
+          "width": "30%",
+          "height": "100%",
+          "horizontal": "right",
+          "vertical": "center"
+        }
+      },
       "chart": {
         "visible": true,
         "type": "line",
@@ -193,13 +246,19 @@
           "title": "日本国内における結核の新規患者数の推移",
           "dataSource": "公益財団法人結核予防会結核研究所疫学情報センター"
         }
-      },
-      "text": {
-        "visible": true
       }
     },
     {
       "id": "japan-current-status",
+      "text": {
+        "content": "エイズの死者数",
+        "position": {
+          "width": "30%",
+          "height": "100%",
+          "horizontal": "right",
+          "vertical": "center"
+        }
+      },
       "chart": {
         "visible": true,
         "type": "line",
@@ -228,22 +287,34 @@
           "title": "日本国内における結核の新規患者数の推移",
           "dataSource": "公益財団法人結核予防会結核研究所疫学情報センター"
         }
-      },
-      "text": {
-        "visible": true
       }
     },
     {
       "id": "global-end-tb-strategy",
+      "text": {
+        "content": "",
+        "visible": true,
+        "position": {
+          "width": "30%",
+          "horizontal": "center",
+          "vertical": "center"
+        }
+      },
       "chart": {
         "visible": false
-      },
-      "text": {
-        "visible": true
       }
     },
     {
       "id": "covid-impact",
+      "text": {
+        "content": "エイズの死者数",
+        "position": {
+          "width": "30%",
+          "height": "100%",
+          "horizontal": "right",
+          "vertical": "center"
+        }
+      },
       "chart": {
         "visible": true,
         "type": "line",
@@ -272,13 +343,19 @@
           "title": "結核感染者数の推移",
           "dataSource": "公益財団法人結核予防会結核研究所疫学情報センター"
         }
-      },
-      "text": {
-        "visible": true
       }
     },
     {
       "id": "covid-impact-2",
+      "text": {
+        "content": "エイズの死者数",
+        "position": {
+          "width": "30%",
+          "height": "100%",
+          "horizontal": "right",
+          "vertical": "center"
+        }
+      },
       "chart": {
         "visible": true,
         "type": "line",
@@ -307,9 +384,6 @@
           "title": "結核による推定死者数の推移",
           "dataSource": "【To Be Delivered】"
         }
-      },
-      "text": {
-        "visible": true
       }
     },
     {
@@ -336,6 +410,15 @@
     },
     {
       "id": "drug-resistance",
+      "text": {
+        "content": "",
+        "visible": true,
+        "position": {
+          "width": "30%",
+          "horizontal": "center",
+          "vertical": "center"
+        }
+      },
       "chart": {
         "layout": "dual",
         "visible": true,
@@ -397,13 +480,19 @@
             }
           }
         ]
-      },
-      "text": {
-        "visible": true
       }
     },
     {
       "id": "funding-shortage",
+      "text": {
+        "content": "",
+        "position": {
+          "width": "30%",
+          "height": "100%",
+          "horizontal": "right",
+          "vertical": "center"
+        }
+      },
       "chart": {
         "visible": true,
         "type": "line",
@@ -430,36 +519,51 @@
           "title": "結核対策予算の推移",
           "dataSource": "【To Be Delivered】"
         }
-      },
-      "text": {
-        "visible": true
       }
     },
     {
       "id": "covid-setback",
+      "text": {
+        "content": "",
+        "visible": true,
+        "position": {
+          "width": "30%",
+          "horizontal": "center",
+          "vertical": "center"
+        }
+      },
       "chart": {
         "visible": false
-      },
-      "text": {
-        "visible": true
       }
     },
     {
       "id": "drug-development-delay",
+      "text": {
+        "content": "",
+        "visible": true,
+        "position": {
+          "width": "30%",
+          "horizontal": "center",
+          "vertical": "center"
+        }
+      },
       "chart": {
         "visible": false
-      },
-      "text": {
-        "visible": true
       }
     },
     {
       "id": "comprehensive-approach",
+      "text": {
+        "content": "",
+        "visible": true,
+        "position": {
+          "width": "30%",
+          "horizontal": "center",
+          "vertical": "center"
+        }
+      },
       "chart": {
         "visible": false
-      },
-      "text": {
-        "visible": true
       }
     },
     {
