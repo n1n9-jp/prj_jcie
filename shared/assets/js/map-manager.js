@@ -297,12 +297,15 @@ class MapManager extends BaseManager {
                         // highlightCountriesが指定されている場合、ハイライト国のみ地域色、他は薄いグレー
                         if (highlightCountries && highlightCountries.length > 0) {
                             // より厳密な国名マッチング
-                            const isHighlighted = highlightCountries.some(hc => 
-                                countryName === hc || 
-                                countryName.includes('United States') || 
-                                countryName === 'USA' ||
-                                hc.includes(countryName)
-                            );
+                            const isHighlighted = highlightCountries.some(hc => {
+                                // 完全一致
+                                if (countryName === hc) return true;
+                                
+                                // 双方向部分一致（正当な名前の変形に対応）
+                                if (countryName.includes(hc) || hc.includes(countryName)) return true;
+                                
+                                return false;
+                            });
                             
                             if (isHighlighted) {
                                 if (region) {
@@ -678,12 +681,15 @@ class MapManager extends BaseManager {
                     // highlightCountriesが指定されている場合、ハイライト国のみ地域色、他は薄いグレー
                     if (highlightCountries && highlightCountries.length > 0) {
                         // より厳密な国名マッチング
-                        const isHighlighted = highlightCountries.some(hc => 
-                            countryName === hc || 
-                            countryName.includes('United States') || 
-                            countryName === 'USA' ||
-                            hc.includes(countryName)
-                        );
+                        const isHighlighted = highlightCountries.some(hc => {
+                            // 完全一致
+                            if (countryName === hc) return true;
+                            
+                            // 双方向部分一致（正当な名前の変形に対応）
+                            if (countryName.includes(hc) || hc.includes(countryName)) return true;
+                            
+                            return false;
+                        });
                         
                         if (isHighlighted) {
                             if (region) {
