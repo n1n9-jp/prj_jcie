@@ -57,12 +57,10 @@
             </div>
         </div>
 
-        <!-- スクロールテキストエリア -->
-        <div id="scrolly-text">
-            <div class="text-section" id="text-section">
-                <!-- テキストステップはJavaScriptで動的に生成 -->
-
-                <div class="step" data-step="opening">
+        <!-- スクロール可能なテキストエリア -->
+        <div id="scroll-content" class="relative z-10">
+            <!-- 各段落のステップ -->
+            <div class="step" data-step="opening">
                     <div class="w-full min-h-screen flex items-center justify-center relative">
                         <!-- 背景画像とオーバーレイ用の特別なコンテナ -->
                         <div class="absolute inset-0 z-0" id="step0-bg-container">
