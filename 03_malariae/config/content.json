@@ -15,6 +15,9 @@
       "chart": {
         "visible": false
       },
+      "map": {
+        "visible": false
+      },
       "image": {
         "src": "assets/images/opening.jpg",
         "alt": "マラリアとの闘い",
