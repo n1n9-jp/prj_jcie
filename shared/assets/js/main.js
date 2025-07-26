@@ -357,6 +357,7 @@ class ScrollytellingApp {
                 // Grid chart の場合
                 const gridChartData = {
                     ...stepConfig.chart,
+                    type: 'grid', // GridChartRenderer が認識するためのタイプを明示的に設定
                     data: this.getChartData('pie', stepConfig.chart.config.dataFile)
                 };
                 pubsub.publish(EVENTS.CHART_UPDATE, gridChartData);

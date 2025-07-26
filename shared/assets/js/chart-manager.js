@@ -109,7 +109,13 @@ class ChartManager extends BaseManager {
             
             // GridChartRenderer
             if (window.GridChartRenderer) {
-                this.renderers.grid = new GridChartRenderer(containerId);
+                try {
+                    this.renderers.grid = new GridChartRenderer(containerId);
+                    console.log('✓ GridChartRenderer initialized successfully');
+                } catch (gridError) {
+                    console.error('✗ Failed to initialize GridChartRenderer:', gridError);
+                    this.renderers.grid = null;
+                }
             } else {
                 console.error('✗ GridChartRenderer not available in window');
             }

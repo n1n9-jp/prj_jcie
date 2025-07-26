@@ -171,10 +171,16 @@ class GridChartRenderer extends BaseManager {
             console.log('GridChartRenderer: mergedConfig.position =', mergedConfig.position);
             
             // position設定からwidth=100%の場合、より大きなサイズを使用
+            const isFullViewport = (mergedConfig.widthPercent === 100 && mergedConfig.heightPercent === 100);
             let actualContainerWidth = containerWidth;
             if (mergedConfig.position && mergedConfig.position.width === "100%") {
-                actualContainerWidth = Math.max(containerWidth, window.innerWidth * 0.8); // 画面幅の80%を最小とする
-                console.log('GridChartRenderer: actualContainerWidth adjusted to', actualContainerWidth);
+                if (isFullViewport) {
+                    // 100%指定の場合は制約を最小限に
+                    actualContainerWidth = Math.max(containerWidth, window.innerWidth * 0.95);
+                } else {
+                    actualContainerWidth = Math.max(containerWidth, window.innerWidth * 0.8);
+                }
+                console.log('GridChartRenderer: actualContainerWidth adjusted to', actualContainerWidth, 'isFullViewport:', isFullViewport);
             }
             
             // コンテナサイズに基づいて個々のチャートサイズを計算
@@ -182,8 +188,16 @@ class GridChartRenderer extends BaseManager {
             const availableHeight = containerHeight - (title ? 40 : 0) - (dataSource ? 30 : 0) - 40;
             
             // レスポンシブサイズ計算（最大・最小値を考慮）
-            const maxWidth = mergedConfig.maxChartWidth || 140;
-            const maxHeight = mergedConfig.maxChartHeight || 140;
+            // 100%指定の場合は制約を大幅に緩和（isFullViewportは上で既に定義済み）
+            let maxWidth, maxHeight;
+            if (isFullViewport) {
+                // 100%指定時は画面サイズに基づいて動的に制限値を計算
+                maxWidth = Math.floor(availableWidth / columns * 0.9); // 利用可能幅の90%を各チャートの最大幅に
+                maxHeight = Math.floor(availableHeight / rows * 0.9);   // 利用可能高さの90%を各チャートの最大高さに
+            } else {
+                maxWidth = mergedConfig.maxChartWidth || 140;
+                maxHeight = mergedConfig.maxChartHeight || 140;
+            }
             const minWidth = mergedConfig.minChartWidth || 80;
             const minHeight = mergedConfig.minChartHeight || 80;
             
@@ -397,13 +411,16 @@ class GridChartRenderer extends BaseManager {
         let containerWidth = containerRect.width;
         let containerHeight = containerRect.height;
         
+        // widthPercent/heightPercent が100%の場合は制約を回避
+        const isFullViewport = (config.widthPercent === 100 && config.heightPercent === 100);
+        
         // position設定でwidth/heightが指定されている場合
         if (config.position) {
             const { width: posWidth, height: posHeight } = config.position;
             
             // width設定の処理
             if (posWidth === "100%") {
-                containerWidth = window.innerWidth * 0.9; // 画面幅の90%
+                containerWidth = isFullViewport ? window.innerWidth * 0.98 : window.innerWidth * 0.9;
             } else if (typeof posWidth === "string" && posWidth.endsWith("%")) {
                 const percent = parseFloat(posWidth) / 100;
                 containerWidth = window.innerWidth * percent;
@@ -413,7 +430,7 @@ class GridChartRenderer extends BaseManager {
             
             // height設定の処理
             if (posHeight === "100%") {
-                containerHeight = window.innerHeight * 0.8; // 画面高さの80%
+                containerHeight = isFullViewport ? window.innerHeight * 0.95 : window.innerHeight * 0.8;
             } else if (typeof posHeight === "string" && posHeight.endsWith("%")) {
                 const percent = parseFloat(posHeight) / 100;
                 containerHeight = window.innerHeight * percent;
@@ -434,7 +451,8 @@ class GridChartRenderer extends BaseManager {
                 maxWidth: 1600,
                 maxHeight: 1000,
                 widthPercent: config.widthPercent || null,
-                heightPercent: config.heightPercent || null
+                heightPercent: config.heightPercent || null,
+                isGridChart: true // グリッドチャート専用フラグ
             });
         }
 

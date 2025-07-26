@@ -129,8 +129,16 @@ class SVGHelper {
         }
 
         // 最小・最大値の制約を適用
-        width = Math.max(minWidth, Math.min(maxWidth, width));
-        height = Math.max(minHeight, Math.min(maxHeight, height));
+        // グリッドチャートで100%指定の場合は制約を大幅に緩和
+        const isGridFullViewport = (config.isGridChart && widthPercent === 100 && heightPercent === 100);
+        if (isGridFullViewport) {
+            // グリッド100%の場合は最大値制約を除去、最小値のみ維持
+            width = Math.max(minWidth, width);
+            height = Math.max(minHeight, height);
+        } else {
+            width = Math.max(minWidth, Math.min(maxWidth, width));
+            height = Math.max(minHeight, Math.min(maxHeight, height));
+        }
 
         return { width, height };
     }
