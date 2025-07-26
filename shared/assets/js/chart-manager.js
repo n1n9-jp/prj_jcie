@@ -266,47 +266,37 @@ class ChartManager extends BaseManager {
     }
 
     /**
-     * デュアルレイアウトの処理
+     * デュアルレイアウトの処理（完全統一版）
+     * DualLayoutクラスを使わず、ChartManagerで直接描画
      * @param {Object} chartData - チャートデータ
      */
-    async handleDualLayout(chartData) {
+    handleDualLayout(chartData) {
         try {
-            // DualLayoutクラスに委譲
-            const dualLayout = this.layouts.dual;
-            if (!dualLayout) {
-                throw new Error('DualLayout not initialized');
-            }
+            console.log('ChartManager: Handling dual layout (complete unified version)');
             
             // レイアウト状態の更新
             this.activeRenderer = null;
             this.currentLayout = 'dual';
             this.layoutData = chartData;
             
-            // LayoutConfigから統一設定を適用
-            if (window.LayoutConfig && window.LayoutConfig.getPreset) {
-                const preset = chartData.preset || 'DUAL_HORIZONTAL';
-                const layoutConfig = LayoutConfig.getPreset(preset, chartData.position);
-                if (layoutConfig) {
-                    chartData.position = { ...layoutConfig.position, ...chartData.position };
-                    chartData.spacing = chartData.spacing || layoutConfig.spacing;
-                    chartData.arrangement = chartData.arrangement || layoutConfig.arrangement;
-                }
-            }
+            // すべてのレンダラーを非表示にしてクリーンな状態にする
+            this.hideAllRenderers();
             
             // コンテナを表示
             this.show();
             
-            // DualLayoutで描画（クリア処理はDualLayoutが責任）
-            const success = await dualLayout.render(chartData);
-            if (!success) {
-                console.error('Failed to render dual layout');
-                this.renderFallbackError('Dual layout rendering failed');
-            }
+            // レンダラー汚染を避けるため、直接SVG描画方式を使用
+            this.renderDualLayoutDirect(chartData);
+            
         } catch (error) {
-            ErrorHandler.handle(error, {
-                context: 'ChartManager.handleDualLayout',
-                chartData
-            });
+            console.error('ChartManager: Error in handleDualLayout:', error);
+            if (window.ErrorHandler) {
+                ErrorHandler.handle(error, 'ChartManager.handleDualLayout', {
+                    type: ErrorHandler.ERROR_TYPES.RENDER,
+                    severity: ErrorHandler.SEVERITY.HIGH,
+                    context: chartData
+                });
+            }
             this.renderFallbackError('Dual layout error: ' + error.message);
         }
     }
@@ -401,11 +391,17 @@ class ChartManager extends BaseManager {
      * @param {string} activeType - アクティブなチャートタイプ
      */
     hideInactiveRenderers(activeType) {
-        Object.keys(this.renderers).forEach(type => {
-            if (type !== activeType && this.renderers[type]) {
-                this.renderers[type].hide();
-            }
-        });
+        // 単一チャートレンダラーの場合のみ、他のレンダラーを非表示
+        if (this.currentLayout === 'single') {
+            Object.keys(this.renderers).forEach(type => {
+                if (type !== activeType && this.renderers[type]) {
+                    this.renderers[type].hide();
+                }
+            });
+        }
+        
+        // DualLayoutの独立管理を無効化（統一アーキテクチャでは不要）
+        // この処理は統一アーキテクチャでは実行しない
     }
 
     /**
@@ -460,45 +456,370 @@ class ChartManager extends BaseManager {
     }
 
     /**
-     * デュアルレイアウトを描画（統一版）
+     * デュアルレイアウトを描画（統一アーキテクチャ版）
+     * Single Chart方式を使用して既存レンダラーを活用
      * @param {Object} chartData - チャートデータ
      */
-    renderDualLayout(chartData) {
+    renderDualLayoutUnified(chartData) {
         const { charts, position } = chartData;
         
-        if (!charts || !Array.isArray(charts)) {
-            console.error('ChartManager: Invalid charts array for dual layout', charts);
+        if (!charts || !Array.isArray(charts) || charts.length !== 2) {
+            console.error('ChartManager: Invalid charts array for dual layout. Expected exactly 2 charts.', charts);
             return;
         }
         
-        // 既存のSVGがあるかチェックし、再利用または新規作成
-        if (!this.chartElement.select('svg').empty()) {
-            // 既存SVGをクリア（削除ではなく内容のみクリア）
-            this.chartElement.select('svg').selectAll('*').remove();
+        console.log('ChartManager: Starting unified dual layout rendering');
+        
+        // 統一コンテナ管理：一度だけクリア
+        this.clearChartContainer();
+        
+        // 横並びレイアウト用のSVGを作成
+        const svg = this.createDualLayoutSVG(chartData);
+        if (!svg) {
+            console.error('ChartManager: Failed to create SVG for unified dual layout');
+            return;
         }
         
-        // BaseManagerの統一position処理を使用
-        if (position) {
-            this.applyPositionSettings(position);
+        // 2つのチャートグループを作成
+        const layout = this.calculateDualLayoutDimensions(position);
+        const leftGroup = svg.append('g').attr('class', 'dual-chart-left');
+        const rightGroup = svg.append('g').attr('class', 'dual-chart-right')
+            .attr('transform', `translate(${layout.chartWidth + layout.spacing}, 0)`);
+        
+        // 各チャート用の仮想コンテナを作成
+        const leftContainer = this.createVirtualContainer(leftGroup, 'dual-left');
+        const rightContainer = this.createVirtualContainer(rightGroup, 'dual-right');
+        
+        // 既存レンダラーを使用して各チャートを描画
+        this.renderChartInDualLayout(charts[0], leftContainer, layout, 'left');
+        this.renderChartInDualLayout(charts[1], rightContainer, layout, 'right');
+        
+        console.log('ChartManager: Unified dual layout rendering completed');
+    }
+
+    /**
+     * デュアルレイアウトを直接描画（レンダラー汚染回避版）
+     * 既存レンダラーを使わず、独立したSVG描画を行う
+     * @param {Object} chartData - チャートデータ
+     */
+    renderDualLayoutDirect(chartData) {
+        const { charts, position } = chartData;
+        
+        if (!charts || !Array.isArray(charts) || charts.length !== 2) {
+            console.error('ChartManager: Invalid charts array for dual layout. Expected exactly 2 charts.', charts);
+            return;
+        }
+        
+        console.log('ChartManager: Starting direct dual layout rendering (no renderer contamination)');
+        
+        // 統一コンテナ管理：完全にクリア
+        this.clearChartContainer();
+        
+        // 横並びレイアウト用のSVGを作成
+        const svg = this.createDualLayoutSVG(chartData);
+        if (!svg) {
+            console.error('ChartManager: Failed to create SVG for direct dual layout');
+            return;
+        }
+        
+        // レイアウト計算
+        const layout = this.calculateDualLayoutDimensions(position);
+        
+        // 2つのチャートエリアを作成（独立したSVGとして）
+        const leftChartSVG = svg.append('g')
+            .attr('class', 'dual-chart-left')
+            .attr('transform', `translate(${layout.marginLeft}, ${layout.marginTop})`);
             
-            // デバッグ: 適用されたクラスを確認
-            const containerElement = this.container.node();
-            if (containerElement) {
+        const rightChartSVG = svg.append('g')
+            .attr('class', 'dual-chart-right')
+            .attr('transform', `translate(${layout.marginLeft + layout.chartWidth + layout.spacing}, ${layout.marginTop})`);
+        
+        // 各チャートを独立して描画（既存レンダラーを使わない）
+        this.drawSingleChartInSVG(leftChartSVG, charts[0], layout, 'left');
+        this.drawSingleChartInSVG(rightChartSVG, charts[1], layout, 'right');
+        
+        console.log('ChartManager: Direct dual layout rendering completed');
+    }
+
+    /**
+     * SVG内で単一チャートを直接描画（レンダラー非使用）
+     * @param {d3.Selection} svgGroup - SVGグループ
+     * @param {Object} chartConfig - チャート設定
+     * @param {Object} layout - レイアウト情報
+     * @param {string} position - 位置 ('left' | 'right')
+     */
+    drawSingleChartInSVG(svgGroup, chartConfig, layout, position) {
+        console.log(`ChartManager: Drawing ${chartConfig.type} chart directly in ${position} position`);
+        
+        if (chartConfig.type !== 'line') {
+            console.error(`ChartManager: Direct rendering only supports line charts, got: ${chartConfig.type}`);
+            return;
+        }
+        
+        // データを取得
+        const data = chartConfig.data;
+        if (!data || data.length === 0) {
+            console.error(`ChartManager: No data available for ${position} chart`);
+            return;
+        }
+        
+        // チャート描画エリアを準備
+        const margin = chartConfig.config.margin || { top: 40, right: 30, bottom: 60, left: 80 };
+        const width = layout.chartWidth - margin.left - margin.right;
+        const height = layout.chartHeight - margin.top - margin.bottom;
+        
+        const chartGroup = svgGroup.append('g')
+            .attr('transform', `translate(${margin.left}, ${margin.top})`);
+        
+        // タイトルを追加
+        if (chartConfig.title) {
+            svgGroup.append('text')
+                .attr('class', 'chart-title')
+                .attr('x', layout.chartWidth / 2)
+                .attr('y', 20)
+                .attr('text-anchor', 'middle')
+                .style('font-size', '14px')
+                .style('font-weight', 'bold')
+                .text(chartConfig.title);
+        }
+        
+        // スケールの設定
+        const xField = chartConfig.config.xField || 'year';
+        const yField = chartConfig.config.yField || 'value';
+        
+        const xScale = d3.scaleLinear()
+            .domain(d3.extent(data, d => +d[xField]))
+            .range([0, width]);
+            
+        const yScale = d3.scaleLinear()
+            .domain(chartConfig.config.yRange || [0, d3.max(data, d => +d[yField])])
+            .range([height, 0]);
+        
+        // 軸の描画
+        const xAxis = d3.axisBottom(xScale);
+        const yAxis = d3.axisLeft(yScale);
+        
+        // 日本語フォーマットが設定されている場合
+        if (chartConfig.config.yAxisFormat && chartConfig.config.yAxisFormat.type === 'japanese') {
+            yAxis.tickFormat(d => {
+                if (d >= 10000) {
+                    return (d / 10000) + '万';
+                }
+                return d;
+            });
+        }
+        
+        chartGroup.append('g')
+            .attr('class', 'x-axis')
+            .attr('transform', `translate(0, ${height})`)
+            .call(xAxis);
+            
+        chartGroup.append('g')
+            .attr('class', 'y-axis')
+            .call(yAxis);
+        
+        // 軸ラベル
+        if (chartConfig.config.yAxisLabel) {
+            chartGroup.append('text')
+                .attr('class', 'y-axis-label')
+                .attr('transform', 'rotate(-90)')
+                .attr('y', 0 - margin.left)
+                .attr('x', 0 - (height / 2))
+                .attr('dy', '1em')
+                .style('text-anchor', 'middle')
+                .style('font-size', '12px')
+                .text(chartConfig.config.yAxisLabel);
+        }
+        
+        // ラインの描画
+        const line = d3.line()
+            .x(d => xScale(+d[xField]))
+            .y(d => yScale(+d[yField]))
+            .curve(d3.curveMonotoneX);
+        
+        chartGroup.append('path')
+            .datum(data)
+            .attr('class', 'line')
+            .attr('fill', 'none')
+            .attr('stroke', '#4ecdc4')
+            .attr('stroke-width', 2)
+            .attr('d', line);
+        
+        // データポイントの描画
+        chartGroup.selectAll('.dot')
+            .data(data)
+            .enter().append('circle')
+            .attr('class', 'dot')
+            .attr('cx', d => xScale(+d[xField]))
+            .attr('cy', d => yScale(+d[yField]))
+            .attr('r', 3)
+            .attr('fill', '#4ecdc4');
+        
+        console.log(`ChartManager: Successfully drew ${chartConfig.type} chart in ${position} position`);
+    }
+
+    /**
+     * デュアルレイアウト用のSVGを作成
+     * @param {Object} chartData - チャートデータ
+     * @returns {d3.Selection} SVG要素
+     */
+    createDualLayoutSVG(chartData) {
+        const containerNode = this.container.node();
+        const containerRect = containerNode.getBoundingClientRect();
+        
+        // ビューポートサイズを基準としたサイズ計算
+        const viewportWidth = window.innerWidth || 1200;
+        const viewportHeight = window.innerHeight || 800;
+        
+        let totalWidth = Math.min(viewportWidth * 0.9, 1400);
+        let totalHeight = Math.min(viewportHeight * 0.8, 700);
+        
+        // position設定がある場合はそれを優先
+        if (chartData.position) {
+            if (chartData.position.width) {
+                totalWidth = this.calculateDimensionFromPosition(chartData.position.width, viewportWidth, 'width');
+            }
+            if (chartData.position.height) {
+                totalHeight = this.calculateDimensionFromPosition(chartData.position.height, viewportHeight, 'height');
             }
         }
         
-        const svg = this.createLayoutSVG('dual', chartData);
+        // SVGHelperを使用してレスポンシブSVGを作成
+        if (window.SVGHelper) {
+            return SVGHelper.initSVG(this.chartElement, totalWidth, totalHeight, {
+                preserveAspectRatio: 'xMidYMid meet',
+                responsive: true
+            });
+        } else {
+            // フォールバック
+            this.chartElement.selectAll('*').remove();
+            return this.chartElement.append('svg')
+                .attr('width', totalWidth)
+                .attr('height', totalHeight);
+        }
+    }
+
+    /**
+     * デュアルレイアウトの寸法を計算（統一版）
+     * @param {Object} position - position設定
+     * @returns {Object} レイアウト情報
+     */
+    calculateDualLayoutDimensions(position = {}) {
+        const viewportWidth = window.innerWidth || 1200;
+        const viewportHeight = window.innerHeight || 800;
         
-        if (!svg) {
-            console.error('ChartManager: Failed to create SVG for dual layout');
+        let totalWidth = Math.min(viewportWidth * 0.9, 1400);
+        let totalHeight = Math.min(viewportHeight * 0.8, 700);
+        
+        // position設定での上書き
+        if (position.width) {
+            totalWidth = this.calculateDimensionFromPosition(position.width, viewportWidth, 'width');
+        }
+        if (position.height) {
+            totalHeight = this.calculateDimensionFromPosition(position.height, viewportHeight, 'height');
+        }
+        
+        const spacing = 40;
+        const marginTop = 40;
+        const marginBottom = 40;
+        const marginLeft = 20;
+        const marginRight = 20;
+        
+        const availableWidth = totalWidth - marginLeft - marginRight;
+        const availableHeight = totalHeight - marginTop - marginBottom;
+        
+        const chartWidth = Math.max((availableWidth - spacing) / 2, 400);
+        const chartHeight = Math.max(availableHeight, 300);
+        
+        return {
+            totalWidth,
+            totalHeight,
+            chartWidth,
+            chartHeight,
+            spacing,
+            marginTop,
+            marginBottom,
+            marginLeft,
+            marginRight
+        };
+    }
+
+    /**
+     * 仮想コンテナを作成（既存レンダラー用）
+     * @param {d3.Selection} group - SVGグループ
+     * @param {string} id - コンテナID
+     * @returns {Object} 仮想コンテナオブジェクト
+     */
+    createVirtualContainer(group, id) {
+        return {
+            selection: group,
+            id: id,
+            node: () => group.node(),
+            selectAll: (selector) => group.selectAll(selector),
+            append: (element) => group.append(element),
+            select: (selector) => group.select(selector),
+            classed: (className, value) => group.classed(className, value),
+            style: (property, value) => group.style(property, value),
+            attr: (attribute, value) => group.attr(attribute, value),
+            // レンダラーが期待するD3セレクションインターフェースを提供
+            empty: () => group.empty(),
+            size: () => group.size()
+        };
+    }
+
+    /**
+     * デュアルレイアウト内でチャートを描画
+     * @param {Object} chartConfig - チャート設定
+     * @param {Object} container - 仮想コンテナ
+     * @param {Object} layout - レイアウト情報
+     * @param {string} position - 位置 ('left' | 'right')
+     */
+    renderChartInDualLayout(chartConfig, container, layout, position) {
+        const { type, data } = chartConfig;
+        
+        console.log(`ChartManager: Rendering ${type} chart in ${position} position`);
+        
+        // 既存レンダラーを取得
+        const renderer = this.getRenderer(type);
+        if (!renderer) {
+            console.error(`ChartManager: No renderer available for type: ${type}`);
             return;
         }
         
-        // レイアウト計算（position設定を考慮）
-        const layout = this.calculateDualLayout(position);
+        // レンダラーの一時的なコンテナ変更
+        const originalContainer = renderer.container;
+        renderer.container = container.selection;
         
-        // 各チャートのデータを読み込んでから描画
-        this.loadChartsDataAndRender(svg, charts, layout);
+        try {
+            // チャート設定を準備
+            const renderConfig = {
+                ...chartConfig.config,
+                ...chartConfig,
+                width: layout.chartWidth,
+                height: layout.chartHeight,
+                data: data,
+                visible: true
+            };
+            
+            // 既存レンダラーで描画
+            renderer.renderChart(type, data, renderConfig);
+            
+            console.log(`ChartManager: Successfully rendered ${type} chart in ${position} position`);
+            
+        } catch (error) {
+            console.error(`ChartManager: Error rendering ${type} chart in ${position} position:`, error);
+            
+            if (window.ErrorHandler) {
+                ErrorHandler.handle(error, 'ChartManager.renderChartInDualLayout', {
+                    type: ErrorHandler.ERROR_TYPES.RENDER,
+                    severity: ErrorHandler.SEVERITY.HIGH,
+                    context: { chartConfig, position }
+                });
+            }
+        } finally {
+            // コンテナを元に戻す
+            renderer.container = originalContainer;
+        }
     }
 
     /**
