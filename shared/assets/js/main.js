@@ -336,6 +336,7 @@ class ScrollytellingApp {
             console.log(`[SCROLLAMA DEBUG] Step detected: index=${index}, stepId=${stepLogicalName}, direction=${direction}`);
         }
         
+        
         if (!stepConfig) {
             console.warn(`No config found for step ${stepLogicalName} (index ${index})`);
             return;
@@ -396,7 +397,7 @@ class ScrollytellingApp {
                     
                     if (layout === 'dual' || layout === 'triple') {
                         // 複数チャートレイアウト: charts配列に事前読み込みデータを添付
-                        const chartsWithData = stepConfig.chart.charts.map(chartConfig => {
+                        const chartsWithData = stepConfig.chart.charts.map((chartConfig, index) => {
                             const data = this.getChartData(chartConfig.type, chartConfig.dataFile);
                             return {
                                 ...chartConfig,

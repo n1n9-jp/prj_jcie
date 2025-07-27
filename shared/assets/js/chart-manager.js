@@ -198,24 +198,17 @@ class ChartManager extends BaseManager {
             }
 
             // レイアウトベースの振り分け
-            // デバッグログ追加
-            console.log('ChartManager: Layout detection:', { layout, type, chartData });
-            
             switch (layout) {
                 case 'dual':
-                    console.log('ChartManager: Handling dual layout');
                     this.handleDualLayout(chartData);
                     break;
                 case 'triple':
-                    console.log('ChartManager: Handling triple layout');
                     this.handleTripleLayout(chartData);
                     break;
                 case 'grid':
-                    console.log('ChartManager: Handling grid layout');
                     this.handleGridLayout(chartData);
                     break;
                 default:
-                    console.log('ChartManager: Handling single chart');
                     this.handleSingleChart(chartData);
                     break;
             }
@@ -690,15 +683,16 @@ class ChartManager extends BaseManager {
         }
         
         // SVGHelperを使用してレスポンシブSVGを作成
+        // 重要：single layoutと同様に#chart-containerに直接作成
         if (window.SVGHelper) {
-            return SVGHelper.initSVG(this.chartElement, totalWidth, totalHeight, {
+            return SVGHelper.initSVG(this.container, totalWidth, totalHeight, {
                 preserveAspectRatio: 'xMidYMid meet',
                 responsive: true
             });
         } else {
             // フォールバック
-            this.chartElement.selectAll('*').remove();
-            return this.chartElement.append('svg')
+            this.container.selectAll('*').remove();
+            return this.container.append('svg')
                 .attr('width', totalWidth)
                 .attr('height', totalHeight);
         }
@@ -1597,10 +1591,9 @@ class ChartManager extends BaseManager {
      * チャート専用のコンテナクリア処理（SVG削除ではなく非表示）
      */
     clearChartContainer() {
-        if (this.chartElement && !this.chartElement.empty()) {
-            // SVGを完全に削除（DualLayout用の確実なクリア）
-            this.chartElement.selectAll('*').remove();
-            console.log('ChartManager: Chart container completely cleared');
+        // #chart-containerの内容を直接クリア（single layoutと統一）
+        if (this.container && !this.container.empty()) {
+            this.container.selectAll('svg').remove();
         }
     }
 

@@ -174,8 +174,16 @@ class PositionManager {
         } = styleConfig;
 
         // トランジション設定
+        // 重要：#chart-containerの場合、d3.jsのtransitionと競合を避けるため
+        // opacity以外のプロパティのみにtransitionを適用
         if (animationDuration) {
-            container.style.transition = `all ${animationDuration} ease-in-out`;
+            if (container.id === 'chart-container' || container.id === 'map-container' || container.id === 'image-container') {
+                // メインコンテナはopacityをd3.jsで管理するため、位置・サイズのみtransition
+                container.style.transition = `width ${animationDuration} ease-in-out, height ${animationDuration} ease-in-out, transform ${animationDuration} ease-in-out, top ${animationDuration} ease-in-out, left ${animationDuration} ease-in-out`;
+            } else {
+                // その他の要素は全プロパティにtransition適用
+                container.style.transition = `all ${animationDuration} ease-in-out`;
+            }
         }
 
         // サイズ設定

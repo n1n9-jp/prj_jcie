@@ -15,12 +15,9 @@ class DualLayout extends BaseLayout {
      * @param {Object} config - レイアウト設定（データ込み）
      */
     async render(config) {
-        console.log('DualLayout: Starting render with config:', config);
-        
         try {
             // レイアウト設定の取得
             const layoutConfig = this.getLayoutConfig(config);
-            console.log('DualLayout: Layout config:', layoutConfig);
             
             // データの準備（main.jsから渡されたデータを使用）
             const chartsData = this.prepareChartsData(config.charts);
@@ -95,12 +92,23 @@ class DualLayout extends BaseLayout {
     }
 
     /**
+     * レンダラーのクリーンアップ
+     * @private
+     */
+    cleanupRenderers() {
+        this.renderers.clear();
+        this.charts = [];
+    }
+
+    /**
      * コンテナの準備
      * @private
      */
     prepareContainer(layoutConfig) {
         try {
-            console.log('DualLayout: Preparing container with config:', layoutConfig);
+            
+            // レンダラーをクリーンアップ
+            this.cleanupRenderers();
             
             // メインコンテナの設定（原子操作で競合回避）
             const container = d3.select('#chart-container');
@@ -131,8 +139,6 @@ class DualLayout extends BaseLayout {
                 
                 this.chartContainers.push(chartContainer);
             }
-            
-            console.log('DualLayout: Container prepared successfully');
         } catch (error) {
             console.error('Error preparing container:', error);
             throw error;
@@ -144,7 +150,6 @@ class DualLayout extends BaseLayout {
      * @private
      */
     renderCharts(chartsData, layoutConfig) {
-        console.log('DualLayout: Starting chart rendering for', chartsData.length, 'charts');
         
         for (let i = 0; i < chartsData.length; i++) {
             const chartData = chartsData[i];
@@ -156,8 +161,6 @@ class DualLayout extends BaseLayout {
 
             const container = this.chartContainers[i];
             const chartConfig = chartData.config;
-            
-            console.log(`DualLayout: Rendering chart ${i} of type ${chartConfig.type}`);
             
             // チャートサイズの計算
             const size = this.calculateChartSize(container.node(), chartConfig, layoutConfig);
@@ -180,15 +183,11 @@ class DualLayout extends BaseLayout {
                     data: chartData.data
                 };
                 
-                console.log(`DualLayout: Chart ${i} rendered successfully`);
-                
             } catch (error) {
                 console.error(`DualLayout: Error rendering chart ${i}:`, error);
                 this.renderErrorState(i, error);
             }
         }
-        
-        console.log('DualLayout: All charts rendering completed');
     }
 
     /**
@@ -224,15 +223,11 @@ class DualLayout extends BaseLayout {
     }
 
     /**
-     * レンダラーの取得または作成
+     * レンダラーの取得または作成（汚染回避のため毎回新規作成）
      * @private
      */
     getOrCreateRenderer(chartType, index, containerNode) {
-        const key = `${chartType}-${index}`;
-        
-        if (this.renderers.has(key)) {
-            return this.renderers.get(key);
-        }
+        // レンダラーキャッシュを無効化：汚染を回避するため毎回新規作成
         
         // コンテナにIDを設定
         const containerId = `dual-chart-${index}`;
@@ -253,7 +248,7 @@ class DualLayout extends BaseLayout {
                 throw new Error(`Unknown chart type: ${chartType}`);
         }
         
-        this.renderers.set(key, renderer);
+        // レンダラーキャッシュは無効化：汚染を回避するため保存しない
         return renderer;
     }
 
