@@ -200,16 +200,16 @@
         "position": {
           "horizontal": "center",
           "vertical": "center",
-          "width": "90%",
-          "height": "80%"
+          "width": "100%",
+          "height": "100%"
         },
         "config": {
           "dataFile": "data/地域別-感染者数と死者数.csv",
           "columns": 6,
           "rows": 2,
           "chartType": "pie",
-          "widthPercent": 85,
-          "heightPercent": 70,
+          "widthPercent": 100,
+          "heightPercent": 100,
           "rowSpacing": 30,
           "labelField": "地域",
           "valueFields": ["感染者の割合", "死亡者の割合"],
