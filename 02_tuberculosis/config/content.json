@@ -221,7 +221,7 @@
     {
       "id": "japan-history-1935",
       "text": {
-        "content": "エイズの死者数",
+        "content": "エイズの死亡者数",
         "position": {
           "width": "30%",
           "height": "100%",
@@ -262,7 +262,7 @@
     {
       "id": "japan-bcg-introduction",
       "text": {
-        "content": "エイズの死者数",
+        "content": "エイズの死亡者数",
         "position": {
           "width": "30%",
           "height": "100%",
@@ -303,7 +303,7 @@
     {
       "id": "japan-postwar-improvement",
       "text": {
-        "content": "エイズの死者数",
+        "content": "エイズの死亡者数",
         "position": {
           "width": "30%",
           "height": "100%",
@@ -344,7 +344,7 @@
     {
       "id": "japan-current-status",
       "text": {
-        "content": "エイズの死者数",
+        "content": "エイズの死亡者数",
         "position": {
           "width": "30%",
           "height": "100%",
@@ -415,7 +415,7 @@
     {
       "id": "covid-impact",
       "text": {
-        "content": "エイズの死者数",
+        "content": "エイズの死亡者数",
         "position": {
           "width": "30%",
           "height": "100%",
@@ -471,7 +471,7 @@
     {
       "id": "covid-impact-2",
       "text": {
-        "content": "エイズの死者数",
+        "content": "エイズの死亡者数",
         "position": {
           "width": "30%",
           "height": "100%",
@@ -483,7 +483,7 @@
         "visible": true,
         "type": "line",
         "dataFile": "tb_deaths_trend.csv",
-        "title": "結核による推定死者数の推移",
+        "title": "結核による推定死亡者数の推移",
         "config": {
           "widthPercent": 100,
           "heightPercent": 70,
@@ -512,7 +512,7 @@
               "position": "top-right"
             }
           ],
-          "title": "結核による推定死者数の推移",
+          "title": "結核による推定死亡者数の推移",
           "dataSource": "【To Be Delivered】"
         }
       }

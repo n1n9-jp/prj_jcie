@@ -770,7 +770,7 @@
         "config": {
           "widthPercent": 70,
           "heightPercent": 100,
-          "title": "ニジェールのマラリア感染者数・死者数の推移",
+          "title": "ニジェールのマラリア感染者数・死亡者数の推移",
           "xField": "year",
           "yField": "value",
           "seriesField": "series",

@@ -298,7 +298,7 @@
     {
       "id": "death-statistics",
       "text": {
-        "content": "エイズの死者数",
+        "content": "エイズの死亡者数",
         "position": {
           "width": "30%",
           "height": "100%",
@@ -323,7 +323,7 @@
           "xField": "year",
           "yField": "value",
           "xAxisLabel": "年",
-          "yAxisLabel": "死者数（万人）",
+          "yAxisLabel": "死亡者数（万人）",
           "yearRange": [1998, 2022],
           "seriesField": "series",
           "multiSeries": true,
