@@ -392,6 +392,7 @@
           "valueField": "percentage",
           "categoryField": "ageGroup",
           "title": "地域別HIV治療カバレッジ",
+          "rowTitles": ["成人（15歳以上）", "こども（0歳から14際）"],
           "dataSource": "UNAIDS 2024 疫学的推計値",
           "showLabels": true,
           "showPercentages": true,

@@ -147,7 +147,6 @@ class GridChartRenderer extends BaseManager {
             const optimalGrid = this.calculateOptimalGrid(data.length, mergedConfig);
             mergedConfig.columns = optimalGrid.columns;
             mergedConfig.rows = optimalGrid.rows;
-            console.log('GridChartRenderer: Auto-calculated grid:', optimalGrid);
         }
         
         const { 
@@ -158,31 +157,22 @@ class GridChartRenderer extends BaseManager {
             title,
             showLabels,
             showPercentages,
-            rowSpacing = chartHeight * 0.5,  // デフォルトの行間スペーシング（チャート高さの50%）
+            rowSpacing = chartHeight * 0.5,
             dataSource = '',
             rowTitles = []
         } = mergedConfig;
         
         try {
-            // データを適切な形式に変換
             const gridData = this.transformToGridData(data, mergedConfig);
-            
-            // レスポンシブサイズを取得（他のレンダラーと統一）
             const { width: containerWidth, height: containerHeight } = this.getResponsiveSize(mergedConfig);
             
             const isFullViewport = (mergedConfig.widthPercent === 100 && mergedConfig.heightPercent === 100);
             let actualContainerWidth = containerWidth;
             if (mergedConfig.position && mergedConfig.position.width === "100%") {
-                if (isFullViewport) {
-                    actualContainerWidth = Math.max(containerWidth, window.innerWidth * 0.95);
-                } else {
-                    actualContainerWidth = Math.max(containerWidth, window.innerWidth * 0.8);
-                }
+                actualContainerWidth = isFullViewport ? Math.max(containerWidth, window.innerWidth * 0.95) : Math.max(containerWidth, window.innerWidth * 0.8);
             }
-
-            const rowTitleWidth = (rowTitles && rowTitles.length > 0) ? 80 : 0;
             
-            const availableWidth = actualContainerWidth - 40 - rowTitleWidth;
+            const availableWidth = actualContainerWidth - 40;
             const availableHeight = containerHeight - (title ? 40 : 0) - (dataSource ? 30 : 0) - 40;
             
             let maxWidth, maxHeight;
@@ -199,7 +189,7 @@ class GridChartRenderer extends BaseManager {
             const calculatedChartWidth = Math.min(maxWidth, Math.max(minWidth, availableWidth / columns));
             const calculatedChartHeight = Math.min(maxHeight, Math.max(minHeight, (availableHeight - (rows - 1) * rowSpacing) / rows));
             
-            const totalWidth = columns * calculatedChartWidth + 40 + rowTitleWidth;
+            const totalWidth = columns * calculatedChartWidth + 40;
             const totalHeight = rows * calculatedChartHeight + (rows - 1) * rowSpacing + (title ? 40 : 0) + (dataSource ? 30 : 0) + 40;
             
             this.svg = this.initSVG(totalWidth, totalHeight);
@@ -220,16 +210,18 @@ class GridChartRenderer extends BaseManager {
                     .text(title);
             }
 
+            const gridContainer = this.svg.append('g')
+                .attr('transform', `translate(20, ${title ? 50 : 30})`);
+
             if (rowTitles && rowTitles.length > 0) {
                 const rowHeight = calculatedChartHeight + rowSpacing;
                 rowTitles.forEach((rowTitle, i) => {
                     if (i < rows) {
-                        this.svg.append('text')
+                        gridContainer.append('text')
                             .attr('class', 'grid-row-title')
-                            .attr('x', rowTitleWidth / 2)
-                            .attr('y', (title ? 40 : 20) + (i * rowHeight) + (calculatedChartHeight / 2))
+                            .attr('x', (columns * calculatedChartWidth) / 2)
+                            .attr('y', (i * rowHeight) + 15)
                             .attr('text-anchor', 'middle')
-                            .attr('dominant-baseline', 'central')
                             .style('font-size', '14px')
                             .style('font-weight', 'bold')
                             .style('fill', '#333')
@@ -238,14 +230,11 @@ class GridChartRenderer extends BaseManager {
                 });
             }
             
-            const gridContainer = this.svg.append('g')
-                .attr('transform', `translate(${rowTitleWidth}, ${title ? 40 : 0})`);
-            
             gridData.forEach((cellData, index) => {
                 const col = index % columns;
                 const row = Math.floor(index / columns);
-                const x = col * calculatedChartWidth + 20;
-                const y = row * (calculatedChartHeight + rowSpacing) + 20;
+                const x = col * calculatedChartWidth;
+                const y = row * (calculatedChartHeight + rowSpacing);
                 
                 this.renderGridCell(gridContainer, cellData, {
                     x: x,
