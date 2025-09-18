@@ -124,7 +124,8 @@ class StackedBarChartRenderer extends BaseManager {
             stackKeys,
             colors = ['#66c2a5', '#fc8d62'],
             title = '',
-            yAxisLabel = ''
+            yAxisLabel = '',
+            dataSource = ''
         } = config;
 
         const svg = this.svg;
@@ -201,6 +202,11 @@ class StackedBarChartRenderer extends BaseManager {
             .attr('width', xScale.bandwidth());
 
         this.addLegend(svg, stackKeys, colorScale, width, margin);
+
+        // データソースを表示
+        if (dataSource) {
+            this.addDataSource(svg, dataSource, width, height);
+        }
     }
 
     /**
@@ -246,6 +252,23 @@ class StackedBarChartRenderer extends BaseManager {
         const legendY = 40;
 
         legendGroup.attr('transform', `translate(${legendX}, ${legendY})`);
+    }
+
+    /**
+     * データソースを追加
+     */
+    addDataSource(svg, dataSource, width, height) {
+        if (!dataSource) return;
+
+        svg.append('text')
+            .attr('class', 'chart-data-source')
+            .attr('x', 10)
+            .attr('y', height - 10)
+            .attr('text-anchor', 'start')
+            .style('font-size', '12px')
+            .style('fill', '#888')
+            .style('font-style', 'normal')
+            .text(`出典: ${dataSource}`);
     }
 
     /**

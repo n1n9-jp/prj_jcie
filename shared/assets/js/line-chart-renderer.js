@@ -2303,8 +2303,9 @@ class LineChartRenderer extends BaseManager {
             .attr('x', 10)
             .attr('y', height - 10)
             .attr('text-anchor', 'start')
-            .attr('font-size', '10px')
-            .attr('fill', '#888')
+            .style('font-size', '12px')
+            .style('fill', '#888')
+            .style('font-style', 'normal')
             .text(`出典: ${dataSource}`);
     }
 
