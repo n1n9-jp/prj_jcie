@@ -163,6 +163,10 @@
           "seriesField": "series",
           "multiSeries": true,
           "yAxisLabel": "人数",
+          "yAxis": {
+            "type": "log",
+            "ticks": 5
+          },
           "dataSource": "【To Be Delivered】",
           "legendType": "inline",
           "yAxisFormat": {
@@ -773,7 +777,8 @@
           "multiSeries": true,
           "yAxisLabel": "人数",
           "yAxis": {
-            "type": "log"
+            "type": "log",
+            "ticks": 5
           },
           "dataSource": "【To Be Delivered】",
           "legendType": "inline",

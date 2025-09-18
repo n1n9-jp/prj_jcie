@@ -241,6 +241,10 @@ class LineChartRenderer extends BaseManager {
         const newYAxis = d3.axisLeft(newYScale)
             .tickFormat(d => ChartFormatterHelper.formatYAxisValue(d, config.yAxisFormat));
 
+        if (config.yAxis && config.yAxis.ticks) {
+            newYAxis.ticks(config.yAxis.ticks);
+        }
+
         // 統一されたトランジション設定
         const transitionConfig = {
             chartType: 'line',
@@ -428,8 +432,10 @@ class LineChartRenderer extends BaseManager {
                     xAxis = isYearData ? d3.axisBottom(newXScale).tickFormat(d3.format("d")) : d3.axisBottom(newXScale);
                     yAxis = d3.axisLeft(newYScale).tickFormat(d => ChartFormatterHelper.formatYAxisValue(d, this.config.yAxisFormat));
                     
-                    // yAxisのtickValues設定がある場合は適用
-                    if (this.config.yAxis && this.config.yAxis.tickValues) {
+                    if (this.config.yAxis && this.config.yAxis.type === 'log') {
+                        const tickValues = newYScale.ticks().filter(d => Number.isInteger(Math.log10(d)) || d === 1);
+                        yAxis.tickValues(tickValues);
+                    } else if (this.config.yAxis && this.config.yAxis.tickValues) {
                         yAxis.tickValues(this.config.yAxis.tickValues);
                     } else if (this.config.yAxis && this.config.yAxis.ticks) {
                         yAxis.ticks(this.config.yAxis.ticks);
@@ -751,7 +757,10 @@ class LineChartRenderer extends BaseManager {
             : d3.axisLeft(yScale);
             
         // yAxisのtickValues設定がある場合は適用
-        if (config.yAxis && config.yAxis.tickValues) {
+        if (config.yAxis && config.yAxis.type === 'log') {
+            const tickValues = yScale.ticks().filter(d => Number.isInteger(Math.log10(d)) || d === 1);
+            yAxis.tickValues(tickValues);
+        } else if (config.yAxis && config.yAxis.tickValues) {
             yAxis.tickValues(config.yAxis.tickValues);
         } else if (config.yAxis && config.yAxis.ticks) {
             yAxis.ticks(config.yAxis.ticks);
@@ -991,7 +1000,10 @@ class LineChartRenderer extends BaseManager {
             : d3.axisLeft(yScale);
             
         // yAxisのtickValues設定がある場合は適用
-        if (config.yAxis && config.yAxis.tickValues) {
+        if (config.yAxis && config.yAxis.type === 'log') {
+            const tickValues = yScale.ticks().filter(d => Number.isInteger(Math.log10(d)) || d === 1);
+            yAxis.tickValues(tickValues);
+        } else if (config.yAxis && config.yAxis.tickValues) {
             yAxis.tickValues(config.yAxis.tickValues);
         } else if (config.yAxis && config.yAxis.ticks) {
             yAxis.ticks(config.yAxis.ticks);
@@ -2508,4 +2520,4 @@ class LineChartRenderer extends BaseManager {
 }
 
 // グローバルスコープで利用可能にする（ES6モジュール移行前の暫定措置）
-window.LineChartRenderer = LineChartRenderer;
+window.LineChartRenderer = LineChartRenderer;Renderer = LineChartRenderer;
