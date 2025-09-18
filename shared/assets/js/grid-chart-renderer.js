@@ -135,7 +135,8 @@ class GridChartRenderer extends BaseManager {
             showLabels: true,
             showPercentages: true,
             rowSpacing: null,  // nullの場合、chartHeightの50%を使用
-            position: layoutDefaults.position
+            position: layoutDefaults.position,
+            rowTitles: [] // 行ごとの見出し
         };
 
         // AppDefaultsとの設定マージ
@@ -158,7 +159,8 @@ class GridChartRenderer extends BaseManager {
             showLabels,
             showPercentages,
             rowSpacing = chartHeight * 0.5,  // デフォルトの行間スペーシング（チャート高さの50%）
-            dataSource = ''
+            dataSource = '',
+            rowTitles = []
         } = mergedConfig;
         
         try {
@@ -167,33 +169,26 @@ class GridChartRenderer extends BaseManager {
             
             // レスポンシブサイズを取得（他のレンダラーと統一）
             const { width: containerWidth, height: containerHeight } = this.getResponsiveSize(mergedConfig);
-            console.log('GridChartRenderer: containerWidth =', containerWidth, 'height =', containerHeight);
-            console.log('GridChartRenderer: mergedConfig.position =', mergedConfig.position);
             
-            // position設定からwidth=100%の場合、より大きなサイズを使用
             const isFullViewport = (mergedConfig.widthPercent === 100 && mergedConfig.heightPercent === 100);
             let actualContainerWidth = containerWidth;
             if (mergedConfig.position && mergedConfig.position.width === "100%") {
                 if (isFullViewport) {
-                    // 100%指定の場合は制約を最小限に
                     actualContainerWidth = Math.max(containerWidth, window.innerWidth * 0.95);
                 } else {
                     actualContainerWidth = Math.max(containerWidth, window.innerWidth * 0.8);
                 }
-                console.log('GridChartRenderer: actualContainerWidth adjusted to', actualContainerWidth, 'isFullViewport:', isFullViewport);
             }
+
+            const rowTitleWidth = (rowTitles && rowTitles.length > 0) ? 80 : 0;
             
-            // コンテナサイズに基づいて個々のチャートサイズを計算
-            const availableWidth = actualContainerWidth - 40; // マージンを減らして画面内に収める
+            const availableWidth = actualContainerWidth - 40 - rowTitleWidth;
             const availableHeight = containerHeight - (title ? 40 : 0) - (dataSource ? 30 : 0) - 40;
             
-            // レスポンシブサイズ計算（最大・最小値を考慮）
-            // 100%指定の場合は制約を大幅に緩和（isFullViewportは上で既に定義済み）
             let maxWidth, maxHeight;
             if (isFullViewport) {
-                // 100%指定時は画面サイズに基づいて動的に制限値を計算
-                maxWidth = Math.floor(availableWidth / columns * 0.9); // 利用可能幅の90%を各チャートの最大幅に
-                maxHeight = Math.floor(availableHeight / rows * 0.9);   // 利用可能高さの90%を各チャートの最大高さに
+                maxWidth = Math.floor(availableWidth / columns * 0.9);
+                maxHeight = Math.floor(availableHeight / rows * 0.9);
             } else {
                 maxWidth = mergedConfig.maxChartWidth || 140;
                 maxHeight = mergedConfig.maxChartHeight || 140;
@@ -204,20 +199,14 @@ class GridChartRenderer extends BaseManager {
             const calculatedChartWidth = Math.min(maxWidth, Math.max(minWidth, availableWidth / columns));
             const calculatedChartHeight = Math.min(maxHeight, Math.max(minHeight, (availableHeight - (rows - 1) * rowSpacing) / rows));
             
-            console.log('GridChartRenderer: calculatedChartWidth =', calculatedChartWidth, 'calculatedChartHeight =', calculatedChartHeight);
-            console.log('GridChartRenderer: totalWidth =', columns * calculatedChartWidth + 80, 'totalHeight =', rows * calculatedChartHeight + (rows - 1) * rowSpacing + (title ? 40 : 0) + (dataSource ? 30 : 0) + 40);
-            
-            // 実際の全体サイズを計算（マージンを最小限に）
-            const totalWidth = columns * calculatedChartWidth + 40; // マージンを減らして表示領域を幅幅扩張
+            const totalWidth = columns * calculatedChartWidth + 40 + rowTitleWidth;
             const totalHeight = rows * calculatedChartHeight + (rows - 1) * rowSpacing + (title ? 40 : 0) + (dataSource ? 30 : 0) + 40;
             
             this.svg = this.initSVG(totalWidth, totalHeight);
             
-            // 計算されたサイズを設定に反映
             mergedConfig.chartWidth = calculatedChartWidth;
             mergedConfig.chartHeight = calculatedChartHeight;
             
-            // タイトルを追加
             if (title) {
                 this.svg.append('text')
                     .attr('class', 'chart-title')
@@ -230,19 +219,33 @@ class GridChartRenderer extends BaseManager {
                     .style('font-weight', 'var(--font-weight-bold)')
                     .text(title);
             }
+
+            if (rowTitles && rowTitles.length > 0) {
+                const rowHeight = calculatedChartHeight + rowSpacing;
+                rowTitles.forEach((rowTitle, i) => {
+                    if (i < rows) {
+                        this.svg.append('text')
+                            .attr('class', 'grid-row-title')
+                            .attr('x', rowTitleWidth / 2)
+                            .attr('y', (title ? 40 : 20) + (i * rowHeight) + (calculatedChartHeight / 2))
+                            .attr('text-anchor', 'middle')
+                            .attr('dominant-baseline', 'central')
+                            .style('font-size', '14px')
+                            .style('font-weight', 'bold')
+                            .style('fill', '#333')
+                            .text(rowTitle);
+                    }
+                });
+            }
             
-            // グリッドコンテナ
             const gridContainer = this.svg.append('g')
-                .attr('transform', `translate(0, ${title ? 40 : 0})`);
+                .attr('transform', `translate(${rowTitleWidth}, ${title ? 40 : 0})`);
             
-            // 各セルを描画（行間スペーシングを考慮）
             gridData.forEach((cellData, index) => {
                 const col = index % columns;
                 const row = Math.floor(index / columns);
-                const x = col * calculatedChartWidth + 20; // 左マージンを追加
-                const y = row * (calculatedChartHeight + rowSpacing) + 20;  // 上マージンと行間スペーシングを追加
-                
-                console.log(`GridChartRenderer: Cell ${index} - x:${x}, y:${y}, width:${calculatedChartWidth}, height:${calculatedChartHeight}`);
+                const x = col * calculatedChartWidth + 20;
+                const y = row * (calculatedChartHeight + rowSpacing) + 20;
                 
                 this.renderGridCell(gridContainer, cellData, {
                     x: x,
@@ -254,7 +257,6 @@ class GridChartRenderer extends BaseManager {
                 });
             });
             
-            // データソースを表示
             if (dataSource) {
                 this.addDataSource(this.svg, dataSource, totalWidth, totalHeight);
             }

@@ -214,6 +214,7 @@
           "labelField": "地域",
           "valueFields": ["感染者の割合", "死亡者の割合"],
           "title": "地域別マラリア感染者・死亡者分布",
+          "rowTitles": ["感染者数", "死亡者数"],
           "dataSource": "【To Be Delivered】",
           "chartSizeMode": "responsive",
           "maxChartWidth": 140,
