@@ -214,9 +214,17 @@ class LineChartRenderer extends BaseManager {
             yDomain = d3.extent(allNewValues, d => +d[yField]);
         }
         
-        const newYScale = d3.scaleLinear()
-            .domain(yDomain)
-            .range([innerHeight, 0]);
+        let newYScale;
+        if (config.yAxis && config.yAxis.type === 'log') {
+            const yMin = yDomain[0] > 0 ? yDomain[0] : 1;
+            newYScale = d3.scaleLog()
+                .domain([yMin, yDomain[1]])
+                .range([innerHeight, 0]);
+        } else {
+            newYScale = d3.scaleLinear()
+                .domain(yDomain)
+                .range([innerHeight, 0]);
+        }
         
         // yRangeが明示的に設定されていない場合のみnice()を適用
         if (!(this.config && this.config.yRange && this.config.yRange.length === 2)) {
@@ -397,7 +405,11 @@ class LineChartRenderer extends BaseManager {
             // データが存在する場合のみ軸を更新
             if (allCurrentData.length > 0) {
                 const xExtent = d3.extent(allCurrentData, d => +d[xField]);
-                const yExtent = d3.extent(allCurrentData, d => +d[yField]);
+                let yExtent = d3.extent(allCurrentData, d => +d[yField]);
+
+                if (newYScale.base) { // scaleLogにはbaseプロパティがある
+                    yExtent[0] = yExtent[0] > 0 ? yExtent[0] : 1;
+                }
                 
                 newXScale.domain(xExtent);
                 newYScale.domain(yExtent);
@@ -689,9 +701,17 @@ class LineChartRenderer extends BaseManager {
             yDomain = d3.extent(allValues, d => +d[yField]);
         }
         
-        const yScale = d3.scaleLinear()
-            .domain(yDomain)
-            .range([innerHeight, 0]);
+        let yScale;
+        if (config.yAxis && config.yAxis.type === 'log') {
+            const yMin = yDomain[0] > 0 ? yDomain[0] : 1;
+            yScale = d3.scaleLog()
+                .domain([yMin, yDomain[1]])
+                .range([innerHeight, 0]);
+        } else {
+            yScale = d3.scaleLinear()
+                .domain(yDomain)
+                .range([innerHeight, 0]);
+        }
         
         // yRangeが明示的に設定されていない場合のみnice()を適用
         if (!(config.yRange && config.yRange.length === 2)) {
