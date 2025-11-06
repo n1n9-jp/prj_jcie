@@ -107,35 +107,64 @@ class MapController {
      * @param {string} mode - 表示モード
      */
     animateToView(center, zoom, mode = null) {
-        if (!this.mapManager.projection) {
+        if (!this.mapManager.projection || !this.mapManager.svg) {
             if (window.Logger) {
-                window.Logger.warn('MapController: Projection not initialized yet');
+                window.Logger.warn('MapController: Projection or SVG not initialized yet');
             }
             return;
         }
 
-        // 中心座標とズーム値を動的に計算
+        const duration = window.AppDefaults?.animation?.chartTransitionDuration || 1000;
+        const currentCenter = this.mapManager.projection.center();
+        const currentScale = this.mapManager.projection.scale();
+        const scaleMultiplier = (mode === 'single-city') ? 1.0 : 1.5; // 都市モードでは拡大なし
+        const targetScale = zoom * 150 * scaleMultiplier;
+
+        // 中心座標の安全性チェック
         const safeCenter = [
             (center && typeof center[0] === 'number' && !isNaN(center[0])) ? center[0] : 0,
             (center && typeof center[1] === 'number' && !isNaN(center[1])) ? center[1] : 0
         ];
-        const safeZoom = (typeof zoom === 'number' && !isNaN(zoom) && zoom > 0) ? zoom : 1;
 
-        // 滑らかなトランジション（D3.js transition）
-        const duration = window.AppDefaults?.animation?.normalDuration || 1000;
-
-        this.mapManager.svg.selectAll('.map-group')
+        // SVGに対してtransitionを適用（projectionではなく）
+        this.mapManager.svg
             .transition()
             .duration(duration)
-            .attr('transform', () => {
-                const scale = safeZoom * 150;
-                const translate = [
-                    this.mapManager.svg.attr('width') / 2 || 400,
-                    this.mapManager.svg.attr('height') / 2 || 300
-                ];
-                const projectionTranslate = this.mapManager.projection.translate(translate);
-                this.mapManager.projection.scale(scale).center(safeCenter);
-                return `translate(${translate[0]},${translate[1]})scale(${safeZoom})`;
+            .tween('projection', () => {
+                const interpolateCenter = d3.interpolate(currentCenter, safeCenter);
+                const interpolateScale = d3.interpolate(currentScale, targetScale);
+
+                return (t) => {
+                    this.mapManager.projection
+                        .center(interpolateCenter(t))
+                        .scale(interpolateScale(t));
+
+                    // パスを再描画
+                    this.mapManager.svg.selectAll('.map-country')
+                        .attr('d', this.mapManager.path);
+
+                    // 都市マーカーを更新
+                    this.mapManager.svg.selectAll('.map-city')
+                        .attr('cx', d => {
+                            const coords = this.mapManager.projection(this.mapManager.getCityCoordinates(d));
+                            return coords ? coords[0] : 0;
+                        })
+                        .attr('cy', d => {
+                            const coords = this.mapManager.projection(this.mapManager.getCityCoordinates(d));
+                            return coords ? coords[1] : 0;
+                        });
+
+                    // 都市ラベルを更新
+                    this.mapManager.svg.selectAll('.city-label')
+                        .attr('x', d => {
+                            const coords = this.mapManager.projection(this.mapManager.getCityCoordinates(d));
+                            return coords ? coords[0] : 0;
+                        })
+                        .attr('y', d => {
+                            const coords = this.mapManager.projection(this.mapManager.getCityCoordinates(d));
+                            return coords ? coords[1] - 10 : 0;
+                        });
+                };
             });
     }
 
