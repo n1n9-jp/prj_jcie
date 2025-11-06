@@ -11,7 +11,10 @@ class MapManager extends BaseManager {
         this.path = null;
         this.geoData = null;
         this.currentView = null;
-        
+
+        // MapRenderer のインスタンス化
+        this.renderer = null;
+
         // Initialize after properties are set
         this.init();
     }
@@ -139,102 +142,58 @@ class MapManager extends BaseManager {
 
     /**
      * SVG要素を初期化（レスポンシブ対応）
+     * MapRenderer へ委譲
      */
     initSVG(config = {}) {
-        
-        // 地図専用のレスポンシブサイズ計算
-        let responsiveSize;
-        if (config.widthPercent || config.heightPercent) {
-            // パーセント指定の場合は、コンテナサイズに基づいて計算
-            const containerElement = this.container.node();
-            const containerRect = containerElement.getBoundingClientRect();
-            const containerWidth = containerRect.width || window.innerWidth;
-            const containerHeight = containerRect.height || window.innerHeight;
-            
-            let width = config.width || 800;
-            let height = config.height || 600;
-            
-            if (config.widthPercent) {
-                width = containerWidth * (config.widthPercent / 100);
-            }
-            if (config.heightPercent) {
-                height = containerHeight * (config.heightPercent / 100);
-            }
-            
-            responsiveSize = { width, height };
-        } else if (window.SVGHelper) {
-            responsiveSize = SVGHelper.getResponsiveSize(this.container, {
-                defaultWidth: config.width || 800,
-                defaultHeight: config.height || 600,
-                aspectRatio: config.aspectRatio
-            });
-        } else {
-            // フォールバック：固定サイズ
-            responsiveSize = {
-                width: config.width || 800,
-                height: config.height || 600
-            };
+        // MapRenderer のインスタンスを作成（初回のみ）
+        if (!this.renderer) {
+            this.renderer = new window.MapRenderer(this.container, this);
         }
-        
-        const { width, height } = responsiveSize;
-        
-        this.container.selectAll('*').remove();
-        
-        // パーセント指定の場合は独自にSVGを作成
-        if (config.widthPercent || config.heightPercent) {
-            this.svg = this.container
-                .append('svg')
-                .attr('viewBox', `0 0 ${width} ${height}`)
-                .attr('preserveAspectRatio', 'xMidYMid meet')
-                .style('width', '100%')
-                .style('height', 'auto')
-                .style('max-width', '100%')
-                .style('display', 'block');
-        } else if (window.SVGHelper) {
-            // 固定サイズの場合はSVGHelperを使用
-            this.svg = SVGHelper.initSVG(this.container, width, height, {
-                responsive: true,
-                preserveAspectRatio: 'xMidYMid meet'
-            });
-        } else {
-            // フォールバック：従来の方法
-            this.svg = this.container
-                .append('svg')
-                .attr('width', width)
-                .attr('height', height)
-                .attr('viewBox', `0 0 ${width} ${height}`)
-                .style('width', '100%')
-                .style('height', '100%');
-        }
-            
 
-        // ズーム機能を追加
-        const zoom = d3.zoom()
-            .scaleExtent([0.5, 8])
-            .on('zoom', (event) => {
-                this.svg.select('.map-group')
-                    .attr('transform', event.transform);
-            });
+        // MapRenderer の initSVG を使用
+        const svg = this.renderer.initSVG(config);
 
-        this.svg.call(zoom);
-            
-        return this.svg;
+        // MapManager のプロパティを同期
+        this.svg = this.renderer.getSVG();
+        this.projection = this.renderer.getProjection();
+        this.path = this.renderer.getPath();
+
+        return svg;
     }
 
     /**
      * 地図を描画
      * @param {Object} geoData - GeoJSONデータ
      * @param {Object} config - 設定オプション
+     * MapRenderer へ委譲
      */
     renderMap(geoData, config = {}) {
-        
+        // MapRenderer のインスタンスを作成（初回のみ）
+        if (!this.renderer) {
+            this.renderer = new window.MapRenderer(this.container, this);
+        }
+
+        // MapRenderer の renderMap を使用
+        this.renderer.renderMap(geoData, config);
+
+        // MapManager のプロパティを同期
+        this.svg = this.renderer.getSVG();
+        this.projection = this.renderer.getProjection();
+        this.path = this.renderer.getPath();
+    }
+
+    /**
+     * 【非推奨】従来の renderMap 実装（削除予定）
+     * 互換性保持のため残存
+     */
+    _renderMapLegacy(geoData, config = {}) {
         // 再描画時は既存の拡散矢印を即座にクリア
         this.clearSpreadingArrows();
-        
-        const { 
-            center = [0, 0], 
-            zoom = 1, 
-            highlightCountries = [], 
+
+        const {
+            center = [0, 0],
+            zoom = 1,
+            highlightCountries = [],
             cities = [],
             useRegionColors = false,
             lightenNonVisited = false,

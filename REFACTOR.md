@@ -189,8 +189,117 @@
     - 02_tuberculosis/index.html に stacked-bar-chart-renderer.js スクリプト追加
     - 03_malariae/index.html には既に存在
 
+### 🔄 進行中
+- **2️⃣ 長大関数分割とクラス責務の明確化**: MapManager 分割を実施中
+  - **Phase 1 Step 1 完了**（2025-11-06）:
+    - ✅ MapRenderer クラスを新規作成（shared/assets/js/map-renderer.js）
+      - initSVG() メソッド: SVG初期化とレスポンシブ対応
+      - renderMap() メソッド: 地図描画、国境線、都市マーカー、ラベル、拡散矢印
+    - ✅ MapManager を MapRenderer 対応に修正
+      - renderMap() を MapRenderer に委譲
+      - initSVG() を MapRenderer に委譲
+      - プロパティ同期: this.svg, this.projection, this.path を MapRenderer から取得
+    - ✅ HTML に MapRenderer スクリプト読み込みを追加（全3感染症）
+      - script 読み込み順序確認: map-renderer.js → map-manager.js
+    - ✅ ブラウザでの動作確認完了
+      - MapRenderer クラスが正常に読み込まれる
+      - MapManager が MapRenderer を正常に使用できる
+      - 地図レンダリング機能に変化なし（互換性確認済み）
+
 ### ⏸️ 将来計画
 - その他すべて
+
+---
+
+## 候補2 実装計画（2025-11-06）
+
+### Phase 1: MapManager の分割（対象: 1588行）
+
+#### 分割方針
+MapManager を3つの専門クラスに分割：
+
+**1. MapRenderer（描画専用）**
+- 責務: SVG初期化、地図描画、UI更新
+- メソッド数: 8個
+- 行数（予想）: 400行
+```
+initSVG()
+renderMap()
+renderTimelineMap()
+updateCountryHighlights()
+updateCityMarkers()
+showCityMarker()
+drawSpreadingArrows()
+clearSpreadingArrows()
+```
+
+**2. MapController（制御・イベント）**
+- 責務: 地図の更新制御、イベントハンドリング、状態管理
+- メソッド数: 10個
+- 行数（予想）: 600行
+```
+updateMap()
+animateToView()
+highlightCountries()
+updateCities()
+updateExistingMap()
+handleMapProgress()
+getCurrentVisitedCountry()
+resize()
+setGeoData()
+destroy()
+```
+
+**3. CityManager（都市タイムライン管理）**
+- 責務: 都市タイムラインデータ管理、都市表示ロジック
+- メソッド数: 9個
+- 行数（予想）: 400行
+```
+initCitiesTimeline()
+handleSingleCityMode()
+initializeSingleCityMap()
+updateTimelineCities()
+updateGeographicInfo()
+getCityCoordinates()
+getCityStyle()
+getCityColor()
+animateToCity()
+```
+
+#### 実装順序
+1. ✅ **完了** MapRenderer クラスを新規作成 → Step 1 完了
+2. ⏳ MapController クラスを新規作成 → Step 2 予定
+3. ⏳ CityManager クラスを新規作成 → Step 3 予定
+4. ⏳ 既存 MapManager をラッパーにするか、段階的に廃止 → Step 4 予定
+5. ⏳ 統合テスト → Final 予定
+
+---
+
+### Phase 2: ChartManager の分割（対象: 1646行）
+
+対象メソッド:
+- updateChart() （200行超）
+  - チャートタイプ別の更新ロジックを分割
+  - Layout別処理の分離
+
+---
+
+### Phase 3: main.js の分割（対象: 1275行）
+
+対象メソッド:
+- handleStepEnter() （250行超）
+  - Step別処理の分割
+  - 各ステップタイプのハンドラー化
+
+---
+
+### 期待される改善
+
+| ファイル | 現在の行数 | 分割後 | 最大行数 | 改善効果 |
+|---------|----------|--------|--------|--------|
+| MapManager | 1588 | 3ファイル | 600 | 複雑度70%削減 |
+| ChartManager | 1646 | 複数 | 400 | 複雑度75%削減 |
+| main.js | 1275 | 複数 | 300 | 複雑度75%削減 |
 
 ---
 
@@ -322,6 +431,124 @@ window.Logger.timeEnd(ラベル);               // タイマー終了
 | CityFocusManager | 12+ | 2-3個 | ⚠️ 部分使用 | 都市管理の中央化 |
 | CountryRegionMapping | 8+ | 1-2個 | ⚠️ 部分使用 | 国-地域マッピングの統一化 |
 | ConfigLoader | 多数 | 10+個 | ✅ 十分使用 | 設定管理の核、現状維持 |
+
+---
+
+## 候補2 Phase 1 Step 1 実装詳細（2025-11-06）
+
+### 実装概要
+MapManager クラスから描画責務を分離し、MapRenderer という新しいクラスを作成しました。
+
+### 実装内容
+
+#### 1. MapRenderer クラスの新規作成
+**ファイル**: `shared/assets/js/map-renderer.js` (364行)
+
+**責務**: SVG初期化、地図描画、UI更新
+
+**実装メソッド**:
+- `constructor(container, mapManager)` - 初期化
+- `initSVG(config = {})` - SVG要素の初期化（レスポンシブ対応）
+  - パーセント指定サイズ計算
+  - viewBox属性とpreserveAspectRatioの設定
+  - D3.jsズーム機能の自動統合
+- `renderMap(geoData, config = {})` - 地図の描画
+  - 国境線の描画
+  - 地域別色分けの適用
+  - 都市マーカーの表示
+  - 都市ラベルの追加
+  - 拡散矢印の描画（step3用）
+- `getSVG()` - SVG要素への参照取得
+- `getProjection()` - 地図投影法への参照取得
+- `getPath()` - D3 geoPath への参照取得
+
+**特徴**:
+- MapManager への参照を持つ（getCityCoordinates等のユーティリティメソッド呼び出し用）
+- グローバルスコープ（window.MapRenderer）に登録
+- 既存 MapManager との互換性を完全に保持
+
+#### 2. MapManager の修正
+**ファイル**: `shared/assets/js/map-manager.js`
+
+**変更点**:
+- `this.renderer = null` プロパティを追加
+- `initSVG()` メソッドを MapRenderer へ委譲
+  ```javascript
+  initSVG(config = {}) {
+      if (!this.renderer) {
+          this.renderer = new window.MapRenderer(this.container, this);
+      }
+      return this.renderer.initSVG(config);
+  }
+  ```
+- `renderMap()` メソッドを MapRenderer へ委譲
+  ```javascript
+  renderMap(geoData, config = {}) {
+      if (!this.renderer) {
+          this.renderer = new window.MapRenderer(this.container, this);
+      }
+      this.renderer.renderMap(geoData, config);
+      // プロパティ同期
+      this.svg = this.renderer.getSVG();
+      this.projection = this.renderer.getProjection();
+      this.path = this.renderer.getPath();
+  }
+  ```
+- `_renderMapLegacy()` メソッドを削除予定の従来実装として保持
+
+**互換性**:
+- MapManager のパブリックインターフェースに変化なし
+- 既存コード（main.js、chart-manager.js等）は修正不要
+- this.svg, this.projection, this.path のプロパティは変わらず動作
+
+#### 3. HTML への統合
+**修正ファイル**:
+- `01_aids/index.html` 行321-322
+- `02_tuberculosis/index.html` 行348-349
+- `03_malariae/index.html` 行428-429
+
+**追加スクリプト**:
+```html
+<!-- Map renderer -->
+<script src="../shared/assets/js/map-renderer.js"></script>
+```
+
+**スクリプト読み込み順序**:
+1. chart renderers (bar, line, pie, grid, stacked-bar)
+2. **map-renderer.js** ← 新規追加
+3. pubsub.js
+4. chart-manager.js
+5. **map-manager.js** ← MapRenderer を使用するため、後に読み込み
+6. image-manager.js
+7. main.js
+
+#### 4. 動作確認（ブラウザテスト）
+✅ すべて確認済み
+
+**テスト項目**:
+- MapRenderer.js ファイルが HTTP 200 で読み込まれる（15.67 KB）
+- MapRenderer クラスがグローバルスコープで定義される
+- MapManager.renderMap() が MapRenderer に正常に委譲される
+- 地図レンダリング機能に変化なし（外部インターフェース不変）
+- 3感染症すべてで同じ動作を確認
+
+### 期待される効果
+
+| 項目 | 値 |
+|-----|-----|
+| MapManager行数削減 | 約200行削減（1588行 → 1388行） |
+| 複雑度削減 | 画面レンダリング責務を分離 |
+| テスト容易性 | MapRenderer を独立テスト可能に |
+| 保守性向上 | 責務が明確化 |
+
+### 次のステップ
+- **Phase 1 Step 2**: MapController クラスの作成
+  - 地図の更新制御
+  - イベントハンドリング
+  - 状態管理
+- **Phase 1 Step 3**: CityManager クラスの作成
+  - 都市タイムラインデータ管理
+  - 都市表示ロジック
 
 ---
 
