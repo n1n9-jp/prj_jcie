@@ -1,0 +1,793 @@
+{
+  "steps": [
+    {
+      "id": "opening",
+      "text": {
+        "content": "",
+        "visible": true,
+        "position": {
+          "horizontal": "center",
+          "vertical": "center",
+          "width": "100%",
+          "height": "100%"
+        }
+      },
+      "chart": {
+        "visible": false
+      },
+      "map": {
+        "visible": false
+      },
+      "image": {
+        "visible": true,
+        "src": "assets/images/opening.jpg",
+        "alt": "{{ disease_title }}",
+        "position": {
+          "horizontal": "center",
+          "vertical": "center",
+          "width": "100%",
+          "height": "100%"
+        },
+        "config": {
+          "opacity": 1.0,
+          "objectFit": "cover",
+          "specialMode": "step0-background"
+        }
+      }
+    },
+    {
+      "id": "intro",
+      "text": {
+        "content": "",
+        "visible": true,
+        "position": {
+          "width": "30%",
+          "horizontal": "center",
+          "vertical": "center"
+        }
+      },
+      "image": {
+        "visible": true,
+        "src": "assets/images/intro.jpg",
+        "alt": "",
+        "position": {
+          "horizontal": "center",
+          "vertical": "center",
+          "width": "100%",
+          "height": "100%"
+        },
+        "config": {
+          "opacity": 1.0,
+          "objectFit": "cover"
+        }
+      },
+      "chart": {
+        "visible": false
+      },
+      "map": {
+        "visible": false
+      }
+    },
+    {
+      "id": "global-burden",
+      "text": {
+        "content": "",
+        "visible": true,
+        "position": {
+          "width": "30%",
+          "horizontal": "center",
+          "vertical": "center"
+        }
+      },
+      "image": {
+        "visible": true,
+        "src": "assets/images/global-burden.jpg",
+        "alt": "",
+        "position": {
+          "horizontal": "center",
+          "vertical": "center",
+          "width": "100%",
+          "height": "100%"
+        },
+        "config": {
+          "opacity": 1.0,
+          "objectFit": "cover"
+        }
+      },
+      "chart": {
+        "visible": false
+      }
+    },
+    {
+      "id": "transmission",
+      "text": {
+        "content": "",
+        "visible": true,
+        "position": {
+          "width": "30%",
+          "horizontal": "center",
+          "vertical": "center"
+        }
+      },
+      "image": {
+        "visible": true,
+        "src": "assets/images/transmission.jpg",
+        "alt": "",
+        "position": {
+          "horizontal": "center",
+          "vertical": "center",
+          "width": "100%",
+          "height": "100%"
+        },
+        "config": {
+          "opacity": 1.0,
+          "objectFit": "cover"
+        }
+      },
+      "chart": {
+        "visible": false
+      }
+    },
+    {
+      "id": "infection-vs-disease",
+      "text": {
+        "content": "",
+        "visible": true,
+        "position": {
+          "width": "30%",
+          "horizontal": "center",
+          "vertical": "center"
+        }
+      },
+      "image": {
+        "visible": true,
+        "src": "assets/images/infection-vs-disease.jpg",
+        "alt": "",
+        "position": {
+          "horizontal": "center",
+          "vertical": "center",
+          "width": "100%",
+          "height": "100%"
+        },
+        "config": {
+          "opacity": 1.0,
+          "objectFit": "cover"
+        }
+      },
+      "chart": {
+        "visible": false
+      }
+    },
+    {
+      "id": "historical-impact",
+      "text": {
+        "content": "",
+        "visible": true,
+        "position": {
+          "width": "30%",
+          "horizontal": "center",
+          "vertical": "center"
+        }
+      },
+      "image": {
+        "visible": true,
+        "src": "assets/images/historical-impact.jpg",
+        "alt": "",
+        "position": {
+          "horizontal": "center",
+          "vertical": "center",
+          "width": "100%",
+          "height": "100%"
+        },
+        "config": {
+          "opacity": 1.0,
+          "objectFit": "cover"
+        }
+      },
+      "chart": {
+        "visible": false
+      }
+    },
+    {
+      "id": "medical-breakthroughs",
+      "text": {
+        "content": "",
+        "visible": true,
+        "position": {
+          "width": "30%",
+          "horizontal": "center",
+          "vertical": "center"
+        }
+      },
+      "image": {
+        "visible": true,
+        "src": "assets/images/medical-breakthroughs.jpg",
+        "alt": "",
+        "position": {
+          "horizontal": "center",
+          "vertical": "center",
+          "width": "100%",
+          "height": "100%"
+        },
+        "config": {
+          "opacity": 1.0,
+          "objectFit": "cover"
+        }
+      },
+      "chart": {
+        "visible": false
+      }
+    },
+    {
+      "id": "japan-history-1935",
+      "text": {
+        "content": "エイズの死亡者数",
+        "position": {
+          "width": "30%",
+          "height": "100%",
+          "horizontal": "right",
+          "vertical": "center"
+        }
+      },
+      "chart": {
+        "visible": true,
+        "type": "line",
+        "dataFile": "japan_tb_cases.csv",
+        "title": "日本国内における結核の新規患者数の推移",
+        "config": {
+          "widthPercent": 90,
+          "heightPercent": 70,
+          "margin": {
+            "top": 40,
+            "right": 50,
+            "bottom": 60,
+            "left": 80
+          },
+          "xAxis": {
+            "title": "年度"
+          },
+          "yAxisLabel": "新規感染者数（万人）",
+          "yAxisFormat": {
+            "type": "japanese",
+            "decimals": 0,
+            "units": {
+              "万": 10000
+            }
+          },
+          "title": "日本国内における結核の新規患者数の推移",
+          "dataSource": "公益財団法人結核予防会結核研究所疫学情報センター"
+        }
+      }
+    },
+    {
+      "id": "japan-bcg-introduction",
+      "text": {
+        "content": "エイズの死亡者数",
+        "position": {
+          "width": "30%",
+          "height": "100%",
+          "horizontal": "right",
+          "vertical": "center"
+        }
+      },
+      "chart": {
+        "visible": true,
+        "type": "line",
+        "dataFile": "japan_tb_cases.csv",
+        "title": "日本国内における結核の新規患者数の推移",
+        "config": {
+          "widthPercent": 90,
+          "heightPercent": 70,
+          "margin": {
+            "top": 40,
+            "right": 50,
+            "bottom": 60,
+            "left": 80
+          },
+          "xAxis": {
+            "title": "年度"
+          },
+          "yAxisLabel": "新規感染者数（万人）",
+          "yAxisFormat": {
+            "type": "japanese",
+            "decimals": 0,
+            "units": {
+              "万": 10000
+            }
+          },
+          "title": "日本国内における結核の新規患者数の推移",
+          "dataSource": "公益財団法人結核予防会結核研究所疫学情報センター"
+        }
+      }
+    },
+    {
+      "id": "japan-postwar-improvement",
+      "text": {
+        "content": "エイズの死亡者数",
+        "position": {
+          "width": "30%",
+          "height": "100%",
+          "horizontal": "right",
+          "vertical": "center"
+        }
+      },
+      "chart": {
+        "visible": true,
+        "type": "line",
+        "dataFile": "japan_tb_cases.csv",
+        "title": "日本国内における結核の新規患者数の推移",
+        "config": {
+          "widthPercent": 90,
+          "heightPercent": 70,
+          "margin": {
+            "top": 40,
+            "right": 50,
+            "bottom": 60,
+            "left": 80
+          },
+          "xAxis": {
+            "title": "年度"
+          },
+          "yAxisLabel": "新規感染者数（万人）",
+          "yAxisFormat": {
+            "type": "japanese",
+            "decimals": 0,
+            "units": {
+              "万": 10000
+            }
+          },
+          "title": "日本国内における結核の新規患者数の推移",
+          "dataSource": "公益財団法人結核予防会結核研究所疫学情報センター"
+        }
+      }
+    },
+    {
+      "id": "japan-current-status",
+      "text": {
+        "content": "エイズの死亡者数",
+        "position": {
+          "width": "30%",
+          "height": "100%",
+          "horizontal": "right",
+          "vertical": "center"
+        }
+      },
+      "chart": {
+        "visible": true,
+        "type": "line",
+        "dataFile": "japan_tb_cases.csv",
+        "title": "日本国内における結核の新規患者数の推移",
+        "config": {
+          "widthPercent": 90,
+          "heightPercent": 70,
+          "margin": {
+            "top": 40,
+            "right": 50,
+            "bottom": 60,
+            "left": 80
+          },
+          "xAxis": {
+            "title": "年度"
+          },
+          "yAxisLabel": "新規感染者数（万人）",
+          "yAxisFormat": {
+            "type": "japanese",
+            "decimals": 0,
+            "units": {
+              "万": 10000
+            }
+          },
+          "title": "日本国内における結核の新規患者数の推移",
+          "dataSource": "公益財団法人結核予防会結核研究所疫学情報センター"
+        }
+      }
+    },
+    {
+      "id": "global-end-tb-strategy",
+      "text": {
+        "content": "",
+        "visible": true,
+        "position": {
+          "width": "30%",
+          "horizontal": "center",
+          "vertical": "center"
+        }
+      },
+      "image": {
+        "visible": true,
+        "src": "assets/images/global-end-tb-strategy.jpg",
+        "alt": "",
+        "position": {
+          "horizontal": "center",
+          "vertical": "center",
+          "width": "100%",
+          "height": "100%"
+        },
+        "config": {
+          "opacity": 1.0,
+          "objectFit": "cover"
+        }
+      },
+      "chart": {
+        "visible": false
+      }
+    },
+    {
+      "id": "covid-impact",
+      "text": {
+        "content": "エイズの死亡者数",
+        "position": {
+          "width": "30%",
+          "height": "100%",
+          "horizontal": "right",
+          "vertical": "center"
+        }
+      },
+      "chart": {
+        "visible": true,
+        "type": "line",
+        "dataFile": "tb_infections_trend.csv",
+        "title": "結核感染者数の推移",
+        "config": {
+          "widthPercent": 100,
+          "heightPercent": 70,
+          "margin": {
+            "top": 40,
+            "right": 50,
+            "bottom": 60,
+            "left": 80
+          },
+          "xAxis": {
+            "title": "年"
+          },
+          "yAxisLabel": "新規感染者数（万人）",
+          "yAxisFormat": {
+            "type": "japanese",
+            "decimals": 0,
+            "units": {
+              "万": 10000
+            }
+          },
+          "yRange": [0, 14000000],
+          "title": "結核感染者数の推移",
+          "dataSource": "公益財団法人結核予防会結核研究所疫学情報センター",
+          "annotations": [
+            {
+              "type": "verticalLine",
+              "year": 2020,
+              "label": "2020年",
+              "position": "top-right"
+            },
+            {
+              "type": "verticalLine",
+              "year": 2023,
+              "label": "2023年",
+              "position": "top-right"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "covid-impact-2",
+      "text": {
+        "content": "エイズの死亡者数",
+        "position": {
+          "width": "30%",
+          "height": "100%",
+          "horizontal": "right",
+          "vertical": "center"
+        }
+      },
+      "chart": {
+        "visible": true,
+        "type": "line",
+        "dataFile": "tb_deaths_trend.csv",
+        "title": "結核による推定死亡者数の推移",
+        "config": {
+          "widthPercent": 100,
+          "heightPercent": 70,
+          "margin": {
+            "top": 40,
+            "right": 50,
+            "bottom": 60,
+            "left": 80
+          },
+          "xAxis": {
+            "title": "年"
+          },
+          "yAxisLabel": "死亡者数（万人）",
+          "yAxisFormat": {
+            "type": "japanese",
+            "decimals": 0,
+            "units": {
+              "万": 10000
+            }
+          },
+          "annotations": [
+            {
+              "type": "verticalLine",
+              "year": 2023,
+              "label": "2023年",
+              "position": "top-right"
+            }
+          ],
+          "title": "結核による推定死亡者数の推移",
+          "dataSource": "【To Be Delivered】"
+        }
+      }
+    },
+    {
+      "id": "country-episodes",
+      "text": {
+        "visible": true,
+        "position": {
+          "width": "60%",
+          "horizontal": "center",
+          "vertical": "center"
+        }
+      },
+      "map": {
+        "center": [0, 0],
+        "zoom": 1,
+        "visible": true,
+        "mode": "world-overview",
+        "cities": [],
+        "useRegionColors": true,
+        "lightenAllCountries": true,
+        "widthPercent": 100,
+        "heightPercent": 100
+      }
+    },
+    {
+      "id": "drug-resistance",
+      "text": {
+        "content": "",
+        "visible": true,
+        "position": {
+          "width": "30%",
+          "horizontal": "right",
+          "vertical": "center"
+        }
+      },
+      "chart": {
+        "layout": "dual",
+        "visible": true,
+        "position": {
+          "horizontal": "left",
+          "vertical": "center",
+          "width": "70%",
+          "height": "100%"
+        },
+        "charts": [
+          {
+            "id": "indonesia",
+            "type": "line",
+            "title": "インドネシアにおける結核感染者数の推移",
+            "dataFile": "data/indonesia_tb_trend.csv",
+            "position": "left",
+            "config": {
+              "widthPercent": 70,
+              "heightPercent": 100,
+              "xField": "year",
+              "yField": "value",
+              "yAxisLabel": "感染者数（万人）",
+              "color": "#ff6b6b",
+              "margin": {
+                "top": 40,
+                "right": 30,
+                "bottom": 60,
+                "left": 80
+              },
+              "xAxis": {
+                "title": "年"
+              },
+              "yRange": [0, 1200000],
+              "yAxis": {
+                "ticks": 5,
+                "tickValues": [0, 200000, 400000, 600000, 800000, 1000000]
+              },
+              "yAxisFormat": {
+                "type": "japanese",
+                "decimals": 0,
+                "units": {
+                  "万": 10000,
+                  "億": 100000000
+                }
+              },
+              "title": "インドネシアにおける結核感染者数の推移",
+              "dataSource": "【To Be Delivered】"
+            }
+          },
+          {
+            "id": "vietnam",
+            "type": "line",
+            "title": "ベトナムにおける結核感染者数の推移",
+            "dataFile": "data/vietnam_tb_trend.csv",
+            "position": "right",
+            "config": {
+              "widthPercent": 70,
+              "heightPercent": 100,
+              "xField": "year",
+              "yField": "value",
+              "yAxisLabel": "感染者数（万人）",
+              "color": "#4ecdc4",
+              "margin": {
+                "top": 40,
+                "right": 30,
+                "bottom": 60,
+                "left": 80
+              },
+              "xAxis": {
+                "title": "年"
+              },
+              "yRange": [0, 1200000],
+              "yAxis": {
+                "ticks": 5,
+                "tickValues": [0, 200000, 400000, 600000, 800000, 1000000]
+              },
+              "yAxisFormat": {
+                "type": "japanese",
+                "decimals": 0,
+                "units": {
+                  "万": 10000,
+                  "億": 100000000
+                }
+              },
+              "title": "ベトナムにおける結核感染者数の推移",
+              "dataSource": "【To Be Delivered】"
+            }
+          }
+        ]
+      },
+      "map": {
+        "visible": false
+      },
+      "image": {
+        "visible": false
+      }
+    },
+    {
+      "id": "funding-shortage",
+      "text": {
+        "content": "",
+        "position": {
+          "width": "30%",
+          "height": "100%",
+          "horizontal": "right",
+          "vertical": "center"
+        }
+      },
+      "chart": {
+        "visible": true,
+        "type": "line",
+        "dataFile": "結核対策予算の推移.csv",
+        "title": "結核対策予算の推移",
+        "config": {
+          "widthPercent": 90,
+          "heightPercent": 60,
+          "margin": {
+            "top": 40,
+            "right": 50,
+            "bottom": 60,
+            "left": 80
+          },
+          "xAxis": {
+            "title": "年"
+          },
+          "yAxisLabel": "予算【単位不明】",
+          "yAxisFormat": {
+            "type": "number",
+            "decimals": 0
+          },
+          "xField": "year",
+          "seriesField": "series",
+          "series": ["国内予算", "国際予算"],
+          "colors": ["#ff7f0e", "#2ca02c"],
+          "multiSeries": true,
+          "title": "結核対策予算の推移",
+          "dataSource": "【To Be Delivered】"
+        }
+      }
+    },
+    {
+      "id": "covid-setback",
+      "text": {
+        "content": "",
+        "visible": true,
+        "position": {
+          "width": "80%",
+          "horizontal": "center",
+          "vertical": "center"
+        }
+      },
+      "image": {
+        "visible": true,
+        "src": "assets/images/covid-setback.jpg",
+        "alt": "",
+        "position": {
+          "horizontal": "center",
+          "vertical": "center",
+          "width": "100%",
+          "height": "100%"
+        },
+        "config": {
+          "opacity": 1.0,
+          "objectFit": "cover"
+        }
+      },
+      "chart": {
+        "visible": false
+      }
+    },
+    {
+      "id": "drug-development-delay",
+      "text": {
+        "content": "",
+        "visible": true,
+        "position": {
+          "width": "80%",
+          "horizontal": "center",
+          "vertical": "center"
+        }
+      },
+      "image": {
+        "visible": true,
+        "src": "assets/images/drug-development-delay.jpg",
+        "alt": "",
+        "position": {
+          "horizontal": "center",
+          "vertical": "center",
+          "width": "100%",
+          "height": "100%"
+        },
+        "config": {
+          "opacity": 1.0,
+          "objectFit": "cover"
+        }
+      },
+      "chart": {
+        "visible": false
+      }
+    },
+    {
+      "id": "comprehensive-approach",
+      "text": {
+        "content": "",
+        "visible": true,
+        "position": {
+          "width": "80%",
+          "horizontal": "center",
+          "vertical": "center"
+        }
+      },
+      "image": {
+        "visible": true,
+        "src": "assets/images/comprehensive-approach.jpg",
+        "alt": "",
+        "position": {
+          "horizontal": "center",
+          "vertical": "center",
+          "width": "100%",
+          "height": "100%"
+        },
+        "config": {
+          "opacity": 1.0,
+          "objectFit": "cover"
+        }
+      },
+      "chart": {
+        "visible": false
+      }
+    },
+    {
+      "id": "footer",
+      "footer": {
+        "visible": true
+      },
+      "text": {
+        "visible": false
+      }
+    }
+  ]
+}

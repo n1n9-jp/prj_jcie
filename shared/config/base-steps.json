@@ -1,0 +1,947 @@
+{
+  "version": "2.0",
+  "description": "Base step structure - common to all diseases. Disease-specific values should override via disease-specific config files.",
+  "steps": [
+    {
+      "id": "opening",
+      "text": {
+        "content": "",
+        "visible": false
+      },
+      "chart": {
+        "visible": false
+      },
+      "map": {
+        "visible": false
+      },
+      "image": {
+        "src": "assets/images/opening.jpg",
+        "alt": "{{ disease_title }}",
+        "visible": true,
+        "position": {
+          "horizontal": "center",
+          "vertical": "center",
+          "width": "100%",
+          "height": "100%"
+        },
+        "config": {
+          "opacity": 1.0,
+          "objectFit": "cover",
+          "specialMode": "step0-background"
+        }
+      }
+    },
+    {
+      "id": "intro",
+      "text": {
+        "content": "{{ intro_text }}",
+        "visible": true,
+        "position": {
+          "width": "30%",
+          "horizontal": "center",
+          "vertical": "center"
+        }
+      },
+      "chart": {
+        "visible": false
+      },
+      "map": {
+        "visible": false
+      },
+      "image": {
+        "src": "assets/images/intro.jpg",
+        "alt": "{{ intro_alt }}",
+        "visible": true,
+        "position": {
+          "horizontal": "center",
+          "vertical": "center",
+          "width": "100%",
+          "height": "100%"
+        },
+        "config": {
+          "opacity": 0.9,
+          "objectFit": "cover"
+        }
+      }
+    },
+    {
+      "id": "treatment-progress",
+      "text": {
+        "content": "{{ treatment_progress_title }}",
+        "position": {
+          "width": "30%",
+          "horizontal": "center",
+          "vertical": "center"
+        }
+      },
+      "chart": {
+        "visible": false
+      },
+      "map": {
+        "visible": false
+      },
+      "image": {
+        "src": "assets/images/treatment-progress.jpg",
+        "alt": "{{ treatment_progress_alt }}",
+        "visible": true,
+        "position": {
+          "horizontal": "center",
+          "vertical": "center",
+          "width": "100%",
+          "height": "100%"
+        },
+        "config": {
+          "opacity": 0.9,
+          "objectFit": "cover"
+        }
+      }
+    },
+    {
+      "id": "history-overview",
+      "text": {
+        "content": "{{ history_overview_title }}",
+        "position": {
+          "width": "30%",
+          "horizontal": "right",
+          "vertical": "center"
+        }
+      },
+      "chart": {
+        "visible": false
+      },
+      "map": {
+        "visible": true,
+        "center": [-100, 40],
+        "zoom": 1.8,
+        "widthPercent": 100,
+        "heightPercent": 100,
+        "useRegionColors": true,
+        "lightenAllCountries": true,
+        "highlightCountries": "{{ history_highlight_countries }}"
+      },
+      "image": {
+        "visible": false
+      }
+    },
+    {
+      "id": "early-expansion",
+      "text": {
+        "content": "{{ early_expansion_text }}",
+        "position": {
+          "width": "30%",
+          "horizontal": "right",
+          "vertical": "center"
+        }
+      },
+      "chart": {
+        "visible": false
+      },
+      "map": {
+        "visible": true,
+        "center": [70, 10],
+        "zoom": 1.8,
+        "widthPercent": 100,
+        "heightPercent": 100,
+        "useRegionColors": true,
+        "lightenAllCountries": true,
+        "targetRegions": "{{ early_expansion_regions }}",
+        "showSpreadingArrows": false
+      },
+      "image": {
+        "visible": false
+      }
+    },
+    {
+      "id": "peak-crisis",
+      "text": {
+        "content": "{{ peak_crisis_title }}",
+        "position": {
+          "width": "30%",
+          "horizontal": "right",
+          "vertical": "center"
+        }
+      },
+      "chart": {
+        "type": "line",
+        "dataFile": "{{ peak_crisis_data_file }}",
+        "visible": true,
+        "position": {
+          "horizontal": "left",
+          "vertical": "center",
+          "width": "70%",
+          "height": "100%",
+          "padding": "2rem"
+        },
+        "config": {
+          "widthPercent": 70,
+          "heightPercent": 100,
+          "xField": "year",
+          "yField": "value",
+          "xAxisLabel": "年",
+          "yAxisLabel": "{{ peak_crisis_y_axis_label }}",
+          "seriesField": "series",
+          "multiSeries": true,
+          "title": "{{ peak_crisis_chart_title }}",
+          "dataSource": "Our World in Data",
+          "legendType": "inline",
+          "yAxisFormat": {
+            "type": "japanese",
+            "decimals": 0,
+            "units": {
+              "億": 100000000,
+              "万": 10000
+            }
+          },
+          "filter": "{{ peak_crisis_filter }}",
+          "yRange": [0, 4000000],
+          "animation": {
+            "mode": "progressive",
+            "duration": 3000,
+            "stepDelay": 200
+          },
+          "annotations": "{{ peak_crisis_annotations }}"
+        }
+      },
+      "map": {
+        "visible": false
+      },
+      "image": {
+        "visible": false
+      }
+    },
+    {
+      "id": "treatment-breakthrough",
+      "text": {
+        "content": "{{ treatment_breakthrough_title }}",
+        "position": {
+          "width": "30%",
+          "horizontal": "right",
+          "vertical": "center"
+        }
+      },
+      "chart": {
+        "type": "line",
+        "dataFile": "{{ treatment_breakthrough_data_file }}",
+        "visible": true,
+        "position": {
+          "horizontal": "left",
+          "vertical": "center",
+          "width": "70%",
+          "height": "100%",
+          "padding": "2rem"
+        },
+        "config": {
+          "widthPercent": 70,
+          "heightPercent": 100,
+          "xField": "year",
+          "yField": "value",
+          "xAxisLabel": "年",
+          "yAxisLabel": "{{ treatment_breakthrough_y_axis_label }}",
+          "yearRange": [1980, 2025],
+          "seriesField": "series",
+          "multiSeries": true,
+          "title": "{{ treatment_breakthrough_chart_title }}",
+          "dataSource": "Our World in Data",
+          "legendType": "inline",
+          "yAxisFormat": {
+            "type": "japanese",
+            "decimals": 0,
+            "units": {
+              "億": 100000000,
+              "万": 10000
+            }
+          },
+          "yRange": [0, 4000000],
+          "animation": {
+            "mode": "progressive",
+            "duration": 4000,
+            "stepDelay": 150
+          },
+          "annotations": "{{ treatment_breakthrough_annotations }}"
+        }
+      },
+      "map": {
+        "visible": false
+      },
+      "image": {
+        "visible": false
+      }
+    },
+    {
+      "id": "death-statistics",
+      "text": {
+        "content": "{{ death_statistics_title }}",
+        "position": {
+          "width": "30%",
+          "height": "100%",
+          "horizontal": "right",
+          "vertical": "center"
+        }
+      },
+      "chart": {
+        "type": "line",
+        "dataFile": "{{ death_statistics_data_file }}",
+        "visible": true,
+        "position": {
+          "horizontal": "left",
+          "vertical": "center",
+          "width": "70%",
+          "height": "100%",
+          "padding": "2rem"
+        },
+        "config": {
+          "widthPercent": 70,
+          "heightPercent": 100,
+          "xField": "year",
+          "yField": "value",
+          "xAxisLabel": "年",
+          "yAxisLabel": "{{ death_statistics_y_axis_label }}",
+          "yearRange": [1998, 2022],
+          "seriesField": "series",
+          "multiSeries": true,
+          "title": "{{ death_statistics_chart_title }}",
+          "dataSource": "Our World in Data",
+          "legendType": "inline",
+          "yAxisFormat": {
+            "type": "japanese",
+            "decimals": 0,
+            "units": {
+              "億": 100000000,
+              "万": 10000
+            }
+          },
+          "yRange": [0, 4000000],
+          "animation": {
+            "mode": "progressive",
+            "duration": 3500,
+            "stepDelay": 180
+          },
+          "annotations": "{{ death_statistics_annotations }}"
+        }
+      },
+      "map": {
+        "visible": false
+      },
+      "image": {
+        "visible": false
+      }
+    },
+    {
+      "id": "regional-disparity",
+      "text": {
+        "content": "{{ regional_disparity_title }}",
+        "position": {
+          "width": "30%",
+          "horizontal": "right",
+          "vertical": "center"
+        }
+      },
+      "chart": {
+        "layout": "grid",
+        "visible": true,
+        "position": {
+          "horizontal": "center",
+          "vertical": "center",
+          "width": "100%",
+          "height": "100%"
+        },
+        "config": {
+          "dataFile": "{{ regional_disparity_data_file }}",
+          "columns": 8,
+          "rows": 2,
+          "chartType": "pie",
+          "widthPercent": 100,
+          "heightPercent": 100,
+          "rowSpacing": 30,
+          "labelField": "region",
+          "valueField": "percentage",
+          "categoryField": "ageGroup",
+          "title": "{{ regional_disparity_chart_title }}",
+          "rowTitles": ["成人（15歳以上）", "こども（0歳から14際）"],
+          "dataSource": "{{ regional_disparity_data_source }}",
+          "showLabels": true,
+          "showPercentages": true,
+          "chartSizeMode": "responsive",
+          "maxChartWidth": 120,
+          "maxChartHeight": 120,
+          "minChartWidth": 80,
+          "minChartHeight": 80
+        }
+      },
+      "map": {
+        "visible": false
+      },
+      "image": {
+        "visible": false
+      }
+    },
+    {
+      "id": "mother-child-prevention",
+      "text": {
+        "content": "{{ mother_child_prevention_title }}",
+        "position": {
+          "width": "30%",
+          "horizontal": "right",
+          "vertical": "center"
+        }
+      },
+      "chart": {
+        "type": "line",
+        "dataFile": "{{ mother_child_prevention_data_file }}",
+        "visible": true,
+        "position": {
+          "horizontal": "left",
+          "vertical": "center",
+          "width": "70%",
+          "height": "100%",
+          "padding": "2rem"
+        },
+        "config": {
+          "widthPercent": 70,
+          "heightPercent": 100,
+          "xField": "year",
+          "yField": "value",
+          "xAxisLabel": "年",
+          "yAxisLabel": "{{ mother_child_prevention_y_axis_label }}",
+          "yearRange": [1990, 2025],
+          "seriesField": "series",
+          "multiSeries": false,
+          "seriesName": "{{ mother_child_prevention_series_name }}",
+          "colors": ["#10b981"],
+          "title": "{{ mother_child_prevention_chart_title }}",
+          "dataSource": "{{ mother_child_prevention_data_source }}",
+          "yRange": [0, 40],
+          "animation": {
+            "mode": "progressive",
+            "duration": 3500,
+            "stepDelay": 120
+          },
+          "annotations": "{{ mother_child_prevention_annotations }}"
+        }
+      },
+      "map": {
+        "visible": false
+      },
+      "image": {
+        "visible": false
+      }
+    },
+    {
+      "id": "episode-intro",
+      "text": {
+        "content": "{{ episode_intro_text }}",
+        "position": {
+          "width": "60%",
+          "horizontal": "center",
+          "vertical": "center"
+        }
+      },
+      "map": {
+        "center": [0, 0],
+        "zoom": 1,
+        "visible": true,
+        "mode": "world-overview",
+        "cities": [],
+        "useRegionColors": true,
+        "lightenAllCountries": true,
+        "widthPercent": 100,
+        "heightPercent": 100
+      }
+    },
+    {
+      "id": "city-episodes-0",
+      "text": {
+        "content": "{{ city_episode_0_title }}",
+        "position": {
+          "width": "30%",
+          "horizontal": "left",
+          "vertical": "center"
+        }
+      },
+      "map": {
+        "visible": true,
+        "mode": "single-city",
+        "cityId": "{{ city_episode_0_id }}",
+        "citiesFile": "config/cities-timeline.json",
+        "useRegionColors": true,
+        "lightenNonVisited": true,
+        "widthPercent": 100,
+        "heightPercent": 100
+      }
+    },
+    {
+      "id": "city-episodes-1",
+      "text": {
+        "content": "{{ city_episode_1_title }}",
+        "position": {
+          "width": "30%",
+          "horizontal": "left",
+          "vertical": "center"
+        }
+      },
+      "map": {
+        "visible": true,
+        "mode": "single-city",
+        "cityId": "{{ city_episode_1_id }}",
+        "citiesFile": "config/cities-timeline.json",
+        "useRegionColors": true,
+        "lightenNonVisited": true,
+        "widthPercent": 100,
+        "heightPercent": 100
+      }
+    },
+    {
+      "id": "city-episodes-2",
+      "text": {
+        "content": "{{ city_episode_2_title }}",
+        "position": {
+          "width": "30%",
+          "horizontal": "left",
+          "vertical": "center"
+        }
+      },
+      "map": {
+        "visible": true,
+        "mode": "single-city",
+        "cityId": "{{ city_episode_2_id }}",
+        "citiesFile": "config/cities-timeline.json",
+        "useRegionColors": true,
+        "lightenNonVisited": true,
+        "widthPercent": 100,
+        "heightPercent": 100
+      }
+    },
+    {
+      "id": "city-episodes-3",
+      "text": {
+        "content": "{{ city_episode_3_title }}",
+        "position": {
+          "width": "30%",
+          "horizontal": "left",
+          "vertical": "center"
+        }
+      },
+      "map": {
+        "visible": true,
+        "mode": "single-city",
+        "cityId": "{{ city_episode_3_id }}",
+        "citiesFile": "config/cities-timeline.json",
+        "useRegionColors": true,
+        "lightenNonVisited": true,
+        "widthPercent": 100,
+        "heightPercent": 100
+      }
+    },
+    {
+      "id": "city-episodes-4",
+      "text": {
+        "content": "{{ city_episode_4_title }}",
+        "position": {
+          "width": "30%",
+          "horizontal": "left",
+          "vertical": "center"
+        }
+      },
+      "map": {
+        "visible": true,
+        "mode": "single-city",
+        "cityId": "{{ city_episode_4_id }}",
+        "citiesFile": "config/cities-timeline.json",
+        "useRegionColors": true,
+        "lightenNonVisited": true,
+        "widthPercent": 100,
+        "heightPercent": 100
+      }
+    },
+    {
+      "id": "city-episodes-5",
+      "text": {
+        "content": "{{ city_episode_5_title }}",
+        "position": {
+          "width": "30%",
+          "horizontal": "left",
+          "vertical": "center"
+        }
+      },
+      "map": {
+        "visible": true,
+        "mode": "single-city",
+        "cityId": "{{ city_episode_5_id }}",
+        "citiesFile": "config/cities-timeline.json",
+        "useRegionColors": true,
+        "lightenNonVisited": true,
+        "widthPercent": 100,
+        "heightPercent": 100
+      }
+    },
+    {
+      "id": "city-episodes-6",
+      "text": {
+        "content": "{{ city_episode_6_title }}",
+        "position": {
+          "width": "30%",
+          "horizontal": "left",
+          "vertical": "center"
+        }
+      },
+      "map": {
+        "visible": true,
+        "mode": "single-city",
+        "cityId": "{{ city_episode_6_id }}",
+        "citiesFile": "config/cities-timeline.json",
+        "useRegionColors": true,
+        "lightenNonVisited": true,
+        "widthPercent": 100,
+        "heightPercent": 100
+      }
+    },
+    {
+      "id": "remaining-challenges",
+      "text": {
+        "content": "{{ remaining_challenges_title }}",
+        "position": {
+          "width": "30%",
+          "horizontal": "right",
+          "vertical": "center"
+        }
+      },
+      "chart": {
+        "layout": "dual",
+        "visible": true,
+        "position": {
+          "horizontal": "left",
+          "vertical": "center",
+          "width": "70%",
+          "height": "100%"
+        },
+        "charts": [
+          {
+            "id": "women",
+            "type": "line",
+            "title": "{{ remaining_challenges_women_title }}",
+            "dataFile": "{{ remaining_challenges_women_data_file }}",
+            "position": "left",
+            "config": {
+              "widthPercent": 70,
+              "heightPercent": 100,
+              "xField": "year",
+              "yField": "value",
+              "yAxisLabel": "{{ remaining_challenges_women_y_axis_label }}",
+              "seriesField": "series",
+              "dataSource": "{{ remaining_challenges_data_source }}",
+              "yRange": [0, 500000],
+              "multiSeries": true,
+              "legendType": "inline",
+              "yAxisFormat": {
+                "type": "japanese",
+                "decimals": 0,
+                "units": {
+                  "万": 10000
+                }
+              }
+            }
+          },
+          {
+            "id": "men",
+            "type": "line",
+            "title": "{{ remaining_challenges_men_title }}",
+            "dataFile": "{{ remaining_challenges_men_data_file }}",
+            "position": "right",
+            "config": {
+              "widthPercent": 70,
+              "heightPercent": 100,
+              "xField": "year",
+              "yField": "value",
+              "yAxisLabel": "{{ remaining_challenges_men_y_axis_label }}",
+              "seriesField": "series",
+              "dataSource": "{{ remaining_challenges_data_source }}",
+              "yRange": [0, 500000],
+              "multiSeries": true,
+              "legendType": "inline",
+              "yAxisFormat": {
+                "type": "japanese",
+                "decimals": 0,
+                "units": {
+                  "万": 10000
+                }
+              }
+            }
+          }
+        ]
+      },
+      "map": {
+        "visible": false
+      },
+      "image": {
+        "visible": false
+      }
+    },
+    {
+      "id": "solution-approaches",
+      "text": {
+        "content": "{{ solution_approaches_title }}",
+        "position": {
+          "width": "30%",
+          "horizontal": "right",
+          "vertical": "center"
+        }
+      },
+      "chart": {
+        "type": "line",
+        "dataFile": "{{ solution_approaches_data_file }}",
+        "visible": true,
+        "position": {
+          "horizontal": "left",
+          "vertical": "center",
+          "width": "70%",
+          "height": "100%"
+        },
+        "config": {
+          "widthPercent": 70,
+          "heightPercent": 100,
+          "xField": "year",
+          "yField": "value",
+          "xAxisLabel": "年",
+          "yAxisLabel": "{{ solution_approaches_y_axis_label }}",
+          "multiSeries": false,
+          "seriesName": "{{ solution_approaches_series_name }}",
+          "colors": ["#3b82f6"],
+          "title": "{{ solution_approaches_chart_title }}",
+          "dataSource": "{{ solution_approaches_data_source }}",
+          "yAxisFormat": {
+            "type": "japanese",
+            "decimals": 0,
+            "units": {
+              "億": 100000000,
+              "万": 10000
+            }
+          },
+          "animation": {
+            "mode": "progressive",
+            "duration": 2500,
+            "stepDelay": 200
+          }
+        }
+      },
+      "map": {
+        "visible": false
+      },
+      "image": {
+        "visible": false
+      }
+    },
+    {
+      "id": "funding-crisis",
+      "text": {
+        "content": "{{ funding_crisis_title }}",
+        "position": {
+          "width": "30%",
+          "horizontal": "right",
+          "vertical": "center"
+        }
+      },
+      "chart": {
+        "type": "line",
+        "dataFile": "{{ funding_crisis_data_file }}",
+        "visible": true,
+        "position": {
+          "horizontal": "left",
+          "vertical": "center",
+          "width": "70%",
+          "height": "100%"
+        },
+        "config": {
+          "widthPercent": 70,
+          "heightPercent": 100,
+          "xField": "year",
+          "yField": "value",
+          "xAxisLabel": "年",
+          "yAxisLabel": "{{ funding_crisis_y_axis_label }}",
+          "yearRange": [2000, 2025],
+          "yRange": [0, 35000000000],
+          "seriesField": "series",
+          "multiSeries": true,
+          "title": "{{ funding_crisis_chart_title }}",
+          "dataSource": "{{ funding_crisis_data_source }}",
+          "legendType": "inline",
+          "yAxisFormat": {
+            "type": "custom",
+            "format": ".0f",
+            "divisor": 100000000,
+            "suffix": "億ドル"
+          },
+          "animation": {
+            "mode": "progressive",
+            "duration": 3000,
+            "stepDelay": 150
+          },
+          "annotations": "{{ funding_crisis_annotations }}"
+        }
+      },
+      "map": {
+        "visible": false
+      },
+      "image": {
+        "visible": false
+      }
+    },
+    {
+      "id": "solidarity-message",
+      "text": {
+        "content": "{{ solidarity_message_text }}",
+        "position": {
+          "width": "80%",
+          "horizontal": "center",
+          "vertical": "center"
+        }
+      },
+      "chart": {
+        "visible": false
+      },
+      "map": {
+        "visible": false
+      },
+      "image": {
+        "src": "assets/images/solidarity-message.jpg",
+        "alt": "{{ solidarity_message_alt }}",
+        "visible": true,
+        "config": {
+          "width": "100%",
+          "height": "100%",
+          "position": "center",
+          "opacity": 0.9,
+          "objectFit": "cover"
+        }
+      }
+    },
+    {
+      "id": "call-to-action",
+      "text": {
+        "content": "{{ call_to_action_text }}",
+        "position": {
+          "width": "80%",
+          "horizontal": "center",
+          "vertical": "center"
+        }
+      },
+      "chart": {
+        "visible": false
+      },
+      "map": {
+        "visible": false
+      },
+      "image": {
+        "src": "assets/images/opening.jpg",
+        "alt": "{{ call_to_action_alt }}",
+        "visible": true,
+        "config": {
+          "width": "100%",
+          "height": "100%",
+          "position": "center",
+          "opacity": 0.9,
+          "objectFit": "cover"
+        }
+      }
+    },
+    {
+      "id": "footer",
+      "text": {
+        "content": "",
+        "visible": false
+      },
+      "chart": {
+        "visible": false
+      },
+      "map": {
+        "visible": false
+      },
+      "image": {
+        "visible": false
+      },
+      "footer": {
+        "visible": true
+      }
+    }
+  ],
+  "notes": {
+    "template_variables": {
+      "{{ disease_title }}": "感染症の全タイトル",
+      "{{ intro_text }}": "イントロダクションのテキスト",
+      "{{ intro_alt }}": "イントロ画像のalt属性",
+      "{{ disease }}": "感染症コード (aids, tuberculosis, malariae)",
+      "{{ treatment_progress_title }}": "治療進展の見出しテキスト",
+      "{{ treatment_progress_alt }}": "治療進展画像のalt属性",
+      "{{ history_overview_title }}": "歴史概観の見出しテキスト",
+      "{{ history_highlight_countries }}": "マップハイライト対象国の配列",
+      "{{ early_expansion_text }}": "初期拡大のテキスト",
+      "{{ early_expansion_regions }}": "初期拡大の対象地域配列",
+      "{{ peak_crisis_title }}": "ピーク危機の見出しテキスト",
+      "{{ peak_crisis_data_file }}": "ピーク危機のデータファイルパス",
+      "{{ peak_crisis_y_axis_label }}": "ピーク危機グラフのY軸ラベル",
+      "{{ peak_crisis_chart_title }}": "ピーク危機グラフのタイトル",
+      "{{ peak_crisis_filter }}": "ピーク危機グラフのフィルタ設定",
+      "{{ peak_crisis_annotations }}": "ピーク危機グラフのアノテーション配列",
+      "{{ treatment_breakthrough_title }}": "治療ブレークスルーの見出しテキスト",
+      "{{ treatment_breakthrough_data_file }}": "治療ブレークスルーのデータファイルパス",
+      "{{ treatment_breakthrough_y_axis_label }}": "治療ブレークスルーグラフのY軸ラベル",
+      "{{ treatment_breakthrough_chart_title }}": "治療ブレークスルーグラフのタイトル",
+      "{{ treatment_breakthrough_annotations }}": "治療ブレークスルーグラフのアノテーション配列",
+      "{{ death_statistics_title }}": "死亡統計の見出しテキスト",
+      "{{ death_statistics_data_file }}": "死亡統計のデータファイルパス",
+      "{{ death_statistics_y_axis_label }}": "死亡統計グラフのY軸ラベル",
+      "{{ death_statistics_chart_title }}": "死亡統計グラフのタイトル",
+      "{{ death_statistics_annotations }}": "死亡統計グラフのアノテーション配列",
+      "{{ regional_disparity_title }}": "地域格差の見出しテキスト",
+      "{{ regional_disparity_data_file }}": "地域格差のデータファイルパス",
+      "{{ regional_disparity_chart_title }}": "地域格差グラフのタイトル",
+      "{{ regional_disparity_data_source }}": "地域格差グラフのデータソース",
+      "{{ mother_child_prevention_title }}": "母子感染防止の見出しテキスト",
+      "{{ mother_child_prevention_data_file }}": "母子感染防止のデータファイルパス",
+      "{{ mother_child_prevention_y_axis_label }}": "母子感染防止グラフのY軸ラベル",
+      "{{ mother_child_prevention_series_name }}": "母子感染防止グラフのシリーズ名",
+      "{{ mother_child_prevention_chart_title }}": "母子感染防止グラフのタイトル",
+      "{{ mother_child_prevention_data_source }}": "母子感染防止グラフのデータソース",
+      "{{ mother_child_prevention_annotations }}": "母子感染防止グラフのアノテーション配列",
+      "{{ episode_intro_text }}": "エピソード導入のテキスト",
+      "{{ city_episode_0_title }}": "都市エピソード0のタイトル",
+      "{{ city_episode_0_id }}": "都市エピソード0のcityId",
+      "{{ city_episode_1_title }}": "都市エピソード1のタイトル",
+      "{{ city_episode_1_id }}": "都市エピソード1のcityId",
+      "{{ city_episode_2_title }}": "都市エピソード2のタイトル",
+      "{{ city_episode_2_id }}": "都市エピソード2のcityId",
+      "{{ city_episode_3_title }}": "都市エピソード3のタイトル",
+      "{{ city_episode_3_id }}": "都市エピソード3のcityId",
+      "{{ city_episode_4_title }}": "都市エピソード4のタイトル",
+      "{{ city_episode_4_id }}": "都市エピソード4のcityId",
+      "{{ city_episode_5_title }}": "都市エピソード5のタイトル",
+      "{{ city_episode_5_id }}": "都市エピソード5のcityId",
+      "{{ city_episode_6_title }}": "都市エピソード6のタイトル",
+      "{{ city_episode_6_id }}": "都市エピソード6のcityId",
+      "{{ remaining_challenges_title }}": "残存課題の見出しテキスト",
+      "{{ remaining_challenges_women_title }}": "残存課題女性グラフのタイトル",
+      "{{ remaining_challenges_women_data_file }}": "残存課題女性グラフのデータファイルパス",
+      "{{ remaining_challenges_women_y_axis_label }}": "残存課題女性グラフのY軸ラベル",
+      "{{ remaining_challenges_men_title }}": "残存課題男性グラフのタイトル",
+      "{{ remaining_challenges_men_data_file }}": "残存課題男性グラフのデータファイルパス",
+      "{{ remaining_challenges_men_y_axis_label }}": "残存課題男性グラフのY軸ラベル",
+      "{{ remaining_challenges_data_source }}": "残存課題グラフのデータソース",
+      "{{ solution_approaches_title }}": "解決方法の見出しテキスト",
+      "{{ solution_approaches_data_file }}": "解決方法のデータファイルパス",
+      "{{ solution_approaches_y_axis_label }}": "解決方法グラフのY軸ラベル",
+      "{{ solution_approaches_series_name }}": "解決方法グラフのシリーズ名",
+      "{{ solution_approaches_chart_title }}": "解決方法グラフのタイトル",
+      "{{ solution_approaches_data_source }}": "解決方法グラフのデータソース",
+      "{{ funding_crisis_title }}": "資金危機の見出しテキスト",
+      "{{ funding_crisis_data_file }}": "資金危機のデータファイルパス",
+      "{{ funding_crisis_y_axis_label }}": "資金危機グラフのY軸ラベル",
+      "{{ funding_crisis_chart_title }}": "資金危機グラフのタイトル",
+      "{{ funding_crisis_data_source }}": "資金危機グラフのデータソース",
+      "{{ funding_crisis_annotations }}": "資金危機グラフのアノテーション配列",
+      "{{ solidarity_message_text }}": "連帯メッセージのテキスト",
+      "{{ solidarity_message_alt }}": "連帯メッセージ画像のalt属性",
+      "{{ call_to_action_text }}": "行動喚起のテキスト",
+      "{{ call_to_action_alt }}": "行動喚起画像のalt属性"
+    },
+    "overrides": "疾患固有の値は disease-specific ファイルでオーバーライドしてください"
+  }
+}

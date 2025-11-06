@@ -93,7 +93,31 @@ class ConfigLoader {
             // content.jsonを読み込み
             if (this.mainConfig.configFiles.content) {
                 const contentPath = this._resolveConfigPath(this.mainConfig.configFiles.content);
-                this.configs.content = await this._loadConfig(contentPath) || {};
+                const content = await this._loadConfig(contentPath) || {};
+
+                // "extends" プロパティがある場合、参照されたファイルもロードしてマージ
+                if (content.extends) {
+                    try {
+                        const extendedPath = this._resolveConfigPath(content.extends);
+                        const extendedContent = await this._loadConfig(extendedPath);
+                        if (extendedContent) {
+                            // extendedContentをベースにして、contentでオーバーライド
+                            const mergeStrategy = {
+                                deep: true,
+                                arrayMerge: 'replace',
+                                overwriteOnConflict: true
+                            };
+                            this.configs.content = this._deepMerge(extendedContent, content, mergeStrategy);
+                        } else {
+                            this.configs.content = content;
+                        }
+                    } catch (error) {
+                        console.warn(`Failed to load extended config from ${content.extends}:`, error);
+                        this.configs.content = content;
+                    }
+                } else {
+                    this.configs.content = content;
+                }
             }
 
             // 設定をマージ
@@ -705,6 +729,103 @@ class ConfigLoader {
      */
     getBreakpoint(name) {
         return this.get(`app.breakpoints.${name}`, 768);
+    }
+
+    /**
+     * 感染症別設定とベース設定をマージ
+     * テンプレート変数の置換を含む
+     * @param {Object} baseSteps - ベースステップ構造
+     * @param {Object} diseaseOverride - 感染症別オーバーライド
+     * @param {Object} templateVars - テンプレート変数マップ
+     * @returns {Object} マージ済み設定
+     */
+    mergeDiseasConfig(baseSteps, diseaseOverride, templateVars = {}) {
+        // baseStepsとdiseaseOverrideをディープマージ
+        const mergeStrategy = {
+            deep: true,
+            arrayMerge: 'replace',
+            overwriteOnConflict: true
+        };
+
+        // diseaseOverrideがsteps配列を持つ場合、それが優先される（完全に置き換える）
+        let merged = this._deepMerge(baseSteps, diseaseOverride, mergeStrategy);
+
+        // テンプレート変数を置換
+        if (Object.keys(templateVars).length > 0) {
+            merged = this._substituteTemplateVariables(merged, templateVars);
+        }
+
+        return merged;
+    }
+
+    /**
+     * テンプレート変数を再帰的に置換
+     * @param {Object} obj - 対象オブジェクト
+     * @param {Object} vars - テンプレート変数マップ
+     * @returns {Object} 置換後のオブジェクト
+     * @private
+     */
+    _substituteTemplateVariables(obj, vars) {
+        if (typeof obj === 'string') {
+            // テンプレート変数を置換（例：{{ disease_title }} → vars.disease_title）
+            let result = obj;
+            for (const [key, value] of Object.entries(vars)) {
+                const placeholder = `{{ ${key} }}`;
+                if (typeof value === 'string' || typeof value === 'number') {
+                    result = result.replace(new RegExp(placeholder, 'g'), value);
+                }
+            }
+            return result;
+        }
+
+        if (Array.isArray(obj)) {
+            return obj.map(item => this._substituteTemplateVariables(item, vars));
+        }
+
+        if (obj !== null && typeof obj === 'object') {
+            const result = {};
+            for (const [key, value] of Object.entries(obj)) {
+                result[key] = this._substituteTemplateVariables(value, vars);
+            }
+            return result;
+        }
+
+        return obj;
+    }
+
+    /**
+     * 感染症の設定を読み込んでマージ
+     * @param {string} disease - 感染症コード (aids, tuberculosis, malariae)
+     * @returns {Promise<Object>} マージ済み設定
+     */
+    async loadDiseaseConfig(disease) {
+        try {
+            // ベース設定を読み込み
+            const basePath = '../../../shared/config/base-steps.json';
+            const baseConfig = await this._loadConfig(basePath);
+
+            // 感染症別オーバーライドを読み込み
+            const diseasePath = `../../../shared/config/disease-specific/${disease}.json`;
+            const diseaseOverride = await this._loadConfig(diseasePath);
+
+            if (!baseConfig || !diseaseOverride) {
+                console.warn(`Failed to load disease config for ${disease}`);
+                return null;
+            }
+
+            // テンプレート変数マップを作成（diseaseOverrideから）
+            const templateVars = {
+                disease: disease,
+                disease_title: diseaseOverride.disease_title || '',
+                ...diseaseOverride
+            };
+
+            // マージして返す
+            return this.mergeDiseasConfig(baseConfig, diseaseOverride, templateVars);
+        } catch (error) {
+            console.error(`Error loading disease config for ${disease}:`, error);
+            return null;
+        }
     }
 }
 

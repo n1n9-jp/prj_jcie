@@ -1,0 +1,140 @@
+{
+  "disease_title": "HIV/エイズとの闘い",
+  "intro_text": "エイズ対策の物語",
+  "intro_alt": "エイズ対策の物語の導入画像",
+  "treatment_progress_title": "はじめに",
+  "treatment_progress_alt": "エイズ対策の物語の導入画像",
+  "history_overview_title": "エイズの歴史",
+  "history_highlight_countries": ["United States", "United States of America", "USA"],
+  "early_expansion_text": "感染の世界的拡大\n\n1990年代に入ると、感染はヨーロッパやアジア、アフリカなどに急速に拡大していきました。",
+  "early_expansion_regions": ["西・中央ヨーロッパおよび北米", "アジア・太平洋地域", "東部・南部アフリカ", "西部・中部アフリカ"],
+  "peak_crisis_title": "新規感染者数の推移（1990-1998年）",
+  "peak_crisis_data_file": "data/trend_new_infections_normalized.csv",
+  "peak_crisis_y_axis_label": "感染者数（万人）",
+  "peak_crisis_chart_title": "新規HIV感染者数の推移（1990-1998年）",
+  "peak_crisis_filter": {
+    "type": "range",
+    "field": "year",
+    "range": [1990, 1998]
+  },
+  "peak_crisis_annotations": [
+    {
+      "type": "verticalLine",
+      "year": 1997,
+      "label": "世界の年間新規感染者のピークに達した年",
+      "position": "top-left"
+    },
+    {
+      "type": "horizontalLine",
+      "value": 3300000,
+      "label": "世界の年間新規感染者のピーク",
+      "position": "top-left"
+    }
+  ],
+  "treatment_breakthrough_title": "新規感染者数の推移（全期間データ）",
+  "treatment_breakthrough_data_file": "data/trend_new_infections_normalized.csv",
+  "treatment_breakthrough_y_axis_label": "感染者数（万人）",
+  "treatment_breakthrough_chart_title": "新規HIV感染者数の推移（全期間）",
+  "treatment_breakthrough_annotations": [
+    {
+      "type": "verticalLine",
+      "year": 1987,
+      "label": "1987年：最初の抗HIV薬が誕生",
+      "position": "top-left"
+    },
+    {
+      "type": "verticalLine",
+      "year": 1995,
+      "label": "1990年代後半：「多剤併用療法」（HAART）が導入",
+      "position": "top-right"
+    }
+  ],
+  "death_statistics_title": "エイズの死亡者数",
+  "death_statistics_data_file": "data/trend_new_deaths_normalized.csv",
+  "death_statistics_y_axis_label": "死亡者数（万人）",
+  "death_statistics_chart_title": "エイズ関連死亡者数の推移",
+  "death_statistics_annotations": [
+    {
+      "type": "verticalLine",
+      "year": 2002,
+      "label": "グローバルファンドが創設",
+      "position": "top-right"
+    }
+  ],
+  "regional_disparity_title": "地域別のHIV/エイズの治療機会",
+  "regional_disparity_data_file": "data/ratio_抗HIV治療.csv",
+  "regional_disparity_chart_title": "地域別HIV治療カバレッジ",
+  "regional_disparity_data_source": "UNAIDS 2024 疫学的推計値",
+  "mother_child_prevention_title": "母子感染防止の成果",
+  "mother_child_prevention_data_file": "data/trend_母子感染の推移.csv",
+  "mother_child_prevention_y_axis_label": "母子感染率",
+  "mother_child_prevention_series_name": "母子感染率",
+  "mother_child_prevention_chart_title": "HIV母子感染率の推移（%）",
+  "mother_child_prevention_data_source": "【To Be Delivered】",
+  "mother_child_prevention_annotations": [
+    {
+      "type": "horizontalLine",
+      "value": 8.7,
+      "label": "2023年には8.7%まで減少した",
+      "position": "right"
+    },
+    {
+      "type": "horizontalLine",
+      "value": 35.2,
+      "label": "最も感染率の高いサハラ以南アフリカ地域での母子間感染率",
+      "position": "right"
+    },
+    {
+      "type": "verticalLine",
+      "year": 1995,
+      "label": "1995年",
+      "position": "right"
+    }
+  ],
+  "episode_intro_text": "世界全体での取り組み",
+  "city_episode_0_title": "ムリカットの物語",
+  "city_episode_0_id": "lagos",
+  "city_episode_1_title": "闘うマラウイの女性達",
+  "city_episode_1_id": "lilongwe",
+  "city_episode_2_title": "ローズマリーの物語",
+  "city_episode_2_id": "nairobi",
+  "city_episode_3_title": "エリカ・カステヤノスの物語",
+  "city_episode_3_id": "belmopan",
+  "city_episode_4_title": "マーク・ダイブル（支援者）の物語",
+  "city_episode_4_id": "washington",
+  "city_episode_5_title": "モーリーン・ムレンガの物語",
+  "city_episode_5_id": "nairobi2",
+  "city_episode_6_title": "ジェフリー・アカバの物語",
+  "city_episode_6_id": "manila",
+  "remaining_challenges_title": "それでもなお存在する課題",
+  "remaining_challenges_women_title": "若年女性（15-24歳）",
+  "remaining_challenges_women_data_file": "data/trend_africa_young_woman_normalized.csv",
+  "remaining_challenges_women_y_axis_label": "新規感染者数（人）",
+  "remaining_challenges_men_title": "若年男性（15-24歳）",
+  "remaining_challenges_men_data_file": "data/trend_africa_young_man_normalized.csv",
+  "remaining_challenges_men_y_axis_label": "新規感染者数（人）",
+  "remaining_challenges_data_source": "UNAIDS epidemiological estimates, 2024",
+  "solution_approaches_title": "解決に向けて",
+  "solution_approaches_data_file": "data/trend_PrEP_normalized.csv",
+  "solution_approaches_y_axis_label": "PrEP利用者数（万人）",
+  "solution_approaches_series_name": "PrEP利用者数",
+  "solution_approaches_chart_title": "PrEP（曝露前予防投与）利用者数の推移",
+  "solution_approaches_data_source": "UNAIDS",
+  "funding_crisis_title": "継続的な支援の重要性",
+  "funding_crisis_data_file": "data/trend_エイズ対策の資金不足.csv",
+  "funding_crisis_y_axis_label": "資金（億ドル）",
+  "funding_crisis_chart_title": "エイズ対策資金の推移（資金源別）",
+  "funding_crisis_data_source": "Global Fund / Kaiser Family Foundation",
+  "funding_crisis_annotations": [
+    {
+      "type": "horizontalLine",
+      "value": 29300000000,
+      "label": "エイズの終結に向けた軌道に乗せるために必要とされる資金",
+      "position": "top-left"
+    }
+  ],
+  "solidarity_message_text": "連帯の力",
+  "solidarity_message_alt": "連帯の力を示す画像",
+  "call_to_action_text": "今後の展望",
+  "call_to_action_alt": "連帯の力を示す画像"
+}
