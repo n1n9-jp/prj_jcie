@@ -98,17 +98,33 @@ class ConfigLoader {
                 // "extends" プロパティがある場合、参照されたファイルもロードしてマージ
                 if (content.extends) {
                     try {
-                        const extendedPath = this._resolveConfigPath(content.extends);
+                        // extends のパスは相対パスとして扱う（_resolveConfigPath を通さない）
+                        const extendedPath = content.extends;
+                        console.log(`📁 Loading extended config: ${extendedPath}`);
                         const extendedContent = await this._loadConfig(extendedPath);
+
                         if (extendedContent) {
                             // extendedContentをベースにして、contentでオーバーライド
+                            // ただし、steps配列が空の場合はextendedContentのstepsを保持
                             const mergeStrategy = {
                                 deep: true,
-                                arrayMerge: 'replace',
+                                arrayMerge: 'keep-extended',
                                 overwriteOnConflict: true
                             };
-                            this.configs.content = this._deepMerge(extendedContent, content, mergeStrategy);
+
+                            // カスタムマージロジック：steps配列の特別処理
+                            const merged = this._deepMerge(extendedContent, content, mergeStrategy);
+
+                            // contentのstepsが空配列の場合、extendedContentのstepsを使用
+                            if (Array.isArray(content.steps) && content.steps.length === 0 &&
+                                Array.isArray(extendedContent.steps)) {
+                                merged.steps = extendedContent.steps;
+                                console.log(`✅ Merged ${extendedContent.steps.length} steps from extended config`);
+                            }
+
+                            this.configs.content = merged;
                         } else {
+                            console.warn(`⚠️ Extended config file not found or empty: ${extendedPath}`);
                             this.configs.content = content;
                         }
                     } catch (error) {
@@ -271,6 +287,11 @@ class ConfigLoader {
                         result[key] = [...source[key]];
                     } else if (strategy.arrayMerge === 'concat') {
                         result[key] = (result[key] || []).concat(source[key]);
+                    } else if (strategy.arrayMerge === 'keep-extended') {
+                        // targetに配列があればそれを保持、なければsourceを使用
+                        if (!Array.isArray(result[key])) {
+                            result[key] = [...source[key]];
+                        }
                     }
                 } else if (typeof source[key] === 'object' && source[key] !== null) {
                     // オブジェクトの再帰マージ

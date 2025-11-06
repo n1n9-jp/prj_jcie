@@ -1,6 +1,6 @@
 {
   "version": "2.0",
   "description": "マラリアコンテンツ設定（共有設定を継承）",
-  "extends": "../../../shared/config/disease-specific/malariae.json",
-  "note": "このファイルは共有される ../../../shared/config/disease-specific/malariae.json からコンテンツを継承しています。ConfigLoaderはこれらを自動的にマージします。詳細は shared/config/base-steps.json と shared/config/disease-specific/malariae.json を参照してください。"
+  "extends": "../../shared/config/disease-specific/malariae.json",
+  "steps": []
 }

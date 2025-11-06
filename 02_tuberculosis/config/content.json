@@ -1,6 +1,6 @@
 {
   "version": "2.0",
   "description": "結核コンテンツ設定（共有設定を継承）",
-  "extends": "../../../shared/config/disease-specific/tuberculosis.json",
-  "note": "このファイルは共有される ../../../shared/config/disease-specific/tuberculosis.json からコンテンツを継承しています。ConfigLoaderはこれらを自動的にマージします。詳細は shared/config/base-steps.json と shared/config/disease-specific/tuberculosis.json を参照してください。"
+  "extends": "../../shared/config/disease-specific/tuberculosis.json",
+  "steps": []
 }
