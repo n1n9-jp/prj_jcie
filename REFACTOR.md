@@ -179,6 +179,16 @@
 ### 📋 待機中
 - **8️⃣ ユーティリティクラスの使用率向上 - グループ2以降**: 部分使用や最適化対象の検討
 
+### ✅ 完了
+- **エラー修正（2025-11-06）**: step-definitions.js削除に伴うエラー対応
+  - STEP_DEFINITIONS の依存関係修正: step-mapper.js を ConfigLoader対応に修正
+    - _getStepDefinitions() メソッド追加（ConfigLoaderから動的に取得）
+    - _getMinimalDefinitions() メソッド追加（フォールバック）
+  - StackedBarChartRenderer の読み込み追加:
+    - 01_aids/index.html に stacked-bar-chart-renderer.js スクリプト追加
+    - 02_tuberculosis/index.html に stacked-bar-chart-renderer.js スクリプト追加
+    - 03_malariae/index.html には既に存在
+
 ### ⏸️ 将来計画
 - その他すべて
 

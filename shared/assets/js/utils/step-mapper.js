@@ -52,43 +52,108 @@ window.StepMapper = class StepMapper {
      */
     static calculateAllMappings() {
         if (this.cache) return this.cache;
-        
-        if (!window.STEP_DEFINITIONS) {
-            console.error('STEP_DEFINITIONS が読み込まれていません');
+
+        // ConfigLoader から steps を取得（STEP_DEFINITIONS の代替）
+        let stepDefinitions = this._getStepDefinitions();
+
+        if (!stepDefinitions || Object.keys(stepDefinitions).length === 0) {
+            if (window.Logger) {
+                window.Logger.error('STEP_DEFINITIONS を取得できません');
+            } else {
+                console.error('STEP_DEFINITIONS を取得できません');
+            }
             return {};
         }
-        
+
         const mappings = {};
         let currentIndex = 0;
-        
+
         // Step Definitionsに従って順序立ててマッピングを作成
-        for (const [stepName, definition] of Object.entries(window.STEP_DEFINITIONS)) {
+        for (const [stepName, definition] of Object.entries(stepDefinitions)) {
             if (definition.type === 'fixed') {
                 mappings[stepName] = currentIndex++;
-            } 
+            }
             else if (definition.type === 'dynamic') {
                 const count = this.getDynamicStepCount(stepName);
                 mappings[`${stepName}-start`] = currentIndex;
-                
+
                 // 個別の都市エピソード
                 for (let i = 0; i < count; i++) {
                     mappings[`${stepName}-${i}`] = currentIndex++;
                 }
-                
+
                 mappings[`${stepName}-end`] = currentIndex - 1;
                 mappings[`${stepName}-count`] = count;
             }
         }
-        
-        
+
+
         this.cache = mappings;
-        
+
         // デバッグ情報
         if (window.DEBUG_STEP_MAPPER) {
-            console.log('StepMapper: 計算されたマッピング', mappings);
+            const logger = window.Logger || console;
+            logger.log('StepMapper: 計算されたマッピング', mappings);
         }
-        
+
         return mappings;
+    }
+
+    /**
+     * ステップ定義を取得（ConfigLoader または STEP_DEFINITIONS から）
+     * @private
+     */
+    static _getStepDefinitions() {
+        // グローバル STEP_DEFINITIONS を優先
+        if (window.STEP_DEFINITIONS) {
+            return window.STEP_DEFINITIONS;
+        }
+
+        // ConfigLoader から步 情報を取得して STEP_DEFINITIONS を構築
+        if (window.ConfigLoader && window.ConfigLoader.loaded) {
+            const config = window.ConfigLoader.getLegacyCompatibleConfig();
+
+            if (config && config.steps) {
+                const definitions = {};
+
+                config.steps.forEach(step => {
+                    const stepId = step.id || step['data-step'];
+
+                    // 特別なステップを検出
+                    if (stepId === 'city-episodes' || stepId?.includes('city')) {
+                        definitions[stepId] = {
+                            type: 'dynamic',
+                            description: 'City episodes',
+                            contentType: 'mixed'
+                        };
+                    } else {
+                        definitions[stepId] = {
+                            type: 'fixed',
+                            description: stepId,
+                            contentType: 'mixed'
+                        };
+                    }
+                });
+
+                return definitions;
+            }
+        }
+
+        // フォールバック: 最小限の定義
+        return this._getMinimalDefinitions();
+    }
+
+    /**
+     * 最小限のステップ定義を取得（フォールバック用）
+     * @private
+     */
+    static _getMinimalDefinitions() {
+        return {
+            'opening': { type: 'fixed', description: 'Opening' },
+            'intro': { type: 'fixed', description: 'Introduction' },
+            'city-episodes': { type: 'dynamic', description: 'City episodes' },
+            'footer': { type: 'fixed', description: 'Footer' }
+        };
     }
     
     /**
