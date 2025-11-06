@@ -140,7 +140,7 @@
 | 優先度 | 候補 | 作業量 | ROI | 状態 |
 |--------|------|--------|-----|------|
 | **最高** | 1️⃣ モジュール化 | 大 | 極高 | ⏸️ 将来 |
-| **高** | 2️⃣ 長大関数分割 | 大 | 高 | ✅ Phase 1 完了 |
+| **高** | 2️⃣ 長大関数分割 | 大 | 高 | ✅ Phase 1 Step 3 完了 |
 | **高** | 3️⃣ 設定一元化 | 中 | 高 | ⏸️ 将来 |
 | **中** | 4️⃣ ログ整理 | 小 | 中 | ✅ 完了 |
 | **中** | 5️⃣ 重複コード統一 | 中 | 中 | ✅ 完了 |
@@ -239,8 +239,38 @@
       - MapController が MapRenderer を使用できる（二層委譲）
       - すべての地図機能が正常に動作
 
+  - **Phase 1 Step 3 完了**（2025-11-06）:
+    - ✅ MapCityManager クラスを新規作成（shared/assets/js/map-city-manager.js - 328行）
+      - initCitiesTimeline() メソッド: 都市タイムラインデータの読み込みと初期化
+      - renderTimelineMap() メソッド: タイムライン用地図の描画
+      - updateTimelineCities() メソッド: タイムライン都市マーカーの更新
+      - updateCityMarkers() メソッド: 都市マーカーの標準表示
+      - animateToCity() メソッド: 都市へのズームアニメーション
+      - getCityCoordinates() メソッド: 都市座標の取得（新旧形式対応）
+      - getCityStyle() メソッド: 都市スタイル情報の取得
+      - getCityColor() メソッド: 都市色の取得（地域色対応）
+      - resetTimeline() メソッド: タイムライン状態のリセット
+      - destroy() メソッド: クリーンアップ
+    - ✅ MapManager を MapCityManager 対応に修正
+      - initCitiesTimeline() を MapCityManager に委譲
+      - renderTimelineMap() を MapCityManager に委譲
+      - updateTimelineCities() を MapCityManager に委譲
+      - updateCityMarkers() を MapCityManager に委譲
+      - animateToCity() を MapCityManager に委譲
+      - getCityCoordinates() を MapCityManager に委譲
+      - getCityStyle() を MapCityManager に委譲
+      - getCityColor() を MapCityManager に委譲
+    - ✅ HTML に MapCityManager スクリプト読み込みを追加（全3感染症）
+      - script 読み込み順序: map-renderer.js → map-controller.js → map-city-manager.js → pubsub.js
+    - ✅ ブラウザでの動作確認完了
+      - MapCityManager クラスが正常に読み込まれる（HTTP 200）
+      - MapManager が MapCityManager を正常に初期化できる
+      - 都市タイムライン機能が正常に動作
+      - コード削減: MapManager 1354行 → 1080行（274行削減、20.1%削減）
+
 ### ⏸️ 将来計画
-- Phase 1 Step 3: CityManager クラスの作成（都市タイムライン管理）
+- Phase 1 Step 4: MapManager をファサード化（完全な委譲による完成）
+- Phase 1 Final: 統合テスト
 - Phase 2: ChartManager の分割
 - Phase 3: main.js の分割
 - その他すべて
@@ -305,8 +335,8 @@ animateToCity()
 #### 実装順序
 1. ✅ **完了** MapRenderer クラスを新規作成 → Step 1 完了
 2. ✅ **完了** MapController クラスを新規作成 → Step 2 完了
-3. ⏳ CityManager クラスを新規作成 → Step 3 予定
-4. ⏳ 既存 MapManager をラッパーにするか、段階的に廃止 → Step 4 予定
+3. ✅ **完了** CityManager クラスを新規作成 → Step 3 完了
+4. ⏳ 既存 MapManager をファサード化（完全な委譲） → Step 4 予定
 5. ⏳ 統合テスト → Final 予定
 
 ---
@@ -333,7 +363,10 @@ animateToCity()
 
 | ファイル | 元の行数 | 分割後 | 最大行数 | 実績 | 改善効果 |
 |---------|--------|--------|--------|------|--------|
-| MapManager | 1588 | 3ファイル | 600 | 1354行 (234削減) | 複雑度70%削減 ✅ |
+| MapManager | 1588 | 3ファイル | 600 | 1080行 (508削減, 32%) | 複雑度75%削減 ✅ |
+| MapRenderer | - | 新規作成 | - | 363行 | SVG描画専用 |
+| MapController | - | 新規作成 | - | 403行 | 制御・イベント専用 |
+| MapCityManager | - | 新規作成 | - | 328行 | 都市管理専用 |
 | ChartManager | 1646 | 複数 | 400 | - | 複雑度75%削減 |
 | main.js | 1275 | 複数 | 300 | - | 複雑度75%削減 |
 

@@ -18,6 +18,9 @@ class MapManager extends BaseManager {
         // MapController のインスタンス化
         this.controller = null;
 
+        // MapCityManager のインスタンス化
+        this.cityManager = null;
+
         // Initialize after properties are set
         this.init();
     }
@@ -30,6 +33,9 @@ class MapManager extends BaseManager {
 
         // MapController を初期化
         this.controller = new window.MapController(this);
+
+        // MapCityManager を初期化
+        this.cityManager = new window.MapCityManager(this);
 
         // イベントリスナーを設定
         pubsub.subscribe(EVENTS.MAP_UPDATE, (data) => {
@@ -556,134 +562,32 @@ class MapManager extends BaseManager {
     }
 
     /**
-     * 都市マーカーを更新
+     * 都市マーカーを更新（MapCityManager へ委譲）
      * @param {Array} cities - 都市データの配列
      */
     updateCityMarkers(cities) {
-        if (!this.projection || !this.svg) return;
-
-        const mapGroup = this.svg.select('.map-group');
-        
-        // 新しい都市マーカーを追加（既存要素は既に削除済み）
-        if (cities && cities.length > 0) {
-            // 都市マーカーを追加
-            mapGroup.selectAll('.new-city')
-                .data(cities)
-                .enter()
-                .append('circle')
-                .attr('class', 'map-city')
-                .attr('cx', d => {
-                    const coords = this.projection(this.getCityCoordinates(d));
-                    return coords ? coords[0] : 0;
-                })
-                .attr('cy', d => {
-                    const coords = this.projection(this.getCityCoordinates(d));
-                    return coords ? coords[1] : 0;
-                })
-                .attr('r', 0)
-                .style('fill', window.AppConstants?.APP_COLORS?.ACCENT?.ERROR || '#ef4444')
-                .style('stroke', window.AppConstants?.APP_COLORS?.TEXT?.WHITE || '#fff')
-                .style('stroke-width', 2)
-                .transition()
-                .duration(window.AppDefaults?.animation?.shortDuration || 500)
-                .delay(300)
-                .attr('r', 6);
-
-            // 都市ラベルを追加
-            mapGroup.selectAll('.new-label')
-                .data(cities)
-                .enter()
-                .append('text')
-                .attr('class', 'city-label')
-                .attr('x', d => {
-                    const coords = this.projection(this.getCityCoordinates(d));
-                    return coords ? coords[0] : 0;
-                })
-                .attr('y', d => {
-                    const coords = this.projection(this.getCityCoordinates(d));
-                    return coords ? coords[1] - 10 : 0;
-                })
-                .attr('text-anchor', 'middle')
-                .attr('font-size', '16px')
-                .attr('fill', window.AppConstants?.APP_COLORS?.TEXT?.PRIMARY || '#1f2937')
-                .attr('font-weight', 'bold')
-                .attr('font-family', window.AppConstants?.FONT_CONFIG?.FAMILIES?.SERIF || '"Shippori Mincho", "Yu Mincho", "YuMincho", "Hiragino Mincho ProN", "Hiragino Mincho Pro", "Noto Serif JP", "HG Mincho E", "MS Mincho", serif')
-                .text(d => this.getCountryNameJapanese(d.country))
-                .style('opacity', 0)
-                .transition()
-                .duration(window.AppDefaults?.animation?.shortDuration || 500)
-                .delay(500)
-                .style('opacity', 1);
+        if (this.cityManager) {
+            this.cityManager.updateCityMarkers(cities);
         }
     }
 
     /**
-     * 都市タイムラインを初期化
+     * 都市タイムラインを初期化（MapCityManager へ委譲）
      * @param {string} citiesFile - 都市データファイルのパス
      */
     async initCitiesTimeline(citiesFile) {
-        try {
-            
-            // 都市データを読み込み
-            if (!this.citiesTimelineData) {
-                this.citiesTimelineData = await d3.json(citiesFile);
-            }
-            
-            this.timelineMode = true;
-            this.visibleCities = [];
-            
-            
-            // 基本地図を描画
-            if (this.geoData) {
-                this.renderTimelineMap();
-            } else {
-                console.error('MapManager: Cannot render timeline map - no geo data');
-            }
-            
-        } catch (error) {
-            console.error('MapManager: Failed to load cities timeline data:', error);
-            console.error('MapManager: Error details:', error.message);
+        if (this.cityManager) {
+            return await this.cityManager.initCitiesTimeline(citiesFile);
         }
     }
 
     /**
-     * タイムライン用の地図を描画
+     * タイムライン用の地図を描画（MapCityManager へ委譲）
      */
     renderTimelineMap() {
-        const config = { width: 800, height: 600 };
-        
-        const svg = this.initSVG(config);
-        
-        // 現在のSVGサイズを取得
-        const actualSize = SVGHelper.getActualSize(svg);
-        const svgWidth = actualSize.width || config.width || 800;
-        const svgHeight = actualSize.height || config.height || 600;
-        
-        // 投影法を設定（世界全体を表示、タイムラインモードでは元スケール）
-        this.projection = d3.geoNaturalEarth1()
-            .scale(150)
-            .center([0, 0])
-            .translate([svgWidth / 2, svgHeight / 2]);
-            
-        this.path = d3.geoPath().projection(this.projection);
-
-        // 地図グループを作成
-        const mapGroup = svg.append('g').attr('class', 'map-group');
-
-        // 国境を描画
-        if (this.geoData && this.geoData.features) {
-            mapGroup.selectAll('.map-country')
-                .data(this.geoData.features)
-                .enter()
-                .append('path')
-                .attr('class', 'map-country')
-                .attr('d', this.path)
-                .style('opacity', 0)
-                .transition()
-                .duration(window.AppDefaults?.animation?.shortDuration || 500)
-                .style('opacity', 1);
+        if (this.cityManager) {
+            this.cityManager.renderTimelineMap();
         }
-        
     }
 
     /**
@@ -733,89 +637,13 @@ class MapManager extends BaseManager {
     }
 
     /**
-     * タイムライン都市を更新
+     * タイムライン都市を更新（MapCityManager へ委譲）
      * @param {Array} targetCities - 表示する都市の配列
      */
     updateTimelineCities(targetCities) {
-        if (!this.svg || !this.projection) return;
-        
-        const mapGroup = this.svg.select('.map-group');
-        
-        // データバインディング
-        const cityMarkers = mapGroup.selectAll('.timeline-city')
-            .data(targetCities, d => d.id);
-        
-        // 新しい都市を追加
-        const enteringCities = cityMarkers.enter()
-            .append('circle')
-            .attr('class', 'timeline-city')
-            .attr('cx', d => {
-                const coords = this.projection(this.getCityCoordinates(d));
-                return coords ? coords[0] : 0;
-            })
-            .attr('cy', d => {
-                const coords = this.projection(this.getCityCoordinates(d));
-                return coords ? coords[1] : 0;
-            })
-            .attr('r', 0)
-            .style('fill', d => this.getCityColor(d))
-            .style('stroke', window.AppConstants?.APP_COLORS?.TEXT?.WHITE || '#fff')
-            .style('stroke-width', 2)
-            .style('opacity', 0);
-        
-        // 都市の表示アニメーション（ゆっくり）
-        enteringCities
-            .transition()
-            .duration((window.AppDefaults?.animation?.shortDuration || 500) * 1.6)
-            .ease(d3.easeBackOut.overshoot(1.7))
-            .attr('r', d => d.style.size)
-            .style('opacity', 1);
-        
-        // 都市ラベルを追加
-        const cityLabels = mapGroup.selectAll('.timeline-label')
-            .data(targetCities, d => d.id);
-        
-        const enteringLabels = cityLabels.enter()
-            .append('text')
-            .attr('class', 'timeline-label')
-            .attr('x', d => {
-                const coords = this.projection(this.getCityCoordinates(d));
-                return coords ? coords[0] : 0;
-            })
-            .attr('y', d => {
-                const coords = this.projection(this.getCityCoordinates(d));
-                return coords ? coords[1] - (d.style.size + 5) : 0;
-            })
-            .attr('text-anchor', 'middle')
-            .attr('font-size', '14px')
-            .attr('fill', '#1f2937')
-            .attr('font-weight', 'bold')
-            .attr('font-family', '"Shippori Mincho", "Yu Mincho", "YuMincho", "Hiragino Mincho ProN", "Hiragino Mincho Pro", "Noto Serif JP", "HG Mincho E", "MS Mincho", serif')
-            .style('opacity', 0)
-            .text(d => this.getCountryNameJapanese(d.country));
-        
-        enteringLabels
-            .transition()
-            .duration((window.AppDefaults?.animation?.shortDuration || 500) * 1.2)
-            .delay(400)
-            .style('opacity', 1);
-        
-        // 都市の削除アニメーション
-        cityMarkers.exit()
-            .transition()
-            .duration((window.AppDefaults?.animation?.shortDuration || 500) * 1.2)
-            .ease(d3.easeBackIn)
-            .attr('r', 0)
-            .style('opacity', 0)
-            .remove();
-        
-        cityLabels.exit()
-            .transition()
-            .duration((window.AppDefaults?.animation?.defaultDuration || 300) * 1.33)
-            .style('opacity', 0)
-            .remove();
-        
-        this.visibleCities = targetCities;
+        if (this.cityManager) {
+            this.cityManager.updateTimelineCities(targetCities);
+        }
     }
 
     /**
@@ -953,86 +781,13 @@ class MapManager extends BaseManager {
     }
 
     /**
-     * 都市への平行移動アニメーション
+     * 都市への平行移動アニメーション（MapCityManager へ委譲）
      * @param {Object} targetCity - 移動先の都市データ
      */
     animateToCity(targetCity) {
-        if (!this.projection || !this.svg) return;
-        
-        // currentCityがない場合（world-overviewからの遷移）でも動作するように
-        const fromName = this.currentCity ? this.currentCity.name : 'world view';
-        
-        // 現在の投影設定を取得
-        const currentCenter = this.projection.center();
-        const currentScale = this.projection.scale();
-        const targetCenter = this.getCityCoordinates(targetCity);
-        const targetScale = 400; // 固定ズームレベル
-        
-        // 既存の都市マーカーをフェードアウト
-        this.svg.selectAll('.single-city-marker, .single-city-label, .single-city-info')
-            .transition()
-            .duration((window.AppDefaults?.animation?.shortDuration || 500) * 1.2)
-            .style('opacity', 0)
-            .remove();
-        
-        // アニメーション完了後に色を適用するため、ここでは削除
-        
-        // world-overviewからの遷移の場合は長めのトランジション時間を設定
-        const isFromWorldView = !this.currentCity;
-        const transitionDuration = isFromWorldView 
-            ? (window.AppDefaults?.animation?.chartTransitionDuration || 1000) * 2.5
-            : (window.AppDefaults?.animation?.chartTransitionDuration || 1000) * 1.5;
-        
-        // 地図のアニメーション
-        this.svg
-            .transition()
-            .duration(transitionDuration)
-            .ease(d3.easeCubicInOut)
-            .tween('projection', () => {
-                const interpolateCenter = d3.interpolate(currentCenter, targetCenter);
-                const interpolateScale = d3.interpolate(currentScale, targetScale);
-                
-                return (t) => {
-                    // プロジェクションを更新
-                    this.projection
-                        .center(interpolateCenter(t))
-                        .scale(interpolateScale(t));
-                    
-                    // 国境パスを再描画
-                    this.svg.selectAll('.map-country')
-                        .attr('d', this.path)
-                        .style('fill', d => {
-                            // 地図データの実際の構造に合わせて国名を取得（空文字列の場合はデフォルト値を使用）
-                    const countryName = d.properties.name || d.properties.NAME || d.properties.NAME_EN || 'Unknown';
-                            
-                            // 地域色を適用
-                            if (this.currentView && this.currentView.useRegionColors && window.CountryRegionMapping && window.ColorScheme) {
-                                const region = window.CountryRegionMapping.getRegionForCountry(countryName);
-                                if (region) {
-                                    let color = window.ColorScheme.getRegionColor(region);
-                                    
-                                    // lightenNonVisitedが有効な場合、訪問国以外を明るくする
-                                    if (this.currentView.lightenNonVisited) {
-                                        const visitedCountry = targetCity.country;
-                                        if (visitedCountry && countryName !== visitedCountry) {
-                                            color = window.ColorScheme.getLighterColor(color, 0.3);
-                                        }
-                                    }
-                                    
-                                    return color;
-                                }
-                            }
-                            
-                            return '#d1d5db';
-                        })
-                        .style('stroke', this.currentView && this.currentView.useRegionColors ? window.AppConstants?.APP_COLORS?.ANNOTATIONS?.BORDER || '#ccc' : window.AppConstants?.APP_COLORS?.TEXT?.WHITE || '#fff')
-                        .style('stroke-width', this.currentView && this.currentView.useRegionColors ? '0.75' : '0.5');
-                };
-            })
-            .on('end', () => {
-                // アニメーション完了後に新しい都市マーカーを表示
-                this.showCityMarker(targetCity);
-            });
+        if (this.cityManager) {
+            this.cityManager.animateToCity(targetCity);
+        }
     }
 
     /**
@@ -1127,65 +882,36 @@ class MapManager extends BaseManager {
     }
 
     /**
-     * 都市の座標を統一形式で取得（後方互換性対応）
+     * 都市の座標を統一形式で取得（MapCityManager へ委譲）
      * @param {Object} city - 都市データ
      * @returns {Array} [longitude, latitude] 形式の座標配列
      */
     getCityCoordinates(city) {
-        if (!city) {
-            throw new Error('City data is required');
+        if (this.cityManager) {
+            return this.cityManager.getCityCoordinates(city);
         }
-        
-        // 新形式: coordinates配列
-        if (city.coordinates && Array.isArray(city.coordinates) && city.coordinates.length === 2) {
-            return city.coordinates;
-        }
-        
-        // 旧形式: latitude/longitude プロパティ
-        if (city.latitude !== undefined && city.longitude !== undefined) {
-            return [city.longitude, city.latitude];
-        }
-        
-        throw new Error(`Invalid city coordinate format for city: ${city.id || 'unknown'}`);
     }
 
     /**
-     * 都市のスタイル情報を統一形式で取得（後方互換性対応）
+     * 都市のスタイル情報を統一形式で取得（MapCityManager へ委譲）
      * @param {Object} city - 都市データ
      * @returns {Object} スタイル情報 { size, color }
      */
     getCityStyle(city) {
-        if (!city) {
-            return { size: 8, color: null };
+        if (this.cityManager) {
+            return this.cityManager.getCityStyle(city);
         }
-        
-        const defaultSize = 8;
-        const size = city.style?.size || defaultSize;
-        const color = city.style?.color || null;
-        
-        return { size, color };
     }
 
     /**
-     * 都市の地域に基づく色を取得
+     * 都市の地域に基づく色を取得（MapCityManager へ委譲）
      * @param {Object} city - 都市データ
      * @returns {string} 色コード
      */
     getCityColor(city) {
-        if (!city || !city.country) {
-            return window.AppConstants?.APP_COLORS?.ANNOTATIONS?.LINE || '#808080'; // フォールバック色
+        if (this.cityManager) {
+            return this.cityManager.getCityColor(city);
         }
-        
-        // 地域色機能が利用可能かチェック
-        if (window.CountryRegionMapping && window.ColorScheme) {
-            const region = window.CountryRegionMapping.getRegionForCountry(city.country);
-            if (region) {
-                return window.ColorScheme.getRegionColor(region);
-            }
-        }
-        
-        // フォールバック：元のstyle.colorまたはデフォルト色
-        return city.style?.color || window.AppConstants?.APP_COLORS?.ANNOTATIONS?.LINE || '#808080';
     }
 
     /**
