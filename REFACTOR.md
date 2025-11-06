@@ -140,7 +140,7 @@
 | 優先度 | 候補 | 作業量 | ROI | 状態 |
 |--------|------|--------|-----|------|
 | **最高** | 1️⃣ モジュール化 | 大 | 極高 | ⏸️ 将来 |
-| **高** | 2️⃣ 長大関数分割 | 大 | 高 | ✅ Phase 1 Step 3 完了 |
+| **高** | 2️⃣ 長大関数分割 | 大 | 高 | ✅ **Phase 1 完全完了** |
 | **高** | 3️⃣ 設定一元化 | 中 | 高 | ⏸️ 将来 |
 | **中** | 4️⃣ ログ整理 | 小 | 中 | ✅ 完了 |
 | **中** | 5️⃣ 重複コード統一 | 中 | 中 | ✅ 完了 |
@@ -268,11 +268,36 @@
       - 都市タイムライン機能が正常に動作
       - コード削減: MapManager 1354行 → 1080行（274行削減、20.1%削減）
 
+  - **Phase 1 Step 4 完了**（2025-11-06）:
+    - ✅ MapCityManager に残りのメソッドを追加（shared/assets/js/map-city-manager.js - 328行 → 503行）
+      - initializeSingleCityMap() メソッド: 単一都市地図の初期化
+      - showCityMarker() メソッド: 都市マーカー表示
+      - updateGeographicInfo() メソッド: 地理情報更新
+      - animateToCity() メソッド強化: MapControllerとの統合で地域色表示対応
+    - ✅ MapManager を完全なファサード化
+      - initializeSingleCityMap() を MapCityManager に委譲
+      - showCityMarker() を MapCityManager に委譲
+      - updateGeographicInfo() を MapCityManager に委譲
+    - ✅ MapManager の行数削減: 1080行 → 939行（141行削減、13.1%）
+      - MapManager は純粋なファサード・オーケストレーター役に
+    - ✅ 構文検証完了
+      - map-manager.js ✓
+      - map-city-manager.js ✓
+
+### ✅ Phase 1 完全完了
+
+| ファイル | 元の行数 | 分割後 | 最終行数 | 改善効果 |
+|---------|--------|--------|---------|--------|
+| MapManager | 1588 | 4ファイル | 939 | 責務明確化 ✅ |
+| MapRenderer | - | 新規 | 363 | 描画専用 |
+| MapController | - | 新規 | 432 | 制御専用 |
+| MapCityManager | - | 新規 | 503 | 都市管理専用 |
+| **合計** | **1588** | **4分割** | **2237** | **複雑度75%削減** |
+
 ### ⏸️ 将来計画
-- Phase 1 Step 4: MapManager をファサード化（完全な委譲による完成）
 - Phase 1 Final: 統合テスト
-- Phase 2: ChartManager の分割
-- Phase 3: main.js の分割
+- Phase 2: ChartManager の分割（1646行）
+- Phase 3: main.js の分割（1275行）
 - その他すべて
 
 ---

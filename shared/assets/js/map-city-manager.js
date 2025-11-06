@@ -328,6 +328,167 @@ class MapCityManager {
     }
 
     /**
+     * 単一都市地図を初期化（初回のみ）
+     * @param {Object} targetCity - 表示する都市データ
+     */
+    initializeSingleCityMap(targetCity) {
+        const config = { width: 800, height: 600 };
+
+        const svg = this.mapManager.initSVG(config);
+
+        // SVGのviewBoxサイズを取得（パーセンテージ表示対応）
+        const viewBox = svg.attr('viewBox').split(' ');
+        const viewBoxWidth = parseFloat(viewBox[2]);
+        const viewBoxHeight = parseFloat(viewBox[3]);
+
+        // 投影法を設定（都市モードでは元スケール、viewBoxサイズを使用）
+        this.mapManager.projection = d3.geoNaturalEarth1()
+            .scale(400)
+            .center(this.getCityCoordinates(targetCity))
+            .translate([viewBoxWidth / 2, viewBoxHeight / 2]);
+
+        this.mapManager.path = d3.geoPath().projection(this.mapManager.projection);
+
+        // 地図グループを作成
+        const mapGroup = svg.append('g').attr('class', 'map-group');
+
+        // 国境を描画
+        if (this.mapManager.geoData && this.mapManager.geoData.features) {
+            mapGroup.selectAll('.map-country')
+                .data(this.mapManager.geoData.features)
+                .enter()
+                .append('path')
+                .attr('class', 'map-country')
+                .attr('d', this.mapManager.path)
+                .style('fill', d => {
+                    const countryName = d.properties.name || d.properties.NAME || d.properties.NAME_EN || 'Unknown';
+
+                    if (this.mapManager.currentView && this.mapManager.currentView.useRegionColors && window.CountryRegionMapping && window.ColorScheme) {
+                        const region = window.CountryRegionMapping.getRegionForCountry(countryName);
+                        if (region) {
+                            let color = window.ColorScheme.getRegionColor(region);
+
+                            if (this.mapManager.currentView.lightenNonVisited) {
+                                let visitedCountry = this.mapManager.getCurrentVisitedCountry();
+                                if (!visitedCountry && this.mapManager.currentCity) {
+                                    visitedCountry = this.mapManager.currentCity.country;
+                                }
+                                if (!visitedCountry && targetCity) {
+                                    visitedCountry = targetCity.country;
+                                }
+                                if (visitedCountry && countryName !== visitedCountry) {
+                                    color = window.ColorScheme.getLighterColor(color, 0.5);
+                                }
+                            }
+
+                            return color;
+                        }
+                    }
+
+                    return window.AppConstants?.APP_COLORS?.BACKGROUND?.LIGHT || '#d1d5db';
+                })
+                .style('stroke', this.mapManager.currentView && this.mapManager.currentView.useRegionColors ? window.AppConstants?.APP_COLORS?.ANNOTATIONS?.BORDER || '#ccc' : window.AppConstants?.APP_COLORS?.TEXT?.WHITE || '#fff')
+                .style('stroke-width', this.mapManager.currentView && this.mapManager.currentView.useRegionColors ? 0.75 : 0.5)
+                .style('opacity', 0)
+                .transition()
+                .duration(window.AppDefaults?.animation?.shortDuration || 500)
+                .style('opacity', 1);
+        }
+
+        // 初回都市マーカーを表示
+        this.showCityMarker(targetCity);
+    }
+
+    /**
+     * 都市マーカーを表示
+     * @param {Object} city - 都市データ
+     */
+    showCityMarker(city) {
+        // SVGのviewBoxサイズを取得
+        const viewBox = this.mapManager.svg.attr('viewBox').split(' ');
+        const viewBoxWidth = parseFloat(viewBox[2]);
+        const viewBoxHeight = parseFloat(viewBox[3]);
+
+        // プロジェクションの中心が都市座標と一致している場合、画面中央に配置
+        const projectionCenter = this.mapManager.projection.center();
+        const cityCoords = this.getCityCoordinates(city);
+        const isCityCenter = Math.abs(projectionCenter[0] - cityCoords[0]) < 0.001 &&
+                            Math.abs(projectionCenter[1] - cityCoords[1]) < 0.001;
+
+        let coords;
+        if (isCityCenter) {
+            // 都市が中心の場合は、強制的に画面中央に配置
+            coords = [viewBoxWidth / 2, viewBoxHeight / 2];
+        } else {
+            // 通常の投影計算
+            coords = this.mapManager.projection(cityCoords);
+        }
+
+        if (!coords) {
+            console.error('MapCityManager: Failed to project city coordinates:', city);
+            return;
+        }
+
+        const mapGroup = this.mapManager.svg.select('.map-group');
+
+        // 都市マーカーを追加
+        const markerColor = this.getCityColor(city);
+        const cityStyle = this.getCityStyle(city);
+
+        mapGroup.append('circle')
+            .attr('class', 'single-city-marker')
+            .attr('cx', coords[0])
+            .attr('cy', coords[1])
+            .attr('r', 0)
+            .style('fill', markerColor)
+            .style('stroke', window.AppConstants?.APP_COLORS?.TEXT?.WHITE || '#fff')
+            .style('stroke-width', 3)
+            .style('opacity', 0)
+            .transition()
+            .duration((window.AppDefaults?.animation?.shortDuration || 500) * 1.6)
+            .ease(d3.easeBackOut.overshoot(1.7))
+            .attr('r', cityStyle.size * 1.5)
+            .style('opacity', 1);
+
+        // 都市ラベルを追加
+        mapGroup.append('text')
+            .attr('class', 'single-city-label')
+            .attr('x', coords[0])
+            .attr('y', coords[1] - (cityStyle.size * 1.5 + 8))
+            .attr('text-anchor', 'middle')
+            .attr('font-size', '18px')
+            .attr('font-weight', 'bold')
+            .attr('font-family', '"Shippori Mincho", "Yu Mincho", "YuMincho", "Hiragino Mincho ProN", "Hiragino Mincho Pro", "Noto Serif JP", "HG Mincho E", "MS Mincho", serif')
+            .attr('fill', '#1f2937')
+            .style('opacity', 0)
+            .text(this.mapManager.getCountryNameJapanese(city.country))
+            .transition()
+            .duration((window.AppDefaults?.animation?.shortDuration || 500) * 1.2)
+            .delay(400)
+            .style('opacity', 1);
+
+        // 地理的情報をHTMLコンテナに動的表示
+        this.updateGeographicInfo(city);
+    }
+
+    /**
+     * 地理的情報をHTMLに動的表示（地図専用機能）
+     * @param {Object} city - 都市データ
+     */
+    updateGeographicInfo(city) {
+        // ステップIDから対応するHTMLコンテナを特定
+        const stepId = city.order + 2; // step3から開始（order 1 = step3）
+        const geoInfoContainer = document.getElementById(`geographic-info-${stepId}`);
+
+        if (!geoInfoContainer) {
+            return;
+        }
+
+        // 地理的情報を非表示にする
+        geoInfoContainer.style.display = 'none';
+    }
+
+    /**
      * クリーンアップ処理
      */
     destroy() {
