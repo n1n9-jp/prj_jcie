@@ -242,6 +242,20 @@ class MapCityManager {
                     this.mapManager.svg.selectAll('.map-country')
                         .attr('d', this.mapManager.path);
                 };
+            })
+            .on('end', () => {
+                // アニメーション完了後に訪問国色を適用（lightenNonVisited演出）
+                // MapControllerのupdateCountryHighlights()を使用
+                if (this.mapManager.controller) {
+                    // 訪問国をハイライト、他の国を明るくする
+                    this.mapManager.controller.updateCountryHighlights(
+                        [targetCity.country], // ハイライト国
+                        true,                  // useRegionColors
+                        true,                  // lightenNonVisited
+                        false,                 // lightenAllCountries
+                        []                     // targetRegions
+                    );
+                }
             });
     }
 
