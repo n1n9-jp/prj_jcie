@@ -5,23 +5,12 @@
 class StackedBarChartRenderer extends ChartRendererBase {
     constructor(containerId) {
         super(containerId);
+        this.type = 'stacked-bar';  // チャート種別を設定
         this.svg = null;
         this.currentChart = null;
         this.data = null;
         this.config = null;
         this.init();
-    }
-
-    /**
-     * イベントリスナーを設定
-     */
-    setupEventListeners() {
-        super.setupEventListeners();
-        pubsub.subscribe(EVENTS.CHART_UPDATE, (data) => {
-            if (data.type === 'stacked-bar') {
-                this.updateChart(data);
-            }
-        });
     }
 
     /**

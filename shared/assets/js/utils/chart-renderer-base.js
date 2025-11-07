@@ -16,6 +16,33 @@ class ChartRendererBase extends BaseManager {
     }
 
     /**
+     * チャート更新イベントの購読を設定
+     * BaseManager の RESIZE リスナーに加えて、CHART_UPDATE リスナーを登録
+     */
+    setupEventListeners() {
+        super.setupEventListeners();  // BaseManager の RESIZE リスナーを呼ぶ
+
+        // チャート更新イベント
+        pubsub.subscribe(EVENTS.CHART_UPDATE, (data) => {
+            if (this.isMyChart(data)) {
+                this.updateChart(data);
+            }
+        });
+    }
+
+    /**
+     * このレンダラーが処理すべきチャートデータかを判定
+     * 派生クラスでオーバーライド可能
+     *
+     * @param {Object} data - チャートデータ
+     * @returns {boolean} 処理すべき場合は true
+     */
+    isMyChart(data) {
+        // デフォルト実装：type プロパティで判定
+        return data.type === this.type;
+    }
+
+    /**
      * レスポンシブサイズを計算
      * 全レンダラーで共通実装
      *

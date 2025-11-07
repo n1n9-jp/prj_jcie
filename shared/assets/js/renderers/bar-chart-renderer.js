@@ -5,28 +5,14 @@
 class BarChartRenderer extends ChartRendererBase {
     constructor(containerId) {
         super(containerId);
+        this.type = 'bar';  // チャート種別を設定
         this.svg = null;
         this.currentChart = null;
         this.data = null;
         this.config = null;
-        
+
         // Initialize after properties are set
         this.init();
-    }
-
-
-    /**
-     * イベントリスナーを設定
-     */
-    setupEventListeners() {
-        super.setupEventListeners();
-        
-        // 棒グラフ特有のイベント
-        pubsub.subscribe(EVENTS.CHART_UPDATE, (data) => {
-            if (data.type === 'bar') {
-                this.updateChart(data);
-            }
-        });
     }
 
     /**

@@ -5,29 +5,26 @@
 class GridChartRenderer extends ChartRendererBase {
     constructor(containerId) {
         super(containerId);
+        this.type = 'grid';  // チャート種別を設定
         this.svg = null;
         this.currentChart = null;
         this.data = null;
         this.config = null;
         this.isUpdating = false; // 重複呼び出し防止フラグ
-        
+
         // Initialize after properties are set
         this.init();
     }
 
     /**
-     * イベントリスナーを設定
+     * このレンダラーが処理すべきチャートデータかを判定
+     * GridChartRenderer は layout === 'grid' で判定
+     *
+     * @param {Object} data - チャートデータ
+     * @returns {boolean} 処理すべき場合は true
      */
-    setupEventListeners() {
-        super.setupEventListeners();
-        
-        // グリッドチャート特有のイベント
-        pubsub.subscribe(EVENTS.CHART_UPDATE, (data) => {
-            // 厳密なチェック：grid layoutが明示的に指定されている場合のみ処理
-            if (data && data.layout === 'grid' && data.visible !== false) {
-                this.updateChart(data);
-            }
-        });
+    isMyChart(data) {
+        return data && data.layout === 'grid' && data.visible !== false;
     }
 
     /**

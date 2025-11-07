@@ -5,29 +5,15 @@
 class LineChartRenderer extends ChartRendererBase {
     constructor(containerId) {
         super(containerId);
+        this.type = 'line';  // チャート種別を設定
         this.svg = null;
         this.currentChart = null;
         this.data = null;
         this.config = null;
         this.animationTimers = []; // アニメーションタイマーを管理
-        
+
         // Initialize after properties are set
         this.init();
-    }
-
-
-    /**
-     * イベントリスナーを設定
-     */
-    setupEventListeners() {
-        super.setupEventListeners();
-        
-        // 線グラフ特有のイベント
-        pubsub.subscribe(EVENTS.CHART_UPDATE, (data) => {
-            if (data.type === 'line') {
-                this.updateChart(data);
-            }
-        });
     }
 
     /**
