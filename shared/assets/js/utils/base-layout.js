@@ -269,6 +269,193 @@ class BaseLayout {
             config: this.config
         };
     }
+
+    /**
+     * レイアウト設定の取得（DualLayout/TripleLayout で使用）
+     * @protected
+     * @param {Object} config - レイアウト設定
+     * @returns {Object} マージされたレイアウト設定
+     */
+    getLayoutConfig(config) {
+        if (!window.LayoutConfig) {
+            console.warn('LayoutConfig not available, using basic config');
+            return config;
+        }
+
+        // プリセットの適用
+        const preset = config.preset || `${this.layoutType.toUpperCase()}_HORIZONTAL`;
+        const presetConfig = LayoutConfig.PRESETS[preset] || {};
+
+        // デフォルト設定との統合
+        return window.ConfigHelper ?
+            ConfigHelper.mergeConfig(
+                LayoutConfig.DEFAULT_SETTINGS,
+                presetConfig,
+                config
+            ) :
+            { ...presetConfig, ...config };
+    }
+
+    /**
+     * チャートデータの準備（DualLayout/TripleLayout で使用）
+     * @protected
+     * @param {Array} charts - チャート設定配列
+     * @param {number} expectedCount - 期待されるチャート数
+     * @returns {Array} チャートデータ配列
+     */
+    prepareChartsData(charts, expectedCount) {
+        if (!charts || charts.length !== expectedCount) {
+            throw new Error(`${this.layoutType} layout requires exactly ${expectedCount} charts configuration`);
+        }
+
+        return charts.map((chartConfig) => {
+            if (chartConfig.data) {
+                return {
+                    config: chartConfig,
+                    data: chartConfig.data,
+                    error: null
+                };
+            } else {
+                console.error(`No data provided for chart: ${chartConfig.dataFile || 'unknown'}`);
+                return {
+                    config: chartConfig,
+                    data: null,
+                    error: new Error(`No data provided for chart: ${chartConfig.dataFile || 'unknown'}`)
+                };
+            }
+        });
+    }
+
+    /**
+     * チャートサイズの計算（DualLayout/TripleLayout で使用）
+     * @protected
+     * @param {HTMLElement} containerNode - コンテナ要素
+     * @param {Object} chartConfig - チャート設定
+     * @param {Object} layoutConfig - レイアウト設定
+     * @returns {Object} 計算されたサイズ
+     */
+    calculateChartSize(containerNode, chartConfig, layoutConfig) {
+        const containerRect = containerNode.getBoundingClientRect();
+
+        let width = containerRect.width;
+        let height = containerRect.height;
+
+        // 設定からのサイズ指定がある場合
+        if (chartConfig.width) {
+            width = typeof chartConfig.width === 'string' && chartConfig.width.includes('%')
+                ? containerRect.width * (parseFloat(chartConfig.width) / 100)
+                : chartConfig.width;
+        }
+
+        if (chartConfig.height) {
+            height = typeof chartConfig.height === 'string' && chartConfig.height.includes('%')
+                ? containerRect.height * (parseFloat(chartConfig.height) / 100)
+                : chartConfig.height;
+        }
+
+        // 最小・最大サイズの制約を適用
+        const constraints = layoutConfig.sizeConstraints || {};
+        width = Math.max(constraints.minWidth || 400, Math.min(width, constraints.maxWidth || 1200));
+        height = Math.max(constraints.minHeight || 300, Math.min(height, constraints.maxHeight || 800));
+
+        return { width, height };
+    }
+
+    /**
+     * レンダラーの取得または作成（DualLayout/TripleLayout で使用）
+     * @protected
+     * @param {string} chartType - チャートタイプ
+     * @param {number} index - チャートインデックス
+     * @param {string} containerId - コンテナID
+     * @returns {Object} チャートレンダラーインスタンス
+     */
+    getOrCreateRenderer(chartType, index, containerId) {
+        let renderer;
+        switch (chartType) {
+            case 'line':
+                renderer = new LineChartRenderer(`#${containerId}`);
+                break;
+            case 'bar':
+                renderer = new BarChartRenderer(`#${containerId}`);
+                break;
+            case 'pie':
+                renderer = new PieChartRenderer(`#${containerId}`);
+                break;
+            default:
+                throw new Error(`Unknown chart type: ${chartType}`);
+        }
+        return renderer;
+    }
+
+    /**
+     * エラー状態の表示（DualLayout/TripleLayout で使用）
+     * @protected
+     * @param {Object} container - D3 コンテナセレクション
+     * @param {Error} error - エラーオブジェクト
+     */
+    renderErrorState(container, error) {
+        container
+            .style('display', 'flex')
+            .style('align-items', 'center')
+            .style('justify-content', 'center')
+            .style('background-color', '#f8f8f8')
+            .style('border', '2px dashed #ddd')
+            .append('div')
+            .style('text-align', 'center')
+            .style('color', '#666')
+            .html(`
+                <p style="margin: 0 0 10px 0;">チャートデータの読み込みに失敗しました</p>
+                <p style="margin: 0; font-size: 0.9em; color: #999;">${error?.message || 'Unknown error'}</p>
+            `);
+    }
+
+    /**
+     * 各チャートの描画（DualLayout/TripleLayout で共通使用）
+     * @protected
+     * @param {Array} chartsData - チャートデータ配列
+     * @param {Object} layoutConfig - レイアウト設定
+     */
+    async renderCharts(chartsData, layoutConfig) {
+        for (let i = 0; i < chartsData.length; i++) {
+            const chartData = chartsData[i];
+            if (chartData.error || !chartData.data) {
+                console.warn(`${this.layoutType} Layout: Chart ${i} has error or no data:`, chartData.error);
+                this.renderErrorState(this.chartContainers[i], chartData.error);
+                continue;
+            }
+
+            const container = this.chartContainers[i];
+            const chartConfig = chartData.config;
+
+            // チャートサイズの計算
+            const size = this.calculateChartSize(container.node(), chartConfig, layoutConfig);
+
+            // チャートタイプに応じたレンダラーの取得または作成
+            const containerId = `${this.layoutType}-chart-${i}`;
+            container.node().id = containerId;
+            const renderer = this.getOrCreateRenderer(chartConfig.type, i, containerId);
+
+            try {
+                // チャートの描画
+                renderer.renderChart(chartConfig.type, chartData.data, {
+                    ...chartConfig,
+                    ...chartConfig.config,
+                    width: size.width,
+                    height: size.height
+                });
+
+                this.charts[i] = {
+                    renderer,
+                    config: chartConfig,
+                    data: chartData.data
+                };
+
+            } catch (error) {
+                console.error(`${this.layoutType} Layout: Error rendering chart ${i}:`, error);
+                this.renderErrorState(container, error);
+            }
+        }
+    }
 }
 
 // グローバルスコープで利用可能にする
