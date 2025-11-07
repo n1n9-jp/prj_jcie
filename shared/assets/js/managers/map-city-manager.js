@@ -109,19 +109,19 @@ class MapCityManager {
 
         // 新しい都市マーカーを追加
         if (targetCities.length > 0) {
+            // 座標投影計算を最適化（キャッシング）
+            const projectedData = targetCities.map(d => ({
+                ...d,
+                coords: this.mapManager.projection(this.getCityCoordinates(d))
+            }));
+
             mapGroup.selectAll('.timeline-city')
-                .data(targetCities)
+                .data(projectedData)
                 .enter()
                 .append('circle')
                 .attr('class', 'timeline-city')
-                .attr('cx', d => {
-                    const coords = this.mapManager.projection(this.getCityCoordinates(d));
-                    return coords ? coords[0] : 0;
-                })
-                .attr('cy', d => {
-                    const coords = this.mapManager.projection(this.getCityCoordinates(d));
-                    return coords ? coords[1] : 0;
-                })
+                .attr('cx', d => d.coords ? d.coords[0] : 0)
+                .attr('cy', d => d.coords ? d.coords[1] : 0)
                 .attr('r', d => {
                     const style = this.getCityStyle(d);
                     return style.size || 8;
@@ -134,18 +134,12 @@ class MapCityManager {
 
             // 都市ラベルを追加
             mapGroup.selectAll('.timeline-city-label')
-                .data(targetCities)
+                .data(projectedData)
                 .enter()
                 .append('text')
                 .attr('class', 'timeline-city-label')
-                .attr('x', d => {
-                    const coords = this.mapManager.projection(this.getCityCoordinates(d));
-                    return coords ? coords[0] : 0;
-                })
-                .attr('y', d => {
-                    const coords = this.mapManager.projection(this.getCityCoordinates(d));
-                    return coords ? coords[1] - 12 : 0;
-                })
+                .attr('x', d => d.coords ? d.coords[0] : 0)
+                .attr('y', d => d.coords ? d.coords[1] - 12 : 0)
                 .attr('text-anchor', 'middle')
                 .attr('font-size', '12px')
                 .attr('fill', window.AppConstants?.APP_COLORS?.TEXT?.PRIMARY || '#1f2937')
@@ -177,25 +171,31 @@ class MapCityManager {
 
         // 新しい都市マーカーを追加
         if (cities && cities.length > 0) {
+            // 座標投影計算を最適化（キャッシング）
+            const projectedData = cities.map(d => ({
+                ...d,
+                coords: this.mapManager.projection(this.getCityCoordinates(d))
+            }));
+
             mapGroup.selectAll('.map-city')
-                .data(cities)
+                .data(projectedData)
                 .enter()
                 .append('circle')
                 .attr('class', 'map-city')
-                .attr('cx', d => this.mapManager.projection(this.getCityCoordinates(d))[0])
-                .attr('cy', d => this.mapManager.projection(this.getCityCoordinates(d))[1])
+                .attr('cx', d => d.coords ? d.coords[0] : 0)
+                .attr('cy', d => d.coords ? d.coords[1] : 0)
                 .attr('r', 0)
                 .transition()
                 .duration(window.AppDefaults?.animation?.defaultDuration || 300)
                 .attr('r', 6);
 
             mapGroup.selectAll('.city-label')
-                .data(cities)
+                .data(projectedData)
                 .enter()
                 .append('text')
                 .attr('class', 'city-label')
-                .attr('x', d => this.mapManager.projection(this.getCityCoordinates(d))[0])
-                .attr('y', d => this.mapManager.projection(this.getCityCoordinates(d))[1] - 10)
+                .attr('x', d => d.coords ? d.coords[0] : 0)
+                .attr('y', d => d.coords ? d.coords[1] - 10 : 0)
                 .attr('text-anchor', 'middle')
                 .attr('font-size', '16px')
                 .attr('fill', window.AppConstants?.APP_COLORS?.TEXT?.PRIMARY || '#1f2937')
