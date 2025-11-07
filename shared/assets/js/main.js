@@ -420,7 +420,8 @@ class ScrollytellingApp {
                             ...stepConfig.chart.config, // configがある場合は展開
                             charts: chartsWithData, // データ付きのcharts配列
                             updateMode: updateMode,
-                            direction: direction
+                            direction: direction,
+                            layout: layout
                         };
                     } else if (layout === 'grid') {
                         // gridレイアウト: configをそのまま渡す
