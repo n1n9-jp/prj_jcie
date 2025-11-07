@@ -266,41 +266,33 @@ class BarChartRenderer extends ChartRendererBase {
      * @returns {Object} 検証結果 {valid: boolean, errors: Array}
      */
     validateChartData(data, config) {
+        // 基本クラスの検証を先に実行
+        const baseValidation = super.validateChartData(data, config);
+        if (!baseValidation.valid) {
+            return baseValidation;
+        }
+
         const errors = [];
 
-        // データの検証
-        if (!data || !Array.isArray(data)) {
-            errors.push('Data must be an array');
-        } else if (data.length === 0) {
-            errors.push('Data array is empty');
+        // 棒グラフ特有の検証：フィールドの存在確認
+        const xField = config.xField || 'category';
+        const yField = config.yField || 'value';
+
+        const hasXField = data.every(d => d.hasOwnProperty(xField));
+        const hasYField = data.every(d => d.hasOwnProperty(yField));
+
+        if (!hasXField) {
+            errors.push(`X field '${xField}' not found in all data items`);
+        }
+        if (!hasYField) {
+            errors.push(`Y field '${yField}' not found in all data items`);
         }
 
-        // 設定の検証
-        if (!config || typeof config !== 'object') {
-            errors.push('Config must be an object');
-        }
-
-        // フィールドの存在確認
-        if (data && data.length > 0 && config) {
-            const xField = config.xField || 'category';
-            const yField = config.yField || 'value';
-            
-            const hasXField = data.every(d => d.hasOwnProperty(xField));
-            const hasYField = data.every(d => d.hasOwnProperty(yField));
-            
-            if (!hasXField) {
-                errors.push(`X field '${xField}' not found in all data items`);
-            }
-            if (!hasYField) {
-                errors.push(`Y field '${yField}' not found in all data items`);
-            }
-            
-            // Y値が数値かどうかチェック
-            if (hasYField) {
-                const hasValidYValues = data.every(d => !isNaN(+d[yField]));
-                if (!hasValidYValues) {
-                    errors.push(`Y field '${yField}' contains non-numeric values`);
-                }
+        // Y値が数値かどうかチェック
+        if (hasYField) {
+            const hasValidYValues = data.every(d => !isNaN(+d[yField]));
+            if (!hasValidYValues) {
+                errors.push(`Y field '${yField}' contains non-numeric values`);
             }
         }
 

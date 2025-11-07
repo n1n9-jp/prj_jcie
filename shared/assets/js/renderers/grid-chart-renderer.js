@@ -645,34 +645,26 @@ class GridChartRenderer extends ChartRendererBase {
      * @returns {Object} 検証結果 {valid: boolean, errors: Array}
      */
     validateChartData(data, config) {
+        // 基本クラスの検証を先に実行
+        const baseValidation = super.validateChartData(data, config);
+        if (!baseValidation.valid) {
+            return baseValidation;
+        }
+
         const errors = [];
 
-        // データの検証
-        if (!data || !Array.isArray(data)) {
-            errors.push('Data must be an array');
-        } else if (data.length === 0) {
-            errors.push('Data array is empty');
+        // グリッドレイアウト特有の検証：グリッド設定パラメータ
+        if (config.columns && (!Number.isInteger(config.columns) || config.columns <= 0)) {
+            errors.push('Columns must be a positive integer');
         }
-
-        // 設定の検証
-        if (!config || typeof config !== 'object') {
-            errors.push('Config must be an object');
+        if (config.rows && (!Number.isInteger(config.rows) || config.rows <= 0)) {
+            errors.push('Rows must be a positive integer');
         }
-
-        // グリッド設定の検証
-        if (config) {
-            if (config.columns && (!Number.isInteger(config.columns) || config.columns <= 0)) {
-                errors.push('Columns must be a positive integer');
-            }
-            if (config.rows && (!Number.isInteger(config.rows) || config.rows <= 0)) {
-                errors.push('Rows must be a positive integer');
-            }
-            if (config.chartWidth && (typeof config.chartWidth !== 'number' || config.chartWidth <= 0)) {
-                errors.push('Chart width must be a positive number');
-            }
-            if (config.chartHeight && (typeof config.chartHeight !== 'number' || config.chartHeight <= 0)) {
-                errors.push('Chart height must be a positive number');
-            }
+        if (config.chartWidth && (typeof config.chartWidth !== 'number' || config.chartWidth <= 0)) {
+            errors.push('Chart width must be a positive number');
+        }
+        if (config.chartHeight && (typeof config.chartHeight !== 'number' || config.chartHeight <= 0)) {
+            errors.push('Chart height must be a positive number');
         }
 
         return {

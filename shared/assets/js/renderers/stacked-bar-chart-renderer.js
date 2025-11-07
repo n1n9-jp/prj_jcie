@@ -87,17 +87,21 @@ class StackedBarChartRenderer extends ChartRendererBase {
      * チャートデータとコンフィグを検証
      */
     validateChartData(data, config) {
+        // 基本クラスの検証を先に実行
+        const baseValidation = super.validateChartData(data, config);
+        if (!baseValidation.valid) {
+            return baseValidation;
+        }
+
         const errors = [];
-        if (!data || !Array.isArray(data) || data.length === 0) {
-            errors.push('Data is invalid or empty');
-        }
-        if (!config || typeof config !== 'object') {
-            errors.push('Config must be an object');
-        }
+
+        // 積み重ね棒グラフ特有の検証：stackKeys の確認
         if (!config.stackKeys || !Array.isArray(config.stackKeys) || config.stackKeys.length < 1) {
             errors.push('Config must include a stackKeys array with at least one key.');
         }
-        if (data && data.length > 0 && config.stackKeys) {
+
+        // stackKeys のプロパティがデータに存在するか確認
+        if (data.length > 0 && config.stackKeys) {
             const firstItem = data[0];
             for (const key of config.stackKeys) {
                 if (!firstItem.hasOwnProperty(key)) {
@@ -106,6 +110,7 @@ class StackedBarChartRenderer extends ChartRendererBase {
                 }
             }
         }
+
         return { valid: errors.length === 0, errors };
     }
 
