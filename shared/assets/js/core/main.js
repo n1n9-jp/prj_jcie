@@ -112,13 +112,26 @@ class ScrollytellingApp {
                 debug: false
             })
             .onStepEnter((response) => {
-                this.handleStepEnter(response);
+                EventHandlers.handleStepEnter(response, this);
+
+                // ポジショニング処理
+                const stepLogicalName = response.element.getAttribute('data-step');
+                const stepConfig = this.config?.steps?.find(step => step.id === stepLogicalName);
+                if (stepConfig) {
+                    this.applyStepPositioning(stepConfig, stepLogicalName);
+                    this.applyTextPositioning(stepConfig, stepLogicalName);
+
+                    // フッター更新
+                    if (stepConfig.footer) {
+                        this.renderFooter(stepConfig.footer);
+                    }
+                }
             })
             .onStepExit((response) => {
-                this.handleStepExit(response);
+                EventHandlers.handleStepExit(response);
             })
             .onStepProgress((response) => {
-                this.handleStepProgress(response);
+                EventHandlers.handleStepProgress(response, this);
             });
     }
 
