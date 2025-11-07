@@ -531,57 +531,6 @@ class LineChartRenderer extends ChartRendererBase {
     }
 
     /**
-     * データにフィルタを適用
-     * @param {Array} data - 生データ
-     * @param {Object} filterConfig - フィルタ設定
-     * @returns {Array} フィルタ済みデータ
-     */
-    applyFilter(data, filterConfig) {
-        if (!filterConfig || !data || data.length === 0) {
-            return data;
-        }
-
-        const { type, field, range, values, exclude } = filterConfig;
-
-        switch (type) {
-            case 'range':
-                if (range && range.length === 2 && field) {
-                    const [min, max] = range;
-                    return data.filter(d => {
-                        const value = +d[field];
-                        return value >= min && value <= max;
-                    });
-                }
-                break;
-
-            case 'values':
-                if (values && values.length > 0 && field) {
-                    return data.filter(d => values.includes(d[field]));
-                }
-                break;
-
-            case 'exclude':
-                if (exclude && exclude.length > 0 && field) {
-                    return data.filter(d => !exclude.includes(d[field]));
-                }
-                break;
-
-            case 'series':
-                if (values && values.length > 0) {
-                    const seriesField = filterConfig.seriesField || 'series';
-                    return data.filter(d => values.includes(d[seriesField]));
-                }
-                break;
-
-            default:
-                console.warn(`Unknown filter type: ${type}`);
-                return data;
-        }
-
-        return data;
-    }
-
-    /**
      * データを系列別に変換
      * @param {Array} data - 生データ
      * @param {Object} config - 設定
