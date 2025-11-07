@@ -6,10 +6,9 @@
 class ImageManager extends BaseManager {
     constructor(containerId) {
         super(containerId);
-        this.imageContainer = d3.select('#image-container');
-        this.imageElement = d3.select('#image');
+        this.image = d3.select('#image');
         this.currentImage = null;
-        
+
         // Initialize after properties are set
         this.init();
     }
@@ -19,7 +18,7 @@ class ImageManager extends BaseManager {
      */
     init() {
         super.init();
-        
+
         // イベントリスナーを設定
         pubsub.subscribe(EVENTS.IMAGE_UPDATE, (data) => {
             this.updateImage(data);
@@ -32,17 +31,24 @@ class ImageManager extends BaseManager {
      */
     updateImage(imageData) {
         const { src, alt, config, visible, position } = imageData;
-        
+
         this.config = config;
         this.currentImage = { src, alt, visible, position };
 
         if (visible && src) {
             this.show();
             this.loadImage(src, alt, config);
-            
-            // BaseManagerの統一position処理を適用
-            if (position) {
-                this.applyPositionSettings(position);
+
+            // 位置設定を適用（main.jsでも適用されるが、確実にするため）
+            if (position && window.PositionManager) {
+                const container = document.getElementById('image-container');
+                if (container) {
+                    const positionConfig = PositionManager.mergePositionConfig(position, 'image');
+                    PositionManager.applyPosition(container, positionConfig, {
+                        responsive: true,
+                        debugMode: false
+                    });
+                }
             }
         } else {
             this.hide();
@@ -50,27 +56,21 @@ class ImageManager extends BaseManager {
     }
 
     /**
-     * 画像コンテナを表示（BaseManagerの統一メソッドを使用）
+     * 画像コンテナを表示
      */
     show() {
-        // BaseManagerの統一showメソッドを呼び出す
-        super.show();
+        this.container.classed('visible', true);
     }
 
     /**
-     * 画像コンテナを非表示（BaseManagerの統一メソッドを使用）
+     * 画像コンテナを非表示
      */
-    hide(options = {}) {
-        // BaseManagerの統一hideメソッドを呼び出す
-        super.hide(options);
-        
-        // 画像特有のクリーンアップ処理
-        if (this.imageElement) {
-            this.imageElement.style('opacity', 0);
-            // src属性を削除（空文字列ではなく削除）
-            this.imageElement.node().removeAttribute('src');
-        }
-        
+    hide() {
+        this.container.classed('visible', false);
+
+        // 画像要素のopacityを0に設定（前のステップの画像を完全に非表示にする）
+        this.image.style('opacity', 0);
+
         // step0の背景画像もクリア
         const step0BgContainer = d3.select('#step0-bg-container');
         if (!step0BgContainer.empty()) {
@@ -98,13 +98,13 @@ class ImageManager extends BaseManager {
             specialMode = null
         } = config;
 
-        // openingステップの特別処理（論理名システム対応）
-        if (specialMode === 'opening-background' || specialMode === 'step0-background') {
+        // step0の特別処理
+        if (specialMode === 'step0-background') {
             const step0BgContainer = d3.select('#step0-bg-container');
             if (!step0BgContainer.empty()) {
                 // 既存の画像を削除
                 step0BgContainer.selectAll('img').remove();
-                
+
                 // 新しい画像を作成
                 const bgImage = step0BgContainer.append('img')
                     .attr('src', src)
@@ -116,33 +116,32 @@ class ImageManager extends BaseManager {
                     .style('height', '100%')
                     .style('object-fit', 'cover')
                     .style('opacity', 0);
-                
+
                 // フェードイン
                 bgImage.transition()
                     .duration(500)
                     .style('opacity', opacity);
-                
+
                 // 通常のimage-containerは非表示
                 this.container.classed('visible', false);
                 return;
             }
         }
 
-        // 通常の画像処理 - 既存のimg要素を更新
-        const imageElement = this.imageElement
+        // 通常の画像処理
+        this.image
             .attr('src', src)
             .attr('alt', alt)
             .style('opacity', 0)
             .style('width', width)
             .style('height', height)
-            .style('object-fit', objectFit)
-            .style('display', 'block');
+            .style('object-fit', objectFit);
 
         // ポジション設定
         this.setImagePosition(position);
 
         // フェードイン効果
-        imageElement
+        this.image
             .transition()
             .duration(500)
             .style('opacity', opacity);
