@@ -221,10 +221,9 @@ class LineChartRenderer extends ChartRendererBase {
         }
 
         const g = this.svg.select('g');
-        const transitionDuration = config.transitionDuration || 1000;
 
         // ChartTransitionsを使用して軸を更新
-        const newXAxis = isYearData 
+        const newXAxis = isYearData
             ? d3.axisBottom(newXScale).tickFormat(d3.format("d"))
             : d3.axisBottom(newXScale);
         const newYAxis = d3.axisLeft(newYScale)
@@ -234,14 +233,12 @@ class LineChartRenderer extends ChartRendererBase {
             newYAxis.ticks(config.yAxis.ticks);
         }
 
-        // 統一されたトランジション設定
-        const transitionConfig = {
+        // 軸をトランジションで更新（ChartRendererBase のヘルパーメソッドを使用）
+        const transitionDuration = config.transitionDuration || 1000;
+        this.updateChartAxes(g, newXAxis, newYAxis, {
             chartType: 'line',
             duration: transitionDuration
-        };
-
-        ChartTransitions.updateAxis(g.select('.x-axis'), newXAxis, transitionConfig);
-        ChartTransitions.updateAxis(g.select('.y-axis'), newYAxis, transitionConfig);
+        });
 
         // 新しいライン生成器
         const newLine = d3.line()

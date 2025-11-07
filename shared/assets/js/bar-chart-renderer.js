@@ -198,13 +198,11 @@ class BarChartRenderer extends ChartRendererBase {
         const newYAxis = d3.axisLeft(newYScale)
             .tickFormat(d => ChartFormatterHelper.formatYAxisValue(d, config.yAxisFormat));
 
-        const transitionConfig = {
+        // 軸をトランジションで更新（ChartRendererBase のヘルパーメソッドを使用）
+        this.updateChartAxes(g, newXAxis, newYAxis, {
             chartType: 'bar',
             duration: transitionDuration
-        };
-
-        ChartTransitions.updateAxis(g.select('.x-axis'), newXAxis, transitionConfig);
-        ChartTransitions.updateAxis(g.select('.y-axis'), newYAxis, transitionConfig);
+        });
 
         // 統一された色設定
         let barColors;

@@ -141,6 +141,43 @@ class ChartRendererBase extends BaseManager {
     }
 
     /**
+     * トランジション設定を生成（ChartTransitions統合版）
+     * 全レンダラーで共通実装
+     *
+     * @param {string} chartType - チャートタイプ（デフォルト: this.type）
+     * @param {number} [customDuration] - カスタム期間（省略時は設定から自動取得）
+     * @returns {Object} トランジション設定 {chartType, duration}
+     */
+    getTransitionConfig(chartType, customDuration = null) {
+        const duration = customDuration !== null ? customDuration :
+                        (this.config?.transitionDuration || 600);
+        return {
+            chartType: chartType || this.type,
+            duration
+        };
+    }
+
+    /**
+     * X/Y軸をトランジションで更新（ChartTransitions統合版）
+     * 全レンダラーで共通実装
+     *
+     * @param {Object} g - D3グループ要素
+     * @param {Object} xAxis - X軸オブジェクト
+     * @param {Object} yAxis - Y軸オブジェクト
+     * @param {Object} options - オプション
+     * @param {string} [options.chartType] - チャートタイプ（デフォルト: this.type）
+     * @param {number} [options.duration] - トランジション期間
+     */
+    updateChartAxes(g, xAxis, yAxis, options = {}) {
+        const transitionConfig = this.getTransitionConfig(
+            options.chartType || this.type,
+            options.duration
+        );
+        ChartTransitions.updateAxis(g.select('.x-axis'), xAxis, transitionConfig);
+        ChartTransitions.updateAxis(g.select('.y-axis'), yAxis, transitionConfig);
+    }
+
+    /**
      * チャートデータの基本検証
      * 派生クラスでオーバーライド可能
      *
