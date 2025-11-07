@@ -1,73 +1,40 @@
 /**
  * 統一スタイリングシステム
  * 感染症固有の色変数を動的に設定
+ * DiseaseDetectorとDISEASE_CONFIGを使用
  */
 
 class UnifiedStylingSys {
     constructor() {
-        this.diseaseColors = {
-            'aids': {
-                primary: '#ff6b6b',
-                secondary: '#ff8e8e', 
-                accent: '#e85555'
-            },
-            'tuberculosis': {
-                primary: '#4ecdc4',
-                secondary: '#6fd8d1',
-                accent: '#3bc2b8'
-            },
-            'malariae': {
-                primary: '#f4a620',
-                secondary: '#f6b84a',
-                accent: '#e89813'
-            }
-        };
-    }
-
-    /**
-     * 現在の感染症タイプを取得
-     */
-    getCurrentDiseaseType() {
-        // window.DISEASE_TYPEが設定されていればそれを使用
-        if (window.DISEASE_TYPE) {
-            return window.DISEASE_TYPE;
-        }
-        
-        // パスから自動検出
-        const path = window.location.pathname;
-        if (path.includes('01_aids')) return 'aids';
-        if (path.includes('02_tuberculosis')) return 'tuberculosis';
-        if (path.includes('03_malariae')) return 'malariae';
-        
-        // デフォルトはaids
-        return 'aids';
+        // 色情報はDISEASE_CONFIGから取得（重複排除）
     }
 
     /**
      * CSS変数を設定
      */
     applyCSSVariables(diseaseType) {
-        const colors = this.diseaseColors[diseaseType];
-        if (!colors) {
-            // console.warn(`Unknown disease type: ${diseaseType}`);
+        // DISEASE_CONFIGから色情報を取得
+        const diseaseConfig = window.DISEASE_CONFIG?.[diseaseType];
+        if (!diseaseConfig || !diseaseConfig.color) {
+            console.warn(`Unknown disease type or color config: ${diseaseType}`);
             return;
         }
 
+        const colors = diseaseConfig.color;
         const root = document.documentElement;
         root.style.setProperty('--disease-primary', colors.primary);
         root.style.setProperty('--disease-secondary', colors.secondary);
         root.style.setProperty('--disease-accent', colors.accent);
-
-        // console.log(`Applied unified styling for: ${diseaseType}`, colors);
     }
 
     /**
      * 初期化
      */
     init() {
-        const diseaseType = this.getCurrentDiseaseType();
+        // DiseaseDetectorから感染症タイプを取得
+        const diseaseType = window.DiseaseDetector?.getDiseaseType() || 'aids';
         this.applyCSSVariables(diseaseType);
-        
+
         // DOMContentLoadedイベントでも実行（念のため）
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', () => {
