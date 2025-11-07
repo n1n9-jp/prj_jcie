@@ -36,18 +36,23 @@ class LineChartRenderer extends ChartRendererBase {
      */
     updateChart(chartData) {
         const { type, data, config, visible, updateMode, direction } = chartData;
-        
+
+        // ★重要: Dual/Triple layout の場合はスキップ（ChartSVGDrawer が処理）
+        if (this.shouldSkipDualLayout(chartData)) {
+            return;
+        }
+
         // updateModeが'transition'で既存チャートと同じタイプ、同じデータファイルの場合
-        if (updateMode === 'transition' && 
-            this.currentChart === type && 
-            this.data && 
+        if (updateMode === 'transition' &&
+            this.currentChart === type &&
+            this.data &&
             this.svg &&
             config.dataFile === this.config?.dataFile) {
-            
+
             this.updateChartWithTransition(data, config, direction);
             return;
         }
-        
+
         // 通常の更新（再描画）
         this.data = data;
         this.config = config;

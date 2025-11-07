@@ -283,6 +283,17 @@ class ChartRendererBase extends BaseManager {
     }
 
     /**
+     * Dual/Triple layout の場合に描画をスキップすべきかを判定
+     * 各レンダラーで利用：個別レンダラーは dual/triple では動作しない
+     * @param {Object} chartData - チャートデータ
+     * @returns {boolean} スキップすべき場合は true
+     */
+    shouldSkipDualLayout(chartData) {
+        const { layout } = chartData;
+        return layout === 'dual' || layout === 'triple';
+    }
+
+    /**
      * デバッグ情報を取得
      * @returns {Object} デバッグ情報
      */

@@ -34,7 +34,12 @@ class PieChartRenderer extends ChartRendererBase {
      */
     updateChart(chartData) {
         const { type, data, config, visible, updateMode, direction } = chartData;
-        
+
+        // Dual/Triple layout では個別レンダラーは動作しない
+        if (this.shouldSkipDualLayout(chartData)) {
+            return;
+        }
+
         // updateModeが'transition'で既存チャートと同じタイプ、同じデータファイルの場合
         if (updateMode === 'transition' && 
             this.currentChart === type && 
