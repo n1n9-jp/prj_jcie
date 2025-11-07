@@ -141,10 +141,10 @@ class ScrollytellingApp {
             if (cityRange && cityRange.start !== undefined) {
                 startStep = cityRange.start;
             } else {
-                console.warn('StepMapper: Unable to get city steps range, using fallback');
+                // console.warn('StepMapper: Unable to get city steps range, using fallback');
             }
         } else {
-            console.warn('StepMapper not available, using fallback');
+            // console.warn('StepMapper not available, using fallback');
         }
         
         // フォールバック：感染症別の都市ステップ開始番号
@@ -342,13 +342,13 @@ class ScrollytellingApp {
         const stepConfig = this.config?.steps?.find(step => step.id === stepLogicalName);
         
         // デバッグ用ログ（開発環境のみ）
-        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-            console.log(`[SCROLLAMA DEBUG] Step detected: index=${index}, stepId=${stepLogicalName}, direction=${direction}`);
-        }
-        
-        
+        // if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        //     console.log(`[SCROLLAMA DEBUG] Step detected: index=${index}, stepId=${stepLogicalName}, direction=${direction}`);
+        // }
+
+
         if (!stepConfig) {
-            console.warn(`No config found for step ${stepLogicalName} (index ${index})`);
+            // console.warn(`No config found for step ${stepLogicalName} (index ${index})`);
             return;
         }
 

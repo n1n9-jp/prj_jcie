@@ -65,7 +65,7 @@ class ConfigLoader {
             const mainConfigPath = this._resolveConfigPath('main.config.json');
             this.mainConfig = await this._loadConfig(mainConfigPath);
             if (!this.mainConfig) {
-                console.warn('Main config not found, using legacy mode');
+                // console.warn('Main config not found, using legacy mode');
                 return this._loadLegacyConfigs();
             }
 
@@ -111,13 +111,13 @@ class ConfigLoader {
             return this.mergedConfig;
 
         } catch (error) {
-            console.error('Failed to load configurations, using defaults', error);
-            console.error('Error details:', {
-                message: error.message,
-                stack: error.stack,
-                diseaseDetector: !!this.diseaseDetector,
-                mainConfig: this.mainConfig
-            });
+            // console.error('Failed to load configurations, using defaults', error);
+            // console.error('Error details:', {
+            //     message: error.message,
+            //     stack: error.stack,
+            //     diseaseDetector: !!this.diseaseDetector,
+            //     mainConfig: this.mainConfig
+            // });
             return this._loadFallbackConfigs();
         }
     }
@@ -355,14 +355,14 @@ class ConfigLoader {
      */
     async _loadConfig(path) {
         try {
-            console.log(`📁 Loading config: ${path}`);
+            // console.log(`📁 Loading config: ${path}`);
             const response = await fetch(path);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             return await response.json();
         } catch (error) {
-            console.warn(`❌ Failed to load ${path}:`, error);
+            // console.warn(`❌ Failed to load ${path}:`, error);
             return null;
         }
     }

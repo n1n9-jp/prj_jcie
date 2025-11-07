@@ -113,24 +113,24 @@ class ChartManager extends BaseManager {
             if (window.GridChartRenderer) {
                 try {
                     this.renderers.grid = new GridChartRenderer(containerId);
-                    console.log('✓ GridChartRenderer initialized successfully');
+                    // console.log('✓ GridChartRenderer initialized successfully');
                 } catch (gridError) {
-                    console.error('✗ Failed to initialize GridChartRenderer:', gridError);
+                    // console.error('✗ Failed to initialize GridChartRenderer:', gridError);
                     this.renderers.grid = null;
                 }
             } else {
-                console.error('✗ GridChartRenderer not available in window');
+                // console.error('✗ GridChartRenderer not available in window');
             }
 
             // StackedBarChartRenderer
             if (window.StackedBarChartRenderer) {
                 this.renderers['stacked-bar'] = new StackedBarChartRenderer(containerId);
-                console.log('✓ StackedBarChartRenderer initialized successfully');
+                // console.log('✓ StackedBarChartRenderer initialized successfully');
             } else {
-                console.error('✗ StackedBarChartRenderer not available in window');
+                // console.error('✗ StackedBarChartRenderer not available in window');
             }
         } catch (error) {
-            console.error('ChartManager: Error initializing renderers:', error);
+            // console.error('ChartManager: Error initializing renderers:', error);
             
             if (window.ErrorHandler) {
                 ErrorHandler.handle(error, 'ChartManager.initializeRenderers', {
@@ -157,20 +157,20 @@ class ChartManager extends BaseManager {
             // DualLayout
             if (window.DualLayout) {
                 this.layouts.dual = new DualLayout(this.containerId);
-                console.log('✓ DualLayout initialized successfully');
+                // console.log('✓ DualLayout initialized successfully');
             } else {
-                console.error('✗ DualLayout not available in window');
+                // console.error('✗ DualLayout not available in window');
             }
-            
+
             // TripleLayout
             if (window.TripleLayout) {
                 this.layouts.triple = new TripleLayout(this.containerId);
-                console.log('✓ TripleLayout initialized successfully');
+                // console.log('✓ TripleLayout initialized successfully');
             } else {
-                console.error('✗ TripleLayout not available in window');
+                // console.error('✗ TripleLayout not available in window');
             }
         } catch (error) {
-            console.error('Error initializing layout managers:', error);
+            // console.error('Error initializing layout managers:', error);
         }
     }
 
@@ -275,7 +275,7 @@ class ChartManager extends BaseManager {
      */
     handleDualLayout(chartData) {
         try {
-            console.log('ChartManager: Handling dual layout (complete unified version)');
+            // console.log('ChartManager: Handling dual layout (complete unified version)');
             
             // レイアウト状態の更新
             this.activeRenderer = null;
@@ -513,7 +513,7 @@ class ChartManager extends BaseManager {
             return;
         }
         
-        console.log('ChartManager: Starting direct dual layout rendering (no renderer contamination)');
+        // console.log('ChartManager: Starting direct dual layout rendering (no renderer contamination)');
         
         // 統一コンテナ管理：完全にクリア
         this.clearChartContainer();
@@ -541,7 +541,7 @@ class ChartManager extends BaseManager {
         this.drawSingleChartInSVG(leftChartSVG, charts[0], layout, 'left');
         this.drawSingleChartInSVG(rightChartSVG, charts[1], layout, 'right');
         
-        console.log('ChartManager: Direct dual layout rendering completed');
+        // console.log('ChartManager: Direct dual layout rendering completed');
     }
 
     /**
@@ -552,7 +552,7 @@ class ChartManager extends BaseManager {
      * @param {string} position - 位置 ('left' | 'right')
      */
     drawSingleChartInSVG(svgGroup, chartConfig, layout, position) {
-        console.log(`ChartManager: Drawing ${chartConfig.type} chart directly in ${position} position`);
+        // console.log(`ChartManager: Drawing ${chartConfig.type} chart directly in ${position} position`);
         
         if (chartConfig.type !== 'line') {
             console.error(`ChartManager: Direct rendering only supports line charts, got: ${chartConfig.type}`);
@@ -561,10 +561,10 @@ class ChartManager extends BaseManager {
         
         // データを取得
         const data = chartConfig.data;
-        console.log(`DEBUG: Drawing ${position} chart - dataFile: ${chartConfig.dataFile}, data length: ${data ? data.length : 'null'}`);
+        // console.log(`DEBUG: Drawing ${position} chart - dataFile: ${chartConfig.dataFile}, data length: ${data ? data.length : 'null'}`);
         if (data && data.length > 0) {
-            console.log(`DEBUG: First row of ${position} data:`, data[0]);
-            console.log(`DEBUG: Chart ${position} title: ${chartConfig.title}`);
+            // console.log(`DEBUG: First row of ${position} data:`, data[0]);
+            // console.log(`DEBUG: Chart ${position} title: ${chartConfig.title}`);
         }
         if (!data || data.length === 0) {
             console.error(`ChartManager: No data available for ${position} chart`);
@@ -679,7 +679,7 @@ class ChartManager extends BaseManager {
                 .text(`出典: ${chartConfig.config.dataSource}`);
         }
         
-        console.log(`ChartManager: Successfully drew ${chartConfig.type} chart in ${position} position`);
+        // console.log(`ChartManager: Successfully drew ${chartConfig.type} chart in ${position} position`);
     }
 
     /**

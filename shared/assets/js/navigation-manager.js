@@ -72,14 +72,14 @@ class NavigationManager {
     renderNavigation() {
         const navUl = document.querySelector('#site-header .site-nav ul');
         if (!navUl) {
-            console.error('Navigation container not found');
+            // console.error('Navigation container not found');
             return;
         }
 
         const html = this.generateNavigationHTML();
         navUl.innerHTML = html;
-        
-        console.log(`Navigation rendered for: ${this.getCurrentDiseaseType()}`);
+
+        // console.log(`Navigation rendered for: ${this.getCurrentDiseaseType()}`);
     }
 
     /**

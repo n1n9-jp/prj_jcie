@@ -49,7 +49,7 @@ class UnifiedStylingSys {
     applyCSSVariables(diseaseType) {
         const colors = this.diseaseColors[diseaseType];
         if (!colors) {
-            console.warn(`Unknown disease type: ${diseaseType}`);
+            // console.warn(`Unknown disease type: ${diseaseType}`);
             return;
         }
 
@@ -57,8 +57,8 @@ class UnifiedStylingSys {
         root.style.setProperty('--disease-primary', colors.primary);
         root.style.setProperty('--disease-secondary', colors.secondary);
         root.style.setProperty('--disease-accent', colors.accent);
-        
-        console.log(`Applied unified styling for: ${diseaseType}`, colors);
+
+        // console.log(`Applied unified styling for: ${diseaseType}`, colors);
     }
 
     /**
