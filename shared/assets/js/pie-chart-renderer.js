@@ -102,21 +102,13 @@ class PieChartRenderer extends ChartRendererBase {
             width = responsiveSize.width;
             height = responsiveSize.height;
         }
-        
-        // ChartLayoutHelperを使用して動的マージンを計算
-        let margin;
-        if (window.ChartLayoutHelper) {
-            margin = ChartLayoutHelper.calculateDynamicMargins(data, config, {
-                chartType: type,
-                hasLegend: config.showLegend !== false,
-                screenWidth: window.innerWidth,
-                screenHeight: window.innerHeight
-            });
-        } else {
-            // フォールバック：従来の固定マージン
-            margin = config.margin || window.AppDefaults?.chartMargin?.default || { top: 40, right: 20, bottom: 40, left: 50 };
-        }
-        
+
+        // マージンを計算（ChartRendererBase のヘルパーメソッドを使用）
+        const margin = this.getChartMargin(data, config, {
+            chartType: type,
+            hasLegend: config.showLegend !== false
+        });
+
         // SVGHelperを使用してレスポンシブSVGを作成
         if (window.SVGHelper) {
             // パーセンテージ指定の場合は実際のピクセルサイズを計算

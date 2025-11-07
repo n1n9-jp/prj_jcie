@@ -90,21 +90,13 @@ class LineChartRenderer extends ChartRendererBase {
             width = responsiveSize.width;
             height = responsiveSize.height;
         }
-        
-        // ChartLayoutHelperを使用して動的マージンを計算
-        let margin;
-        if (window.ChartLayoutHelper) {
-            margin = ChartLayoutHelper.calculateDynamicMargins(data, config, {
-                chartType: type,
-                hasLegend: config.showLegend !== false && config.multiSeries,
-                screenWidth: window.innerWidth,
-                screenHeight: window.innerHeight
-            });
-        } else {
-            // フォールバック：従来の固定マージン
-            margin = config.margin || window.AppDefaults?.chartMargin?.default || { top: 40, right: 20, bottom: 40, left: 50 };
-        }
-        
+
+        // マージンを計算（ChartRendererBase のヘルパーメソッドを使用）
+        const margin = this.getChartMargin(data, config, {
+            chartType: type,
+            hasLegend: config.showLegend !== false && config.multiSeries
+        });
+
         // インラインラベル使用時は右マージンを拡大
         if (config.legendType === 'inline' && config.multiSeries) {
             margin.right = Math.max(margin.right, 240); // ラベル用の余白をさらに拡大
@@ -162,21 +154,13 @@ class LineChartRenderer extends ChartRendererBase {
         const allNewValues = newSeries.flatMap(s => s.values);
         
         const { width, height } = this.getResponsiveSize(config);
-        
-        // ChartLayoutHelperを使用して動的マージンを計算
-        let margin;
-        if (window.ChartLayoutHelper) {
-            margin = ChartLayoutHelper.calculateDynamicMargins(data, config, {
-                chartType: 'line',
-                hasLegend: config.showLegend !== false && config.multiSeries,
-                screenWidth: window.innerWidth,
-                screenHeight: window.innerHeight
-            });
-        } else {
-            // フォールバック：従来の固定マージン
-            margin = config.margin || window.AppDefaults?.chartMargin?.compact || { top: 20, right: 20, bottom: 40, left: 40 };
-        }
-        
+
+        // マージンを計算（ChartRendererBase のヘルパーメソッドを使用）
+        const margin = this.getChartMargin(data, config, {
+            chartType: 'line',
+            hasLegend: config.showLegend !== false && config.multiSeries
+        });
+
         // インラインラベル使用時は右マージンを拡大
         if (config.legendType === 'inline' && config.multiSeries) {
             margin.right = Math.max(margin.right, 240); // ラベル用の余白をさらに拡大

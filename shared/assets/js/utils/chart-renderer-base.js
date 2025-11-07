@@ -108,6 +108,39 @@ class ChartRendererBase extends BaseManager {
     }
 
     /**
+     * チャートマージンを計算（ChartLayoutHelper統合版）
+     * 全レンダラーで共通実装
+     *
+     * @param {Array} data - チャートデータ
+     * @param {Object} config - チャート設定
+     * @param {Object} options - オプション
+     * @param {string} [options.chartType] - チャートタイプ（デフォルト: this.type）
+     * @param {boolean} [options.hasLegend] - 凡例の有無（デフォルト: false）
+     * @returns {Object} マージン {top, right, bottom, left}
+     */
+    getChartMargin(data, config, options = {}) {
+        const chartType = options.chartType || this.type;
+        const hasLegend = options.hasLegend !== undefined ? options.hasLegend : false;
+
+        if (!window.ChartLayoutHelper) {
+            // フォールバック：従来の固定マージン
+            return config.margin || {
+                top: 40,
+                right: 20,
+                bottom: 40,
+                left: 50
+            };
+        }
+
+        return ChartLayoutHelper.calculateDynamicMargins(data, config, {
+            chartType,
+            hasLegend,
+            screenWidth: window.innerWidth,
+            screenHeight: window.innerHeight
+        });
+    }
+
+    /**
      * チャートデータの基本検証
      * 派生クラスでオーバーライド可能
      *

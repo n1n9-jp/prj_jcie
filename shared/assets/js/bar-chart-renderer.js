@@ -103,21 +103,13 @@ class BarChartRenderer extends ChartRendererBase {
             width = responsiveSize.width;
             height = responsiveSize.height;
         }
-        
-        // ChartLayoutHelperを使用して動的マージンを計算
-        let margin;
-        if (window.ChartLayoutHelper) {
-            margin = ChartLayoutHelper.calculateDynamicMargins(data, config, {
-                chartType: type,
-                hasLegend: config.showLegend !== false && config.multiSeries,
-                screenWidth: window.innerWidth,
-                screenHeight: window.innerHeight
-            });
-        } else {
-            // フォールバック：従来の固定マージン
-            margin = config.margin || window.AppDefaults?.chartMargin?.default || { top: 40, right: 20, bottom: 40, left: 50 };
-        }
-        
+
+        // マージンを計算（ChartRendererBase のヘルパーメソッドを使用）
+        const margin = this.getChartMargin(data, config, {
+            chartType: type,
+            hasLegend: config.showLegend !== false && config.multiSeries
+        });
+
         // SVGHelperを使用してレスポンシブSVGを作成
         if (window.SVGHelper) {
             // パーセンテージ指定の場合は実際のピクセルサイズを計算
@@ -175,25 +167,17 @@ class BarChartRenderer extends ChartRendererBase {
             this.data = data;
             this.config = config;
 
-        const { width, height } = this.getResponsiveSize(config);
-        
-        // ChartLayoutHelperを使用して動的マージンを計算
-        let margin;
-        if (window.ChartLayoutHelper) {
-            margin = ChartLayoutHelper.calculateDynamicMargins(data, config, {
+            const { width, height } = this.getResponsiveSize(config);
+
+            // マージンを計算（ChartRendererBase のヘルパーメソッドを使用）
+            const margin = this.getChartMargin(data, config, {
                 chartType: 'bar',
-                hasLegend: config.showLegend !== false && config.multiSeries,
-                screenWidth: window.innerWidth,
-                screenHeight: window.innerHeight
+                hasLegend: config.showLegend !== false && config.multiSeries
             });
-        } else {
-            // フォールバック：従来の固定マージン
-            margin = config.margin || window.AppDefaults?.chartMargin?.compact || { top: 20, right: 20, bottom: 40, left: 40 };
-        }
-        const innerWidth = width - margin.left - margin.right;
-        const innerHeight = height - margin.top - margin.bottom;
-        
-        const { xField = 'category', yField = 'value' } = config;
+            const innerWidth = width - margin.left - margin.right;
+            const innerHeight = height - margin.top - margin.bottom;
+
+            const { xField = 'category', yField = 'value' } = config;
         
         // 新しいスケールを計算
         const newXScale = d3.scaleBand()
