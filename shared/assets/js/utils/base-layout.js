@@ -1,24 +1,49 @@
 /**
- * BaseLayout - 全レイアウトタイプの基底クラス
- * 
- * レイアウトの共通処理を提供し、統一されたインターフェースを確保
+ * BaseLayout - 全レイアウトタイプの統合基底クラス
+ *
+ * Dual/Triple/Single レイアウトの共通処理を提供
+ * 以前の DualLayout/TripleLayout は本クラスに統合
  */
 class BaseLayout {
     /**
      * コンストラクタ
      * @param {string} containerId - コンテナID
-     * @param {string} layoutType - レイアウトタイプ
+     * @param {string} layoutType - レイアウトタイプ ('dual', 'triple', 'single', 'grid')
      */
-    constructor(containerId, layoutType) {
+    constructor(containerId, layoutType = 'single') {
         this.containerId = containerId;
         this.layoutType = layoutType;
         this.container = null;
         this.svg = null;
         this.config = null;
         this.isInitialized = false;
-        
+
         // レイアウト設定を取得
-        this.layoutDefaults = LayoutConfig.getLayoutConfig(layoutType);
+        const resolvedType = layoutType || 'single';
+        this.layoutDefaults = LayoutConfig.getLayoutConfig(resolvedType);
+
+        // チャート管理
+        this.charts = [];
+        this.chartContainers = [];
+        this.chartCount = this.getChartCountForType(layoutType);
+    }
+
+    /**
+     * レイアウトタイプに応じた期待チャート数を取得
+     * @param {string} layoutType - レイアウトタイプ
+     * @returns {number} 期待されるチャート数
+     */
+    getChartCountForType(layoutType) {
+        switch(layoutType) {
+            case 'dual':
+                return 2;
+            case 'triple':
+                return 3;
+            case 'grid':
+                return -1; // 可変
+            default:
+                return 1;
+        }
     }
 
     /**
@@ -176,18 +201,37 @@ class BaseLayout {
      * レイアウトを更新
      * @param {Object} config - 設定
      */
-    update(config) {
+    async update(config) {
         this.config = this.mergeConfig(config);
-        
-        // サブクラスで実装
-        this.render();
+        return await this.render(config);
     }
 
     /**
-     * レイアウトを描画（サブクラスで実装）
+     * レイアウトを描画（統合実装）
+     * @param {Object} config - レイアウト設定
      */
-    render() {
-        throw new Error('BaseLayout: render() must be implemented by subclass');
+    async render(config) {
+        try {
+            // レイアウト設定の取得
+            const layoutConfig = this.getLayoutConfig(config);
+
+            // データの準備
+            const chartsData = this.prepareChartsData(config.charts, this.chartCount);
+
+            // コンテナの準備
+            this.prepareContainer(layoutConfig);
+
+            // 各チャートの描画
+            await this.renderCharts(chartsData, layoutConfig);
+
+            return true;
+        } catch (error) {
+            ErrorHandler.handle(error, {
+                context: `BaseLayout.render (${this.layoutType})`,
+                config
+            });
+            return false;
+        }
     }
 
     /**
@@ -197,6 +241,51 @@ class BaseLayout {
      */
     mergeConfig(config) {
         return LayoutConfig.deepMerge(this.layoutDefaults, config);
+    }
+
+    /**
+     * コンテナを準備（DualLayout/TripleLayout 統合）
+     * @protected
+     */
+    prepareContainer(layoutConfig) {
+        try {
+            const container = d3.select(`#${this.containerId}`) || this.container;
+
+            // 既存のコンテンツを一度にクリア
+            container.selectAll('*').remove();
+
+            // コンテナスタイルを設定
+            const flexDirection = layoutConfig.arrangement === 'vertical' ? 'column' : 'row';
+            container
+                .classed(`${this.layoutType}-layout-container`, true)
+                .style('display', 'flex')
+                .style('flex-direction', flexDirection)
+                .style('gap', `${layoutConfig.spacing || (this.layoutType === 'dual' ? 40 : 30)}px`)
+                .style('width', '100%')
+                .style('height', '100%');
+
+            // 特定レイアウトのスタイル
+            if (this.layoutType === 'single') {
+                container.style('visibility', 'visible')
+                    .style('opacity', '1');
+            }
+
+            // 各チャート用のコンテナを作成
+            this.chartContainers = [];
+            for (let i = 0; i < this.chartCount; i++) {
+                const chartContainer = container.append('div')
+                    .attr('class', `${this.layoutType}-chart-container chart-${i}`)
+                    .style('flex', '1')
+                    .style('min-width', '0')
+                    .style('position', 'relative')
+                    .style('display', 'block');
+
+                this.chartContainers.push(chartContainer);
+            }
+        } catch (error) {
+            console.error(`BaseLayout.prepareContainer (${this.layoutType}):`, error);
+            throw error;
+        }
     }
 
     /**

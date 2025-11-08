@@ -151,26 +151,21 @@ class ChartManager extends BaseManager {
     
     /**
      * レイアウト管理クラスを初期化
+     * BaseLayout で Dual/Triple レイアウトを統合管理
      */
     initializeLayoutManagers() {
         try {
-            // DualLayout
-            if (window.DualLayout) {
-                this.layouts.dual = new DualLayout(this.containerId);
-                // console.log('✓ DualLayout initialized successfully');
-            } else {
-                // console.error('✗ DualLayout not available in window');
+            // Dual レイアウト（BaseLayout で統合）
+            if (window.BaseLayout) {
+                this.layouts.dual = new BaseLayout(this.container.node().id, 'dual');
             }
 
-            // TripleLayout
-            if (window.TripleLayout) {
-                this.layouts.triple = new TripleLayout(this.containerId);
-                // console.log('✓ TripleLayout initialized successfully');
-            } else {
-                // console.error('✗ TripleLayout not available in window');
+            // Triple レイアウト（BaseLayout で統合）
+            if (window.BaseLayout) {
+                this.layouts.triple = new BaseLayout(this.container.node().id, 'triple');
             }
         } catch (error) {
-            // console.error('Error initializing layout managers:', error);
+            console.warn('ChartManager: Error initializing layout managers:', error);
         }
     }
 
