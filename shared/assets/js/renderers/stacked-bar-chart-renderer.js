@@ -11,13 +11,6 @@ class StackedBarChartRenderer extends ChartRendererBase {
         this.data = null;
         this.config = null;
 
-        // フィールド設定（validateChartData() で使用）
-        this.fieldConfig = {
-            xField: 'year',
-            yField: 'value',
-            numericY: true
-        };
-
         this.init();
     }
 
@@ -57,7 +50,7 @@ class StackedBarChartRenderer extends ChartRendererBase {
             return;
         }
 
-        const validation = this.validateChartData(data, config, this.fieldConfig);
+        const validation = this.validateChartData(data, config);
         if (!validation.valid) {
             console.error('StackedBarChartRenderer: Invalid data or config:', validation.errors);
             return;
