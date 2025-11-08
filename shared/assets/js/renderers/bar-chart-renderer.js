@@ -11,6 +11,13 @@ class BarChartRenderer extends ChartRendererBase {
         this.data = null;
         this.config = null;
 
+        // フィールド設定（validateChartData() で使用）
+        this.fieldConfig = {
+            xField: 'category',
+            yField: 'value',
+            numericY: true
+        };
+
         // Initialize after properties are set
         this.init();
     }
@@ -64,7 +71,7 @@ class BarChartRenderer extends ChartRendererBase {
         }
 
         // データとコンフィグの検証
-        const validation = this.validateChartData(data, config);
+        const validation = this.validateChartData(data, config, this.fieldConfig);
         if (!validation.valid) {
             console.error('BarChartRenderer: Invalid data or config:', validation.errors);
             if (window.ErrorHandler) {
@@ -257,49 +264,6 @@ class BarChartRenderer extends ChartRendererBase {
                 });
             }
         }
-    }
-
-    /**
-     * チャートデータとコンフィグを検証
-     * @param {Array} data - データ
-     * @param {Object} config - 設定
-     * @returns {Object} 検証結果 {valid: boolean, errors: Array}
-     */
-    validateChartData(data, config) {
-        // 基本クラスの検証を先に実行
-        const baseValidation = super.validateChartData(data, config);
-        if (!baseValidation.valid) {
-            return baseValidation;
-        }
-
-        const errors = [];
-
-        // 棒グラフ特有の検証：フィールドの存在確認
-        const xField = config.xField || 'category';
-        const yField = config.yField || 'value';
-
-        const hasXField = data.every(d => d.hasOwnProperty(xField));
-        const hasYField = data.every(d => d.hasOwnProperty(yField));
-
-        if (!hasXField) {
-            errors.push(`X field '${xField}' not found in all data items`);
-        }
-        if (!hasYField) {
-            errors.push(`Y field '${yField}' not found in all data items`);
-        }
-
-        // Y値が数値かどうかチェック
-        if (hasYField) {
-            const hasValidYValues = data.every(d => !isNaN(+d[yField]));
-            if (!hasValidYValues) {
-                errors.push(`Y field '${yField}' contains non-numeric values`);
-            }
-        }
-
-        return {
-            valid: errors.length === 0,
-            errors
-        };
     }
 
     /**

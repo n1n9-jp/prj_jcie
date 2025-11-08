@@ -11,6 +11,13 @@ class PieChartRenderer extends ChartRendererBase {
         this.data = null;
         this.config = null;
 
+        // フィールド設定（validateChartData() で使用）
+        this.fieldConfig = {
+            labelField: 'label',
+            valueField: 'value',
+            numericValue: true
+        };
+
         // Initialize after properties are set
         this.init();
     }
@@ -64,7 +71,7 @@ class PieChartRenderer extends ChartRendererBase {
         }
 
         // データとコンフィグの検証
-        const validation = this.validateChartData(data, config);
+        const validation = this.validateChartData(data, config, this.fieldConfig);
         if (!validation.valid) {
             console.error('PieChartRenderer: Invalid data or config:', validation.errors);
             if (window.ErrorHandler) {
@@ -235,49 +242,6 @@ class PieChartRenderer extends ChartRendererBase {
                 });
             }
         }
-    }
-
-    /**
-     * チャートデータとコンフィグを検証
-     * @param {Array} data - データ
-     * @param {Object} config - 設定
-     * @returns {Object} 検証結果 {valid: boolean, errors: Array}
-     */
-    validateChartData(data, config) {
-        // 基本クラスの検証を先に実行
-        const baseValidation = super.validateChartData(data, config);
-        if (!baseValidation.valid) {
-            return baseValidation;
-        }
-
-        const errors = [];
-
-        // 円グラフ特有の検証：フィールドの存在確認
-        const labelField = config.labelField || 'label';
-        const valueField = config.valueField || 'value';
-
-        const hasLabelField = data.every(d => d.hasOwnProperty(labelField));
-        const hasValueField = data.every(d => d.hasOwnProperty(valueField));
-
-        if (!hasLabelField) {
-            errors.push(`Label field '${labelField}' not found in all data items`);
-        }
-        if (!hasValueField) {
-            errors.push(`Value field '${valueField}' not found in all data items`);
-        }
-
-        // Value値が数値かどうかチェック（円グラフは非負値が必須）
-        if (hasValueField) {
-            const hasValidValues = data.every(d => !isNaN(+d[valueField]) && +d[valueField] >= 0);
-            if (!hasValidValues) {
-                errors.push(`Value field '${valueField}' contains non-numeric or negative values`);
-            }
-        }
-
-        return {
-            valid: errors.length === 0,
-            errors
-        };
     }
 
     /**

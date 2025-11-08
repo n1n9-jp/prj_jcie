@@ -247,13 +247,14 @@ class ChartRendererBase extends BaseManager {
 
     /**
      * チャートデータの基本検証
-     * 派生クラスでオーバーライド可能
+     * 派生クラスで fieldConfig を設定して拡張可能
      *
      * @param {Array} data - チャートデータ
      * @param {Object} config - チャート設定
+     * @param {Object} fieldConfig - フィールド設定 { xField, yField, labelField, valueField, ... }
      * @returns {Object} { valid: boolean, errors: string[] }
      */
-    validateChartData(data, config = {}) {
+    validateChartData(data, config = {}, fieldConfig = null) {
         const errors = [];
 
         // データ配列の確認
@@ -266,6 +267,57 @@ class ChartRendererBase extends BaseManager {
         if (typeof config !== 'object' || config === null) {
             errors.push('Config must be an object');
             return { valid: false, errors };
+        }
+
+        // フィールド検証（fieldConfig が指定されている場合）
+        if (fieldConfig) {
+            // デフォルトフィールド名
+            const xField = fieldConfig.xField || 'x';
+            const yField = fieldConfig.yField || 'value';
+            const labelField = fieldConfig.labelField || 'label';
+            const valueField = fieldConfig.valueField || 'value';
+
+            // X軸フィールドの検証（棒グラフ、折れ線グラフなど）
+            if (fieldConfig.xField || fieldConfig.yField) {
+                const hasXField = data.every(d => d.hasOwnProperty(xField));
+                const hasYField = data.every(d => d.hasOwnProperty(yField));
+
+                if (!hasXField) {
+                    errors.push(`X field '${xField}' not found in all data items`);
+                }
+                if (!hasYField) {
+                    errors.push(`Y field '${yField}' not found in all data items`);
+                }
+
+                // Y値が数値かどうかチェック
+                if (hasYField && fieldConfig.numericY !== false) {
+                    const hasValidYValues = data.every(d => !isNaN(+d[yField]));
+                    if (!hasValidYValues) {
+                        errors.push(`Y field '${yField}' contains non-numeric values`);
+                    }
+                }
+            }
+
+            // ラベル・値フィールドの検証（円グラフなど）
+            if (fieldConfig.labelField || fieldConfig.valueField) {
+                const hasLabelField = data.every(d => d.hasOwnProperty(labelField));
+                const hasValueField = data.every(d => d.hasOwnProperty(valueField));
+
+                if (!hasLabelField && fieldConfig.labelField) {
+                    errors.push(`Label field '${labelField}' not found in all data items`);
+                }
+                if (!hasValueField && fieldConfig.valueField) {
+                    errors.push(`Value field '${valueField}' not found in all data items`);
+                }
+
+                // 値が数値かどうかチェック
+                if (hasValueField && fieldConfig.numericValue !== false) {
+                    const hasValidValues = data.every(d => !isNaN(+d[valueField]));
+                    if (!hasValidValues) {
+                        errors.push(`Value field '${valueField}' contains non-numeric values`);
+                    }
+                }
+            }
         }
 
         return {

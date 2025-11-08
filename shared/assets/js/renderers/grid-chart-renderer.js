@@ -12,6 +12,13 @@ class GridChartRenderer extends ChartRendererBase {
         this.config = null;
         this.isUpdating = false; // 重複呼び出し防止フラグ
 
+        // フィールド設定（validateChartData() で使用）
+        this.fieldConfig = {
+            labelField: 'label',
+            valueField: 'value',
+            numericValue: true
+        };
+
         // Initialize after properties are set
         this.init();
     }
@@ -46,7 +53,7 @@ class GridChartRenderer extends ChartRendererBase {
         }
 
         // データとコンフィグの検証
-        const validation = this.validateChartData(data, config);
+        const validation = this.validateChartData(data, config, this.fieldConfig);
         if (!validation.valid) {
             console.error('GridChartRenderer: Invalid data or config:', validation.errors);
             if (window.ErrorHandler) {
@@ -635,41 +642,6 @@ class GridChartRenderer extends ChartRendererBase {
             rows: optimalRows,
             totalItems: itemCount,
             actualItems: optimalColumns * optimalRows
-        };
-    }
-
-    /**
-     * チャートデータとコンフィグを検証
-     * @param {Array} data - データ
-     * @param {Object} config - 設定
-     * @returns {Object} 検証結果 {valid: boolean, errors: Array}
-     */
-    validateChartData(data, config) {
-        // 基本クラスの検証を先に実行
-        const baseValidation = super.validateChartData(data, config);
-        if (!baseValidation.valid) {
-            return baseValidation;
-        }
-
-        const errors = [];
-
-        // グリッドレイアウト特有の検証：グリッド設定パラメータ
-        if (config.columns && (!Number.isInteger(config.columns) || config.columns <= 0)) {
-            errors.push('Columns must be a positive integer');
-        }
-        if (config.rows && (!Number.isInteger(config.rows) || config.rows <= 0)) {
-            errors.push('Rows must be a positive integer');
-        }
-        if (config.chartWidth && (typeof config.chartWidth !== 'number' || config.chartWidth <= 0)) {
-            errors.push('Chart width must be a positive number');
-        }
-        if (config.chartHeight && (typeof config.chartHeight !== 'number' || config.chartHeight <= 0)) {
-            errors.push('Chart height must be a positive number');
-        }
-
-        return {
-            valid: errors.length === 0,
-            errors
         };
     }
 

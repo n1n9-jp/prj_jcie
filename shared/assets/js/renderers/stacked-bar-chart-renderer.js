@@ -10,6 +10,14 @@ class StackedBarChartRenderer extends ChartRendererBase {
         this.currentChart = null;
         this.data = null;
         this.config = null;
+
+        // フィールド設定（validateChartData() で使用）
+        this.fieldConfig = {
+            xField: 'year',
+            yField: 'value',
+            numericY: true
+        };
+
         this.init();
     }
 
@@ -49,7 +57,7 @@ class StackedBarChartRenderer extends ChartRendererBase {
             return;
         }
 
-        const validation = this.validateChartData(data, config);
+        const validation = this.validateChartData(data, config, this.fieldConfig);
         if (!validation.valid) {
             console.error('StackedBarChartRenderer: Invalid data or config:', validation.errors);
             return;
@@ -81,37 +89,6 @@ class StackedBarChartRenderer extends ChartRendererBase {
         } catch (error) {
             console.error('StackedBarChartRenderer: Error during chart rendering:', error);
         }
-    }
-
-    /**
-     * チャートデータとコンフィグを検証
-     */
-    validateChartData(data, config) {
-        // 基本クラスの検証を先に実行
-        const baseValidation = super.validateChartData(data, config);
-        if (!baseValidation.valid) {
-            return baseValidation;
-        }
-
-        const errors = [];
-
-        // 積み重ね棒グラフ特有の検証：stackKeys の確認
-        if (!config.stackKeys || !Array.isArray(config.stackKeys) || config.stackKeys.length < 1) {
-            errors.push('Config must include a stackKeys array with at least one key.');
-        }
-
-        // stackKeys のプロパティがデータに存在するか確認
-        if (data.length > 0 && config.stackKeys) {
-            const firstItem = data[0];
-            for (const key of config.stackKeys) {
-                if (!firstItem.hasOwnProperty(key)) {
-                    errors.push(`Data items must have the property '${key}' as defined in stackKeys.`);
-                    break;
-                }
-            }
-        }
-
-        return { valid: errors.length === 0, errors };
     }
 
     /**
