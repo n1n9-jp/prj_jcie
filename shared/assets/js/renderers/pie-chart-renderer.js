@@ -599,10 +599,10 @@ class PieChartRenderer extends ChartRendererBase {
         const labelField = config.labelField || 'label';
         const categories = data.map(d => d[labelField]);
         
-        // ChartLayoutHelperを使用して最適な凡例レイアウトを計算
+        // ChartLayoutManagerを使用して最適な凡例レイアウトを計算
         let legendLayout;
-        if (window.ChartLayoutHelper) {
-            legendLayout = ChartLayoutHelper.calculateLegendLayout(categories, width, height);
+        if (window.ChartLayoutManager) {
+            legendLayout = ChartLayoutManager.calculateLegendLayout(categories, width, height);
         } else {
             // フォールバック：従来の固定レイアウト
             legendLayout = {

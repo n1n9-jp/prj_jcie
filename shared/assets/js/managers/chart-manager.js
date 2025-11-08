@@ -853,8 +853,8 @@ class ChartManager extends BaseManager {
         
         // マージンを計算
         let margin;
-        if (window.ChartLayoutHelper) {
-            margin = ChartLayoutHelper.calculateDynamicMargins(data, config, {
+        if (window.ChartLayoutManager) {
+            margin = ChartLayoutManager.calculateDynamicMargins(data, config, {
                 chartType: chartType,
                 hasLegend: config.showLegend !== false && config.multiSeries,
                 screenWidth: width,

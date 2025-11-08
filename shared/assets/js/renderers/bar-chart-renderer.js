@@ -356,21 +356,21 @@ class BarChartRenderer extends ChartRendererBase {
 
         // 単位情報を分析
         let unitInfo = { xAxis: {}, yAxis: {} };
-        if (window.ChartLayoutHelper) {
-            unitInfo = ChartLayoutHelper.analyzeUnits(filteredData, config);
+        if (window.ChartLayoutManager) {
+            unitInfo = ChartLayoutManager.analyzeUnits(filteredData, config);
         }
 
-        // 軸を描画（カスタムフォーマット優先、ChartLayoutHelper、D3デフォルトの順）
+        // 軸を描画（カスタムフォーマット優先、ChartLayoutManager、D3デフォルトの順）
         let xAxis, yAxis;
         
-        // Y軸フォーマッターを決定（優先順位：カスタム > ChartLayoutHelper > D3デフォルト）
+        // Y軸フォーマッターを決定（優先順位：カスタム > ChartLayoutManager > D3デフォルト）
         let yFormatter;
         if (config.yAxisFormat) {
             // カスタムフォーマットが指定されている場合
             yFormatter = (value) => ChartFormatterHelper.formatYAxisValue(value, config.yAxisFormat);
-        } else if (window.ChartLayoutHelper) {
-            // ChartLayoutHelperが利用可能な場合
-            yFormatter = (value) => ChartLayoutHelper.formatAxisWithUnits(value, unitInfo.yAxis);
+        } else if (window.ChartLayoutManager) {
+            // ChartLayoutManagerが利用可能な場合
+            yFormatter = (value) => ChartLayoutManager.formatAxisWithUnits(value, unitInfo.yAxis);
         } else {
             // デフォルト（D3の標準フォーマット）
             yFormatter = null; // D3のデフォルトを使用
@@ -382,8 +382,8 @@ class BarChartRenderer extends ChartRendererBase {
             : d3.axisLeft(yScale);
         
         // X軸フォーマッター（将来の拡張用）
-        if (window.ChartLayoutHelper && !config.xAxisFormat) {
-            const xFormatter = (value) => ChartLayoutHelper.formatAxisWithUnits(value, unitInfo.xAxis);
+        if (window.ChartLayoutManager && !config.xAxisFormat) {
+            const xFormatter = (value) => ChartLayoutManager.formatAxisWithUnits(value, unitInfo.xAxis);
             if (xAxis) {
                 xAxis.tickFormat(xFormatter);
             }
@@ -399,8 +399,8 @@ class BarChartRenderer extends ChartRendererBase {
             .call(yAxis);
 
         // 軸ラベルを統一的に追加（カスタム優先、デフォルト単位フォールバック）
-        if (window.ChartLayoutHelper) {
-            ChartLayoutHelper.addAxisLabels(g, filteredData, config, innerWidth, innerHeight);
+        if (window.ChartLayoutManager) {
+            ChartLayoutManager.addAxisLabels(g, filteredData, config, innerWidth, innerHeight);
         }
 
         // 棒の色を取得（ChartRendererBase のヘルパーメソッドを使用）
@@ -465,15 +465,15 @@ class BarChartRenderer extends ChartRendererBase {
 
         // 単位情報を分析
         let unitInfo = { xAxis: {}, yAxis: {} };
-        if (window.ChartLayoutHelper) {
-            unitInfo = ChartLayoutHelper.analyzeUnits(data, config);
+        if (window.ChartLayoutManager) {
+            unitInfo = ChartLayoutManager.analyzeUnits(data, config);
         }
 
         // 軸を描画（単位情報を使ったフォーマッターを使用）
         let xAxis, yAxis;
-        if (window.ChartLayoutHelper) {
-            const xFormatter = (value) => ChartLayoutHelper.formatAxisWithUnits(value, unitInfo.xAxis);
-            const yFormatter = (value) => ChartLayoutHelper.formatAxisWithUnits(value, unitInfo.yAxis);
+        if (window.ChartLayoutManager) {
+            const xFormatter = (value) => ChartLayoutManager.formatAxisWithUnits(value, unitInfo.xAxis);
+            const yFormatter = (value) => ChartLayoutManager.formatAxisWithUnits(value, unitInfo.yAxis);
             
             xAxis = d3.axisBottom(xScale);
             yAxis = d3.axisLeft(yScale).tickFormat(yFormatter);
@@ -492,8 +492,8 @@ class BarChartRenderer extends ChartRendererBase {
             .call(yAxis);
 
         // 軸ラベルを統一的に追加（カスタム優先、デフォルト単位フォールバック）
-        if (window.ChartLayoutHelper) {
-            ChartLayoutHelper.addAxisLabels(g, data, config, width, height);
+        if (window.ChartLayoutManager) {
+            ChartLayoutManager.addAxisLabels(g, data, config, width, height);
         }
 
         // 統一された色設定
@@ -546,10 +546,10 @@ class BarChartRenderer extends ChartRendererBase {
         const xField = config.xField || 'category';
         const categories = data.map(d => d[xField]);
         
-        // ChartLayoutHelperを使用して最適な凡例レイアウトを計算
+        // ChartLayoutManagerを使用して最適な凡例レイアウトを計算
         let legendLayout;
-        if (window.ChartLayoutHelper) {
-            legendLayout = ChartLayoutHelper.calculateLegendLayout(categories, width, height);
+        if (window.ChartLayoutManager) {
+            legendLayout = ChartLayoutManager.calculateLegendLayout(categories, width, height);
         } else {
             // フォールバック：従来の固定レイアウト
             legendLayout = {
