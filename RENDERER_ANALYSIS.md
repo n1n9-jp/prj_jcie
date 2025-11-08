@@ -190,6 +190,7 @@ pubsub.subscribe(EVENTS.CHART_UPDATE, (data) => {
 
 #### validateChartData() の重複
 ```javascript
+
 // バーチャート
 const xField = config.xField || 'category';
 const yField = config.yField || 'value';
