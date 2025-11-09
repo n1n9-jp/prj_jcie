@@ -360,6 +360,10 @@ class GridChartRenderer extends ChartRendererBase {
             
             // パーセンテージを中央に表示
             if (showPercentages && cellData.percentage !== undefined) {
+                const formattedPercentage = (window.ChartFormatterHelper)
+                    ? ChartFormatterHelper.formatYAxisValue(cellData.percentage / 100, { type: 'percentage' })
+                    : `${cellData.percentage}%`;
+
                 ChartTransitions.animateText(
                     cellGroup.append('text')
                         .attr('class', 'percentage-label')
@@ -369,7 +373,7 @@ class GridChartRenderer extends ChartRendererBase {
                         .attr('font-size', '12px')
                         .attr('font-weight', 'bold')
                         .attr('fill', window.AppDefaults?.colors?.text?.primary || '#333')
-                        .text(`${cellData.percentage}%`),
+                        .text(formattedPercentage),
                     {
                         chartType: 'grid',
                         phase: 'enter',
