@@ -484,7 +484,7 @@ animateToCity()
 
 ### 今後の拡張
 - その他共通データファイル（world-map.jsonなど）の統一化検討
-- cities-timeline.json は感染症固有のため、個別管理継続（推奨）
+- content-map.json は感染症固有のため、個別管理継続（推奨）
 - index.html は感染症別コンテンツのため、統一化不要（推奨）
 
 ---

@@ -302,9 +302,9 @@ class ConfigLoader {
             return dataFile;
         }
 
-        // cities-timeline.jsonはconfig/フォルダから読み込む
-        if (dataFile === 'cities-timeline.json') {
-            return 'config/cities-timeline.json';
+        // content-map.jsonはconfig/フォルダから読み込む
+        if (dataFile === 'content-map.json') {
+            return 'config/content-map.json';
         }
 
         // countries-110m.jsonは共有フォルダから読み込む（Netlify対応）

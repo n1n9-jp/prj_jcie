@@ -41,7 +41,7 @@ window.StepMapper = class StepMapper {
             return config['city-episodes'].expectedCityCount;
         }
         
-        // フォールバック：cities-timeline.jsonから動的に取得を試みる
+        // フォールバック：content-map.jsonから動的に取得を試みる
         // （ただし、同期的な処理のため、実際にはconfig設定を推奨）
         return 7; // AIDSのデフォルト
     }

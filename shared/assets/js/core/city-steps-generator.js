@@ -70,7 +70,7 @@ class CityStepsGenerator {
                     cityId: city.id,
                     center: city.coordinates ? city.coordinates : [city.longitude, city.latitude],
                     zoom: 6,
-                    citiesFile: "config/cities-timeline.json",
+                    citiesFile: "config/content-map.json",
                     useRegionColors: true,
                     lightenNonVisited: true,
                     widthPercent: 100,

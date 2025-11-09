@@ -22,8 +22,8 @@ class DataLoader {
             // デバッグ情報を出力
             const env = window.ConfigLoader.getEnvironment();
 
-            // cities-timeline.jsonを読み込む（感染症対応パス）
-            const citiesDataPath = window.ConfigLoader.resolveDataPath('cities-timeline.json');
+            // content-map.jsonを読み込む（感染症対応パス）
+            const citiesDataPath = window.ConfigLoader.resolveDataPath('content-map.json');
             const citiesData = await d3.json(citiesDataPath);
 
             // 設定から必要なデータファイルを抽出
