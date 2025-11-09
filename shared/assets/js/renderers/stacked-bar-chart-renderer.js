@@ -197,7 +197,7 @@ class StackedBarChartRenderer extends ChartRendererBase {
             .attr('height', d => Math.max(0, yScale(d[0]) - yScale(d[1])))
             .attr('width', xScale.bandwidth());
 
-        this.addLegend(svg, stackKeys, colorScale, width, margin);
+        this.addLegend(svg, stackKeys, colorScale, width, height, margin);
 
         // データソースを表示
         if (dataSource) {
@@ -208,7 +208,67 @@ class StackedBarChartRenderer extends ChartRendererBase {
     /**
      * 凡例を追加
      */
-    addLegend(svg, keys, colorScale, width, margin) {
+    addLegend(svg, keys, colorScale, width, height, margin) {
+        if (!keys || keys.length === 0) {
+            return;
+        }
+
+        let legendLayout = null;
+        if (window.ChartLayoutManager && typeof ChartLayoutManager.calculateLegendLayout === 'function') {
+            legendLayout = ChartLayoutManager.calculateLegendLayout(keys, width, height);
+        }
+
+        if (!legendLayout || legendLayout.show === false) {
+            this.renderFallbackLegend(svg, keys, colorScale, width, margin);
+            return;
+        }
+
+        const legendGroup = svg.append('g')
+            .attr('class', 'chart-legend');
+
+        const legendItems = legendGroup.selectAll('.legend-item')
+            .data(keys)
+            .enter()
+            .append('g')
+            .attr('class', 'legend-item');
+
+        legendItems.append('rect')
+            .attr('x', 0)
+            .attr('y', -10)
+            .attr('width', 12)
+            .attr('height', 12)
+            .attr('fill', d => colorScale(d));
+
+        legendItems.append('text')
+            .attr('x', 18)
+            .attr('y', 0)
+            .attr('dy', '-0.1em')
+            .style('font-size', '12px')
+            .style('text-anchor', 'start')
+            .text(d => d);
+
+        if (legendLayout.orientation === 'horizontal') {
+            legendItems.attr('transform', (d, i) => `translate(${i * legendLayout.itemWidth}, 0)`);
+        } else {
+            legendItems.attr('transform', (d, i) => `translate(0, ${i * legendLayout.itemHeight})`);
+        }
+
+        let legendX = width - margin.right - (legendLayout.totalWidth || legendLayout.itemWidth * keys.length);
+        let legendY = margin.top + 20;
+
+        if (legendLayout.position === 'bottom') {
+            const totalWidth = legendLayout.itemWidth * keys.length;
+            legendX = Math.max(margin.left, (width - totalWidth) / 2);
+            legendY = height - margin.bottom - (legendLayout.totalHeight || legendLayout.itemHeight + 20);
+        }
+
+        legendGroup.attr('transform', `translate(${legendX}, ${legendY})`);
+    }
+
+    /**
+     * ChartLayoutManagerが使えない場合のフォールバック凡例
+     */
+    renderFallbackLegend(svg, keys, colorScale, width, margin) {
         const legendGroup = svg.append('g')
             .attr('class', 'chart-legend');
 
@@ -241,8 +301,8 @@ class StackedBarChartRenderer extends ChartRendererBase {
             d3.select(this).attr('transform', `translate(${totalLegendWidth}, 0)`);
             totalLegendWidth += itemWidth + legendPadding;
         });
-        
-        totalLegendWidth -= legendPadding; // remove last padding
+
+        totalLegendWidth -= legendPadding;
 
         const legendX = width - margin.right - totalLegendWidth;
         const legendY = 40;
