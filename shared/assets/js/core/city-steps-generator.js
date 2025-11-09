@@ -119,7 +119,7 @@ class CityStepsGenerator {
                     <div class="max-w-lg p-8 bg-white bg-opacity-90 rounded-lg shadow-lg mx-auto">
                         ${city.data.thumbnail ? `
                         <div class="mb-6">
-                            <img src="data/thumb/${city.data.thumbnail}"
+                            <img src="thumb/${city.data.thumbnail}"
                                  alt="${city.data.title}"
                                  class="w-full h-48 object-cover rounded-lg shadow-md">
                         </div>
