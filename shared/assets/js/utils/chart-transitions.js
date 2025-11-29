@@ -221,7 +221,11 @@ export class ChartTransitions {
             };
 
         } catch (error) {
-            console.error('ChartTransitions: Error in enter/update/exit pattern:', error);
+            ErrorHandler.handle(
+                error,
+                'ChartTransitions.applyPattern',
+                { type: ErrorHandler.ERROR_TYPES.RENDER, severity: ErrorHandler.SEVERITY.MEDIUM }
+            );
             throw error;
         }
     }
@@ -267,7 +271,11 @@ export class ChartTransitions {
                 .call(axisGenerator);
 
         } catch (error) {
-            console.error('ChartTransitions: Error updating axis:', error);
+            ErrorHandler.handle(
+                error,
+                'ChartTransitions.updateAxis',
+                { type: ErrorHandler.ERROR_TYPES.RENDER, severity: ErrorHandler.SEVERITY.MEDIUM }
+            );
             // フォールバック: 即座に更新
             return axisSelection.call(axisGenerator);
         }
@@ -307,7 +315,11 @@ export class ChartTransitions {
             }
 
         } catch (error) {
-            console.error('ChartTransitions: Error animating line:', error);
+            ErrorHandler.handle(
+                error,
+                'ChartTransitions.animateLine',
+                { type: ErrorHandler.ERROR_TYPES.RENDER, severity: ErrorHandler.SEVERITY.MEDIUM }
+            );
             // フォールバック: 即座に更新
             return pathSelection.attr('d', d => lineGenerator(d.values || d));
         }
@@ -397,7 +409,11 @@ export class ChartTransitions {
             }
 
         } catch (error) {
-            console.error('ChartTransitions: Error animating bars:', error);
+            ErrorHandler.handle(
+                error,
+                'ChartTransitions.animateBars',
+                { type: ErrorHandler.ERROR_TYPES.RENDER, severity: ErrorHandler.SEVERITY.MEDIUM }
+            );
             throw error;
         }
     }
@@ -445,7 +461,11 @@ export class ChartTransitions {
             }
 
         } catch (error) {
-            console.error('ChartTransitions: Error animating arcs:', error);
+            ErrorHandler.handle(
+                error,
+                'ChartTransitions.animateArcs',
+                { type: ErrorHandler.ERROR_TYPES.RENDER, severity: ErrorHandler.SEVERITY.MEDIUM }
+            );
             throw error;
         }
     }
@@ -489,7 +509,11 @@ export class ChartTransitions {
             }
 
         } catch (error) {
-            console.error('ChartTransitions: Error animating points:', error);
+            ErrorHandler.handle(
+                error,
+                'ChartTransitions.animatePoints',
+                { type: ErrorHandler.ERROR_TYPES.RENDER, severity: ErrorHandler.SEVERITY.MEDIUM }
+            );
             throw error;
         }
     }
@@ -523,7 +547,11 @@ export class ChartTransitions {
             }
 
         } catch (error) {
-            console.error('ChartTransitions: Error animating text:', error);
+            ErrorHandler.handle(
+                error,
+                'ChartTransitions.animateText',
+                { type: ErrorHandler.ERROR_TYPES.RENDER, severity: ErrorHandler.SEVERITY.MEDIUM }
+            );
             return textSelection;
         }
     }
@@ -555,7 +583,11 @@ export class ChartTransitions {
             }
 
         } catch (error) {
-            console.error('ChartTransitions: Error animating legend:', error);
+            ErrorHandler.handle(
+                error,
+                'ChartTransitions.animateLegend',
+                { type: ErrorHandler.ERROR_TYPES.RENDER, severity: ErrorHandler.SEVERITY.MEDIUM }
+            );
             return legendSelection;
         }
     }
@@ -590,7 +622,11 @@ export class ChartTransitions {
         try {
             return transitionFunction();
         } catch (error) {
-            console.error(`ChartTransitions: Error in ${operation}:`, error);
+            ErrorHandler.handle(
+                error,
+                `ChartTransitions.${operation}`,
+                { type: ErrorHandler.ERROR_TYPES.RENDER, severity: ErrorHandler.SEVERITY.MEDIUM }
+            );
 
             // ErrorHandlerが利用可能な場合は使用
             if (window.ErrorHandler) {

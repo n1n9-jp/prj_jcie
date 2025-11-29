@@ -31,7 +31,15 @@ export class ChartSVGRenderer extends BaseManager {
         const { charts, position } = chartData;
 
         if (!charts || !Array.isArray(charts) || charts.length !== 2) {
-            console.error('ChartSVGRenderer: Invalid charts array for dual layout. Expected exactly 2 charts.', charts);
+            ErrorHandler.handle(
+                new Error('Invalid charts array for dual layout. Expected exactly 2 charts.'),
+                'ChartSVGRenderer.createDualLayoutSVG',
+                {
+                    type: ErrorHandler.ERROR_TYPES.RENDER,
+                    severity: ErrorHandler.SEVERITY.HIGH,
+                    additionalInfo: { charts }
+                }
+            );
             return;
         }
 
@@ -47,7 +55,11 @@ export class ChartSVGRenderer extends BaseManager {
         const svg = this.createDualLayoutSVG(chartData);
 
         if (!svg) {
-            console.error('ChartSVGRenderer: Failed to create SVG for direct dual layout');
+            ErrorHandler.handle(
+                new Error('Failed to create SVG for direct dual layout'),
+                'ChartSVGRenderer.createDualLayoutSVG',
+                { type: ErrorHandler.ERROR_TYPES.RENDER, severity: ErrorHandler.SEVERITY.HIGH }
+            );
             return;
         }
 
@@ -83,14 +95,22 @@ export class ChartSVGRenderer extends BaseManager {
      */
     drawSingleChartInSVG(svgGroup, chartConfig, layout, position) {
         if (chartConfig.type !== 'line') {
-            console.error(`ChartSVGRenderer: Direct rendering only supports line charts, got: ${chartConfig.type}`);
+            ErrorHandler.handle(
+                new Error(`Direct rendering only supports line charts, got: ${chartConfig.type}`),
+                'ChartSVGRenderer.renderDirectChart',
+                { type: ErrorHandler.ERROR_TYPES.RENDER, severity: ErrorHandler.SEVERITY.MEDIUM }
+            );
             return;
         }
 
         // データを取得
         const data = chartConfig.data;
         if (!data || data.length === 0) {
-            console.error(`ChartSVGRenderer: No data available for ${position} chart`);
+            ErrorHandler.handle(
+                new Error(`No data available for ${position} chart`),
+                'ChartSVGRenderer.renderDirectChart',
+                { type: ErrorHandler.ERROR_TYPES.DATA, severity: ErrorHandler.SEVERITY.MEDIUM }
+            );
             return;
         }
 
@@ -622,14 +642,22 @@ export class ChartSVGRenderer extends BaseManager {
      */
     static drawSingleChartInSVGStatic(svgGroup, chartConfig, layout, position) {
         if (chartConfig.type !== 'line') {
-            console.error(`ChartSVGRenderer: Direct rendering only supports line charts, got: ${chartConfig.type}`);
+            ErrorHandler.handle(
+                new Error(`Direct rendering only supports line charts, got: ${chartConfig.type}`),
+                'ChartSVGRenderer.renderDirectChart',
+                { type: ErrorHandler.ERROR_TYPES.RENDER, severity: ErrorHandler.SEVERITY.MEDIUM }
+            );
             return;
         }
 
         // データを取得
         const data = chartConfig.data;
         if (!data || data.length === 0) {
-            console.error(`ChartSVGRenderer: No data available for ${position} chart`);
+            ErrorHandler.handle(
+                new Error(`No data available for ${position} chart`),
+                'ChartSVGRenderer.renderDirectChart',
+                { type: ErrorHandler.ERROR_TYPES.DATA, severity: ErrorHandler.SEVERITY.MEDIUM }
+            );
             return;
         }
 

@@ -421,7 +421,11 @@ export class LineChartLabelManager {
             this.postProcessLabelPositions(labels, width, height, config);
 
         } catch (error) {
-            console.error('LineChartLabelManager: D3-Labeler optimization failed:', error);
+            ErrorHandler.handle(
+                error,
+                'LineChartLabelManager.optimizeLabels',
+                { type: ErrorHandler.ERROR_TYPES.RENDER, severity: ErrorHandler.SEVERITY.LOW }
+            );
             // フォールバックとして簡易重複回避を実行
             this.applySimpleCollisionAvoidance(labels, config);
         }

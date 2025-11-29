@@ -103,21 +103,30 @@ export class ChartManager extends BaseManager {
             if (LineChartRenderer) {
                 this.renderers.line = new LineChartRenderer(containerId);
             } else {
-                console.error('✗ LineChartRenderer not available');
+                ErrorHandler.handle(new Error('LineChartRenderer not available'), 'ChartManager.initializeRenderers', {
+                    type: ErrorHandler.ERROR_TYPES.INITIALIZATION,
+                    severity: ErrorHandler.SEVERITY.MEDIUM
+                });
             }
 
             // BarChartRenderer
             if (BarChartRenderer) {
                 this.renderers.bar = new BarChartRenderer(containerId);
             } else {
-                console.error('✗ BarChartRenderer not available');
+                ErrorHandler.handle(new Error('BarChartRenderer not available'), 'ChartManager.initializeRenderers', {
+                    type: ErrorHandler.ERROR_TYPES.INITIALIZATION,
+                    severity: ErrorHandler.SEVERITY.MEDIUM
+                });
             }
 
             // PieChartRenderer
             if (PieChartRenderer) {
                 this.renderers.pie = new PieChartRenderer(containerId);
             } else {
-                console.error('✗ PieChartRenderer not available');
+                ErrorHandler.handle(new Error('PieChartRenderer not available'), 'ChartManager.initializeRenderers', {
+                    type: ErrorHandler.ERROR_TYPES.INITIALIZATION,
+                    severity: ErrorHandler.SEVERITY.MEDIUM
+                });
             }
 
             // GridChartRenderer
@@ -151,7 +160,10 @@ export class ChartManager extends BaseManager {
         const initializedRenderers = Object.keys(this.renderers).filter(key => this.renderers[key] !== null);
 
         if (initializedRenderers.length === 0) {
-            console.error('ChartManager: WARNING - No renderers were successfully initialized!');
+            ErrorHandler.handle(new Error('No renderers were successfully initialized'), 'ChartManager.initializeRenderers', {
+                type: ErrorHandler.ERROR_TYPES.INITIALIZATION,
+                severity: ErrorHandler.SEVERITY.HIGH
+            });
         }
     }
 
@@ -263,14 +275,14 @@ export class ChartManager extends BaseManager {
             });
 
         } catch (error) {
-            console.error('ChartManager: Error updating chart:', error);
-
             if (ErrorHandler) {
                 ErrorHandler.handle(error, 'ChartManager.updateChart', {
                     type: ErrorHandler.ERROR_TYPES.RENDER,
                     severity: ErrorHandler.SEVERITY.HIGH,
                     context: chartData
                 });
+            } else {
+                console.error('ChartManager: Error updating chart:', error);
             }
         }
     }
@@ -317,7 +329,10 @@ export class ChartManager extends BaseManager {
                             console.log(`ChartManager: Loading data for ${chart.id} from ${dataPath}`);
                             chart.data = await d3.csv(dataPath);
                         } catch (e) {
-                            console.error(`ChartManager: Failed to load data for chart ${chart.id}:`, e);
+                            ErrorHandler.handle(e, `ChartManager.handleDualLayout (loading ${chart.id})`, {
+                                type: ErrorHandler.ERROR_TYPES.DATA_LOAD,
+                                severity: ErrorHandler.SEVERITY.HIGH
+                            });
                         }
                     }
                 });
@@ -339,13 +354,14 @@ export class ChartManager extends BaseManager {
             this.renderDualLayoutDirect(chartData);
 
         } catch (error) {
-            console.error('ChartManager: Error in handleDualLayout:', error);
             if (ErrorHandler) {
                 ErrorHandler.handle(error, 'ChartManager.handleDualLayout', {
                     type: ErrorHandler.ERROR_TYPES.RENDER,
                     severity: ErrorHandler.SEVERITY.HIGH,
                     context: chartData
                 });
+            } else {
+                console.error('ChartManager: Error in handleDualLayout:', error);
             }
             this.renderFallbackError('Dual layout error: ' + error.message);
         }
@@ -552,7 +568,11 @@ export class ChartManager extends BaseManager {
      * @param {string} message - エラーメッセージ
      */
     renderFallbackError(message) {
-        console.error(message);
+        ErrorHandler.handle(new Error(message), 'ChartManager.renderFallbackError', {
+            type: ErrorHandler.ERROR_TYPES.RENDER,
+            severity: ErrorHandler.SEVERITY.HIGH,
+            showNotification: false // フォールバック表示自体が通知の役割を果たすため
+        });
         this.clearChartContainer();
         this.show();
 
@@ -580,7 +600,11 @@ export class ChartManager extends BaseManager {
         const { charts, position } = chartData;
 
         if (!charts || !Array.isArray(charts) || charts.length !== 2) {
-            console.error('ChartManager: Invalid charts array for dual layout. Expected exactly 2 charts.', charts);
+            ErrorHandler.handle(new Error('Invalid charts array for dual layout. Expected exactly 2 charts.'), 'ChartManager.renderDualLayoutDirect', {
+                type: ErrorHandler.ERROR_TYPES.VALIDATION,
+                severity: ErrorHandler.SEVERITY.HIGH,
+                context: { charts }
+            });
             return;
         }
 
@@ -590,7 +614,10 @@ export class ChartManager extends BaseManager {
         // 横並びレイアウト用のSVGを作成
         const svg = this.createDualLayoutSVG(chartData);
         if (!svg) {
-            console.error('ChartManager: Failed to create SVG for direct dual layout');
+            ErrorHandler.handle(new Error('Failed to create SVG for direct dual layout'), 'ChartManager.renderDualLayoutDirect', {
+                type: ErrorHandler.ERROR_TYPES.RENDER,
+                severity: ErrorHandler.SEVERITY.HIGH
+            });
             return;
         }
 
@@ -624,7 +651,10 @@ export class ChartManager extends BaseManager {
         if (ChartSVGRenderer) {
             ChartSVGRenderer.drawSingleChartInSVGStatic(svgGroup, chartConfig, layout, position);
         } else {
-            console.error('ChartSVGRenderer not available');
+            ErrorHandler.handle(new Error('ChartSVGRenderer not available'), 'ChartManager.drawSingleChartInSVG', {
+                type: ErrorHandler.ERROR_TYPES.RENDER,
+                severity: ErrorHandler.SEVERITY.HIGH
+            });
         }
     }
 
@@ -735,8 +765,11 @@ export class ChartManager extends BaseManager {
                         const data = await d3.csv(dataPath);
                         return { ...chartConfig, data };
                     } catch (csvError) {
-                        console.error(`ChartManager: CSV loading error for chart ${index}:`, csvError);
-                        console.error(`ChartManager: Failed path:`, dataPath);
+                        ErrorHandler.handle(csvError, `ChartManager.loadChartsDataAndRender (chart ${index})`, {
+                            type: ErrorHandler.ERROR_TYPES.DATA_LOAD,
+                            severity: ErrorHandler.SEVERITY.HIGH,
+                            additionalInfo: { path: dataPath }
+                        });
                         return { ...chartConfig, data: [] };
                     }
                 } else if (chartConfig.data) {
@@ -785,14 +818,14 @@ export class ChartManager extends BaseManager {
             });
 
         } catch (error) {
-            console.error('ChartManager: Error in loadChartsDataAndRender:', error);
-
             if (ErrorHandler) {
                 ErrorHandler.handle(error, 'ChartManager.loadChartsDataAndRender', {
                     type: ErrorHandler.ERROR_TYPES.DATA_LOAD,
                     severity: ErrorHandler.SEVERITY.HIGH,
                     context: { charts }
                 });
+            } else {
+                console.error('ChartManager: Error in loadChartsDataAndRender:', error);
             }
         }
     }

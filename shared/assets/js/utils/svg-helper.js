@@ -94,7 +94,11 @@ export class SVGHelper {
         } else if (container instanceof HTMLElement) {
             containerElement = container;
         } else {
-            console.error('Invalid container provided to getResponsiveSize');
+            ErrorHandler.handle(
+                new Error('Invalid container provided to getResponsiveSize'),
+                'SvgHelper.getResponsiveSize',
+                { type: ErrorHandler.ERROR_TYPES.RENDER, severity: ErrorHandler.SEVERITY.MEDIUM }
+            );
             return { width: defaultWidth, height: defaultHeight };
         }
 
@@ -177,7 +181,11 @@ export class SVGHelper {
         } else if (container instanceof HTMLElement) {
             containerElement = container;
         } else {
-            console.error('Invalid container provided to resizeSVG');
+            ErrorHandler.handle(
+                new Error('Invalid container provided to resizeSVG'),
+                'SvgHelper.resizeSVG',
+                { type: ErrorHandler.ERROR_TYPES.RENDER, severity: ErrorHandler.SEVERITY.MEDIUM }
+            );
             return;
         }
 

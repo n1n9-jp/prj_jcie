@@ -93,14 +93,15 @@ export class ChartLayoutManager extends BaseLayout {
             // BaseLayout.render handles dual layout if configured
             await this.render(chartData);
         } catch (error) {
-            console.error('ChartLayoutManager: Error creating dual layout:', error);
-            if (ErrorHandler) {
-                ErrorHandler.handle(error, 'ChartLayoutManager.createDualLayout', {
+            ErrorHandler.handle(
+                error,
+                'ChartLayoutManager.createDualLayout',
+                {
                     type: ErrorHandler.ERROR_TYPES.RENDER,
                     severity: ErrorHandler.SEVERITY.HIGH,
                     context: { chartData }
-                });
-            }
+                }
+            );
         }
     }
 
@@ -115,14 +116,15 @@ export class ChartLayoutManager extends BaseLayout {
             // BaseLayout.render handles triple layout if configured
             await this.render(chartData);
         } catch (error) {
-            console.error('ChartLayoutManager: Error creating triple layout:', error);
-            if (ErrorHandler) {
-                ErrorHandler.handle(error, 'ChartLayoutManager.createTripleLayout', {
+            ErrorHandler.handle(
+                error,
+                'ChartLayoutManager.createTripleLayout',
+                {
                     type: ErrorHandler.ERROR_TYPES.RENDER,
                     severity: ErrorHandler.SEVERITY.HIGH,
                     context: { chartData }
-                });
-            }
+                }
+            );
         }
     }
 
@@ -171,7 +173,11 @@ export class ChartLayoutManager extends BaseLayout {
                     this.renderers[type] = new RendererClass(containerId);
                 }
             } catch (error) {
-                console.error(`ChartLayoutManager: Error creating renderer for type ${type}:`, error);
+                ErrorHandler.handle(
+                    error,
+                    `ChartLayoutManager.createRenderer(${type})`,
+                    { type: ErrorHandler.ERROR_TYPES.RENDER, severity: ErrorHandler.SEVERITY.MEDIUM }
+                );
                 return null;
             }
         }

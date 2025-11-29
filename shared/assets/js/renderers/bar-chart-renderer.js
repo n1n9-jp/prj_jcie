@@ -84,14 +84,15 @@ export class BarChartRenderer extends ChartRendererBase {
         // データとコンフィグの検証
         const validation = this.validateChartData(data, config, this.fieldConfig);
         if (!validation.valid) {
-            console.error('BarChartRenderer: Invalid data or config:', validation.errors);
-            if (ErrorHandler) {
-                ErrorHandler.handle(new Error(validation.errors.join(', ')), 'BarChartRenderer.renderChart', {
+            ErrorHandler.handle(
+                new Error('Invalid data or config'),
+                'BarChartRenderer.render',
+                {
                     type: ErrorHandler.ERROR_TYPES.VALIDATION,
-                    severity: ErrorHandler.SEVERITY.HIGH,
-                    context: { data, config }
-                });
-            }
+                    severity: ErrorHandler.SEVERITY.MEDIUM,
+                    additionalInfo: { errors: validation.errors }
+                }
+            );
             return;
         }
 
@@ -144,14 +145,11 @@ export class BarChartRenderer extends ChartRendererBase {
         try {
             this.renderBarChart(data, { width, height, margin, ...config });
         } catch (error) {
-            console.error('BarChartRenderer: Error during chart rendering:', error);
-            if (ErrorHandler) {
-                ErrorHandler.handle(error, 'BarChartRenderer.renderChart', {
-                    type: ErrorHandler.ERROR_TYPES.RENDER,
-                    severity: ErrorHandler.SEVERITY.HIGH,
-                    context: { type, data, config }
-                });
-            }
+            ErrorHandler.handle(
+                error,
+                'BarChartRenderer.render',
+                { type: ErrorHandler.ERROR_TYPES.RENDER, severity: ErrorHandler.SEVERITY.HIGH }
+            );
         }
     }
 
@@ -180,19 +178,6 @@ export class BarChartRenderer extends ChartRendererBase {
             });
             const innerWidth = width - margin.left - margin.right;
             const innerHeight = height - margin.top - margin.bottom;
-
-            const { xField = 'category', yField = 'value' } = config;
-
-            // 新しいスケールを計算
-            const newXScale = d3.scaleBand()
-                .domain(data.map(d => d[xField]))
-                .range([0, innerWidth])
-                .padding(0.1);
-
-            const newYScale = d3.scaleLinear()
-                .domain([0, d3.max(data, d => +d[yField])])
-                .nice()
-                .range([innerHeight, 0]);
 
             const g = this.svg.select('g');
             const transitionDuration = config.transitionDuration || 1000;
@@ -266,14 +251,11 @@ export class BarChartRenderer extends ChartRendererBase {
             );
 
         } catch (error) {
-            console.error('BarChartRenderer: Error during transition update:', error);
-            if (ErrorHandler) {
-                ErrorHandler.handle(error, 'BarChartRenderer.updateChartWithTransition', {
-                    type: ErrorHandler.ERROR_TYPES.TRANSITION,
-                    severity: ErrorHandler.SEVERITY.MEDIUM,
-                    context: { data, config, direction }
-                });
-            }
+            ErrorHandler.handle(
+                error,
+                'BarChartRenderer.update',
+                { type: ErrorHandler.ERROR_TYPES.RENDER, severity: ErrorHandler.SEVERITY.MEDIUM }
+            );
         }
     }
 

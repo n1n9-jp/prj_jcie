@@ -48,7 +48,11 @@ export class MapCityManager {
                 if (Logger) {
                     Logger.error('MapCityManager: Cannot render timeline map - no geo data');
                 } else {
-                    console.error('MapCityManager: Cannot render timeline map - no geo data');
+                    ErrorHandler.handle(
+                        new Error('Cannot render timeline map - no geo data'),
+                        'MapCityManager.renderTimelineMap',
+                        { type: ErrorHandler.ERROR_TYPES.MAP, severity: ErrorHandler.SEVERITY.MEDIUM }
+                    );
                 }
             }
 
@@ -56,7 +60,11 @@ export class MapCityManager {
             if (Logger) {
                 Logger.error('MapCityManager: Failed to load cities timeline data:', error);
             } else {
-                console.error('MapCityManager: Failed to load cities timeline data:', error);
+                ErrorHandler.handle(
+                    error,
+                    'MapCityManager.renderTimelineMap',
+                    { type: ErrorHandler.ERROR_TYPES.MAP, severity: ErrorHandler.SEVERITY.HIGH }
+                );
             }
         }
     }
@@ -583,7 +591,15 @@ export class MapCityManager {
         }
 
         if (!coords) {
-            console.error('MapCityManager: Failed to project city coordinates:', city);
+            ErrorHandler.handle(
+                new Error('Failed to project city coordinates'),
+                'MapCityManager.projectCityCoordinates',
+                {
+                    type: ErrorHandler.ERROR_TYPES.MAP,
+                    severity: ErrorHandler.SEVERITY.LOW,
+                    additionalInfo: { city }
+                }
+            );
             return;
         }
 

@@ -63,7 +63,11 @@ export class StepMapper {
             if (Logger) {
                 Logger.error('STEP_DEFINITIONS を取得できません');
             } else {
-                console.error('STEP_DEFINITIONS を取得できません');
+                ErrorHandler.handle(
+                    new Error('STEP_DEFINITIONS を取得できません'),
+                    'StepMapper.getStepConfig',
+                    { type: ErrorHandler.ERROR_TYPES.CONFIG, severity: ErrorHandler.SEVERITY.MEDIUM }
+                );
             }
             return {};
         }
@@ -315,7 +319,15 @@ export class StepMapper {
         }
 
         if (errors.length > 0) {
-            console.error('StepMapper設定エラー:', errors);
+            ErrorHandler.handle(
+                new Error('StepMapper configuration errors'),
+                'StepMapper.validate',
+                {
+                    type: ErrorHandler.ERROR_TYPES.CONFIG,
+                    severity: ErrorHandler.SEVERITY.MEDIUM,
+                    additionalInfo: { errors }
+                }
+            );
             return false;
         }
 

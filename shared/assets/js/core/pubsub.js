@@ -40,7 +40,11 @@ export class PubSub {
             try {
                 callback(data);
             } catch (error) {
-                console.error(`Error in event handler for "${event}":`, error);
+                ErrorHandler.handle(
+                    error,
+                    `PubSub.publish(${event})`,
+                    { type: ErrorHandler.ERROR_TYPES.UNKNOWN, severity: ErrorHandler.SEVERITY.LOW }
+                );
             }
         });
     }

@@ -10,16 +10,17 @@
 - **対応**: Vite の導入。
 - **結果**: 多数の `<script>` タグを削除し、エントリポイント (`main.js`) からのモジュール読み込みに一本化しました。Tailwind CSS も導入し、スタイリングの依存関係も整理しました。
 
+### 6️⃣ エラーハンドリングの統一化
+- [x] Unify error handling with `ErrorHandler` class
+  - [x] Replace `console.error` in Managers
+  - [x] Replace `console.error` in Renderers
+  - [x] Implement consistent error notification UIdler.handle` を経由。
+  - 軽量な Toast もしくは Alert UI を作成し、致命的エラーのみ表示。
+  - 重要ログは Logger と連携して集計。
+
 ---
 
 ## 🚧 今後の課題（未完了）
-
-### 6️⃣ エラーハンドリングの統一化
-- **現状**: `ErrorHandler` が一部クラスでのみ使用され、UI での通知方法も未統一。
-- **実装方針**:
-  - すべての Manager / Renderer で `ErrorHandler.handle` を経由。
-  - 軽量な Toast もしくは Alert UI を作成し、致命的エラーのみ表示。
-  - 重要ログは Logger と連携して集計。
 
 ### 8️⃣ ユーティリティクラスの使用率向上
 - **現状**: Map 系は `MapHelper` に統一済み、Chart 系ユーティリティの適用が未着手。

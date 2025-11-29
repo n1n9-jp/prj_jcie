@@ -71,7 +71,11 @@ export class DataLoader {
             return { config, data };
 
         } catch (error) {
-            console.error('Data loading failed:', error);
+            ErrorHandler.handle(
+                error,
+                'DataLoader.loadAll',
+                { type: ErrorHandler.ERROR_TYPES.DATA, severity: ErrorHandler.SEVERITY.CRITICAL }
+            );
             throw error;
         }
     }

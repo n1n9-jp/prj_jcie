@@ -75,7 +75,6 @@ export class GridDataTransformer {
                 return this.transformSingleValueData(data, structure, config, valueField, labelField);
             }
         } catch (error) {
-            console.error('GridDataTransformer: Error transforming data:', error);
             if (ErrorHandler) {
                 ErrorHandler.handle(error, 'GridDataTransformer.transformToGridData', {
                     type: ErrorHandler.ERROR_TYPES.DATA_PROCESSING,

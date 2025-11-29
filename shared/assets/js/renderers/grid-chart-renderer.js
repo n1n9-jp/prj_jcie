@@ -61,14 +61,16 @@ export class GridChartRenderer extends ChartRendererBase {
         // データとコンフィグの検証（GridChartRenderer は独自データ構造を使用）
         const validation = this.validateChartData(data, config);
         if (!validation.valid) {
-            console.error('GridChartRenderer: Invalid data or config:', validation.errors);
-            if (ErrorHandler) {
-                ErrorHandler.handle(new Error(validation.errors.join(', ')), 'GridChartRenderer.updateChart', {
+            ErrorHandler.handle(
+                new Error('Invalid data or config'),
+                'GridChartRenderer.render',
+                {
                     type: ErrorHandler.ERROR_TYPES.VALIDATION,
-                    severity: ErrorHandler.SEVERITY.HIGH,
-                    context: { data, config }
-                });
-            }
+                    severity: ErrorHandler.SEVERITY.MEDIUM,
+                    additionalInfo: { errors: validation.errors }
+                }
+            );
+
             return;
         }
 
@@ -113,14 +115,11 @@ export class GridChartRenderer extends ChartRendererBase {
 
             this.renderGridChart(data, chartData.config);
         } catch (error) {
-            console.error('GridChartRenderer: Error during grid chart update:', error);
-            if (ErrorHandler) {
-                ErrorHandler.handle(error, 'GridChartRenderer.updateGridChart', {
-                    type: ErrorHandler.ERROR_TYPES.RENDER,
-                    severity: ErrorHandler.SEVERITY.HIGH,
-                    context: { chartData }
-                });
-            }
+            ErrorHandler.handle(
+                error,
+                'GridChartRenderer.update',
+                { type: ErrorHandler.ERROR_TYPES.RENDER, severity: ErrorHandler.SEVERITY.MEDIUM }
+            );
         }
     }
 
@@ -260,14 +259,11 @@ export class GridChartRenderer extends ChartRendererBase {
                 this.addDataSource(this.svg, dataSource, totalWidth, totalHeight);
             }
         } catch (error) {
-            console.error('GridChartRenderer: Error during grid chart rendering:', error);
-            if (ErrorHandler) {
-                ErrorHandler.handle(error, 'GridChartRenderer.renderGridChart', {
-                    type: ErrorHandler.ERROR_TYPES.RENDER,
-                    severity: ErrorHandler.SEVERITY.HIGH,
-                    context: { data, config: mergedConfig }
-                });
-            }
+            ErrorHandler.handle(
+                error,
+                'GridChartRenderer.render',
+                { type: ErrorHandler.ERROR_TYPES.RENDER, severity: ErrorHandler.SEVERITY.HIGH }
+            );
         }
     }
 
@@ -393,14 +389,11 @@ export class GridChartRenderer extends ChartRendererBase {
                 );
             }
         } catch (error) {
-            console.error('GridChartRenderer: Error rendering grid cell:', error);
-            if (ErrorHandler) {
-                ErrorHandler.handle(error, 'GridChartRenderer.renderGridCell', {
-                    type: ErrorHandler.ERROR_TYPES.RENDER,
-                    severity: ErrorHandler.SEVERITY.MEDIUM,
-                    context: { cellData, layout }
-                });
-            }
+            ErrorHandler.handle(
+                error,
+                'GridChartRenderer.renderCell',
+                { type: ErrorHandler.ERROR_TYPES.RENDER, severity: ErrorHandler.SEVERITY.LOW }
+            );
         }
     }
 

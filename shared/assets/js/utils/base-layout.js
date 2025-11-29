@@ -64,14 +64,22 @@ export class BaseLayout {
             // コンテナを取得または作成
             this.container = d3.select(this.containerId);
             if (this.container.empty()) {
-                console.error(`BaseLayout: Container '${this.containerId}' not found`);
+                ErrorHandler.handle(
+                    new Error(`BaseLayout: Container '${this.containerId}' not found`),
+                    'BaseLayout.init',
+                    { type: ErrorHandler.ERROR_TYPES.RENDER, severity: ErrorHandler.SEVERITY.HIGH }
+                );
                 return false;
             }
 
             this.isInitialized = true;
             return true;
         } catch (error) {
-            console.error('BaseLayout: Initialization error:', error);
+            ErrorHandler.handle(
+                error,
+                'BaseLayout.init',
+                { type: ErrorHandler.ERROR_TYPES.RENDER, severity: ErrorHandler.SEVERITY.HIGH }
+            );
             return false;
         }
     }
@@ -294,7 +302,11 @@ export class BaseLayout {
                 this.chartContainers.push(chartContainer);
             }
         } catch (error) {
-            console.error(`BaseLayout.prepareContainer (${this.layoutType}):`, error);
+            ErrorHandler.handle(
+                error,
+                `BaseLayout.prepareContainer (${this.layoutType})`,
+                { type: ErrorHandler.ERROR_TYPES.RENDER, severity: ErrorHandler.SEVERITY.MEDIUM }
+            );
             throw error;
         }
     }
@@ -339,18 +351,18 @@ export class BaseLayout {
      * @param {string} context - コンテキスト
      */
     handleError(error, context) {
-        console.error(`BaseLayout.${context}:`, error);
-
-        if (ErrorHandler) {
-            ErrorHandler.handle(error, `BaseLayout.${context}`, {
+        ErrorHandler.handle(
+            error,
+            `BaseLayout.${context}`,
+            {
                 type: ErrorHandler.ERROR_TYPES.RENDER,
                 severity: ErrorHandler.SEVERITY.MEDIUM,
                 context: {
                     layoutType: this.layoutType,
                     containerId: this.containerId
                 }
-            });
-        }
+            }
+        );
     }
 
     /**
@@ -414,7 +426,11 @@ export class BaseLayout {
                     error: null
                 };
             } else {
-                console.error(`No data provided for chart: ${chartConfig.dataFile || 'unknown'}`);
+                ErrorHandler.handle(
+                    new Error(`No data provided for chart: ${chartConfig.dataFile || 'unknown'}`),
+                    'BaseLayout.render',
+                    { type: ErrorHandler.ERROR_TYPES.DATA, severity: ErrorHandler.SEVERITY.MEDIUM }
+                );
                 return {
                     config: chartConfig,
                     data: null,
@@ -556,7 +572,11 @@ export class BaseLayout {
                     };
 
                 } catch (error) {
-                    console.error(`${this.layoutType} Layout: Error rendering chart ${i}:`, error);
+                    ErrorHandler.handle(
+                        error,
+                        `${this.layoutType} Layout: Error rendering chart ${i}`,
+                        { type: ErrorHandler.ERROR_TYPES.RENDER, severity: ErrorHandler.SEVERITY.MEDIUM }
+                    );
                     this.renderErrorState(container, error);
                 }
             }

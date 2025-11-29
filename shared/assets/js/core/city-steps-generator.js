@@ -14,7 +14,11 @@ export class CityStepsGenerator {
     static generateSteps(citiesData, config, getCountryNameJapanese) {
         const container = document.getElementById('city-steps-container');
         if (!container) {
-            console.error('City steps container not found');
+            ErrorHandler.handle(
+                new Error('City steps container not found'),
+                'CityStepsGenerator.generate',
+                { type: ErrorHandler.ERROR_TYPES.RENDER, severity: ErrorHandler.SEVERITY.HIGH }
+            );
             return;
         }
 
@@ -45,7 +49,11 @@ export class CityStepsGenerator {
             const cityIndex = index;
             const stepDiv = document.createElement('div');
             if (!stepDiv) {
-                console.error('Failed to create step element');
+                ErrorHandler.handle(
+                    new Error('Failed to create step element'),
+                    'CityStepsGenerator.generate',
+                    { type: ErrorHandler.ERROR_TYPES.RENDER, severity: ErrorHandler.SEVERITY.MEDIUM }
+                );
                 return;
             }
             stepDiv.className = 'step';
@@ -150,8 +158,15 @@ export class CityStepsGenerator {
 
                 container.appendChild(stepDiv);
             } catch (error) {
-                console.error('Failed to set innerHTML for city step:', error);
-                console.error('City data:', city);
+                ErrorHandler.handle(
+                    error,
+                    'CityStepsGenerator.createStepElement',
+                    {
+                        type: ErrorHandler.ERROR_TYPES.RENDER,
+                        severity: ErrorHandler.SEVERITY.MEDIUM,
+                        additionalInfo: { city }
+                    }
+                );
             }
         });
     }

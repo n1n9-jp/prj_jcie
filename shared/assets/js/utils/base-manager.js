@@ -234,9 +234,6 @@ export class BaseManager {
             });
 
         } catch (error) {
-            console.error(`${this.constructor.name}: State update failed:`, error);
-
-            // ErrorHandlerが利用可能な場合は使用
             if (ErrorHandler) {
                 ErrorHandler.handle(error, `${this.constructor.name}.updateState`, {
                     type: ErrorHandler.ERROR_TYPES.RENDER,
@@ -265,8 +262,6 @@ export class BaseManager {
         try {
             return await asyncFunction();
         } catch (error) {
-            console.error(`${this.constructor.name}: ${operationName} failed:`, error);
-
             if (ErrorHandler) {
                 ErrorHandler.handle(error, `${this.constructor.name}.${operationName}`, {
                     type: ErrorHandler.ERROR_TYPES.RENDER,

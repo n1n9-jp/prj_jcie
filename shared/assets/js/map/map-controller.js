@@ -66,7 +66,11 @@ export class MapController {
                 if (Logger) {
                     Logger.error('MapController: No geo data available for rendering');
                 } else {
-                    console.error('MapController: No geo data available for rendering');
+                    ErrorHandler.handle(
+                        new Error('No geo data available for rendering'),
+                        'MapController.renderMap',
+                        { type: ErrorHandler.ERROR_TYPES.MAP, severity: ErrorHandler.SEVERITY.MEDIUM }
+                    );
                 }
             }
         } else {
@@ -83,7 +87,11 @@ export class MapController {
             if (Logger) {
                 Logger.error('MapController: Invalid topoData structure');
             } else {
-                console.error('MapController: Invalid topoData structure');
+                ErrorHandler.handle(
+                    new Error('Invalid topoData structure'),
+                    'MapController.renderMap',
+                    { type: ErrorHandler.ERROR_TYPES.MAP, severity: ErrorHandler.SEVERITY.HIGH }
+                );
             }
             return;
         }
@@ -120,7 +128,11 @@ export class MapController {
         // MapRenderer インスタンスを取得
         const renderer = this.mapManager.renderer || this.renderer;
         if (!renderer) {
-            console.error('MapController: MapRenderer not available');
+            ErrorHandler.handle(
+                new Error('MapRenderer not available'),
+                'MapController.renderMap',
+                { type: ErrorHandler.ERROR_TYPES.MAP, severity: ErrorHandler.SEVERITY.HIGH }
+            );
             return;
         }
 

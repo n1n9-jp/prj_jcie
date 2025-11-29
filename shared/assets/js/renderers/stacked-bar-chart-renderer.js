@@ -59,7 +59,15 @@ export class StackedBarChartRenderer extends ChartRendererBase {
 
         const validation = this.validateChartData(data, config);
         if (!validation.valid) {
-            console.error('StackedBarChartRenderer: Invalid data or config:', validation.errors);
+            ErrorHandler.handle(
+                new Error('Invalid data or config'),
+                'StackedBarChartRenderer.render',
+                {
+                    type: ErrorHandler.ERROR_TYPES.VALIDATION,
+                    severity: ErrorHandler.SEVERITY.MEDIUM,
+                    additionalInfo: { errors: validation.errors }
+                }
+            );
             return;
         }
 
@@ -87,7 +95,11 @@ export class StackedBarChartRenderer extends ChartRendererBase {
         try {
             this.renderStackedBarChart(data, { width, height, margin, ...config });
         } catch (error) {
-            console.error('StackedBarChartRenderer: Error during chart rendering:', error);
+            ErrorHandler.handle(
+                error,
+                'StackedBarChartRenderer.render',
+                { type: ErrorHandler.ERROR_TYPES.RENDER, severity: ErrorHandler.SEVERITY.HIGH }
+            );
         }
     }
 

@@ -11,6 +11,7 @@ import { EventHandlers } from './event-handlers.js';
 import { StepMapper } from '../utils/step-mapper.js';
 import { PositionManager } from '../utils/position-manager.js';
 import { logger as Logger } from '../utils/logger.js';
+import { ErrorHandler } from '../utils/error-handler.js';
 
 /**
  * Main Application - Scrollytelling メインアプリケーション
@@ -52,7 +53,10 @@ export class ScrollytellingApp {
             if (Logger) {
                 Logger.error('Failed to initialize app:', error);
             } else {
-                console.error('Failed to initialize app:', error);
+                ErrorHandler.handle(error, 'ScrollytellingApp.init', {
+                    type: ErrorHandler.ERROR_TYPES.INITIALIZATION,
+                    severity: ErrorHandler.SEVERITY.CRITICAL
+                });
             }
             this.showError('アプリケーションの初期化に失敗しました。');
         }
@@ -75,7 +79,10 @@ export class ScrollytellingApp {
             pubsub.publish(EVENTS.DATA_LOADED, this.data);
 
         } catch (error) {
-            console.error('Data loading failed:', error);
+            ErrorHandler.handle(error, 'ScrollytellingApp.loadData', {
+                type: ErrorHandler.ERROR_TYPES.DATA_LOAD,
+                severity: ErrorHandler.SEVERITY.CRITICAL
+            });
             pubsub.publish(EVENTS.DATA_ERROR, error);
             throw error;
         }
@@ -102,7 +109,10 @@ export class ScrollytellingApp {
         if (this.data.map) {
             this.mapManager.setGeoData(this.data.map);
         } else {
-            console.error('No map data available for setting geo data');
+            ErrorHandler.handle(new Error('No map data available for setting geo data'), 'ScrollytellingApp.initManagers', {
+                type: ErrorHandler.ERROR_TYPES.DATA_LOAD,
+                severity: ErrorHandler.SEVERITY.HIGH
+            });
         }
     }
 
@@ -317,7 +327,10 @@ export class ScrollytellingApp {
         // フッター要素を作成
         const footer = document.createElement('footer');
         if (!footer) {
-            console.error('Failed to create footer element');
+            ErrorHandler.handle(new Error('Failed to create footer element'), 'ScrollytellingApp.renderFooter', {
+                type: ErrorHandler.ERROR_TYPES.RENDER,
+                severity: ErrorHandler.SEVERITY.MEDIUM
+            });
             return;
         }
         footer.className = 'site-footer';
@@ -360,7 +373,10 @@ export class ScrollytellingApp {
 
             containerDiv.appendChild(footer);
         } catch (error) {
-            console.error('Failed to set innerHTML for footer:', error);
+            ErrorHandler.handle(error, 'ScrollytellingApp.renderFooter', {
+                type: ErrorHandler.ERROR_TYPES.RENDER,
+                severity: ErrorHandler.SEVERITY.MEDIUM
+            });
         }
     }
 
@@ -432,7 +448,11 @@ export class ScrollytellingApp {
         // バリデーション
         const validation = PositionManager.validatePositionConfig(positionConfig);
         if (!validation.valid) {
-            console.error('Invalid chart position config:', validation.errors);
+            ErrorHandler.handle(new Error('Invalid chart position config'), 'ScrollytellingApp.applyChartPositioning', {
+                type: ErrorHandler.ERROR_TYPES.VALIDATION,
+                severity: ErrorHandler.SEVERITY.MEDIUM,
+                additionalInfo: { errors: validation.errors }
+            });
             return;
         }
 
@@ -471,7 +491,11 @@ export class ScrollytellingApp {
         // バリデーション
         const validation = PositionManager.validatePositionConfig(positionConfig);
         if (!validation.valid) {
-            console.error('Invalid map position config:', validation.errors);
+            ErrorHandler.handle(new Error('Invalid map position config'), 'ScrollytellingApp.applyMapPositioning', {
+                type: ErrorHandler.ERROR_TYPES.VALIDATION,
+                severity: ErrorHandler.SEVERITY.MEDIUM,
+                additionalInfo: { errors: validation.errors }
+            });
             return;
         }
 
@@ -504,7 +528,11 @@ export class ScrollytellingApp {
         // バリデーション
         const validation = PositionManager.validatePositionConfig(positionConfig);
         if (!validation.valid) {
-            console.error('Invalid image position config:', validation.errors);
+            ErrorHandler.handle(new Error('Invalid image position config'), 'ScrollytellingApp.applyImagePositioning', {
+                type: ErrorHandler.ERROR_TYPES.VALIDATION,
+                severity: ErrorHandler.SEVERITY.MEDIUM,
+                additionalInfo: { errors: validation.errors }
+            });
             return;
         }
 
@@ -646,7 +674,11 @@ export class ScrollytellingApp {
             // バリデーション
             const validation = PositionManager.validatePositionConfig(positionConfig);
             if (!validation.valid) {
-                console.error('Invalid text position config:', validation.errors);
+                ErrorHandler.handle(new Error('Invalid text position config'), 'ScrollytellingApp.applyTextPositioning', {
+                    type: ErrorHandler.ERROR_TYPES.VALIDATION,
+                    severity: ErrorHandler.SEVERITY.MEDIUM,
+                    additionalInfo: { errors: validation.errors }
+                });
                 return;
             }
 

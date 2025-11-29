@@ -83,14 +83,18 @@ export class PieChartRenderer extends ChartRendererBase {
         // データとコンフィグの検証
         const validation = this.validateChartData(data, config, this.fieldConfig);
         if (!validation.valid) {
-            console.error('PieChartRenderer: Invalid data or config:', validation.errors);
-            if (ErrorHandler) {
-                ErrorHandler.handle(new Error(validation.errors.join(', ')), 'PieChartRenderer.renderChart', {
+            ErrorHandler.handle(
+                new Error('Invalid data or config'),
+                'PieChartRenderer.render',
+                new Error(validation.errors.join(', ')),
+                'PieChartRenderer.renderChart',
+                {
                     type: ErrorHandler.ERROR_TYPES.VALIDATION,
                     severity: ErrorHandler.SEVERITY.HIGH,
+                    additionalInfo: { errors: validation.errors },
                     context: { data, config }
-                });
-            }
+                }
+            );
             return;
         }
 
@@ -143,14 +147,15 @@ export class PieChartRenderer extends ChartRendererBase {
         try {
             this.renderPieChart(data, { width, height, margin, ...config });
         } catch (error) {
-            console.error('PieChartRenderer: Error during chart rendering:', error);
-            if (ErrorHandler) {
-                ErrorHandler.handle(error, 'PieChartRenderer.renderChart', {
+            ErrorHandler.handle(
+                error,
+                'PieChartRenderer.renderChart',
+                {
                     type: ErrorHandler.ERROR_TYPES.RENDER,
                     severity: ErrorHandler.SEVERITY.HIGH,
                     context: { type, data, config }
-                });
-            }
+                }
+            );
         }
     }
 
@@ -243,14 +248,15 @@ export class PieChartRenderer extends ChartRendererBase {
             );
 
         } catch (error) {
-            console.error('PieChartRenderer: Error during transition update:', error);
-            if (ErrorHandler) {
-                ErrorHandler.handle(error, 'PieChartRenderer.updateChartWithTransition', {
+            ErrorHandler.handle(
+                error,
+                'PieChartRenderer.updateChartWithTransition',
+                {
                     type: ErrorHandler.ERROR_TYPES.TRANSITION,
                     severity: ErrorHandler.SEVERITY.MEDIUM,
                     context: { data, config, direction }
-                });
-            }
+                }
+            );
         }
     }
 
