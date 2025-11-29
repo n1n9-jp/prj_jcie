@@ -1,0 +1,15 @@
+{
+  "nodes": [
+    { "name": "対象人口" },
+    { "name": "蚊帳を配布された人" },
+    { "name": "蚊帳を配布されなかった人" },
+    { "name": "蚊帳を使っている人" },
+    { "name": "蚊帳を使っていない人数" }
+  ],
+  "links": [
+    { "source": 0, "target": 1, "value": 889695597 },
+    { "source": 0, "target": 2, "value": 259439521 },
+    { "source": 1, "target": 3, "value": 112674584 },
+    { "source": 1, "target": 4, "value": 777021013 }
+  ]
+}

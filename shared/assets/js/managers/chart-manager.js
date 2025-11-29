@@ -6,6 +6,7 @@ import { PieChartRenderer } from '../renderers/pie-chart-renderer.js';
 import { GridChartRenderer } from '../renderers/grid-chart-renderer.js';
 import { StackedBarChartRenderer } from '../renderers/stacked-bar-chart-renderer.js';
 import { VennChartRenderer } from '../renderers/venn-chart-renderer.js';
+import { SankeyChartRenderer } from '../renderers/sankey-chart-renderer.js';
 import { BaseLayout } from '../utils/base-layout.js';
 import { ChartTransitions } from '../utils/chart-transitions.js';
 import { LayoutConfig } from '../config/layout-config.js';
@@ -94,7 +95,8 @@ export class ChartManager extends BaseManager {
                 pie: null,
                 grid: null,
                 'stacked-bar': null,
-                'venn-grid': null
+                'venn-grid': null,
+                'sankey': null
             };
         }
 
@@ -154,6 +156,13 @@ export class ChartManager extends BaseManager {
                 this.renderers['venn-grid'] = new VennChartRenderer(containerId);
             } else {
                 // console.error('✗ VennChartRenderer not available');
+            }
+
+            // SankeyChartRenderer
+            if (SankeyChartRenderer) {
+                this.renderers['sankey'] = new SankeyChartRenderer(containerId);
+            } else {
+                // console.error('✗ SankeyChartRenderer not available');
             }
         } catch (error) {
             if (ErrorHandler) {

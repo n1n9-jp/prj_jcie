@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sankey Diagram Demo</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color: #f2f2f2;
+      font-family: "Helvetica Neue", Arial, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 16px 18px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.35);
+      backdrop-filter: blur(6px);
+      max-width: 1100px;
+      width: 95%;
+    }
+
+    h1 {
+      margin: 0 0 12px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+
+    .subtitle {
+      margin: 0 0 10px;
+      color: #c4d3e2;
+      font-size: 14px;
+    }
+
+    svg {
+      width: 100%;
+      height: 520px;
+    }
+
+    .node rect {
+      cursor: move;
+      shape-rendering: crispEdges;
+    }
+
+    .node text {
+      fill: #f2f2f2;
+      font-size: 12px;
+      pointer-events: none;
+    }
+
+    .link {
+      fill: none;
+      stroke-opacity: 0.45;
+      transition: stroke-opacity 160ms ease, stroke 160ms ease;
+    }
+
+    .link:hover {
+      stroke-opacity: 0.9;
+      stroke: #ffe082;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>サンキー・ダイアグラム (d3 v7 + d3-sankey)</h1>
+    <p class="subtitle">ダミーデータでフローを可視化しています。ノードはドラッグできます。</p>
+    <svg id="sankey"></svg>
+  </div>
+
+  <script src="https://unpkg.com/d3@7/dist/d3.min.js"></script>
+  <script src="https://unpkg.com/d3-sankey@0.12.3/dist/d3-sankey.min.js"></script>
+  <script>
+    const svg = d3.select("#sankey");
+    const { width, height } = svg.node().getBoundingClientRect();
+    const color = d3.scaleOrdinal(d3.schemeTableau10);
+
+    // サンキー生成器をセットアップ
+    const sankeyGenerator = d3
+      .sankey()
+      .nodeWidth(18)
+      .nodePadding(16)
+      .nodeAlign(d3.sankeyLeft) // 同じステップのノードを左寄せ配置にしてグループ化
+      .size([width, height]);
+
+    const linkGroup = svg.append("g").attr("fill", "none");
+    const nodeGroup = svg.append("g");
+
+    function render(data) {
+      const graph = sankeyGenerator({
+        nodes: data.nodes.map((d) => ({ ...d })), // 破壊的変更を避ける
+        links: data.links.map((d) => ({ ...d })),
+      });
+
+      // リンク描画
+      const links = linkGroup
+        .selectAll("path")
+        .data(graph.links)
+        .join("path")
+        .attr("class", "link")
+        .attr("d", d3.sankeyLinkHorizontal())
+        .attr("stroke", (d) => color(d.source.name))
+        .attr("stroke-width", (d) => Math.max(1, d.width));
+
+      links
+        .select("title")
+        .remove();
+
+      links
+        .append("title")
+        .text((d) => `${d.source.name} → ${d.target.name}\n${d.value}`);
+
+      // ノード描画
+      const node = nodeGroup
+        .selectAll("g")
+        .data(graph.nodes)
+        .join("g")
+        .attr("class", "node")
+        .attr("transform", (d) => `translate(${d.x0},${d.y0})`)
+        .call(
+          d3.drag()
+            .subject((d) => d)
+            .on("start", function() {
+              d3.select(this).raise();
+            })
+            .on("drag", function(event, d) {
+              d.y0 += event.dy;
+              d.y1 += event.dy;
+              // 縦方向だけ動かす（xは固定）
+              d3.select(this).attr("transform", `translate(${d.x0},${d.y0})`);
+              sankeyGenerator.update(graph);
+              links.attr("d", d3.sankeyLinkHorizontal());
+            })
+        );
+
+      node
+        .select("rect")
+        .remove();
+
+      node
+        .append("rect")
+        .attr("height", (d) => d.y1 - d.y0)
+        .attr("width", sankeyGenerator.nodeWidth())
+        .attr("fill", (d) => color(d.name))
+        .attr("stroke", "#1c2c36")
+        .select("title")
+        .remove();
+
+      node
+        .select("title")
+        .remove();
+
+      node
+        .append("title")
+        .text((d) => `${d.name}\n${d.value}`);
+
+      node
+        .select("text")
+        .remove();
+
+      node
+        .append("text")
+        .attr("x", (d) => (d.x0 < width / 2 ? sankeyGenerator.nodeWidth() + 6 : -6))
+        .attr("y", (d) => (d.y1 - d.y0) / 2)
+        .attr("dy", "0.35em")
+        .attr("text-anchor", (d) => (d.x0 < width / 2 ? "start" : "end"))
+        .text((d) => d.name);
+    }
+
+    fetch("data.json")
+      .then((res) => res.json())
+      .then(render)
+      .catch((err) => {
+        console.error("データ読み込みに失敗しました:", err);
+      });
+  </script>
+</body>
+</html>

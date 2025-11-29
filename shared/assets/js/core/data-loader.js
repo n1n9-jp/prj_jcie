@@ -49,7 +49,10 @@ export class DataLoader {
 
             // 動的にデータファイルを読み込む（感染症対応パス）
             const dataPromises = [
-                ...Array.from(dataFiles).map(file => d3.csv(configLoader.resolveDataPath(file))),
+                ...Array.from(dataFiles).map(file => {
+                    const path = configLoader.resolveDataPath(file);
+                    return file.endsWith('.json') ? d3.json(path) : d3.csv(path);
+                }),
                 d3.json(configLoader.resolveDataPath('countries-110m.json'))
             ];
 
