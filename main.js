@@ -1,4 +1,5 @@
-import './shared/assets/css/tailwind.css';
+import './shared/assets/css/main.css';
+
 import { navigationManager } from './shared/assets/js/managers/navigation-manager.js';
 
 // 感染症タイプを設定

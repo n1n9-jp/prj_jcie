@@ -1,3 +1,5 @@
+import '../shared/assets/css/main.css';
+
 import { ScrollytellingApp } from '../shared/assets/js/core/ScrollytellingApp.js';
 
 // 感染症タイプを設定

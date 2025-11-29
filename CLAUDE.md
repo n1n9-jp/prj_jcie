@@ -652,8 +652,8 @@ const DISEASE_CONFIG = {
 ```
 
 #### 3. 統一スタイルシステム
-- **shared/assets/css/shared-base.css**: 基本共通スタイル
-- **shared/assets/css/unified-base.css**: 統一コンポーネントスタイル
+
+- **shared/assets/css/unified-base.css**: 統一コンポーネントスタイル（shared-base.cssを統合済み）
 - **動的カラーテーマ**: JavaScriptによる感染症別色の自動適用
 
 #### 4. Step0統一実装

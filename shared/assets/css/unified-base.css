@@ -103,6 +103,20 @@
     
     /* Layout */
     --header-height: 60px;
+    --content-max-width: 1200px;
+
+    /* z-index */
+    --z-background: -1;
+    --z-default: 1;
+    --z-sticky: 10;
+    --z-dropdown: 100;
+    --z-modal: 1000;
+    --z-tooltip: 1050;
+}
+
+/* リセット */
+* {
+    box-sizing: border-box;
 }
 
 body {
@@ -160,14 +174,16 @@ body {
     text-decoration: none;
     transition: color var(--animation-short) var(--easing-ease-in-out);
     position: relative;
+    font-family: var(--font-family-serif) !important;
 }
 
 #site-header .site-nav a:hover {
     color: #2563eb;
 }
 
-/* 現在のページ（span要素）のスタイル */
-#site-header .site-nav span {
+/* 現在のページ（span要素または.nav-currentクラス）のスタイル */
+#site-header .site-nav span,
+#site-header .site-nav .nav-current {
     color: var(--color-text-primary);
     font-weight: var(--font-weight-bold);
     font-size: var(--font-size-sm);
@@ -178,7 +194,8 @@ body {
 }
 
 /* 現在のページの感染症カラーバー */
-#site-header .site-nav span::before {
+#site-header .site-nav span::before,
+#site-header .site-nav .nav-current::before {
     content: '';
     position: absolute;
     top: -10px;
@@ -575,4 +592,81 @@ body {
 .content-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* ==================================================
+   Shared Base 統合スタイル (from shared-base.css)
+   ================================================== */
+
+/* ステップテキストボックス */
+.step .text-box {
+    border-left: 4px solid var(--disease-primary);
+}
+
+/* チャート要素（D3.jsで使用） */
+.chart-primary {
+    fill: var(--disease-primary);
+    stroke: var(--disease-primary);
+}
+
+.chart-secondary {
+    fill: var(--disease-secondary);
+    stroke: var(--disease-secondary);
+}
+
+.chart-accent {
+    fill: var(--disease-accent);
+    stroke: var(--disease-accent);
+}
+
+/* アニメーション共通クラス */
+.fade-in {
+    animation: fadeIn var(--animation-default) var(--easing-ease);
+}
+
+.fade-out {
+    animation: fadeOut var(--animation-default) var(--easing-ease);
+}
+
+.scale-in {
+    animation: scaleIn var(--animation-default) var(--easing-ease);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+@keyframes scaleIn {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+/* アクセシビリティ対応 */
+@media (prefers-reduced-motion: reduce) {
+    .fade-in, .fade-out, .scale-in {
+        animation: none;
+    }
+}
+
+/* デバッグ用スタイル */
+.debug-info {
+    position: fixed;
+    top: var(--header-height);
+    right: 10px;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 10px;
+    font-size: 12px;
+    z-index: var(--z-tooltip);
+    display: none;
+}
+
+body.debug .debug-info {
+    display: block;
 }

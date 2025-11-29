@@ -1,5 +1,6 @@
 import { ScrollytellingApp } from '../shared/assets/js/core/ScrollytellingApp.js';
-import '../shared/assets/css/tailwind.css';
+import '../shared/assets/css/main.css';
+
 
 // 感染症タイプを設定
 window.DISEASE_TYPE = 'tuberculosis';
