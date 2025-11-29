@@ -481,6 +481,55 @@
       }
     },
     {
+      "id": "new-step",
+      "text": {
+        "content": "<h2>エイズと結核の重複感染</h2><p>エイズ（HIV）と結核（TB）の重複感染は、HIV によって免疫が低下することで結核が発症しやすくなる状態を指します。HIV 陽性者は結核のリスクが非常に高く、結核は世界で最も多い HIV 合併症による死因です。特にアフリカ地域では両者の重複が深刻で、HIV 治療と結核治療を同時に行う統合的アプローチが重要とされています。</p>",
+        "visible": true,
+        "position": {
+          "width": "30%",
+          "horizontal": "center",
+          "vertical": "center"
+        }
+      },
+      "chart": {
+        "layout": "venn-grid",
+        "visible": true,
+        "position": {
+          "horizontal": "center",
+          "vertical": "center",
+          "width": "100%",
+          "height": "100%"
+        },
+        "config": {
+          "dataFiles": [
+            "data/venn-world.json",
+            "data/venn-africa.json",
+            "data/venn-america.json",
+            "data/venn-easternmediterranean.json",
+            "data/venn-europe.json",
+            "data/venn-southeastasia.json",
+            "data/venn-westernpacific.json"
+          ],
+          "columns": 4,
+          "rows": 2,
+          "chartWidth": 180,
+          "chartHeight": 180,
+          "title": "地域別HIV-TB重複感染",
+          "colors": {
+            "エイズ": "#e74c3c",
+            "結核": "#3498db"
+          },
+          "dataSource": "WHO 2023"
+        }
+      },
+      "map": {
+        "visible": false
+      },
+      "image": {
+        "visible": false
+      }
+    },
+    {
       "id": "episode-intro",
       "text": {
         "content": "世界全体での取り組み",

@@ -5,6 +5,7 @@ import { BarChartRenderer } from '../renderers/bar-chart-renderer.js';
 import { PieChartRenderer } from '../renderers/pie-chart-renderer.js';
 import { GridChartRenderer } from '../renderers/grid-chart-renderer.js';
 import { StackedBarChartRenderer } from '../renderers/stacked-bar-chart-renderer.js';
+import { VennChartRenderer } from '../renderers/venn-chart-renderer.js';
 import { BaseLayout } from '../utils/base-layout.js';
 import { ChartTransitions } from '../utils/chart-transitions.js';
 import { LayoutConfig } from '../config/layout-config.js';
@@ -92,7 +93,8 @@ export class ChartManager extends BaseManager {
                 bar: null,
                 pie: null,
                 grid: null,
-                'stacked-bar': null
+                'stacked-bar': null,
+                'venn-grid': null
             };
         }
 
@@ -145,6 +147,13 @@ export class ChartManager extends BaseManager {
                 this.renderers['stacked-bar'] = new StackedBarChartRenderer(containerId);
             } else {
                 // console.error('✗ StackedBarChartRenderer not available');
+            }
+
+            // VennChartRenderer
+            if (VennChartRenderer) {
+                this.renderers['venn-grid'] = new VennChartRenderer(containerId);
+            } else {
+                // console.error('✗ VennChartRenderer not available');
             }
         } catch (error) {
             if (ErrorHandler) {
@@ -261,6 +270,9 @@ export class ChartManager extends BaseManager {
                     break;
                 case 'grid':
                     this.handleGridLayout(chartData);
+                    break;
+                case 'venn-grid':
+                    this.handleVennGridLayout(chartData);
                     break;
                 default:
                     this.handleSingleChart(chartData);
@@ -463,6 +475,28 @@ export class ChartManager extends BaseManager {
             this.handleFallback(chartData);
         }
     }
+
+    /**
+     * Venn Grid レイアウトの処理
+     * @param {Object} chartData - チャートデータ
+     */
+    handleVennGridLayout(chartData) {
+        const vennRenderer = this.renderers['venn-grid'];
+
+        if (vennRenderer) {
+            // 前のレンダラーを非表示
+            this.hideInactiveRenderers('venn-grid');
+
+            this.activeRenderer = vennRenderer;
+            this.currentLayout = 'venn-grid';
+
+            vennRenderer.updateChart(chartData);
+        } else {
+            console.warn('ChartManager: VennChartRenderer not available');
+            this.handleFallback(chartData);
+        }
+    }
+
 
     /**
      * 指定されたタイプ以外のレンダラーを非表示にする
