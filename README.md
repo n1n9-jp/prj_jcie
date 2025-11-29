@@ -24,11 +24,26 @@
 - `shared/assets/js/core/data-loader.js` は `ConfigLoader` で決定した `content-map.json` を読み込み、都市データ・CSV・TopoJSONをまとめて `ScrollytellingApp` に渡します。
 - `shared/assets/js/core/city-steps-generator.js` や `shared/assets/js/utils/step-mapper.js` は `content-map.json` を前提に都市ステップを構築します。
 
+## 技術スタック
+- **ビルドツール**: Vite
+- **スタイリング**: Tailwind CSS (v3)
+- **可視化**: D3.js (v7), TopoJSON
+- **スクロール**: Scrollama.js
+- **地図**: Leaflet / D3 Geo
+
 ## 動作確認
 ```bash
+# 依存関係のインストール
 npm install
+
+# 開発サーバーの起動
 npm run dev
-npm test # Jest (jsdom)
+
+# ビルド（本番用）
+npm run build
+
+# テスト実行
+npm test
 ```
 
-ブラウザ確認時は任意の感染症ディレクトリをローカルサーバーで配信し、`shared/` への相対パスを保持したままアクセスしてください。
+開発サーバー起動後、ブラウザで `http://localhost:5173/` にアクセスし、各感染症のディレクトリ（例: `/01_aids/`）に移動してください。
