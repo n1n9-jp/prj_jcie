@@ -328,22 +328,7 @@ export class StackedBarChartRenderer extends ChartRendererBase {
         legendGroup.attr('transform', `translate(${legendX}, ${legendY})`);
     }
 
-    /**
-     * データソースを追加
-     */
-    addDataSource(svg, dataSource, width, height) {
-        if (!dataSource) return;
 
-        svg.append('text')
-            .attr('class', 'chart-data-source')
-            .attr('x', 10)
-            .attr('y', height - 10)
-            .attr('text-anchor', 'start')
-            .style('font-size', '12px')
-            .style('fill', '#888')
-            .style('font-style', 'normal')
-            .text(`出典: ${dataSource}`);
-    }
 
     /**
      * レスポンシブサイズを取得

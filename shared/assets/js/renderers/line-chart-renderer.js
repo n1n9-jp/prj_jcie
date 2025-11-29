@@ -607,18 +607,7 @@ export class LineChartRenderer extends ChartRendererBase {
             }
         }
 
-        // データソースを表示
-        if (dataSource) {
-            g.append('text')
-                .attr('class', 'chart-data-source')
-                .attr('x', 0)
-                .attr('y', height + 35) // X軸の下に配置
-                .attr('text-anchor', 'start')
-                .style('font-size', '12px')
-                .style('fill', '#888')
-                .style('font-style', 'normal')
-                .text(`出典: ${dataSource}`);
-        }
+
     }
 
     /**
