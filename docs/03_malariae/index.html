@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JCIEスペシャルコンテンツ「マラリアとの闘い ～データで見る希望と課題～」</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://d3js.org/topojson.v3.min.js"></script>
+    <script src="https://unpkg.com/scrollama"></script>
+
+    <!-- 統一スタイリングシステム -->
+
+
+    <!-- 感染症固有設定 -->
+    <script>
+        window.DISEASE_TYPE = 'malariae';
+    </script>
+  <script type="module" crossorigin src="../assets/malariae-BepXedHy.js"></script>
+  <link rel="modulepreload" crossorigin href="../assets/navigation-manager-BG1z30ep.js">
+  <link rel="modulepreload" crossorigin href="../assets/ScrollytellingApp-CTAG7f4j.js">
+  <link rel="stylesheet" crossorigin href="../assets/navigation-manager-CbmrV_bh.css">
+</head>
+
+<body class="bg-gray-100">
+    <!-- ヘッダー -->
+    <header id="site-header">
+        <div class="site-title">
+            <a href="../">
+                <h1>JCIEスペシャルコンテンツ「マラリアとの闘い ～データで見る希望と課題～」</h1>
+            </a>
+        </div>
+        <nav class="site-nav">
+            <ul>
+                <!-- ナビゲーションはJavaScriptで動的に生成される -->
+            </ul>
+        </nav>
+    </header>
+
+    <!-- メインコンテナ -->
+    <div id="container">
+        <!-- 固定背景（チャート・地図エリア） -->
+        <div id="fixed-background" class="fixed inset-0 w-full h-full">
+            <!-- チャートエリア -->
+            <div id="chart-container" class="absolute inset-0 flex items-center justify-center">
+                <div id="chart"></div>
+            </div>
+
+            <!-- 地図エリア -->
+            <div id="map-container" class="absolute inset-0">
+                <div id="map" class="w-full h-full"></div>
+            </div>
+
+            <!-- 画像エリア -->
+            <div id="image-container" class="absolute inset-0 flex items-center justify-center">
+                <img id="image" class="max-w-full max-h-full object-contain" alt="" />
+            </div>
+        </div>
+
+        <!-- スクロール可能なテキストエリア -->
+        <div id="scroll-content" class="relative z-10">
+            <!-- 各段落のステップ -->
+            <div class="step" data-step="opening">
+                <div class="w-full min-h-screen flex items-center justify-center relative">
+                    <!-- 背景画像とオーバーレイ用の特別なコンテナ -->
+                    <div class="absolute inset-0 z-0" id="step0-bg-container">
+                        <!-- 背景画像は ImageManager で管理される -->
+                    </div>
+
+                    <!-- 黒い半透明オーバーレイ -->
+                    <div class="absolute inset-0 bg-black bg-opacity-70 z-10"></div>
+
+                    <!-- タイトルコンテナ -->
+                    <div class="relative z-20 text-center">
+                        <h1 class="text-white font-thin mb-4"
+                            style="font-size: 100px; text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.8); font-family: 'Shippori Mincho', serif;">
+                            マラリアとの闘い</h1>
+                        <p class="text-white font-light"
+                            style="font-size: 30px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8); font-family: 'Shippori Mincho', serif;">
+                            ～データで見る希望と課題～</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step" data-step="intro">
+                <div class="w-full min-h-screen flex items-center">
+                    <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
+                        <h2 class="text-2xl font-bold mb-4">マラリアとは</h2>
+                        <p class="text-gray-700 leading-relaxed">
+                            マラリアはHIV／エイズ、結核と並んで世界の3大感染症とされ、特に発展途上国において深刻な健康問題となっています。マラリアに感染すると高熱、寒気、頭痛、嘔吐などの症状に苦しみ、重症化すると脳症や腎不全などの合併症を引き起こし、高い確率で死に至ります。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step" data-step="poverty-disease">
+                <div class="w-full min-h-screen flex items-center">
+                    <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
+                        <p class="text-gray-700 leading-relaxed">
+                            また経済的に脆弱な地域、特にアフリカ、アジア、中南米に感染者の9割が集中していることから「貧困の病」という別名で知られています。この偏りは、医療インフラ不足や予防対策の実施困難さ、気候条件が複雑に絡み合って生じています。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step" data-step="tropical-malaria">
+                <div class="w-full min-h-screen flex items-center">
+                    <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
+                        <p class="text-gray-700 leading-relaxed">
+                            特に重症化しやすく死亡率も高い熱帯熱マラリアは、アフリカやアジア・太平洋の熱帯地域が流行の中心です。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step" data-step="global-statistics">
+                <div class="w-full min-h-screen flex items-center">
+                    <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
+                        <p class="text-gray-700 leading-relaxed">
+                            2023年の全世界の感染者数は2億6300万人と想定され、そのうち死亡者数は59万7千人。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step" data-step="africa-children-deaths">
+                <div class="w-full min-h-screen flex items-center">
+                    <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
+                        <p class="text-gray-700 leading-relaxed">
+                            そして、死亡者数の95％はアフリカ地域の人々であり、その76％に相当する43万2千人は5歳未満の小児でした。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step" data-step="infection-mechanism">
+                <div class="w-full min-h-screen flex items-center justify-center">
+                    <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
+                        <h2 class="text-2xl font-bold mb-4">感染原因と経過</h2>
+                        <p class="text-gray-700 leading-relaxed">
+                            マラリアの原因であるマラリア原虫は、熱帯や亜熱帯に生息するメスのハマダラカの唾液腺に潜んでいます。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step" data-step="parasite-reproduction">
+                <div class="w-full min-h-screen flex items-center justify-center">
+                    <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
+                        <p class="text-gray-700 leading-relaxed">
+                            この蚊が産卵のために人を刺して血を吸う時、唾液と一緒に原虫が人の体内に入ります。原虫は血液の流れに乗って肝臓の細胞に入り、そこで形を変えながら分裂して増殖し、肝細胞を壊して再び血液中に出ていきます。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step" data-step="red-blood-cells">
+                <div class="w-full min-h-screen flex items-center justify-center">
+                    <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
+                        <p class="text-gray-700 leading-relaxed">
+                            その後、赤血球に入り込んでまた分裂・増殖を繰り返し、赤血球を壊しては次々に新しい赤血球に感染していきます。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step" data-step="organ-damage">
+                <div class="w-full min-h-screen flex items-center justify-center">
+                    <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
+                        <p class="text-gray-700 leading-relaxed">
+                            このように感染した赤血球が全身の臓器にダメージを与え、重度の貧血などを引き起こし、命を落とすこともあります。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step" data-step="prevention-treatment">
+                <div class="w-full min-h-screen flex items-center justify-center">
+                    <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
+                        <p class="text-gray-700 leading-relaxed">
+                            このようにマラリアは恐ろしい病気ですが、ハマダラカに刺されないようにすることで予防できる病気であり、効果的な治療薬も開発されてきました。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step" data-step="who-eradication-campaign">
+                <div class="w-full min-h-screen flex items-center justify-center">
+                    <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
+                        <h2 class="text-2xl font-bold mb-4">治療と予防対策</h2>
+                        <p class="text-gray-700 leading-relaxed">
+                            1955年、世界保健機関（WHO）は「世界マラリア撲滅キャンペーン」を開始し、殺虫剤DDTによる屋内への噴霧と抗マラリア薬の併用によって、ヨーロッパやオーストラリアでのマラリア根絶に成功しました。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step" data-step="artemisinin-discovery">
+                <div class="w-full min-h-screen flex items-center justify-center">
+                    <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
+                        <p class="text-gray-700 leading-relaxed">
+                            1970年代には、中国で発見された青蒿（セイコウ）という植物由来のアルテミシニンが登場し、それまでの薬剤に耐性を持つマラリア原虫にも効果を発揮する新たな治療薬として期待されました。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step" data-step="comprehensive-approach">
+                <div class="w-full min-h-screen flex items-center justify-center">
+                    <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
+                        <p class="text-gray-700 leading-relaxed">
+                            1990年代からは、さまざまな対策を組み合わせる方法が取られるようになりました。たとえば、蚊帳に殺虫剤をしみこませた「防虫蚊帳」（ITN）の配布や、家の中に殺虫剤をまく対策の継続、マラリアをすばやく診断できる検査キットの導入などです。こうした取り組みによって、感染した人がすぐに診断され、治療を受けられるようになってきました。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step" data-step="act-therapy">
+                <div class="w-full min-h-screen flex items-center justify-center">
+                    <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
+                        <p class="text-gray-700 leading-relaxed">
+                            2000年代以降は、WHOが「アルテミシニン併用療法（ACT）」を基本の治療法としてすすめています。これは、アルテミシニンと他の薬を一緒に使うことで、薬が効かなくなるのを防ぐ方法です。さらに最近では、遺伝子の仕組みを利用して蚊の数を減らす方法や、新しいワクチンの開発といった先進的な技術も使われるようになっています。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step" data-step="regional-successes">
+                <div class="w-full min-h-screen flex items-center justify-center">
+                    <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
+                        <p class="text-gray-700 leading-relaxed">
+                            こうした取り組みの結果、アジアや中東、ラテンアメリカのいくつかの国ではマラリアの撲滅に成功しました。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step" data-step="el-salvador-case">
+                <div class="w-full min-h-screen flex items-center justify-center">
+                    <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
+                        <p class="text-gray-700 leading-relaxed">
+                            たとえば中米のエルサルバドルでは、1950年代から国をあげて対策を始めましたが、当初は大きな効果が出ませんでした。しかし1980年前後に感染者が最も多くなったことをきっかけに、アメリカ政府の支援などを受けて、本格的な対策が始まりました。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step" data-step="el-salvador-success">
+                <div class="w-full min-h-screen flex items-center justify-center">
+                    <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
+                        <p class="text-gray-700 leading-relaxed">
+                            感染が多い地域を特定したり、検査体制を整えたりすることで、10年の間に感染者数を約9割も減らすことができました。そして2017年には新たな感染者がゼロとなり、WHOは2021年にエルサルバドルがマラリアを撲滅したと正式に認定しました。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step" data-step="china-egypt-success">
+                <div class="w-full min-h-screen flex items-center justify-center">
+                    <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
+                        <p class="text-gray-700 leading-relaxed">
+                            また、中国（2021年）やエジプト（2024年）といった人口の多い国での成功も、マラリアとの長い闘いの中で大きな節目となっています。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step" data-step="failures-exist">
+                <div class="w-full min-h-screen flex items-center justify-center">
+                    <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
+                        <p class="text-gray-700 leading-relaxed">
+                            一方で、マラリアの撲滅がうまく進まなかった国もあります。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step" data-step="niger-failure">
+                <div class="w-full min-h-screen flex items-center justify-center">
+                    <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
+                        <p class="text-gray-700 leading-relaxed">
+                            たとえば西アフリカのニジェールでは、2000年にアフリカの首脳たちが「アブジャ宣言」という感染症対策の方針に合意し、2010年までにマラリアによる死亡を半分に減らすという目標を立てました。治療薬の普及や、殺虫剤をしみこませた蚊帳（ITN）の大量配布、5歳未満の子どもへの医療費無料化など、さまざまな対策がとられましたが、結果として感染件数は逆に4倍に増えてしまいました。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step" data-step="sub-saharan-challenges">
+                <div class="w-full min-h-screen flex items-center justify-center">
+                    <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
+                        <p class="text-gray-700 leading-relaxed">
+                            このように、サハラ砂漠より南のアフリカ地域では、今もマラリアの完全な撲滅には至っておらず、対策の強化が求められています。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step" data-step="country-episodes">
+                <div class="w-full min-h-screen flex items-center justify-center">
+                    <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
+                        <h2 class="text-2xl font-bold mb-4">ひとりひとりのエピソード</h2>
+                        <p class="text-gray-700 leading-relaxed">
+                            感染症の現場で、ひとりひとりの『夢』が希望へとつながり、多くの命が救われてきた実話を紹介します。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 動的に生成される都市ステップ -->
+            <div id="city-steps-container"></div>
+
+            <div class="step" data-step="remaining-challenges">
+                <div class="w-full min-h-screen flex items-center justify-center">
+                    <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
+                        <h2 class="text-2xl font-bold mb-4">課題</h2>
+                        <p class="text-gray-700 leading-relaxed">
+                            現在のマラリア治療には、いくつかの大きな課題があります。2000年代後半から、東南アジアの一部の地域で、主な治療薬であるアルテミシニンが効きにくい「耐性」のあるマラリア原虫が見つかるようになりました。そして2018年には、アフリカでも同じような耐性を持つ原虫が発見され、世界的に懸念が高まっています。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step" data-step="artemisinin-resistance">
+                <div class="w-full min-h-screen flex items-center justify-center">
+                    <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
+                        <p class="text-gray-700 leading-relaxed">
+                            さらに深刻なのは、カンボジアやタイの一部地域で、アルテミシニンだけでなく、併用して使う薬にも耐性を示す「多剤耐性」のマラリア原虫が現れていることです。これは、現在広く使われている治療法が効かなくなる可能性があるという、非常に重大な問題です。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step" data-step="funding-challenges">
+                <div class="w-full min-h-screen flex items-center justify-center">
+                    <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
+                        <p class="text-gray-700 leading-relaxed">
+                            また、マラリア対策に使われる資金の不足も課題となっています。2010年ごろまでは世界的に資金が増えていましたが、その後は伸び悩んでいます。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step" data-step="prevention-shortage">
+                <div class="w-full min-h-screen flex items-center justify-center">
+                    <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
+                        <p class="text-gray-700 leading-relaxed">
+                            その影響で、感染の広がりが深刻なサハラ以南のアフリカでは、殺虫剤をしみこませた蚊帳（ITN）や、家の中に何度も噴霧して使う殺虫剤（IRS）など、予防に効果的な道具が足りなくなっているという報告もあります。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step" data-step="climate-impact">
+                <div class="w-full min-h-screen flex items-center justify-center">
+                    <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
+                        <p class="text-gray-700 leading-relaxed">
+                            さらに、マラリア感染の増加には気候変動の影響も関係していると考えられています。気温や湿度、雨の量が変わることで、マラリアを媒介するハマダラカという蚊が暮らしやすい地域が広がっているのです。日本のように、平均気温が年々上がっている国でも、マラリアは決して「他人事」ではなくなっています。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step" data-step="global-responsibility">
+                <div class="w-full min-h-screen flex items-center justify-center">
+                    <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
+                        <p class="text-gray-700 leading-relaxed">
+                            いまやマラリアの撲滅は、一部の地域だけの問題ではなく、世界全体で取り組むべき「私たち自身の課題」なのです。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="step" data-step="footer">
+                <div class="w-full min-h-screen flex items-center">
+                    <!-- フッターコンテンツは main.js で動的に生成される -->
+                </div>
+            </div>
+
+        </div>
+    </div>
+    </div>
+
+    <!-- アプリケーションエントリーポイント -->
+</body>
+
+</html>

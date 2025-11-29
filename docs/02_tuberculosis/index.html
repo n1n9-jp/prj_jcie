@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JCIEスペシャルコンテンツ「結核との闘い ～データで見る希望と課題～」</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://d3js.org/topojson.v3.min.js"></script>
+    <script src="https://unpkg.com/scrollama"></script>
+
+    <!-- 統一スタイリングシステム -->
+
+
+    <!-- 感染症固有設定 -->
+    <script>
+        window.DISEASE_TYPE = 'tuberculosis';
+    </script>
+  <script type="module" crossorigin src="../assets/tuberculosis-BrdxF1pl.js"></script>
+  <link rel="modulepreload" crossorigin href="../assets/navigation-manager-BG1z30ep.js">
+  <link rel="modulepreload" crossorigin href="../assets/ScrollytellingApp-CTAG7f4j.js">
+  <link rel="stylesheet" crossorigin href="../assets/navigation-manager-CbmrV_bh.css">
+</head>
+
+<body class="bg-gray-100">
+    <!-- ヘッダー -->
+    <header id="site-header">
+        <div class="site-title">
+            <a href="../">
+                <h1>JCIEスペシャルコンテンツ「結核との闘い ～データで見る希望と課題～」</h1>
+            </a>
+        </div>
+        <nav class="site-nav">
+            <ul>
+                <!-- ナビゲーションはJavaScriptで動的に生成される -->
+            </ul>
+        </nav>
+    </header>
+
+    <!-- メインコンテナ -->
+    <div id="container">
+        <!-- 固定背景（チャート・地図エリア） -->
+        <div id="fixed-background" class="fixed inset-0 w-full h-full">
+            <!-- チャートエリア -->
+            <div id="chart-container" class="absolute inset-0 flex items-center justify-center">
+                <div id="chart"></div>
+            </div>
+
+            <!-- 地図エリア -->
+            <div id="map-container" class="absolute inset-0">
+                <div id="map" class="w-full h-full"></div>
+            </div>
+
+            <!-- 画像エリア -->
+            <div id="image-container" class="absolute inset-0 flex items-center justify-center">
+                <img id="image" class="max-w-full max-h-full object-contain" alt="" />
+            </div>
+        </div>
+
+        <!-- スクロール可能なテキストエリア -->
+        <div id="scroll-content" class="relative z-10">
+            <!-- 各段落のステップ -->
+            <div class="step" data-step="opening">
+                <div class="w-full min-h-screen flex items-center justify-center relative">
+                    <!-- 背景画像とオーバーレイ用の特別なコンテナ -->
+                    <div class="absolute inset-0 z-0" id="step0-bg-container">
+                        <!-- 背景画像は ImageManager で管理される -->
+                    </div>
+
+                    <!-- 黒い半透明オーバーレイ -->
+                    <div class="absolute inset-0 bg-black bg-opacity-70 z-10"></div>
+
+                    <!-- タイトルコンテナ -->
+                    <div class="relative z-20 text-center">
+                        <h1 class="text-white font-thin mb-4"
+                            style="font-size: 100px; text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.8); font-family: 'Shippori Mincho', serif;">
+                            結核との闘い</h1>
+                        <p class="text-white font-light"
+                            style="font-size: 30px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8); font-family: 'Shippori Mincho', serif;">
+                            ～データで見る希望と課題～</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step" data-step="intro">
+                <div class="w-full min-h-screen flex items-center">
+                    <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
+                        <p class="text-gray-700 leading-relaxed">
+                        <p>結核は、昔から人類とともにあった古い病気で、主に肺に感染して重い症状を引き起こす感染症です。結核菌という細菌が原因です。</p>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step" data-step="global-burden">
+                <div class="w-full min-h-screen flex items-center">
+                    <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
+                        <p class="text-gray-700 leading-relaxed">
+                        <p>今もなお、結核はマラリアやHIV/エイズと並んで「世界三大感染症」と呼ばれており、特に医療体制が整っていない途上国では深刻な問題となっています。 </p>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step" data-step="transmission">
+                <div class="w-full min-h-screen flex items-center">
+                    <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
+                        <h2 class="text-2xl font-bold mb-4">感染はどのように起こる？</h2>
+                        <p class="text-gray-700 leading-relaxed">
+                        <p>結核を発病していて菌を出している人が咳やくしゃみをすると、空気中に結核菌を含んだ小さなしぶき（飛沫）が飛び散ります。このしぶきが乾いて、空気中にふわふわと浮かぶ結核菌を周りの人が吸い込むことで感染します。
+                        </p>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step" data-step="infection-vs-disease">
+                <div class="w-full min-h-screen flex items-center">
+                    <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
+                        <h2 class="text-2xl font-bold mb-4">「感染」と「発病」の違い</h2>
+                        <p class="text-gray-700 leading-relaxed">
+                        <p>「感染」とは、体の中に結核菌が入り込んでも、まだ病気の症状が出ていない状態のことです。この段階では他の人にうつす心配はありません。</p>
+                        <p>&nbsp;</p>
+                        <p>一方、「発病」とは、体の中で結核菌が増えて、咳や熱などの症状が出る状態のことです。病気が進行すると、咳や痰に菌が混じるようになり、他の人に感染させる可能性が出てきます。 </p>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step" data-step="historical-impact">
+                <div class="w-full min-h-screen flex items-center">
+                    <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
+                        <h2 class="text-2xl font-bold mb-4">治療と予防ワクチンの歴史</h2>
+                        <p class="text-gray-700 leading-relaxed">
+                        <p>結核は、かつて「国民病」や「白死病」などと呼ばれ、多くの人の命を奪った恐ろしい病気でした。特に産業革命のあと、都市に人が集中し、生活環境が悪化したことや貧困の広がりによって、結核が急速に広がったと考えられています。
+                        </p>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step" data-step="medical-breakthroughs">
+                <div class="w-full min-h-screen flex items-center">
+                    <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
+                        <p class="text-gray-700 leading-relaxed">
+                        <p>1882年、ドイツの細菌学者ロベルト・コッホが結核菌を発見し、1921年にはフランスでBCGワクチンが開発され、結核予防に大きな進展がありました。また、1943年には最初の薬であるストレプトマイシンが、1950年代にはイソニアジド等より効果的な薬が開発されたことで、治療法が確立されていきました。
+                        </p>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step" data-step="japan-history-1935">
+                <div class="w-full min-h-screen flex items-center justify-center">
+                    <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
+                        <h2 class="text-2xl font-bold mb-4">日本における結核との闘い</h2>
+                        <p class="text-gray-700 leading-relaxed">
+                        <p>日本では1935年から1950年までの15年間、結核が死因の第1位でした。</p>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step" data-step="japan-bcg-introduction">
+                <div class="w-full min-h-screen flex items-center justify-center">
+                    <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
+                        <p class="text-gray-700 leading-relaxed">
+                        <p>1924年には志賀潔（しがきよし）博士がBCGワクチンをフランスから日本に持ち帰り、その後、1949年には予防接種が法律で定められました。</p>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step" data-step="japan-postwar-improvement">
+                <div class="w-full min-h-screen flex items-center justify-center">
+                    <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
+                        <p class="text-gray-700 leading-relaxed">
+                        <p>さらに、戦後の生活環境の改善や、新しい薬の広まりにより、1948年ごろから結核による死亡者は減、1951年には「新結核予防法」（現在は感染症法に統合）が制定され、結核の治療費を国が負担する仕組みが整えられました。
+                        </p>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step" data-step="japan-current-status">
+                <div class="w-full min-h-screen flex items-center justify-center">
+                    <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
+                        <p class="text-gray-700 leading-relaxed">
+                        <p>このような努力の積み重ねで、日本では結核を減らすことに成功してきましたが、今でも毎年1万人ほどの人が新たに結核を発症しているのが現状です。 </p>
+                        <p>&nbsp;</p>
+                        <p>また日本では近年、外国生まれの結核患者の数が増えており、その対策として「入国前結核スクリーニング」という制度が始まっています。 </p>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step" data-step="global-end-tb-strategy">
+                <div class="w-full min-h-screen flex items-center justify-center">
+                    <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
+                        <h2 class="text-2xl font-bold mb-4">世界の結核対策と現状</h2>
+                        <p class="text-gray-700 leading-relaxed">
+                        <p>結核をなくすための世界的な取り組みも、科学の進歩や国際的な協力によって少しずつ前に進んできました。世界保健機関（WHO）は2014年に「結核終息戦略（End TB
+                            Strategy）」を発表し、2035年までに世界から結核を終わらせることを目標としています。</p>
+                        <p>&nbsp;</p>
+                        <p>この戦略では、主に「1.早期発見と、すべての患者に適切な治療を届けること」「2.患者や地域社会へのサポート」「3.新しい検査法や薬、ワクチンの開発を進めること」を重視しています。こうした取り組みによって、新規感染者数は緩やかな下降傾向にありました。
+                        </p>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step" data-step="covid-impact">
+                <div class="w-full min-h-screen flex items-center justify-center">
+                    <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
+                        <p class="text-gray-700 leading-relaxed">
+                        <p>しかし、新型コロナウイルス感染症（COVID-19）の世界的な流行は、結核対策にも大きな影響を与えました。その結果、2020年には結核による死亡率が上がり、2021年には感染者数（罹患率）も増えてしまいました。
+                        </p>
+                        <p>世界保健機関（WHO）の発表によると、増加傾向は続き、2023年には世界で約1080万人が新たに結核にかかり、そのうち約125万人が亡くなっています。</p>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step" data-step="covid-impact-2">
+                <div class="w-full min-h-screen flex items-center justify-center">
+                    <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
+                        <p class="text-gray-700 leading-relaxed">
+                        <p>特に、HIVに感染している人は免疫力が落ちているため、結核にかかりやすく、重症化しやすい傾向があります。そのため、結核はエイズによる死亡の大きな原因の一つとなっており、2023年の結核による死亡者の中で、HIV感染者は約16万人を占めています。
+                        </p>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step" data-step="country-episodes">
+                <div class="w-full min-h-screen flex items-center justify-center">
+                    <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
+                        <h2 class="text-2xl font-bold mb-4">ひとりひとりのエピソード</h2>
+                        <p class="text-gray-700 leading-relaxed">
+                            感染症の現場で、ひとりひとりの『夢』が希望へとつながり、多くの命が救われてきた実話を紹介します。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 動的に生成される都市ステップ -->
+            <div id="city-steps-container"></div>
+
+            <div class="step" data-step="drug-resistance">
+                <div class="w-full min-h-screen flex items-center">
+                    <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
+                        <h2 class="text-2xl font-bold mb-4">今後の課題</h2>
+                        <p class="text-gray-700 leading-relaxed">
+                        <p>結核対策は進んでいる一方で、今も多くの課題が残されています。その一つが「多剤耐性結核（MDR-TB）」です。これは、ふつうの抗結核薬が効かないタイプの結核で、インドネシアやベトナムなどの結核が多い国では特に大きな問題になっています。2022年には、世界で約41万人がこのタイプの結核を発症しましたが、適切な治療を受けられた人は全体の約4割にとどまっています。
+                        </p>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step" data-step="funding-shortage">
+                <div class="w-full min-h-screen flex items-center">
+                    <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
+                        <p class="text-gray-700 leading-relaxed">
+                        <p>また、結核対策に必要なお金も不足しています。たとえば2023年、低・中所得国で必要とされた結核予防や治療のための資金は、必要額のわずか26％、約57億ドルにとどまりました。このような資金不足が、対策の遅れにつながっています。
+                        </p>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step" data-step="covid-setback">
+                <div class="w-full min-h-screen flex items-center">
+                    <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
+                        <p class="text-gray-700 leading-relaxed">
+                        <p>さらに、新型コロナウイルス（COVID-19）の世界的な流行も、結核対策に大きな影響を与えました。医療の人手や資源がコロナ対応に取られたり、外出制限によって病院に行けなくなったりして、結核の診断や治療が遅れるケースが増えました。
+                        </p>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step" data-step="drug-development-delay">
+                <div class="w-full min-h-screen flex items-center">
+                    <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
+                        <p class="text-gray-700 leading-relaxed">
+                        <p>そしてもう一つの大きな課題は、結核の新しい診断法・治療薬・ワクチンの開発がなかなか進んでいないことです。コロナのワクチンが短期間で開発・普及したのとは対照的に、結核は開発のスピードが遅いと指摘されています。
+                        </p>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step" data-step="comprehensive-approach">
+                <div class="w-full min-h-screen flex items-center">
+                    <div class="max-w-lg mx-auto p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
+                        <p class="text-gray-700 leading-relaxed">
+                        <p>結核を本当に撲滅するためには、医療の力だけでなく、貧困を減らすことや教育を広げることなど、さまざまな分野の取り組みが必要です。世界中が力を合わせて、こうした課題に取り組んでいくことが求められています。
+                        </p>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step" data-step="footer">
+                <div class="w-full min-h-screen flex items-center">
+                    <!-- フッターコンテンツは main.js で動的に生成される -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- スクリプト読み込み -->
+    <!-- 感染症タイプ設定（最初に設定） -->
+    <script>
+        window.DISEASE_TYPE = 'tuberculosis';
+    </script>
+
+
+
+    <!-- アプリケーションエントリーポイント -->
+</body>
+
+</html>
