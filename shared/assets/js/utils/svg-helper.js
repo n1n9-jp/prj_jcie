@@ -1,8 +1,11 @@
+import * as d3 from 'd3';
+import { AppDefaults } from '../config/defaults.js';
+
 /**
  * SVGHelper - SVG操作に関する共通ユーティリティクラス
  * D3.jsを使用したSVG要素の初期化、サイズ計算、共通操作を提供
  */
-class SVGHelper {
+export class SVGHelper {
     /**
      * SVG要素を初期化する（レスポンシブ対応版）
      * @param {d3.Selection} container - D3で選択されたコンテナ要素
@@ -36,7 +39,7 @@ class SVGHelper {
                 // 具体的なサイズが指定されている場合（パーセンテージ等）
                 const widthStyle = actualWidth ? `${actualWidth}px` : '100%';
                 const heightStyle = actualHeight ? `${actualHeight}px` : 'auto';
-                
+
                 svg
                     .style('width', widthStyle)
                     .style('height', heightStyle)
@@ -151,7 +154,7 @@ class SVGHelper {
     static getActualSize(svg) {
         const node = svg.node();
         if (!node) return { width: 0, height: 0 };
-        
+
         const rect = node.getBoundingClientRect();
         return {
             width: rect.width,
@@ -167,7 +170,7 @@ class SVGHelper {
      */
     static resizeSVG(svg, container, config = {}) {
         const { aspectRatio = null } = config;
-        
+
         let containerElement;
         if (container.node) {
             containerElement = container.node();
@@ -380,7 +383,7 @@ class SVGHelper {
      * @param {number} delay - 遅延時間（ミリ秒）
      * @returns {d3.Transition} トランジション
      */
-    static createTransition(duration = window.AppDefaults?.animation?.chartTransitionDuration || 1000, ease = d3.easeQuadInOut, delay = 0) {
+    static createTransition(duration = AppDefaults?.animation?.chartTransitionDuration || 1000, ease = d3.easeQuadInOut, delay = 0) {
         return d3.transition()
             .duration(duration)
             .ease(ease)
@@ -394,7 +397,7 @@ class SVGHelper {
      * @param {Function} ease - イージング関数
      * @returns {Function} トランジション関数
      */
-    static createStaggeredTransition(duration = window.AppDefaults?.animation?.chartTransitionDuration || 1000, staggerDelay = 100, ease = d3.easeQuadInOut) {
+    static createStaggeredTransition(duration = AppDefaults?.animation?.chartTransitionDuration || 1000, staggerDelay = 100, ease = d3.easeQuadInOut) {
         return (d, i) => d3.transition()
             .duration(duration)
             .ease(ease)
@@ -408,7 +411,7 @@ class SVGHelper {
      * @param {number} delay - 遅延時間
      * @returns {d3.Transition} トランジション
      */
-    static fadeIn(selection, duration = window.AppDefaults?.animation?.shortDuration || 500, delay = 0) {
+    static fadeIn(selection, duration = AppDefaults?.animation?.shortDuration || 500, delay = 0) {
         return selection
             .style('opacity', 0)
             .transition()
@@ -424,7 +427,7 @@ class SVGHelper {
      * @param {number} delay - 遅延時間
      * @returns {d3.Transition} トランジション
      */
-    static fadeOut(selection, duration = window.AppDefaults?.animation?.shortDuration || 500, delay = 0) {
+    static fadeOut(selection, duration = AppDefaults?.animation?.shortDuration || 500, delay = 0) {
         return selection
             .transition()
             .duration(duration)
@@ -441,7 +444,7 @@ class SVGHelper {
      * @param {number} delay - 遅延時間
      * @returns {d3.Transition} トランジション
      */
-    static scaleTransition(selection, fromScale = 0, toScale = 1, duration = window.AppDefaults?.animation?.shortDuration || 500, delay = 0) {
+    static scaleTransition(selection, fromScale = 0, toScale = 1, duration = AppDefaults?.animation?.shortDuration || 500, delay = 0) {
         return selection
             .style('transform', `scale(${fromScale})`)
             .transition()
@@ -459,17 +462,17 @@ class SVGHelper {
         return transitionSteps.reduce((promise, step) => {
             return promise.then(() => {
                 return new Promise(resolve => {
-                    const { selection, duration = window.AppDefaults?.animation?.shortDuration || 500, delay = 0, callback } = step;
-                    
+                    const { selection, duration = AppDefaults?.animation?.shortDuration || 500, delay = 0, callback } = step;
+
                     const transition = selection
                         .transition()
                         .duration(duration)
                         .delay(delay);
-                    
+
                     if (callback) {
                         callback(transition);
                     }
-                    
+
                     transition.on('end', resolve);
                 });
             });
@@ -486,7 +489,7 @@ class SVGHelper {
     static accessibleTransition(selection, callback, reducedDuration = 100) {
         // prefers-reduced-motionをチェック
         const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        
+
         if (prefersReducedMotion) {
             // アニメーションを短縮または無効化
             const transition = selection.transition().duration(reducedDuration);
@@ -497,6 +500,3 @@ class SVGHelper {
         }
     }
 }
-
-// グローバルスコープで利用可能にする（ES6モジュール移行前の暫定措置）
-window.SVGHelper = SVGHelper;

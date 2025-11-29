@@ -27,6 +27,7 @@
 ## 動作確認
 ```bash
 npm install
+npm run dev
 npm test # Jest (jsdom)
 ```
 

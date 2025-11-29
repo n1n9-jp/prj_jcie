@@ -1,8 +1,12 @@
+import * as d3 from 'd3';
+import { ChartLayoutManager } from './chart-layout-manager.js';
+import { AppDefaults } from '../config/defaults.js';
+
 /**
  * LineChartLegendManager - 折れ線グラフの凡例管理を専門的に扱うクラス
  * 伝統的な凡例とコンパクト凡例の両方に対応
  */
-class LineChartLegendManager {
+export class LineChartLegendManager {
     constructor() {
         // デフォルト設定
         this.defaultConfig = {
@@ -22,7 +26,7 @@ class LineChartLegendManager {
 
         // ChartLayoutManagerを使用して最適な凡例レイアウトを計算
         let legendLayout;
-        if (window.ChartLayoutManager) {
+        if (ChartLayoutManager) {
             const seriesNames = series.map(s => s.name);
             legendLayout = ChartLayoutManager.calculateLegendLayout(seriesNames, width, height);
         } else {
@@ -91,10 +95,10 @@ class LineChartLegendManager {
             .attr('y', 6)
             .attr('dy', '0.35em')
             .attr('font-size', '12px')
-            .attr('fill', window.AppDefaults?.colors?.text?.primary || '#333');
+            .attr('fill', AppDefaults?.colors?.text?.primary || '#333');
 
         // テキスト省略処理
-        legendTexts.each(function(d) {
+        legendTexts.each(function (d) {
             const textElement = d3.select(this);
             const text = d.name;
             const maxWidth = legendLayout.itemWidth - 25; // アイコン分を除く
@@ -133,7 +137,7 @@ class LineChartLegendManager {
 
         // ChartLayoutManagerを使用して最適な凡例レイアウトを計算（コンパクト版）
         let legendLayout;
-        if (window.ChartLayoutManager) {
+        if (ChartLayoutManager) {
             const seriesNames = series.map(s => s.name);
             legendLayout = ChartLayoutManager.calculateLegendLayout(seriesNames, width, height);
             // コンパクト版の調整：もう少し余裕を持たせる
@@ -181,10 +185,10 @@ class LineChartLegendManager {
             .attr('y', 4)
             .attr('dy', '0.35em')
             .attr('font-size', '10px')
-            .attr('fill', window.AppDefaults?.colors?.text?.primary || '#333');
+            .attr('fill', AppDefaults?.colors?.text?.primary || '#333');
 
         // 改善されたテキスト省略処理
-        legendTexts.each(function(d) {
+        legendTexts.each(function (d) {
             const textElement = d3.select(this);
             const text = d.name;
             const maxWidth = legendLayout.itemWidth - 16; // アイコン分を除く
@@ -227,6 +231,3 @@ class LineChartLegendManager {
         });
     }
 }
-
-// グローバルスコープで利用可能にする
-window.LineChartLegendManager = LineChartLegendManager;

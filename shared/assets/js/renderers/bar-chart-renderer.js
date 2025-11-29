@@ -1,8 +1,19 @@
+import * as d3 from 'd3';
+import { ChartRendererBase } from '../utils/chart-renderer-base.js';
+import { ErrorHandler } from '../utils/error-handler.js';
+import { SVGHelper } from '../utils/svg-helper.js';
+import { ChartTransitions } from '../utils/chart-transitions.js';
+import { ChartFormatterHelper } from '../utils/chart-formatter-helper.js';
+import { ChartLayoutManager } from '../utils/chart-layout-manager.js';
+import { AppDefaults } from '../config/defaults.js';
+import { AppConstants } from '../utils/app-constants.js';
+import { colorScheme } from '../utils/color-scheme.js';
+
 /**
  * BarChartRenderer - 棒グラフの描画と更新を専門的に扱うクラス
  * ChartRendererBaseを継承し、棒グラフ特有の機能を提供
  */
-class BarChartRenderer extends ChartRendererBase {
+export class BarChartRenderer extends ChartRendererBase {
     constructor(containerId) {
         super(containerId);
         this.type = 'bar';  // チャート種別を設定
@@ -74,7 +85,7 @@ class BarChartRenderer extends ChartRendererBase {
         const validation = this.validateChartData(data, config, this.fieldConfig);
         if (!validation.valid) {
             console.error('BarChartRenderer: Invalid data or config:', validation.errors);
-            if (window.ErrorHandler) {
+            if (ErrorHandler) {
                 ErrorHandler.handle(new Error(validation.errors.join(', ')), 'BarChartRenderer.renderChart', {
                     type: ErrorHandler.ERROR_TYPES.VALIDATION,
                     severity: ErrorHandler.SEVERITY.HIGH,
@@ -104,18 +115,18 @@ class BarChartRenderer extends ChartRendererBase {
         });
 
         // SVGHelperを使用してレスポンシブSVGを作成
-        if (window.SVGHelper) {
+        if (SVGHelper) {
             // パーセンテージ指定の場合は実際のピクセルサイズを計算
             let actualWidth = null;
             let actualHeight = null;
-            
+
             if (config.widthPercent) {
                 actualWidth = window.innerWidth * (config.widthPercent / 100);
             }
             if (config.heightPercent) {
                 actualHeight = window.innerHeight * (config.heightPercent / 100);
             }
-            
+
             this.svg = SVGHelper.initSVG(this.container, width, height, {
                 preserveAspectRatio: config.preserveAspectRatio || 'xMidYMid meet',
                 responsive: true,
@@ -134,7 +145,7 @@ class BarChartRenderer extends ChartRendererBase {
             this.renderBarChart(data, { width, height, margin, ...config });
         } catch (error) {
             console.error('BarChartRenderer: Error during chart rendering:', error);
-            if (window.ErrorHandler) {
+            if (ErrorHandler) {
                 ErrorHandler.handle(error, 'BarChartRenderer.renderChart', {
                     type: ErrorHandler.ERROR_TYPES.RENDER,
                     severity: ErrorHandler.SEVERITY.HIGH,
@@ -171,92 +182,92 @@ class BarChartRenderer extends ChartRendererBase {
             const innerHeight = height - margin.top - margin.bottom;
 
             const { xField = 'category', yField = 'value' } = config;
-        
-        // 新しいスケールを計算
-        const newXScale = d3.scaleBand()
-            .domain(data.map(d => d[xField]))
-            .range([0, innerWidth])
-            .padding(0.1);
 
-        const newYScale = d3.scaleLinear()
-            .domain([0, d3.max(data, d => +d[yField])])
-            .nice()
-            .range([innerHeight, 0]);
+            // 新しいスケールを計算
+            const newXScale = d3.scaleBand()
+                .domain(data.map(d => d[xField]))
+                .range([0, innerWidth])
+                .padding(0.1);
 
-        const g = this.svg.select('g');
-        const transitionDuration = config.transitionDuration || 1000;
+            const newYScale = d3.scaleLinear()
+                .domain([0, d3.max(data, d => +d[yField])])
+                .nice()
+                .range([innerHeight, 0]);
 
-        // ChartTransitionsを使用して軸を更新
-        const newXAxis = d3.axisBottom(newXScale);
-        const newYAxis = d3.axisLeft(newYScale)
-            .tickFormat(d => ChartFormatterHelper.formatYAxisValue(d, config.yAxisFormat));
+            const g = this.svg.select('g');
+            const transitionDuration = config.transitionDuration || 1000;
 
-        // 軸をトランジションで更新（ChartRendererBase のヘルパーメソッドを使用）
-        this.updateChartAxes(g, newXAxis, newYAxis, {
-            chartType: 'bar',
-            duration: transitionDuration
-        });
+            // ChartTransitionsを使用して軸を更新
+            const newXAxis = d3.axisBottom(newXScale);
+            const newYAxis = d3.axisLeft(newYScale)
+                .tickFormat(d => ChartFormatterHelper.formatYAxisValue(d, config.yAxisFormat));
 
-        // 棒の色を取得（ChartRendererBase のヘルパーメソッドを使用）
-        const barColors = this.getChartColors(data, config, xField);
-
-        // ChartTransitionsを使用してEnter/Update/Exitパターンを適用
-        const scales = { x: newXScale, y: newYScale };
-        const barUpdateResult = ChartTransitions.applyEnterUpdateExit(
-            g.selectAll('.bar'),
-            data,
-            d => d[xField], // xFieldで一意性を保つ
-            {
-                onEnter: (enterSelection) => {
-                    ChartTransitions.animateBars(
-                        enterSelection
-                            .append('rect')
-                            .attr('class', 'bar')
-                            .attr('x', d => newXScale(d[xField]))
-                            .attr('width', newXScale.bandwidth())
-                            .attr('fill', (d, i) => barColors[i % barColors.length]),
-                        scales,
-                        {
-                            chartType: 'bar',
-                            phase: 'enter',
-                            xField: xField,
-                            yField: yField,
-                            innerHeight: innerHeight,
-                            duration: transitionDuration
-                        }
-                    );
-                },
-                onUpdate: (allSelection, { allWithTransition }) => {
-                    ChartTransitions.animateBars(
-                        allWithTransition,
-                        scales,
-                        {
-                            chartType: 'bar',
-                            phase: 'update',
-                            xField: xField,
-                            yField: yField,
-                            innerHeight: innerHeight,
-                            duration: transitionDuration
-                        }
-                    );
-                },
-                onExit: (exitSelection) => {
-                    exitSelection
-                        .attr('height', 0)
-                        .attr('y', innerHeight)
-                        .style('opacity', 0)
-                        .remove();
-                }
-            },
-            {
+            // 軸をトランジションで更新（ChartRendererBase のヘルパーメソッドを使用）
+            this.updateChartAxes(g, newXAxis, newYAxis, {
                 chartType: 'bar',
-                exit: { duration: transitionDuration / 2 }
-            }
-        );
+                duration: transitionDuration
+            });
+
+            // 棒の色を取得（ChartRendererBase のヘルパーメソッドを使用）
+            const barColors = this.getChartColors(data, config, xField);
+
+            // ChartTransitionsを使用してEnter/Update/Exitパターンを適用
+            const scales = { x: newXScale, y: newYScale };
+            const barUpdateResult = ChartTransitions.applyEnterUpdateExit(
+                g.selectAll('.bar'),
+                data,
+                d => d[xField], // xFieldで一意性を保つ
+                {
+                    onEnter: (enterSelection) => {
+                        ChartTransitions.animateBars(
+                            enterSelection
+                                .append('rect')
+                                .attr('class', 'bar')
+                                .attr('x', d => newXScale(d[xField]))
+                                .attr('width', newXScale.bandwidth())
+                                .attr('fill', (d, i) => barColors[i % barColors.length]),
+                            scales,
+                            {
+                                chartType: 'bar',
+                                phase: 'enter',
+                                xField: xField,
+                                yField: yField,
+                                innerHeight: innerHeight,
+                                duration: transitionDuration
+                            }
+                        );
+                    },
+                    onUpdate: (allSelection, { allWithTransition }) => {
+                        ChartTransitions.animateBars(
+                            allWithTransition,
+                            scales,
+                            {
+                                chartType: 'bar',
+                                phase: 'update',
+                                xField: xField,
+                                yField: yField,
+                                innerHeight: innerHeight,
+                                duration: transitionDuration
+                            }
+                        );
+                    },
+                    onExit: (exitSelection) => {
+                        exitSelection
+                            .attr('height', 0)
+                            .attr('y', innerHeight)
+                            .style('opacity', 0)
+                            .remove();
+                    }
+                },
+                {
+                    chartType: 'bar',
+                    exit: { duration: transitionDuration / 2 }
+                }
+            );
 
         } catch (error) {
             console.error('BarChartRenderer: Error during transition update:', error);
-            if (window.ErrorHandler) {
+            if (ErrorHandler) {
                 ErrorHandler.handle(error, 'BarChartRenderer.updateChartWithTransition', {
                     type: ErrorHandler.ERROR_TYPES.TRANSITION,
                     severity: ErrorHandler.SEVERITY.MEDIUM,
@@ -272,24 +283,24 @@ class BarChartRenderer extends ChartRendererBase {
      * @param {Object} config - 設定
      */
     renderBarChart(data, config) {
-        const { 
-            width, height, margin, 
-            xField = 'category', yField = 'value', 
-            color = window.AppDefaults?.colors?.accent?.success || '#10b981',
+        const {
+            width, height, margin,
+            xField = 'category', yField = 'value',
+            color = AppDefaults?.colors?.accent?.success || '#10b981',
             title = '',
             dataSource = ''
         } = config;
-        
+
         // フィルタが設定されている場合は適用
         let filteredData = data;
         if (config.filter) {
             filteredData = this.applyFilter(data, config.filter);
         }
-        
+
         const svg = this.svg;
         const innerWidth = width - margin.left - margin.right;
         const innerHeight = height - margin.top - margin.bottom;
-        
+
         const g = svg.append('g')
             .attr('transform', `translate(${margin.left},${margin.top})`);
 
@@ -300,7 +311,7 @@ class BarChartRenderer extends ChartRendererBase {
                 .attr('x', 0)
                 .attr('y', -10)
                 .attr('text-anchor', 'start')
-                .attr('fill', window.AppDefaults?.colors?.text?.primary || '#333')
+                .attr('fill', AppDefaults?.colors?.text?.primary || '#333')
                 .style('font-family', 'var(--font-family-serif)')
                 .style('font-size', 'var(--font-size-base)')
                 .style('font-weight', 'var(--font-weight-bold)')
@@ -320,33 +331,33 @@ class BarChartRenderer extends ChartRendererBase {
 
         // 単位情報を分析
         let unitInfo = { xAxis: {}, yAxis: {} };
-        if (window.ChartLayoutManager) {
+        if (ChartLayoutManager) {
             unitInfo = ChartLayoutManager.analyzeUnits(filteredData, config);
         }
 
         // 軸を描画（カスタムフォーマット優先、ChartLayoutManager、D3デフォルトの順）
         let xAxis, yAxis;
-        
+
         // Y軸フォーマッターを決定（優先順位：カスタム > ChartLayoutManager > D3デフォルト）
         let yFormatter;
         if (config.yAxisFormat) {
             // カスタムフォーマットが指定されている場合
             yFormatter = (value) => ChartFormatterHelper.formatYAxisValue(value, config.yAxisFormat);
-        } else if (window.ChartLayoutManager) {
+        } else if (ChartLayoutManager) {
             // ChartLayoutManagerが利用可能な場合
             yFormatter = (value) => ChartLayoutManager.formatAxisWithUnits(value, unitInfo.yAxis);
         } else {
             // デフォルト（D3の標準フォーマット）
             yFormatter = null; // D3のデフォルトを使用
         }
-        
+
         xAxis = d3.axisBottom(xScale);
-        yAxis = yFormatter 
+        yAxis = yFormatter
             ? d3.axisLeft(yScale).tickFormat(yFormatter)
             : d3.axisLeft(yScale);
-        
+
         // X軸フォーマッター（将来の拡張用）
-        if (window.ChartLayoutManager && !config.xAxisFormat) {
+        if (ChartLayoutManager && !config.xAxisFormat) {
             const xFormatter = (value) => ChartLayoutManager.formatAxisWithUnits(value, unitInfo.xAxis);
             if (xAxis) {
                 xAxis.tickFormat(xFormatter);
@@ -363,7 +374,7 @@ class BarChartRenderer extends ChartRendererBase {
             .call(yAxis);
 
         // 軸ラベルを統一的に追加（カスタム優先、デフォルト単位フォールバック）
-        if (window.ChartLayoutManager) {
+        if (ChartLayoutManager) {
             ChartLayoutManager.addAxisLabels(g, filteredData, config, innerWidth, innerHeight);
         }
 
@@ -372,7 +383,7 @@ class BarChartRenderer extends ChartRendererBase {
 
         // ChartTransitionsを使用して棒を描画
         const scales = { x: xScale, y: yScale };
-        
+
         ChartTransitions.createStaggered(
             g.selectAll('.bar')
                 .data(filteredData)
@@ -383,7 +394,7 @@ class BarChartRenderer extends ChartRendererBase {
                 .attr('width', xScale.bandwidth())
                 .attr('fill', (d, i) => barColors[i % barColors.length]),
             { delay: 100, duration: 600 }
-        ).call(function(selection) {
+        ).call(function (selection) {
             ChartTransitions.animateBars(selection, scales, {
                 chartType: 'bar',
                 phase: 'enter',
@@ -414,8 +425,8 @@ class BarChartRenderer extends ChartRendererBase {
      * 指定されたグループ内で棒グラフを描画
      */
     renderBarChartInGroup(g, data, config) {
-        const { width, height, xField = 'category', yField = 'value', color = window.AppDefaults?.colors?.accent?.success || '#10b981' } = config;
-        
+        const { width, height, xField = 'category', yField = 'value', color = AppDefaults?.colors?.accent?.success || '#10b981' } = config;
+
         // スケール設定
         const xScale = d3.scaleBand()
             .domain(data.map(d => d[xField]))
@@ -429,16 +440,16 @@ class BarChartRenderer extends ChartRendererBase {
 
         // 単位情報を分析
         let unitInfo = { xAxis: {}, yAxis: {} };
-        if (window.ChartLayoutManager) {
+        if (ChartLayoutManager) {
             unitInfo = ChartLayoutManager.analyzeUnits(data, config);
         }
 
         // 軸を描画（単位情報を使ったフォーマッターを使用）
         let xAxis, yAxis;
-        if (window.ChartLayoutManager) {
+        if (ChartLayoutManager) {
             const xFormatter = (value) => ChartLayoutManager.formatAxisWithUnits(value, unitInfo.xAxis);
             const yFormatter = (value) => ChartLayoutManager.formatAxisWithUnits(value, unitInfo.yAxis);
-            
+
             xAxis = d3.axisBottom(xScale);
             yAxis = d3.axisLeft(yScale).tickFormat(yFormatter);
         } else {
@@ -456,27 +467,29 @@ class BarChartRenderer extends ChartRendererBase {
             .call(yAxis);
 
         // 軸ラベルを統一的に追加（カスタム優先、デフォルト単位フォールバック）
-        if (window.ChartLayoutManager) {
+        if (ChartLayoutManager) {
             ChartLayoutManager.addAxisLabels(g, data, config, width, height);
         }
 
         // 統一された色設定
         let barColors;
-        if (window.ColorScheme && config.useUnifiedColors !== false && config.multiColor) {
+        if (colorScheme && config.useUnifiedColors !== false && config.multiColor) {
             // 複数色の場合は統一カラースキームを使用
-            barColors = window.ColorScheme.generateColorsForChart(data, { 
-                ...config, 
-                seriesField: xField 
+            // let colorScheme = window.colorScheme; // Removed global usage
+            barColors = colorScheme.generateColorsForChart(data, {
+                ...config,
+                seriesField: xField
             });
-        } else if (window.ColorScheme && config.useUnifiedColors !== false && data.length === 1) {
+        } else if (colorScheme && config.useUnifiedColors !== false && data.length === 1) {
             // 単一データの場合は地域に応じた色を使用
+            // let colorScheme = window.colorScheme; // Removed global usage
             const regionName = data[0][xField];
-            barColors = [window.ColorScheme.getColorForRegion(regionName)];
+            barColors = [colorScheme.getColorForRegion(regionName)];
         } else {
             // フォールバック：設定で指定された色
             barColors = [color];
         }
-        
+
         // 特別なケース：単一系列で色が明示されている場合のみそれを優先
         if (config.colors && config.colors.length > 0 && config.multiSeries === false) {
             barColors = config.colors;
@@ -506,13 +519,13 @@ class BarChartRenderer extends ChartRendererBase {
      */
     addLegend(svg, data, colors, width, height, config) {
         if (!data || data.length <= 1) return;
-        
+
         const xField = config.xField || 'category';
         const categories = data.map(d => d[xField]);
-        
+
         // ChartLayoutManagerを使用して最適な凡例レイアウトを計算
         let legendLayout;
-        if (window.ChartLayoutManager) {
+        if (ChartLayoutManager) {
             legendLayout = ChartLayoutManager.calculateLegendLayout(categories, width, height);
         } else {
             // フォールバック：従来の固定レイアウト
@@ -525,13 +538,13 @@ class BarChartRenderer extends ChartRendererBase {
                 totalWidth: 120
             };
         }
-        
+
         if (!legendLayout.show) return;
-        
+
         // 凡例コンテナを作成
         const legend = svg.append('g')
             .attr('class', 'chart-legend');
-        
+
         // 凡例位置を計算
         let legendX, legendY;
         if (legendLayout.position === 'bottom') {
@@ -542,23 +555,23 @@ class BarChartRenderer extends ChartRendererBase {
             legendX = Math.max(20, width - (legendLayout.totalWidth || legendLayout.itemWidth));
             legendY = 20;
         }
-        
+
         legend.attr('transform', `translate(${legendX}, ${legendY})`);
-        
+
         // 凡例アイテムを作成
         const legendItems = legend.selectAll('.legend-item')
             .data(categories)
             .enter()
             .append('g')
             .attr('class', 'legend-item');
-        
+
         // アイテムの配置
         if (legendLayout.orientation === 'horizontal') {
             legendItems.attr('transform', (d, i) => `translate(${i * legendLayout.itemWidth}, 0)`);
         } else {
             legendItems.attr('transform', (d, i) => `translate(0, ${i * legendLayout.itemHeight})`);
         }
-        
+
         // 凡例アイコン（四角形 - 棒グラフにふさわしい）
         legendItems.append('rect')
             .attr('x', 2)
@@ -566,24 +579,24 @@ class BarChartRenderer extends ChartRendererBase {
             .attr('width', 8)
             .attr('height', 8)
             .attr('fill', (d, i) => colors[i % colors.length]);
-        
+
         // 凡例テキスト
         const legendTexts = legendItems.append('text')
             .attr('x', 16)
             .attr('y', 6)
             .attr('dy', '0.35em')
             .attr('font-size', '12px')
-            .attr('fill', window.AppDefaults?.colors?.text?.primary || '#333');
-        
+            .attr('fill', AppDefaults?.colors?.text?.primary || '#333');
+
         // テキスト省略処理
-        legendTexts.each(function(d) {
+        legendTexts.each(function (d) {
             const textElement = d3.select(this);
             const text = d;
             const maxWidth = legendLayout.itemWidth - 25; // アイコン分を除く
-            
+
             // まず完全なテキストを設定
             textElement.text(text);
-            
+
             // テキスト幅を安全に測定
             let textWidth;
             try {
@@ -592,7 +605,7 @@ class BarChartRenderer extends ChartRendererBase {
                 // getBBoxが失敗した場合のフォールバック
                 textWidth = text.length * 7;
             }
-            
+
             if (textWidth > maxWidth) {
                 // テキストを省略
                 let shortenedText = text;
@@ -600,7 +613,7 @@ class BarChartRenderer extends ChartRendererBase {
                     shortenedText = text.substring(0, 8) + '...';
                 }
                 textElement.text(shortenedText);
-                
+
                 // ツールチップで完全なテキストを表示
                 textElement.append('title').text(text);
             }
@@ -612,21 +625,21 @@ class BarChartRenderer extends ChartRendererBase {
      */
     renderAnnotations(g, annotations, context) {
         if (!annotations || annotations.length === 0) return;
-        
+
         const { xScale, yScale, width, height, xField, yField } = context;
-        
+
         // スケールが存在しない場合は処理をスキップ
         if (!xScale || !yScale) {
             console.warn('BarChartRenderer: xScale or yScale is undefined, skipping annotations');
             return;
         }
-        
+
         const annotationGroup = g.append('g')
             .attr('class', 'chart-annotations');
-        
+
         annotations.forEach((annotation, index) => {
             const { type, x, y, text, style = {} } = annotation;
-            
+
             // X座標の変換（カテゴリの場合はband scaleを使用）
             let xPos;
             try {
@@ -641,7 +654,7 @@ class BarChartRenderer extends ChartRendererBase {
                 console.warn(`BarChartRenderer: Failed to convert x coordinate for annotation ${index}:`, x, error);
                 xPos = 0;
             }
-            
+
             // Y座標の変換
             let yPos;
             try {
@@ -650,28 +663,28 @@ class BarChartRenderer extends ChartRendererBase {
                 console.warn(`BarChartRenderer: Failed to convert y coordinate for annotation ${index}:`, y, error);
                 yPos = 0;
             }
-            
+
             // 座標が有効かチェック
             if (isNaN(xPos) || isNaN(yPos)) {
                 console.warn(`BarChartRenderer: Invalid coordinates for annotation ${index}: x=${xPos}, y=${yPos}`);
                 return;
             }
-            
+
             // 注釈要素を作成
             const annotationElement = annotationGroup.append('g')
                 .attr('class', `annotation annotation-${index}`)
                 .attr('transform', `translate(${xPos}, ${yPos})`);
-            
+
             switch (type) {
                 case 'point':
                     // ポイント注釈
                     annotationElement.append('circle')
                         .attr('r', style.radius || 5)
-                        .attr('fill', style.color || window.AppConstants?.APP_COLORS?.ANNOTATIONS?.POINT || '#ff6b6b')
-                        .attr('stroke', style.strokeColor || window.AppConstants?.APP_COLORS?.ANNOTATIONS?.STROKE || '#fff')
+                        .attr('fill', style.color || AppConstants?.APP_COLORS?.ANNOTATIONS?.POINT || '#ff6b6b')
+                        .attr('stroke', style.strokeColor || AppConstants?.APP_COLORS?.ANNOTATIONS?.STROKE || '#fff')
                         .attr('stroke-width', style.strokeWidth || 2);
                     break;
-                    
+
                 case 'line':
                     // 線注釈（垂直線）
                     annotationElement.append('line')
@@ -679,11 +692,11 @@ class BarChartRenderer extends ChartRendererBase {
                         .attr('y1', -yPos) // 上端まで
                         .attr('x2', 0)
                         .attr('y2', height - yPos) // 下端まで
-                        .attr('stroke', style.color || window.AppConstants?.APP_COLORS?.ANNOTATIONS?.LINE || '#999')
+                        .attr('stroke', style.color || AppConstants?.APP_COLORS?.ANNOTATIONS?.LINE || '#999')
                         .attr('stroke-width', style.strokeWidth || 1)
                         .attr('stroke-dasharray', style.dashArray || '3,3');
                     break;
-                    
+
                 case 'text':
                 default:
                     // テキスト注釈
@@ -694,7 +707,7 @@ class BarChartRenderer extends ChartRendererBase {
                         .attr('fill', style.color || '#333')
                         .attr('text-anchor', style.textAnchor || 'start')
                         .text(text);
-                    
+
                     // 背景を追加（可読性向上）
                     if (style.background !== false) {
                         const bbox = textElement.node().getBBox();
@@ -704,7 +717,7 @@ class BarChartRenderer extends ChartRendererBase {
                             .attr('width', bbox.width + 4)
                             .attr('height', bbox.height + 4)
                             .attr('fill', style.backgroundColor || 'rgba(255, 255, 255, 0.8)')
-                            .attr('stroke', style.borderColor || window.AppConstants?.APP_COLORS?.ANNOTATIONS?.BORDER || '#ccc')
+                            .attr('stroke', style.borderColor || AppConstants?.APP_COLORS?.ANNOTATIONS?.BORDER || '#ccc')
                             .attr('stroke-width', 0.5)
                             .attr('rx', 2);
                     }
@@ -722,6 +735,3 @@ class BarChartRenderer extends ChartRendererBase {
         }
     }
 }
-
-// グローバルスコープで利用可能にする（ES6モジュール移行前の暫定措置）
-window.BarChartRenderer = BarChartRenderer;

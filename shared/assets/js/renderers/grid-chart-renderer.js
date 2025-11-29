@@ -1,8 +1,18 @@
+import * as d3 from 'd3';
+import { ChartRendererBase } from '../utils/chart-renderer-base.js';
+import { GridDataTransformer } from '../utils/grid-data-transformer.js';
+import { ErrorHandler } from '../utils/error-handler.js';
+import { LayoutConfig } from '../config/layout-config.js';
+import { BaseManager } from '../utils/base-manager.js';
+import { ChartTransitions } from '../utils/chart-transitions.js';
+import { ChartFormatterHelper } from '../utils/chart-formatter-helper.js';
+import { AppDefaults } from '../config/defaults.js';
+
 /**
  * GridChartRenderer - グリッドレイアウトでの複数チャート描画を専門的に扱うクラス
  * ChartRendererBaseを継承し、グリッド特有の機能を提供
  */
-class GridChartRenderer extends ChartRendererBase {
+export class GridChartRenderer extends ChartRendererBase {
     constructor(containerId) {
         super(containerId);
         this.type = 'grid';  // チャート種別を設定
@@ -36,12 +46,12 @@ class GridChartRenderer extends ChartRendererBase {
      */
     updateChart(chartData) {
         const { layout, data, config, visible } = chartData;
-        
+
         // 厳密なチェック：grid layout以外は処理しない
         if (layout !== 'grid') {
             return; // ワーニングも表示しないように変更
         }
-        
+
         // グリッドレイアウトの必須設定をチェック
         if (!config || (!config.columns && !config.rows)) {
             console.warn('GridChartRenderer: Grid layout requires columns/rows configuration');
@@ -52,7 +62,7 @@ class GridChartRenderer extends ChartRendererBase {
         const validation = this.validateChartData(data, config);
         if (!validation.valid) {
             console.error('GridChartRenderer: Invalid data or config:', validation.errors);
-            if (window.ErrorHandler) {
+            if (ErrorHandler) {
                 ErrorHandler.handle(new Error(validation.errors.join(', ')), 'GridChartRenderer.updateChart', {
                     type: ErrorHandler.ERROR_TYPES.VALIDATION,
                     severity: ErrorHandler.SEVERITY.HIGH,
@@ -80,7 +90,7 @@ class GridChartRenderer extends ChartRendererBase {
         } else {
             this.hide();
         }
-        
+
         // 更新完了後にフラグをリセット
         setTimeout(() => {
             this.isUpdating = false;
@@ -94,17 +104,17 @@ class GridChartRenderer extends ChartRendererBase {
     updateGridChart(chartData) {
         try {
             this.show();
-            
+
             // SVG要素をクリア
             this.clearContainer();
-            
+
             // データファイルから実際のデータを取得
             const data = chartData.data;
-            
+
             this.renderGridChart(data, chartData.config);
         } catch (error) {
             console.error('GridChartRenderer: Error during grid chart update:', error);
-            if (window.ErrorHandler) {
+            if (ErrorHandler) {
                 ErrorHandler.handle(error, 'GridChartRenderer.updateGridChart', {
                     type: ErrorHandler.ERROR_TYPES.RENDER,
                     severity: ErrorHandler.SEVERITY.HIGH,
@@ -113,7 +123,7 @@ class GridChartRenderer extends ChartRendererBase {
             }
         }
     }
-    
+
     /**
      * Grid layoutで複数の円グラフを描画
      * @param {Array} data - チャートデータ
@@ -121,14 +131,14 @@ class GridChartRenderer extends ChartRendererBase {
      */
     renderGridChart(data, config) {
         // レイアウト設定を統合
-        const layoutDefaults = window.LayoutConfig ? 
+        const layoutDefaults = LayoutConfig ?
             LayoutConfig.getLayoutConfig('grid') : {};
-        
+
         // デフォルト設定をAppDefaultsから取得
         const defaultConfig = {
             gridMode: 'fixed',  // 'fixed' または 'auto'
-            columns: 7, 
-            rows: 2, 
+            columns: 7,
+            rows: 2,
             chartWidth: layoutDefaults.chartSize?.width || 120,
             chartHeight: layoutDefaults.chartSize?.height || 120,
             title: '',
@@ -141,18 +151,18 @@ class GridChartRenderer extends ChartRendererBase {
 
         // AppDefaultsとの設定マージ
         const mergedConfig = BaseManager.mergeConfig(defaultConfig, config);
-        
+
         // gridMode が 'auto' の場合、データから最適なグリッドを計算
         if (mergedConfig.gridMode === 'auto' && data && data.length > 0) {
             const optimalGrid = this.dataTransformer.calculateOptimalGrid(data.length, mergedConfig);
             mergedConfig.columns = optimalGrid.columns;
             mergedConfig.rows = optimalGrid.rows;
         }
-        
-        const { 
-            columns, 
-            rows, 
-            chartWidth, 
+
+        const {
+            columns,
+            rows,
+            chartWidth,
             chartHeight,
             title,
             showLabels,
@@ -161,20 +171,20 @@ class GridChartRenderer extends ChartRendererBase {
             dataSource = '',
             rowTitles = []
         } = mergedConfig;
-        
+
         try {
             const gridData = this.dataTransformer.transformToGridData(data, mergedConfig);
             const { width: containerWidth, height: containerHeight } = this.getResponsiveSize(mergedConfig);
-            
+
             const isFullViewport = (mergedConfig.widthPercent === 100 && mergedConfig.heightPercent === 100);
             let actualContainerWidth = containerWidth;
             if (mergedConfig.position && mergedConfig.position.width === "100%") {
                 actualContainerWidth = isFullViewport ? Math.max(containerWidth, window.innerWidth * 0.95) : Math.max(containerWidth, window.innerWidth * 0.8);
             }
-            
+
             const availableWidth = actualContainerWidth - 40;
             const availableHeight = containerHeight - (title ? 40 : 0) - (dataSource ? 30 : 0) - 40;
-            
+
             let maxWidth, maxHeight;
             if (isFullViewport) {
                 maxWidth = Math.floor(availableWidth / columns * 0.9);
@@ -185,25 +195,25 @@ class GridChartRenderer extends ChartRendererBase {
             }
             const minWidth = mergedConfig.minChartWidth || 80;
             const minHeight = mergedConfig.minChartHeight || 80;
-            
+
             const calculatedChartWidth = Math.min(maxWidth, Math.max(minWidth, availableWidth / columns));
             const calculatedChartHeight = Math.min(maxHeight, Math.max(minHeight, (availableHeight - (rows - 1) * rowSpacing) / rows));
-            
+
             const totalWidth = columns * calculatedChartWidth + 40;
             const totalHeight = rows * calculatedChartHeight + (rows - 1) * rowSpacing + (title ? 40 : 0) + (dataSource ? 30 : 0) + 40;
-            
+
             this.svg = this.initSVG(totalWidth, totalHeight);
-            
+
             mergedConfig.chartWidth = calculatedChartWidth;
             mergedConfig.chartHeight = calculatedChartHeight;
-            
+
             if (title) {
                 this.svg.append('text')
                     .attr('class', 'chart-title')
                     .attr('x', totalWidth / 2)
                     .attr('y', 25)
                     .attr('text-anchor', 'middle')
-                    .attr('fill', window.AppDefaults?.colors?.text?.primary || '#333')
+                    .attr('fill', AppDefaults?.colors?.text?.primary || '#333')
                     .style('font-family', 'var(--font-family-serif)')
                     .style('font-size', 'var(--font-size-base)')
                     .style('font-weight', 'var(--font-weight-bold)')
@@ -229,13 +239,13 @@ class GridChartRenderer extends ChartRendererBase {
                     }
                 });
             }
-            
+
             gridData.forEach((cellData, index) => {
                 const col = index % columns;
                 const row = Math.floor(index / columns);
                 const x = col * calculatedChartWidth;
                 const y = row * (calculatedChartHeight + rowSpacing);
-                
+
                 this.renderGridCell(gridContainer, cellData, {
                     x: x,
                     y: y,
@@ -245,13 +255,13 @@ class GridChartRenderer extends ChartRendererBase {
                     showPercentages
                 });
             });
-            
+
             if (dataSource) {
                 this.addDataSource(this.svg, dataSource, totalWidth, totalHeight);
             }
         } catch (error) {
             console.error('GridChartRenderer: Error during grid chart rendering:', error);
-            if (window.ErrorHandler) {
+            if (ErrorHandler) {
                 ErrorHandler.handle(error, 'GridChartRenderer.renderGridChart', {
                     type: ErrorHandler.ERROR_TYPES.RENDER,
                     severity: ErrorHandler.SEVERITY.HIGH,
@@ -260,7 +270,7 @@ class GridChartRenderer extends ChartRendererBase {
             }
         }
     }
-    
+
     /**
      * グリッドの各セルを描画
      * @param {d3.Selection} container - 親コンテナ
@@ -272,52 +282,52 @@ class GridChartRenderer extends ChartRendererBase {
         const radius = Math.min(width, height) / 2 - 10;  // 余白を調整して円グラフサイズを最適化
         const centerX = x + width / 2;
         const centerY = y + height / 2;
-        
+
         console.log('GridChartRenderer: renderGridCell - width:', width, 'height:', height, 'radius:', radius);
-        
+
         try {
             // セルグループを作成
             const cellGroup = container.append('g')
                 .attr('class', 'grid-cell')
                 .attr('transform', `translate(${centerX}, ${centerY})`);
-            
+
             // パイチャートデータの検証
             if (!cellData.pieData || !Array.isArray(cellData.pieData)) {
                 throw new Error('Invalid pie data for grid cell');
             }
-            
+
             // パイチャートデータ
             const pieData = d3.pie()
                 .value(d => d.value)
                 .sort(null)(cellData.pieData);
-            
+
             // アーク生成器
             const arc = d3.arc()
                 .innerRadius(0)
                 .outerRadius(radius);
-            
+
             // パイスライスを描画
             const slices = cellGroup.selectAll('.pie-slice')
                 .data(pieData)
                 .enter()
                 .append('g')
                 .attr('class', 'pie-slice');
-            
+
             // ChartTransitionsを使用してアークを描画
             ChartTransitions.createStaggered(
                 slices.append('path')
                     .attr('fill', d => d.data.color)
-                    .attr('stroke', window.AppDefaults?.colors?.text?.white || '#fff')
-                    .attr('stroke-width', window.AppDefaults?.strokeWidth?.normal || 1),
-                { delay: 100, duration: window.AppDefaults?.animation?.shortDuration || 500 }
-            ).call(function(selection) {
+                    .attr('stroke', AppDefaults?.colors?.text?.white || '#fff')
+                    .attr('stroke-width', AppDefaults?.strokeWidth?.normal || 1),
+                { delay: 100, duration: AppDefaults?.animation?.shortDuration || 500 }
+            ).call(function (selection) {
                 ChartTransitions.animateArcs(selection, arc, {
                     chartType: 'grid',
                     phase: 'enter',
-                    duration: window.AppDefaults?.animation?.shortDuration || 500
+                    duration: AppDefaults?.animation?.shortDuration || 500
                 });
             });
-            
+
             // ChartTransitionsを使用してラベルを追加
             if (showLabels) {
                 // 地域名
@@ -325,11 +335,11 @@ class GridChartRenderer extends ChartRendererBase {
                     cellGroup.append('text')
                         .attr('class', 'region-label')
                         .attr('x', 0)
-                        .attr('y', -height/3)
+                        .attr('y', -height / 3)
                         .attr('text-anchor', 'middle')
                         .attr('font-size', '10px')
                         .attr('font-weight', 'bold')
-                        .attr('fill', window.AppDefaults?.colors?.text?.primary || '#333')
+                        .attr('fill', AppDefaults?.colors?.text?.primary || '#333')
                         .text(cellData.region || ''),
                     {
                         chartType: 'grid',
@@ -338,16 +348,16 @@ class GridChartRenderer extends ChartRendererBase {
                         duration: 500
                     }
                 );
-                
+
                 // 年齢層
                 ChartTransitions.animateText(
                     cellGroup.append('text')
                         .attr('class', 'age-label')
                         .attr('x', 0)
-                        .attr('y', height/3)
+                        .attr('y', height / 3)
                         .attr('text-anchor', 'middle')
                         .attr('font-size', '9px')
-                        .attr('fill', window.AppDefaults?.colors?.text?.secondary || '#666')
+                        .attr('fill', AppDefaults?.colors?.text?.secondary || '#666')
                         .text(cellData.ageGroup || ''),
                     {
                         chartType: 'grid',
@@ -357,10 +367,10 @@ class GridChartRenderer extends ChartRendererBase {
                     }
                 );
             }
-            
+
             // パーセンテージを中央に表示
             if (showPercentages && cellData.percentage !== undefined) {
-                const formattedPercentage = (window.ChartFormatterHelper)
+                const formattedPercentage = (ChartFormatterHelper)
                     ? ChartFormatterHelper.formatYAxisValue(cellData.percentage / 100, { type: 'percentage' })
                     : `${cellData.percentage}%`;
 
@@ -372,7 +382,7 @@ class GridChartRenderer extends ChartRendererBase {
                         .attr('text-anchor', 'middle')
                         .attr('font-size', '12px')
                         .attr('font-weight', 'bold')
-                        .attr('fill', window.AppDefaults?.colors?.text?.primary || '#333')
+                        .attr('fill', AppDefaults?.colors?.text?.primary || '#333')
                         .text(formattedPercentage),
                     {
                         chartType: 'grid',
@@ -384,7 +394,7 @@ class GridChartRenderer extends ChartRendererBase {
             }
         } catch (error) {
             console.error('GridChartRenderer: Error rendering grid cell:', error);
-            if (window.ErrorHandler) {
+            if (ErrorHandler) {
                 ErrorHandler.handle(error, 'GridChartRenderer.renderGridCell', {
                     type: ErrorHandler.ERROR_TYPES.RENDER,
                     severity: ErrorHandler.SEVERITY.MEDIUM,
@@ -394,9 +404,9 @@ class GridChartRenderer extends ChartRendererBase {
         }
     }
 
-    
-    
-    
+
+
+
 
 
     /**
@@ -412,7 +422,7 @@ class GridChartRenderer extends ChartRendererBase {
         const containerHeight = containerBounds.height;
 
         // AppDefaultsのブレークポイントを使用
-        const breakpoints = window.AppDefaults?.breakpoints;
+        const breakpoints = AppDefaults?.breakpoints;
         let responsiveConfig = { ...config };
 
         if (breakpoints) {
@@ -441,9 +451,9 @@ class GridChartRenderer extends ChartRendererBase {
      */
     initSVG(width, height) {
         this.clearContainer();
-        
+
         console.log('GridChartRenderer: initSVG called with width:', width, 'height:', height);
-        
+
         // グリッドチャートでは固定サイズを使用（レスポンシブではなく）
         this.svg = this.container
             .append('svg')
@@ -452,7 +462,7 @@ class GridChartRenderer extends ChartRendererBase {
             .classed('grid-chart-svg', true)
             .style('display', 'block')
             .style('margin', '0 auto'); // センタリング
-            
+
         console.log('GridChartRenderer: SVG created with actual size:', width, 'x', height);
         return this.svg;
     }
@@ -462,10 +472,10 @@ class GridChartRenderer extends ChartRendererBase {
      */
     resize() {
         if (this.currentChart && this.data && this.config) {
-            
+
             // レスポンシブレイアウトを再計算
             const responsiveConfig = this.calculateResponsiveLayout(this.config);
-            
+
             // チャートを再描画
             this.renderGridChart(this.data, responsiveConfig);
         }
@@ -479,7 +489,7 @@ class GridChartRenderer extends ChartRendererBase {
      */
     updateChartWithTransition(data, config, direction = 'down') {
         // 将来の拡張: グリッドチャートのスムーズな更新機能
-        
+
         // 現状は通常の再描画を実行
         this.renderGridChart(data, config);
     }
@@ -490,23 +500,23 @@ class GridChartRenderer extends ChartRendererBase {
      */
     renderAnnotations(annotations) {
         if (!annotations || annotations.length === 0 || !this.svg) return;
-        
+
         const annotationGroup = this.svg.append('g')
             .attr('class', 'grid-chart-annotations');
-        
+
         annotations.forEach((annotation, index) => {
             const { type, text, style = {}, position = { x: 0, y: 0 } } = annotation;
-            
+
             const annotationElement = annotationGroup.append('g')
                 .attr('class', `grid-annotation grid-annotation-${index}`)
                 .attr('transform', `translate(${position.x}, ${position.y})`);
-            
+
             switch (type) {
                 case 'text':
                 default:
                     annotationElement.append('text')
                         .attr('font-size', style.fontSize || '12px')
-                        .attr('fill', style.color || window.AppDefaults?.colors?.text?.primary || '#333')
+                        .attr('fill', style.color || AppDefaults?.colors?.text?.primary || '#333')
                         .attr('text-anchor', style.textAnchor || 'start')
                         .text(text);
                     break;
@@ -531,6 +541,3 @@ class GridChartRenderer extends ChartRendererBase {
         };
     }
 }
-
-// グローバルスコープで利用可能にする（ES6モジュール移行前の暫定措置）
-window.GridChartRenderer = GridChartRenderer;

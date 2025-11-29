@@ -1,8 +1,12 @@
+import * as d3 from 'd3';
+import { labeler as d3Labeler } from '../libs/d3-labeler.js';
+import { TextMeasurement } from './text-measurement.js';
+
 /**
  * LineChartLabelManager - 折れ線グラフのラベル配置と最適化を専門的に扱うクラス
  * インラインラベル、引き出し線、ラベル衝突回避などの機能を統合管理
  */
-class LineChartLabelManager {
+export class LineChartLabelManager {
     constructor() {
         // 設定可能なデフォルト値
         this.defaultConfig = {
@@ -89,22 +93,22 @@ class LineChartLabelManager {
 
         // ラベルの初期位置を計算
         const labels = endPoints.map(point => {
-            const labelText = window.TextMeasurement
-                ? window.TextMeasurement.truncateText(point.name, inlineConfig.maxLabelWidth, {
+            const labelText = TextMeasurement
+                ? TextMeasurement.truncateText(point.name, inlineConfig.maxLabelWidth, {
                     fontSize: inlineConfig.fontSize,
                     fontFamily: inlineConfig.fontFamily
                 })
                 : point.name;
 
-            const labelWidth = window.TextMeasurement
-                ? window.TextMeasurement.measureTextWidth(labelText, {
+            const labelWidth = TextMeasurement
+                ? TextMeasurement.measureTextWidth(labelText, {
                     fontSize: inlineConfig.fontSize,
                     fontFamily: inlineConfig.fontFamily
                 })
                 : labelText.length * 8;
 
-            const labelHeight = window.TextMeasurement
-                ? window.TextMeasurement.measureTextHeight(labelText, {
+            const labelHeight = TextMeasurement
+                ? TextMeasurement.measureTextHeight(labelText, {
                     fontSize: inlineConfig.fontSize,
                     fontFamily: inlineConfig.fontFamily
                 })
@@ -195,22 +199,22 @@ class LineChartLabelManager {
 
         // ラベルの初期位置を計算
         const labels = endPoints.map(point => {
-            const labelText = window.TextMeasurement
-                ? window.TextMeasurement.truncateText(point.name, dualConfig.maxLabelWidth, {
+            const labelText = TextMeasurement
+                ? TextMeasurement.truncateText(point.name, dualConfig.maxLabelWidth, {
                     fontSize: dualConfig.fontSize,
                     fontFamily: dualConfig.fontFamily
                 })
                 : point.name;
 
-            const labelWidth = window.TextMeasurement
-                ? window.TextMeasurement.measureTextWidth(labelText, {
+            const labelWidth = TextMeasurement
+                ? TextMeasurement.measureTextWidth(labelText, {
                     fontSize: dualConfig.fontSize,
                     fontFamily: dualConfig.fontFamily
                 })
                 : labelText.length * 7; // 小さめのフォントサイズに合わせて調整
 
-            const labelHeight = window.TextMeasurement
-                ? window.TextMeasurement.measureTextHeight(labelText, {
+            const labelHeight = TextMeasurement
+                ? TextMeasurement.measureTextHeight(labelText, {
                     fontSize: dualConfig.fontSize,
                     fontFamily: dualConfig.fontFamily
                 })
@@ -388,8 +392,8 @@ class LineChartLabelManager {
     optimizeLabelPositions(labels, width, height, config) {
         try {
             // D3-Labelerの存在確認
-            if (!window.d3 || !window.d3.labeler) {
-                console.error('LineChartLabelManager: D3-Labeler is not loaded!');
+            if (!d3Labeler) {
+                // console.error('LineChartLabelManager: D3-Labeler is not loaded!');
                 this.applySimpleCollisionAvoidance(labels, config);
                 return;
             }
@@ -404,17 +408,8 @@ class LineChartLabelManager {
             // ラベルの初期配置を改善：重複を事前に避ける
             this.preProcessLabelPositions(labels, config);
 
-            // デバッグ：初期位置を記録
-            const beforePositions = labels.map(label => ({
-                text: label.text,
-                x: label.x,
-                y: label.y
-            }));
-            beforePositions.forEach((pos, i) => {
-            });
-
             // D3-Labelerを実行（座標系を正しく設定）
-            const labeler = d3.labeler()
+            const labelerInstance = d3Labeler()
                 .label(labels)
                 .anchor(anchors)
                 .width(width + 150) // チャート幅を右に拡張
@@ -422,18 +417,11 @@ class LineChartLabelManager {
                 .start(1000); // イテレーション数
 
 
-            // デバッグ：最適化後の位置を確認
-            labels.forEach((label, i) => {
-                const before = beforePositions[i];
-                const moved = Math.abs(label.x - before.x) > 1 || Math.abs(label.y - before.y) > 1;
-            });
-
             // 後処理：チャート範囲外に出たラベルを調整
             this.postProcessLabelPositions(labels, width, height, config);
 
         } catch (error) {
             console.error('LineChartLabelManager: D3-Labeler optimization failed:', error);
-            console.error(error.stack);
             // フォールバックとして簡易重複回避を実行
             this.applySimpleCollisionAvoidance(labels, config);
         }
@@ -522,9 +510,6 @@ class LineChartLabelManager {
 
         // X座標を調整（より右寄りで統一された配置）
         this.adjustXPositionsImproved(sortedLabels, width, config);
-
-        sortedLabels.forEach((label, i) => {
-        });
     }
 
     /**
@@ -572,48 +557,6 @@ class LineChartLabelManager {
             label.x = Math.min(baseX, width + maxExtension - label.width - 10);
         });
 
-    }
-
-    /**
-     * ラベルを等間隔で配置（レガシー）
-     */
-    distributeLabelsEvenly(labels, minY, maxY, minSpacing) {
-        let currentY = minY;
-
-        labels.forEach((label, index) => {
-            label.y = currentY + label.height / 2; // ラベル中心位置
-            currentY += label.height + minSpacing;
-        });
-    }
-
-    /**
-     * ラベルを圧縮して配置（レガシー）
-     */
-    distributeLabelsCompressed(labels, minY, maxY) {
-        const availableHeight = maxY - minY;
-        const totalLabelHeight = labels.reduce((sum, label) => sum + label.height, 0);
-        const spacingPerGap = Math.max(5, (availableHeight - totalLabelHeight) / (labels.length - 1));
-
-        let currentY = minY;
-        labels.forEach((label, index) => {
-            label.y = currentY + label.height / 2; // ラベル中心位置
-            currentY += label.height + spacingPerGap;
-        });
-    }
-
-    /**
-     * X座標を階段状に調整（レガシー）
-     */
-    adjustXPositions(labels, width, config) {
-        const baseX = width * 0.85; // チャート右端から少し左
-        const maxExtension = config.maxExtensionWidth || 100;
-        const staggerStep = 15; // 階段の段差
-
-        labels.forEach((label, index) => {
-            // 階段状に配置（3段階のパターンを繰り返し）
-            const staggerOffset = (index % 3) * staggerStep;
-            label.x = Math.min(baseX + staggerOffset, width + maxExtension - label.width - 10);
-        });
     }
 
     /**
@@ -756,7 +699,7 @@ class LineChartLabelManager {
             .style('pointer-events', 'none');
 
         // ラベルの背景を追加（可読性向上）
-        labelTexts.each(function(d) {
+        labelTexts.each(function (d) {
             const textElement = d3.select(this);
             let bbox;
 
@@ -790,6 +733,3 @@ class LineChartLabelManager {
             .text(d => d.originalName);
     }
 }
-
-// グローバルスコープで利用可能にする
-window.LineChartLabelManager = LineChartLabelManager;

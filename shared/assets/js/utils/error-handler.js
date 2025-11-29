@@ -1,8 +1,11 @@
+import { pubsub, EVENTS } from '../core/pubsub.js';
+import { AppDefaults } from '../config/defaults.js';
+
 /**
  * ErrorHandler - エラーハンドリングの共通管理クラス
  * アプリケーション全体のエラー処理を一元管理
  */
-class ErrorHandler {
+export class ErrorHandler {
     // エラータイプの定数
     static ERROR_TYPES = {
         DATA_LOAD: 'data_load',
@@ -59,8 +62,8 @@ class ErrorHandler {
         ErrorHandler.logError(errorInfo);
 
         // PubSubでエラーイベントを発行
-        if (window.pubsub) {
-            window.pubsub.publish(window.EVENTS?.ERROR || 'error', errorInfo);
+        if (pubsub) {
+            pubsub.publish(EVENTS?.ERROR || 'error', errorInfo);
         }
 
         // ユーザーへの通知
@@ -148,15 +151,15 @@ class ErrorHandler {
         console.error('Message:', errorInfo.message);
         console.error('Type:', errorInfo.type);
         console.error('Timestamp:', errorInfo.timestamp);
-        
+
         if (Object.keys(errorInfo.additionalInfo).length > 0) {
             console.error('Additional Info:', errorInfo.additionalInfo);
         }
-        
+
         if (errorInfo.stack) {
             console.error('Stack trace:', errorInfo.stack);
         }
-        
+
         console.groupEnd();
     }
 
@@ -197,7 +200,7 @@ class ErrorHandler {
         }
         errorDiv.id = 'error-notification';
         errorDiv.className = `error-notification error-${errorInfo.severity}`;
-        
+
         try {
             errorDiv.innerHTML = `
                 <div class="error-content">
@@ -216,12 +219,12 @@ class ErrorHandler {
             position: fixed;
             top: 20px;
             right: 20px;
-            max-width: ${window.AppDefaults?.errorModal?.imageMaxWidth || '400px'};
+            max-width: ${AppDefaults?.errorModal?.imageMaxWidth || '400px'};
             padding: 16px;
             background: ${errorInfo.severity === ErrorHandler.SEVERITY.CRITICAL ? '#e74c3c' : '#f8f9fa'};
             color: ${errorInfo.severity === ErrorHandler.SEVERITY.CRITICAL ? '#fff' : '#333'};
             border-radius: 8px;
-            box-shadow: 0 4px 6px ${window.AppDefaults?.colors?.background?.shadow || 'rgba(0, 0, 0, 0.1)'};
+            box-shadow: 0 4px 6px ${AppDefaults?.colors?.background?.shadow || 'rgba(0, 0, 0, 0.1)'};
             z-index: 10000;
             animation: slideIn 0.3s ease-out;
         `;
@@ -293,13 +296,13 @@ class ErrorHandler {
             return;
         }
         debugPanel.id = 'error-debug-panel';
-        
+
         try {
             debugPanel.innerHTML = `
-                <div style="position: fixed; bottom: 20px; left: 20px; max-width: ${window.AppDefaults?.errorModal?.maxWidth || '600px'}; 
+                <div style="position: fixed; bottom: 20px; left: 20px; max-width: ${AppDefaults?.errorModal?.maxWidth || '600px'}; 
                             background: #2c3e50; color: #ecf0f1; padding: 20px; 
                             border-radius: 8px; font-family: monospace; font-size: 12px;
-                            max-height: ${window.AppDefaults?.errorModal?.imageMaxHeight || '400px'}; overflow-y: auto; z-index: 10001;">
+                            max-height: ${AppDefaults?.errorModal?.imageMaxHeight || '400px'}; overflow-y: auto; z-index: 10001;">
                     <h3 style="margin-top: 0;">Debug Information</h3>
                     <pre>${JSON.stringify(errorInfo, null, 2)}</pre>
                     <button onclick="this.parentElement.remove()" 
@@ -340,7 +343,7 @@ class ErrorHandler {
 }
 
 // アニメーション用のCSS（スタイルシートがない場合のフォールバック）
-if (!document.getElementById('error-handler-styles')) {
+if (typeof document !== 'undefined' && !document.getElementById('error-handler-styles')) {
     const style = document.createElement('style');
     style.id = 'error-handler-styles';
     style.textContent = `
@@ -372,6 +375,3 @@ if (!document.getElementById('error-handler-styles')) {
     `;
     document.head.appendChild(style);
 }
-
-// グローバルスコープで利用可能にする（ES6モジュール移行前の暫定措置）
-window.ErrorHandler = ErrorHandler;

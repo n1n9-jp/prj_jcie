@@ -2,7 +2,7 @@
  * Disease Configuration - 感染症別設定管理
  * 各感染症の固有設定とテーマを定義
  */
-const DISEASE_CONFIG = {
+export const DISEASE_CONFIG = {
     'aids': {
         id: 'aids',
         name: 'HIV/エイズとの闘い',
@@ -79,6 +79,3 @@ const DISEASE_CONFIG = {
         }
     }
 };
-
-// グローバルスコープで利用可能にする
-window.DISEASE_CONFIG = DISEASE_CONFIG;

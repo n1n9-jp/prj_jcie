@@ -1,8 +1,13 @@
+import * as d3 from 'd3';
+import { AppConstants } from '../utils/app-constants.js';
+import { AppDefaults } from '../config/defaults.js';
+import { colorScheme } from '../utils/color-scheme.js';
+
 /**
  * LineChartUtilities - 折れ線グラフの汎用ユーティリティ関数
  * データ変換、色スケール、アノテーション処理などを提供
  */
-class LineChartUtilities {
+export class LineChartUtilities {
     /**
      * データを系列形式に変換
      * @param {Array} data - 元データ
@@ -70,14 +75,8 @@ class LineChartUtilities {
         } else if (config.colors && config.colors.length > 0 && config.multiSeries === false) {
             // 単一系列の明示色
             return d3.scaleOrdinal(config.colors).domain(series.map(d => d.name));
-        } else if (window.ColorScheme && config.useUnifiedColors !== false) {
+        } else if (colorScheme && config.useUnifiedColors !== false) {
             // 統一カラースキーム：地域名→色の直接マッピング
-            let colorScheme = window.colorScheme;
-            if (!colorScheme) {
-                colorScheme = new ColorScheme();
-                window.colorScheme = colorScheme;
-            }
-
             const regionColors = series.map(s => {
                 const color = colorScheme.getRegionColor(s.name);
                 return color;
@@ -87,7 +86,7 @@ class LineChartUtilities {
                 .range(regionColors);
         } else {
             // フォールバック
-            const colors = config.colors || window.AppConstants?.APP_COLORS?.PRIMARY_PALETTE || d3.schemeCategory10;
+            const colors = config.colors || AppConstants?.APP_COLORS?.PRIMARY_PALETTE || d3.schemeCategory10;
             return d3.scaleOrdinal(colors).domain(series.map(d => d.name));
         }
     }
@@ -173,8 +172,8 @@ class LineChartUtilities {
                     // ポイント注釈
                     annotationElement.append('circle')
                         .attr('r', style.radius || 5)
-                        .attr('fill', style.color || window.AppConstants?.APP_COLORS?.ANNOTATIONS?.POINT || '#ff6b6b')
-                        .attr('stroke', style.strokeColor || window.AppConstants?.APP_COLORS?.ANNOTATIONS?.STROKE || '#fff')
+                        .attr('fill', style.color || AppConstants?.APP_COLORS?.ANNOTATIONS?.POINT || '#ff6b6b')
+                        .attr('stroke', style.strokeColor || AppConstants?.APP_COLORS?.ANNOTATIONS?.STROKE || '#fff')
                         .attr('stroke-width', style.strokeWidth || 2);
                     break;
 
@@ -185,8 +184,8 @@ class LineChartUtilities {
                         .attr('y1', -yPos) // チャート上端まで
                         .attr('x2', 0)
                         .attr('y2', height - yPos) // チャート下端まで
-                        .attr('stroke', style.color || window.AppDefaults?.colors?.text?.secondary || '#999')
-                        .attr('stroke-width', style.strokeWidth || window.AppDefaults?.strokeWidth?.normal || 1)
+                        .attr('stroke', style.color || AppDefaults?.colors?.text?.secondary || '#999')
+                        .attr('stroke-width', style.strokeWidth || AppDefaults?.strokeWidth?.normal || 1)
                         .attr('stroke-dasharray', style.dashArray || '3,3');
 
                     // ラベルテキストを追加
@@ -213,7 +212,7 @@ class LineChartUtilities {
                             .attr('y', textY)
                             .attr('text-anchor', textAnchor)
                             .attr('font-size', style.fontSize || '12px')
-                            .attr('fill', style.textColor || window.AppDefaults?.colors?.text?.primary || '#333')
+                            .attr('fill', style.textColor || AppDefaults?.colors?.text?.primary || '#333')
                             .text(text);
                     }
                     break;
@@ -225,8 +224,8 @@ class LineChartUtilities {
                         .attr('y1', 0)
                         .attr('x2', width - xPos) // チャート右端まで
                         .attr('y2', 0)
-                        .attr('stroke', style.color || window.AppDefaults?.colors?.text?.secondary || '#999')
-                        .attr('stroke-width', style.strokeWidth || window.AppDefaults?.strokeWidth?.normal || 1)
+                        .attr('stroke', style.color || AppDefaults?.colors?.text?.secondary || '#999')
+                        .attr('stroke-width', style.strokeWidth || AppDefaults?.strokeWidth?.normal || 1)
                         .attr('stroke-dasharray', style.dashArray || '3,3');
 
                     // ラベルテキストを追加
@@ -253,7 +252,7 @@ class LineChartUtilities {
                             .attr('y', textY)
                             .attr('text-anchor', textAnchor)
                             .attr('font-size', style.fontSize || '12px')
-                            .attr('fill', style.textColor || window.AppDefaults?.colors?.text?.primary || '#333')
+                            .attr('fill', style.textColor || AppDefaults?.colors?.text?.primary || '#333')
                             .text(text);
                     }
                     break;
@@ -278,7 +277,7 @@ class LineChartUtilities {
                             .attr('width', bbox.width + 4)
                             .attr('height', bbox.height + 4)
                             .attr('fill', style.backgroundColor || 'rgba(255, 255, 255, 0.8)')
-                            .attr('stroke', style.borderColor || window.AppConstants?.APP_COLORS?.ANNOTATIONS?.BORDER || '#ccc')
+                            .attr('stroke', style.borderColor || AppConstants?.APP_COLORS?.ANNOTATIONS?.BORDER || '#ccc')
                             .attr('stroke-width', 0.5)
                             .attr('rx', 2);
                     }
@@ -312,5 +311,3 @@ class LineChartUtilities {
     }
 }
 
-// グローバルスコープで利用可能にする
-window.LineChartUtilities = LineChartUtilities;

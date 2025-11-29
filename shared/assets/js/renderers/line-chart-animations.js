@@ -1,8 +1,16 @@
+import * as d3 from 'd3';
+import { LineChartUtilities } from '../renderers/line-chart-utilities.js';
+import { ChartTransitions } from '../utils/chart-transitions.js';
+import { ChartFormatterHelper } from '../utils/chart-formatter-helper.js';
+import { ChartLayoutManager } from '../utils/chart-layout-manager.js';
+import { ChartLayoutHelper } from '../utils/chart-layout-helper.js';
+import { AppDefaults } from '../config/defaults.js';
+
 /**
  * LineChartAnimations - 折れ線グラフのアニメーション処理
  * トランジション、段階的アニメーション、軸更新などを専門的に処理
  */
-class LineChartAnimations {
+export class LineChartAnimations {
     /**
      * トランジションでチャートを更新
      * @param {LineChartRenderer} renderer - LineChartRendererインスタンス
@@ -128,7 +136,7 @@ class LineChartAnimations {
                     enterGroups.append('path')
                         .attr('class', 'chart-line')
                         .attr('stroke', d => colorScale(d.name))
-                        .attr('stroke-width', window.AppDefaults?.strokeWidth?.thick || 2)
+                        .attr('stroke-width', AppDefaults?.strokeWidth?.thick || 2)
                         .attr('fill', 'none')
                         .attr('d', d => newLine(d.values))
                         .style('opacity', 0);
@@ -148,7 +156,7 @@ class LineChartAnimations {
         const allSeriesGroups = seriesUpdateResult.all;
 
         // チャート更新
-        allSeriesGroups.each(function(seriesData, seriesIndex) {
+        allSeriesGroups.each(function (seriesData, seriesIndex) {
             const group = d3.select(this);
             const currentSeriesData = newSeries.find(s => s.name === seriesData.name) || seriesData;
 
@@ -251,7 +259,7 @@ class LineChartAnimations {
             const g = renderer.svg.select('g');
             const allCurrentData = [];
 
-            g.selectAll('.series-group').each(function() {
+            g.selectAll('.series-group').each(function () {
                 const seriesGroup = d3.select(this);
                 const lineData = seriesGroup.select('.chart-line').datum();
                 if (lineData && lineData.values) {
@@ -291,8 +299,8 @@ class LineChartAnimations {
                     } else if (renderer.config.yAxis && renderer.config.yAxis.ticks) {
                         yAxis.ticks(renderer.config.yAxis.ticks);
                     }
-                } else if (window.ChartLayoutManager || window.ChartLayoutHelper) {
-                    const layoutUtil = window.ChartLayoutManager || window.ChartLayoutHelper;
+                } else if (ChartLayoutManager || ChartLayoutHelper) {
+                    const layoutUtil = ChartLayoutManager || ChartLayoutHelper;
                     const unitInfo = layoutUtil.analyzeUnits(allCurrentData, renderer.config || {});
                     const yFormatter = (value) => layoutUtil.formatAxisWithUnits(value, unitInfo.yAxis);
                     xAxis = isYearData ? d3.axisBottom(newXScale).tickFormat(d3.format("d")) : d3.axisBottom(newXScale);
@@ -420,7 +428,7 @@ class LineChartAnimations {
         seriesGroups.selectAll('.points-container').remove();
 
         // 各系列に対して段階的アニメーションを実行
-        seriesGroups.each(function(seriesData, seriesIndex) {
+        seriesGroups.each(function (seriesData, seriesIndex) {
             const group = d3.select(this);
             const color = colorScale(seriesData.name);
 
@@ -431,7 +439,7 @@ class LineChartAnimations {
             const linePath = group.append('path')
                 .attr('class', 'chart-line')
                 .attr('stroke', color)
-                .attr('stroke-width', window.AppDefaults?.strokeWidth?.thick || 2)
+                .attr('stroke-width', AppDefaults?.strokeWidth?.thick || 2)
                 .attr('fill', 'none')
                 .attr('d', fullLinePath);
 
@@ -480,7 +488,7 @@ class LineChartAnimations {
 
                 const pointTimer = setTimeout(() => {
                     allPoints
-                        .filter(function(d) { return +d[xField] === year; })
+                        .filter(function (d) { return +d[xField] === year; })
                         .transition()
                         .duration(300)
                         .ease(d3.easeBackOut.overshoot(1.2))
@@ -501,6 +509,3 @@ class LineChartAnimations {
         renderer.animationTimers = [];
     }
 }
-
-// グローバルスコープで利用可能にする
-window.LineChartAnimations = LineChartAnimations;

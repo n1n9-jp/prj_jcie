@@ -1,8 +1,15 @@
+import * as d3 from 'd3';
+import { ChartRendererBase } from '../utils/chart-renderer-base.js';
+import { SVGHelper } from '../utils/svg-helper.js';
+import { ChartFormatterHelper } from '../utils/chart-formatter-helper.js';
+import { ChartLayoutManager } from '../utils/chart-layout-manager.js';
+import { AppDefaults } from '../config/defaults.js';
+
 /**
  * StackedBarChartRenderer - 時系列積み重ね棒グラフの描画と更新を専門的に扱うクラス
  * ChartRendererBaseを継承し、積み重ね棒グラフ特有の機能を提供
  */
-class StackedBarChartRenderer extends ChartRendererBase {
+export class StackedBarChartRenderer extends ChartRendererBase {
     constructor(containerId) {
         super(containerId);
         this.type = 'stacked-bar';  // チャート種別を設定
@@ -59,13 +66,13 @@ class StackedBarChartRenderer extends ChartRendererBase {
         const responsiveSize = this.getResponsiveSize(config);
         const width = responsiveSize.width;
         const height = responsiveSize.height;
-        
+
         const margin = config.margin || { top: 60, right: 30, bottom: 40, left: 50 };
 
         this.container.selectAll('*').remove();
-        
+
         // SVGHelperを使用してレスポンシブSVGを作成
-        if (window.SVGHelper) {
+        if (SVGHelper) {
             this.svg = SVGHelper.initSVG(this.container, width, height, {
                 preserveAspectRatio: config.preserveAspectRatio || 'xMidYMid meet',
                 responsive: true
@@ -137,11 +144,10 @@ class StackedBarChartRenderer extends ChartRendererBase {
         if (config.yAxisFormat) {
             yAxis.tickFormat(d => ChartFormatterHelper.formatYAxisValue(d, config.yAxisFormat));
         } else {
-            const layoutUtil = window.ChartLayoutManager || window.ChartLayoutHelper;
-            if (layoutUtil && typeof layoutUtil.analyzeUnits === 'function' && typeof layoutUtil.formatAxisWithUnits === 'function') {
-                const unitInfo = layoutUtil.analyzeUnits(data, config);
+            if (ChartLayoutManager && typeof ChartLayoutManager.analyzeUnits === 'function' && typeof ChartLayoutManager.formatAxisWithUnits === 'function') {
+                const unitInfo = ChartLayoutManager.analyzeUnits(data, config);
                 if (unitInfo?.yAxis) {
-                    yAxis.tickFormat(value => layoutUtil.formatAxisWithUnits(value, unitInfo.yAxis));
+                    yAxis.tickFormat(value => ChartLayoutManager.formatAxisWithUnits(value, unitInfo.yAxis));
                 }
             }
         }
@@ -154,8 +160,8 @@ class StackedBarChartRenderer extends ChartRendererBase {
         g.append('g')
             .attr('class', 'chart-axis y-axis')
             .call(yAxis);
-            
-        if (window.ChartLayoutManager && typeof ChartLayoutManager.addAxisLabels === 'function') {
+
+        if (ChartLayoutManager && typeof ChartLayoutManager.addAxisLabels === 'function') {
             ChartLayoutManager.addAxisLabels(
                 g,
                 data,
@@ -168,7 +174,7 @@ class StackedBarChartRenderer extends ChartRendererBase {
                 innerHeight,
                 {
                     labelFontSize: '12px',
-                    labelColor: window.AppDefaults?.colors?.text?.secondary || '#666',
+                    labelColor: AppDefaults?.colors?.text?.secondary || '#666',
                     xAxisLabelOffset: 40,
                     yAxisLabelOffset: margin.left * -0.6
                 }
@@ -214,7 +220,7 @@ class StackedBarChartRenderer extends ChartRendererBase {
         }
 
         let legendLayout = null;
-        if (window.ChartLayoutManager && typeof ChartLayoutManager.calculateLegendLayout === 'function') {
+        if (ChartLayoutManager && typeof ChartLayoutManager.calculateLegendLayout === 'function') {
             legendLayout = ChartLayoutManager.calculateLegendLayout(keys, width, height);
         }
 
@@ -296,7 +302,7 @@ class StackedBarChartRenderer extends ChartRendererBase {
         let totalLegendWidth = 0;
         const legendPadding = 25;
 
-        legendItems.each(function() {
+        legendItems.each(function () {
             const itemWidth = this.getBBox().width;
             d3.select(this).attr('transform', `translate(${totalLegendWidth}, 0)`);
             totalLegendWidth += itemWidth + legendPadding;
@@ -331,7 +337,7 @@ class StackedBarChartRenderer extends ChartRendererBase {
      * レスポンシブサイズを取得
      */
     getResponsiveSize(config) {
-        if (window.SVGHelper) {
+        if (SVGHelper) {
             return SVGHelper.getResponsiveSize(this.container, {
                 defaultWidth: 800,
                 defaultHeight: 600,
@@ -360,5 +366,3 @@ class StackedBarChartRenderer extends ChartRendererBase {
         }
     }
 }
-
-window.StackedBarChartRenderer = StackedBarChartRenderer;

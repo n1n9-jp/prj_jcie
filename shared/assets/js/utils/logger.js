@@ -3,7 +3,7 @@
  * 環境設定に基づいてログレベルを制御
  */
 
-class Logger {
+export class Logger {
     constructor() {
         this.LOG_LEVELS = {
             DEBUG: 0,
@@ -29,14 +29,18 @@ class Logger {
 
     /**
      * ロガーを初期化（設定ファイルから環境レベルを読み込み）
+     * @param {Object} configLoader - ConfigLoaderインスタンス（オプション）
      */
-    init() {
+    init(configLoader = null) {
         if (this.initialized) return;
 
         try {
             // ConfigLoaderから設定を取得
-            if (window.ConfigLoader && window.ConfigLoader.loaded) {
-                const loggingConfig = window.ConfigLoader.get('logging');
+            // 依存性の注入、またはグローバルフォールバック
+            const loader = configLoader || (typeof window !== 'undefined' ? window.ConfigLoader : null);
+
+            if (loader && loader.loaded) {
+                const loggingConfig = loader.get('logging');
 
                 if (loggingConfig) {
                     this.setLevel(loggingConfig.level || 'debug');
@@ -47,8 +51,9 @@ class Logger {
             }
 
             // デフォルト設定（ローカル環境）
-            const isDevelopment = window.location.hostname === 'localhost' ||
-                                 window.location.hostname === '127.0.0.1';
+            const isDevelopment = typeof window !== 'undefined' &&
+                (window.location.hostname === 'localhost' ||
+                    window.location.hostname === '127.0.0.1');
             const defaultLevel = isDevelopment ? 'debug' : 'error';
             this.setLevel(defaultLevel);
             this.initialized = true;
@@ -197,10 +202,12 @@ class Logger {
 
     /**
      * 設定からログレベルを更新
+     * @param {Object} configLoader - ConfigLoaderインスタンス
      */
-    updateFromConfig() {
-        if (window.ConfigLoader && window.ConfigLoader.loaded) {
-            const loggingConfig = window.ConfigLoader.get('logging');
+    updateFromConfig(configLoader) {
+        const loader = configLoader || (typeof window !== 'undefined' ? window.ConfigLoader : null);
+        if (loader && loader.loaded) {
+            const loggingConfig = loader.get('logging');
             if (loggingConfig) {
                 this.setLevel(loggingConfig.level || 'debug');
                 this.enabled = loggingConfig.console !== false;
@@ -222,7 +229,6 @@ class Logger {
     }
 }
 
-// グローバルスコープで利用可能にする（ES6モジュール移行前の暫定措置）
-if (typeof window !== 'undefined') {
-    window.Logger = new Logger();
-}
+// シングルトンインスタンスをエクスポート
+export const logger = new Logger();
+

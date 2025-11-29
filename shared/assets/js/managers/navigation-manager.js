@@ -3,7 +3,7 @@
  * 統一されたナビゲーションを動的に生成
  */
 
-class NavigationManager {
+export class NavigationManager {
     constructor() {
         this.diseases = [
             {
@@ -13,14 +13,14 @@ class NavigationManager {
                 folder: '01_aids'
             },
             {
-                type: 'tuberculosis', 
+                type: 'tuberculosis',
                 name: '結核',
                 path: '../02_tuberculosis/',
                 folder: '02_tuberculosis'
             },
             {
                 type: 'malariae',
-                name: 'マラリア', 
+                name: 'マラリア',
                 path: '../03_malariae/',
                 folder: '03_malariae'
             }
@@ -35,13 +35,13 @@ class NavigationManager {
         if (window.DISEASE_TYPE) {
             return window.DISEASE_TYPE;
         }
-        
+
         // パスから自動検出
         const path = window.location.pathname;
         if (path.includes('01_aids')) return 'aids';
         if (path.includes('02_tuberculosis')) return 'tuberculosis';
         if (path.includes('03_malariae')) return 'malariae';
-        
+
         // デフォルトはaids
         return 'aids';
     }
@@ -98,9 +98,5 @@ class NavigationManager {
 }
 
 // 自動初期化
-const navigationManager = new NavigationManager();
+export const navigationManager = new NavigationManager();
 navigationManager.init();
-
-// グローバルエクスポート
-window.NavigationManager = NavigationManager;
-window.navigationManager = navigationManager;

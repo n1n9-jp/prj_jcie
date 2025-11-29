@@ -1,8 +1,10 @@
+import { pubsub, EVENTS } from './pubsub.js';
+
 /**
  * EventHandlers - スクロールイベントハンドリング
  * scrollamaのイベント処理を統合管理
  */
-class EventHandlers {
+export class EventHandlers {
     /**
      * ステップ進入時のイベント処理
      * @param {Object} response - scrollamaのレスポンス
@@ -20,6 +22,9 @@ class EventHandlers {
         // チャート更新
         if (stepConfig.chart) {
             this._updateChart(stepConfig, direction, context);
+        } else {
+            // チャート設定がない場合は非表示にする
+            pubsub.publish(EVENTS.CHART_UPDATE, { visible: false });
         }
 
         // 地図更新
@@ -143,6 +148,3 @@ class EventHandlers {
         pubsub.publish(EVENTS.CHART_UPDATE, chartData);
     }
 }
-
-// グローバルスコープで利用可能にする
-window.EventHandlers = EventHandlers;

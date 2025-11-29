@@ -1,8 +1,13 @@
+import { ErrorHandler } from './error-handler.js';
+import { colorScheme } from './color-scheme.js';
+import { AppDefaults } from '../config/defaults.js';
+import { LayoutConfig } from '../config/layout-config.js';
+
 /**
  * GridDataTransformer - グリッドチャート用データ変換を専門的に扱うクラス
  * 複数のデータ形式をグリッドレイアウト用に自動変換・最適化
  */
-class GridDataTransformer {
+export class GridDataTransformer {
     constructor() {
         // デフォルト設定
         this.defaultConfig = {
@@ -71,7 +76,7 @@ class GridDataTransformer {
             }
         } catch (error) {
             console.error('GridDataTransformer: Error transforming data:', error);
-            if (window.ErrorHandler) {
+            if (ErrorHandler) {
                 ErrorHandler.handle(error, 'GridDataTransformer.transformToGridData', {
                     type: ErrorHandler.ERROR_TYPES.DATA_PROCESSING,
                     severity: ErrorHandler.SEVERITY.HIGH,
@@ -99,11 +104,13 @@ class GridDataTransformer {
             if (!region || !region.trim()) return;
 
             // ColorSchemeから色を取得
-            const colorScheme = window.ColorScheme;
+            // ColorSchemeから色を取得
+            // let colorScheme = window.colorScheme; // Removed global usage
+
             const treatmentColor = colorScheme ?
                 colorScheme.getRegionColor(region) :
-                window.AppDefaults?.colors?.accent?.info || '#3b82f6';
-            const untreatedColor = window.AppDefaults?.colors?.background?.light || '#e5e7eb';
+                AppDefaults?.colors?.accent?.info || '#3b82f6';
+            const untreatedColor = AppDefaults?.colors?.background?.light || '#e5e7eb';
 
             const categoryData = [];
 
@@ -152,7 +159,7 @@ class GridDataTransformer {
      */
     transformSingleValueData(data, structure, config, valueField, labelField) {
         const result = [];
-        const colorScheme = window.ColorScheme;
+        // let colorScheme = window.colorScheme; // Removed global usage
 
         // マラリアの場合：複数の値フィールドが指定されているかチェック
         const valueFields = config.valueFields || [valueField];
@@ -170,7 +177,7 @@ class GridDataTransformer {
                     const value = parseFloat(valueStr?.replace('%', '') || '0');
                     const baseColor = colorScheme ?
                         colorScheme.getRegionColor(label) :
-                        window.AppDefaults?.colors?.accent?.info || '#3b82f6';
+                        AppDefaults?.colors?.accent?.info || '#3b82f6';
 
                     // フィールドごとに色の調子を変える
                     const color = fieldIndex === 0 ? baseColor :
@@ -182,7 +189,7 @@ class GridDataTransformer {
                         percentage: value,
                         pieData: [
                             { label: '対象地域', value: value, color: color },
-                            { label: 'その他地域', value: Math.max(0, 100 - value), color: window.AppDefaults?.colors?.background?.light || '#e5e7eb' }
+                            { label: 'その他地域', value: Math.max(0, 100 - value), color: AppDefaults?.colors?.background?.light || '#e5e7eb' }
                         ]
                     });
                 });
@@ -198,7 +205,7 @@ class GridDataTransformer {
                 const value = parseFloat(valueStr?.replace('%', '') || '0');
                 const color = colorScheme ?
                     colorScheme.getRegionColor(label) :
-                    window.AppDefaults?.colors?.accent?.info || '#3b82f6';
+                    AppDefaults?.colors?.accent?.info || '#3b82f6';
 
                 result.push({
                     region: label,
@@ -206,7 +213,7 @@ class GridDataTransformer {
                     percentage: value,
                     pieData: [
                         { label: label, value: value, color: color },
-                        { label: 'その他', value: Math.max(0, 100 - value), color: window.AppDefaults?.colors?.background?.light || '#e5e7eb' }
+                        { label: 'その他', value: Math.max(0, 100 - value), color: AppDefaults?.colors?.background?.light || '#e5e7eb' }
                     ]
                 });
             });
@@ -223,7 +230,7 @@ class GridDataTransformer {
      */
     calculateOptimalGrid(itemCount, config = {}) {
         // LayoutConfigが利用可能な場合は使用
-        if (window.LayoutConfig && typeof LayoutConfig.calculateOptimalGrid === 'function') {
+        if (LayoutConfig && typeof LayoutConfig.calculateOptimalGrid === 'function') {
             // コンテナ情報が必要な場合は、呼び出し元で設定を渡す
             return LayoutConfig.calculateOptimalGrid(itemCount, {
                 maxColumns: config.maxColumns || 10,
@@ -257,6 +264,3 @@ class GridDataTransformer {
         };
     }
 }
-
-// グローバルスコープで利用可能にする
-window.GridDataTransformer = GridDataTransformer;

@@ -1,8 +1,23 @@
+import * as d3 from 'd3';
+import { ChartRendererBase } from '../utils/chart-renderer-base.js';
+import { LineChartUtilities } from './line-chart-utilities.js';
+import { LineChartAnimations } from './line-chart-animations.js';
+import { ChartLayoutManager } from '../utils/chart-layout-manager.js';
+import { ChartLayoutHelper } from '../utils/chart-layout-helper.js';
+import { ChartTransitions } from '../utils/chart-transitions.js';
+import { ChartFormatterHelper } from '../utils/chart-formatter-helper.js';
+import { LineChartLabelManager } from '../utils/line-chart-label-manager.js';
+import { LineChartLegendManager } from '../utils/line-chart-legend-manager.js';
+import { LineChartAnimationManager } from '../utils/line-chart-animation-manager.js';
+import { AppDefaults } from '../config/defaults.js';
+import { SVGHelper } from '../utils/svg-helper.js';
+import { AppConstants } from '../utils/app-constants.js';
+
 /**
  * LineChartRenderer - 折れ線グラフの描画と更新を専門的に扱うクラス
  * ChartRendererBaseを継承し、線グラフ特有の機能を提供
  */
-class LineChartRenderer extends ChartRendererBase {
+export class LineChartRenderer extends ChartRendererBase {
     constructor(containerId) {
         super(containerId);
         this.type = 'line';  // チャート種別を設定
@@ -92,23 +107,23 @@ class LineChartRenderer extends ChartRendererBase {
         if (config.legendType === 'inline' && config.multiSeries) {
             margin.right = Math.max(margin.right, 240); // ラベル用の余白をさらに拡大
         }
-        
+
         // コンテナクリア
         this.container.selectAll('*').remove();
-        
+
         // SVGHelperを使用してレスポンシブSVGを作成
-        if (window.SVGHelper) {
+        if (SVGHelper) {
             // パーセンテージ指定の場合は実際のピクセルサイズを計算
             let actualWidth = null;
             let actualHeight = null;
-            
+
             if (config.widthPercent) {
                 actualWidth = window.innerWidth * (config.widthPercent / 100);
             }
             if (config.heightPercent) {
                 actualHeight = window.innerHeight * (config.heightPercent / 100);
             }
-            
+
             this.svg = SVGHelper.initSVG(this.container, width, height, {
                 preserveAspectRatio: config.preserveAspectRatio || 'xMidYMid meet',
                 responsive: true,
@@ -132,19 +147,19 @@ class LineChartRenderer extends ChartRendererBase {
      * @param {Object} config - 設定
      */
     renderLineChart(data, config) {
-        const { 
-            width, height, margin, 
-            xField = 'year', yField = 'value', 
+        const {
+            width, height, margin,
+            xField = 'year', yField = 'value',
             colors = d3.schemeCategory10,
             multiSeries = true,
             title = '',
             dataSource = ''
         } = config;
-        
+
         const svg = this.svg;
         const innerWidth = width - margin.left - margin.right;
         const innerHeight = height - margin.top - margin.bottom;
-        
+
         const g = svg.append('g')
             .attr('transform', `translate(${margin.left},${margin.top})`);
 
@@ -155,7 +170,7 @@ class LineChartRenderer extends ChartRendererBase {
                 .attr('x', 0)
                 .attr('y', -10)
                 .attr('text-anchor', 'start')
-                .attr('fill', window.AppDefaults?.colors?.text?.primary || '#333')
+                .attr('fill', AppDefaults?.colors?.text?.primary || '#333')
                 .style('font-family', 'var(--font-family-serif)')
                 .style('font-size', 'var(--font-size-base)')
                 .style('font-weight', 'var(--font-weight-bold)')
@@ -164,13 +179,13 @@ class LineChartRenderer extends ChartRendererBase {
 
         // データを系列別に変換
         const series = LineChartUtilities.transformToSeries(data, config);
-        
+
         // 全データからドメインを計算
         const allValues = series.flatMap(s => s.values);
-        
+
         // スケール設定 - 年データの場合は線形スケールを使用
         const isYearData = allValues.every(d => !isNaN(d[xField]) && d[xField] > 1900 && d[xField] < 2100);
-        
+
         // X軸のドメインを決定（設定で年度範囲が指定されていればそれを使用、なければデータ範囲）
         let xDomain;
         if (config.yearRange && config.yearRange.length === 2) {
@@ -183,8 +198,8 @@ class LineChartRenderer extends ChartRendererBase {
             // 時間データの場合
             xDomain = d3.extent(allValues, d => new Date(d[xField]));
         }
-        
-        const xScale = isYearData 
+
+        const xScale = isYearData
             ? d3.scaleLinear()
                 .domain(xDomain)
                 .range([0, innerWidth])
@@ -201,7 +216,7 @@ class LineChartRenderer extends ChartRendererBase {
             // データの範囲を使用
             yDomain = d3.extent(allValues, d => +d[yField]);
         }
-        
+
         let yScale;
         if (config.yAxis && config.yAxis.type === 'log') {
             const yMin = yDomain[0] > 0 ? yDomain[0] : 1;
@@ -213,7 +228,7 @@ class LineChartRenderer extends ChartRendererBase {
                 .domain(yDomain)
                 .range([innerHeight, 0]);
         }
-        
+
         // yRangeが明示的に設定されていない場合のみnice()を適用
         if (!(config.yRange && config.yRange.length === 2)) {
             yScale.nice();
@@ -224,33 +239,33 @@ class LineChartRenderer extends ChartRendererBase {
 
         // 単位情報を分析
         let unitInfo = { xAxis: {}, yAxis: {} };
-        if (window.ChartLayoutManager) {
+        if (ChartLayoutManager) {
             unitInfo = ChartLayoutManager.analyzeUnits(data, config);
         }
 
         // 軸を描画（カスタムフォーマット優先、ChartLayoutManager、D3デフォルトの順）
         let xAxis, yAxis;
-        
+
         // Y軸フォーマッターを決定（優先順位：カスタム > ChartLayoutManager > D3デフォルト）
         let yFormatter;
         if (config.yAxisFormat) {
             // カスタムフォーマットが指定されている場合
             yFormatter = (value) => ChartFormatterHelper.formatYAxisValue(value, config.yAxisFormat);
-        } else if (window.ChartLayoutManager) {
+        } else if (ChartLayoutManager) {
             // ChartLayoutManagerが利用可能な場合
             yFormatter = (value) => ChartLayoutManager.formatAxisWithUnits(value, unitInfo.yAxis);
         } else {
             // デフォルト（D3の標準フォーマット）
             yFormatter = null; // D3のデフォルトを使用
         }
-        
-        xAxis = isYearData 
+
+        xAxis = isYearData
             ? d3.axisBottom(xScale).tickFormat(d3.format("d"))  // 年データは整数表示
             : d3.axisBottom(xScale);
-        yAxis = yFormatter 
+        yAxis = yFormatter
             ? d3.axisLeft(yScale).tickFormat(yFormatter)
             : d3.axisLeft(yScale);
-            
+
         // yAxisのtickValues設定がある場合は適用
         if (config.yAxis && config.yAxis.type === 'log') {
             const tickValues = yScale.ticks().filter(d => Number.isInteger(Math.log10(d)) || d === 1);
@@ -260,9 +275,9 @@ class LineChartRenderer extends ChartRendererBase {
         } else if (config.yAxis && config.yAxis.ticks) {
             yAxis.ticks(config.yAxis.ticks);
         }
-        
+
         // X軸フォーマッター（将来の拡張用）
-        if (window.ChartLayoutManager && !config.xAxisFormat) {
+        if (ChartLayoutManager && !config.xAxisFormat) {
             const xFormatter = (value) => ChartLayoutManager.formatAxisWithUnits(value, unitInfo.xAxis);
             if (xAxis && !isYearData) {
                 xAxis.tickFormat(xFormatter);
@@ -279,7 +294,7 @@ class LineChartRenderer extends ChartRendererBase {
             .call(yAxis);
 
         // 軸ラベルを統一的に追加（カスタム優先、デフォルト単位フォールバック）
-        if (window.ChartLayoutManager) {
+        if (ChartLayoutManager) {
             ChartLayoutManager.addAxisLabels(g, data, config, innerWidth, innerHeight);
         }
 
@@ -298,7 +313,7 @@ class LineChartRenderer extends ChartRendererBase {
 
         // プログレッシブアニメーションかどうかをチェック
         const hasProgressiveAnimation = config.animation && config.animation.mode === 'progressive';
-        
+
         let lineElements;
         if (!hasProgressiveAnimation) {
             // 通常のライン描画
@@ -306,7 +321,7 @@ class LineChartRenderer extends ChartRendererBase {
                 .attr('class', 'chart-line')
                 .datum(d => d) // 系列データを設定
                 .attr('stroke', d => colorScale(d.name))
-                .attr('stroke-width', window.AppDefaults?.strokeWidth?.thick || 2)
+                .attr('stroke-width', AppDefaults?.strokeWidth?.thick || 2)
                 .attr('fill', 'none');
 
             // ChartTransitionsを使用してライン描画
@@ -320,12 +335,12 @@ class LineChartRenderer extends ChartRendererBase {
 
         // ChartTransitionsを使用してポイント描画（progressiveモード以外）
         if (!config.animation || config.animation.mode !== 'progressive') {
-            seriesGroups.each(function(seriesData) {
+            seriesGroups.each(function (seriesData) {
                 const group = d3.select(this);
-                
+
                 // 一意キーでデータポイントを追跡
                 const dataWithKeys = ChartTransitions.addObjectKeys(seriesData.values, xField, seriesData.name);
-                
+
                 const scales = { x: xScale, y: yScale };
                 const pointConfig = {
                     chartType: 'line',
@@ -339,22 +354,22 @@ class LineChartRenderer extends ChartRendererBase {
 
                 // ポイントのエンターアニメーション
                 ChartTransitions.createStaggered(
-                group.selectAll('.chart-circle')
-                    .data(dataWithKeys, d => d._uniqueKey)
-                    .enter()
-                    .append('circle')
-                    .attr('class', 'chart-circle')
-                    .attr('fill', d => colorScale(seriesData.name)),
-                { delay: 15, duration: 600 }
-            ).call(function(selection) {
-                ChartTransitions.animatePoints(selection, scales, pointConfig);
-            });
+                    group.selectAll('.chart-circle')
+                        .data(dataWithKeys, d => d._uniqueKey)
+                        .enter()
+                        .append('circle')
+                        .attr('class', 'chart-circle')
+                        .attr('fill', d => colorScale(seriesData.name)),
+                    { delay: 15, duration: 600 }
+                ).call(function (selection) {
+                    ChartTransitions.animatePoints(selection, scales, pointConfig);
+                });
             });
         }
 
         // プログレッシブアニメーションが設定されている場合の処理
         if (hasProgressiveAnimation) {
-            this.animationManager.renderProgressiveAnimation(seriesGroups, series, line, xScale, yScale, xField, yField, colorScale, config);
+            this.animationManager.renderProgressiveAnimation(seriesGroups, series, line, xScale, yScale, xField, yField, colorScale, config, this);
         }
 
         // プログレッシブアニメーション完了後にインラインラベルを追加
@@ -398,7 +413,7 @@ class LineChartRenderer extends ChartRendererBase {
 
         // 注釈（アノテーション）を描画
         if (config.annotations) {
-            LineChartUtilities.renderAnnotations(g, config.annotations, { xScale, yScale, width: innerWidth, height: innerHeight, isYearData, xField, yField });
+            this.renderAnnotations(g, config.annotations, { xScale, yScale, width: innerWidth, height: innerHeight, isYearData, xField, yField });
         }
 
         // データソースを表示
@@ -412,16 +427,16 @@ class LineChartRenderer extends ChartRendererBase {
      */
     renderLineChartInGroup(g, data, config) {
         const { width, height, xField = 'year', yField = 'value', colors = d3.schemeCategory10, multiSeries = true, dataSource = '' } = config;
-        
+
         // データを系列別に変換
         const series = LineChartUtilities.transformToSeries(data, config);
-        
+
         // 全データからドメインを計算
         const allValues = series.flatMap(s => s.values);
-        
+
         // スケール設定
         const isYearData = allValues.every(d => !isNaN(d[xField]) && d[xField] > 1900 && d[xField] < 2100);
-        
+
         // X軸のドメインを決定（設定で年度範囲が指定されていればそれを使用、なければデータ範囲）
         let xDomain;
         if (config.yearRange && config.yearRange.length === 2) {
@@ -434,8 +449,8 @@ class LineChartRenderer extends ChartRendererBase {
             // 時間データの場合
             xDomain = d3.extent(allValues, d => new Date(d[xField]));
         }
-        
-        const xScale = isYearData 
+
+        const xScale = isYearData
             ? d3.scaleLinear()
                 .domain(xDomain)
                 .range([0, width])
@@ -452,11 +467,11 @@ class LineChartRenderer extends ChartRendererBase {
             // データの範囲を使用
             yDomain = d3.extent(allValues, d => +d[yField]);
         }
-        
+
         const yScale = d3.scaleLinear()
             .domain(yDomain)
             .range([height, 0]);
-        
+
         // yRangeが明示的に設定されていない場合のみnice()を適用
         if (!(config.yRange && config.yRange.length === 2)) {
             yScale.nice();
@@ -467,33 +482,33 @@ class LineChartRenderer extends ChartRendererBase {
 
         // 単位情報を分析
         let unitInfo = { xAxis: {}, yAxis: {} };
-        if (window.ChartLayoutManager) {
+        if (ChartLayoutManager) {
             unitInfo = ChartLayoutManager.analyzeUnits(data, config);
         }
 
         // 軸を描画（カスタムフォーマット優先、ChartLayoutManager、D3デフォルトの順）
         let xAxis, yAxis;
-        
+
         // Y軸フォーマッターを決定（優先順位：カスタム > ChartLayoutManager > D3デフォルト）
         let yFormatter;
         if (config.yAxisFormat) {
             // カスタムフォーマットが指定されている場合
             yFormatter = (value) => ChartFormatterHelper.formatYAxisValue(value, config.yAxisFormat);
-        } else if (window.ChartLayoutManager) {
+        } else if (ChartLayoutManager) {
             // ChartLayoutManagerが利用可能な場合
             yFormatter = (value) => ChartLayoutManager.formatAxisWithUnits(value, unitInfo.yAxis);
         } else {
             // デフォルト（D3の標準フォーマット）
             yFormatter = null; // D3のデフォルトを使用
         }
-        
-        xAxis = isYearData 
+
+        xAxis = isYearData
             ? d3.axisBottom(xScale).tickFormat(d3.format("d"))  // 年データは整数表示
             : d3.axisBottom(xScale);
-        yAxis = yFormatter 
+        yAxis = yFormatter
             ? d3.axisLeft(yScale).tickFormat(yFormatter)
             : d3.axisLeft(yScale);
-            
+
         // yAxisのtickValues設定がある場合は適用
         if (config.yAxis && config.yAxis.type === 'log') {
             const tickValues = yScale.ticks().filter(d => Number.isInteger(Math.log10(d)) || d === 1);
@@ -503,9 +518,9 @@ class LineChartRenderer extends ChartRendererBase {
         } else if (config.yAxis && config.yAxis.ticks) {
             yAxis.ticks(config.yAxis.ticks);
         }
-        
+
         // X軸フォーマッター（将来の拡張用）
-        if (window.ChartLayoutManager && !config.xAxisFormat) {
+        if (ChartLayoutManager && !config.xAxisFormat) {
             const xFormatter = (value) => ChartLayoutManager.formatAxisWithUnits(value, unitInfo.xAxis);
             if (xAxis && !isYearData) {
                 xAxis.tickFormat(xFormatter);
@@ -522,7 +537,7 @@ class LineChartRenderer extends ChartRendererBase {
             .call(yAxis);
 
         // 軸ラベルを統一的に追加（カスタム優先、デフォルト単位フォールバック）
-        if (window.ChartLayoutManager) {
+        if (ChartLayoutManager) {
             ChartLayoutManager.addAxisLabels(g, data, config, width, height);
         }
 
@@ -544,7 +559,7 @@ class LineChartRenderer extends ChartRendererBase {
 
         if (hasProgressiveAnimation) {
             // プログレッシブアニメーションが設定されている場合は、アニメーション関数で描画
-            this.animationManager.renderProgressiveAnimation(seriesGroups, series, line, xScale, yScale, xField, yField, colorScale, config);
+            this.animationManager.renderProgressiveAnimation(seriesGroups, series, line, xScale, yScale, xField, yField, colorScale, config, this);
         } else {
             // 通常の描画
             // ラインを描画
@@ -553,13 +568,13 @@ class LineChartRenderer extends ChartRendererBase {
                 .datum(d => d) // 系列データを設定
                 .attr('d', d => line(d.values))
                 .attr('stroke', d => colorScale(d.name))
-                .attr('stroke-width', window.AppDefaults?.strokeWidth?.thick || 2)
+                .attr('stroke-width', AppDefaults?.strokeWidth?.thick || 2)
                 .attr('fill', 'none');
 
             // ポイントを描画
-            seriesGroups.each(function(seriesData) {
+            seriesGroups.each(function (seriesData) {
                 const group = d3.select(this);
-                
+
                 const circles = group.selectAll('.chart-circle')
                     .data(seriesData.values)
                     .enter()
@@ -611,33 +626,33 @@ class LineChartRenderer extends ChartRendererBase {
      */
     renderAnnotations(g, annotations, context) {
         if (!annotations || annotations.length === 0) return;
-        
+
         const { xScale, yScale, width, height, isYearData, xField, yField } = context;
-        
+
         // スケールが存在しない場合は処理をスキップ
         if (!xScale || !yScale) {
             console.warn('LineChartRenderer: xScale or yScale is undefined, skipping annotations');
             return;
         }
-        
+
         const annotationGroup = g.append('g')
             .attr('class', 'chart-annotations');
-        
+
         annotations.forEach((annotation, index) => {
             let { type, x, y, text, style = {} } = annotation;
-            
+
             // 古い形式のアノテーションをサポート
             if (annotation.year !== undefined) {
                 x = annotation.year;
                 y = annotation.y || yScale.domain()[1]; // デフォルトで上端
                 text = annotation.label || text;
-                
+
                 // verticalLine を line に変換
                 if (type === 'verticalLine') {
                     type = 'line';
                 }
             }
-            
+
             // horizontalLine の場合
             if (type === 'horizontalLine' && annotation.value !== undefined) {
                 y = annotation.value;
@@ -645,7 +660,7 @@ class LineChartRenderer extends ChartRendererBase {
                 text = annotation.label || text;
                 type = 'horizontalLine';
             }
-            
+
             // X座標の変換
             let xPos;
             try {
@@ -658,7 +673,7 @@ class LineChartRenderer extends ChartRendererBase {
                 console.warn(`LineChartRenderer: Failed to convert x coordinate for annotation ${index}:`, x, error);
                 xPos = 0;
             }
-            
+
             // Y座標の変換
             let yPos;
             try {
@@ -667,28 +682,28 @@ class LineChartRenderer extends ChartRendererBase {
                 console.warn(`LineChartRenderer: Failed to convert y coordinate for annotation ${index}:`, y, error);
                 yPos = 0;
             }
-            
+
             // 座標が有効かチェック
             if (isNaN(xPos) || isNaN(yPos)) {
                 console.warn(`LineChartRenderer: Invalid coordinates for annotation ${index}: x=${xPos}, y=${yPos}`);
                 return;
             }
-            
+
             // 注釈要素を作成
             const annotationElement = annotationGroup.append('g')
                 .attr('class', `annotation annotation-${index}`)
                 .attr('transform', `translate(${xPos}, ${yPos})`);
-            
+
             switch (type) {
                 case 'point':
                     // ポイント注釈
                     annotationElement.append('circle')
                         .attr('r', style.radius || 5)
-                        .attr('fill', style.color || window.AppConstants?.APP_COLORS?.ANNOTATIONS?.POINT || '#ff6b6b')
-                        .attr('stroke', style.strokeColor || window.AppConstants?.APP_COLORS?.ANNOTATIONS?.STROKE || '#fff')
+                        .attr('fill', style.color || AppConstants?.APP_COLORS?.ANNOTATIONS?.POINT || '#ff6b6b')
+                        .attr('stroke', style.strokeColor || AppConstants?.APP_COLORS?.ANNOTATIONS?.STROKE || '#fff')
                         .attr('stroke-width', style.strokeWidth || 2);
                     break;
-                    
+
                 case 'line':
                     // 線注釈（垂直線）
                     annotationElement.append('line')
@@ -696,17 +711,17 @@ class LineChartRenderer extends ChartRendererBase {
                         .attr('y1', -yPos) // チャート上端まで
                         .attr('x2', 0)
                         .attr('y2', height - yPos) // チャート下端まで
-                        .attr('stroke', style.color || window.AppDefaults?.colors?.text?.secondary || '#999')
-                        .attr('stroke-width', style.strokeWidth || window.AppDefaults?.strokeWidth?.normal || 1)
+                        .attr('stroke', style.color || AppDefaults?.colors?.text?.secondary || '#999')
+                        .attr('stroke-width', style.strokeWidth || AppDefaults?.strokeWidth?.normal || 1)
                         .attr('stroke-dasharray', style.dashArray || '3,3');
-                    
+
                     // ラベルテキストを追加
                     if (text) {
                         const position = annotation.position || 'top-left';
                         let textX = 5; // デフォルトは右側
                         let textY = -yPos + 15; // デフォルトは上側
                         let textAnchor = 'start'; // デフォルトは左寄せ
-                        
+
                         if (position.includes('right')) {
                             textX = 5; // 線の右側に配置
                             textAnchor = 'start'; // テキストを左寄せ
@@ -714,21 +729,21 @@ class LineChartRenderer extends ChartRendererBase {
                             textX = -5; // 線の左側に配置
                             textAnchor = 'end'; // テキストを右寄せ
                         }
-                        
+
                         if (position.includes('bottom')) {
                             textY = height - yPos - 5;
                         }
-                        
+
                         annotationElement.append('text')
                             .attr('x', textX)
                             .attr('y', textY)
                             .attr('text-anchor', textAnchor)
                             .attr('font-size', style.fontSize || '12px')
-                            .attr('fill', style.textColor || window.AppDefaults?.colors?.text?.primary || '#333')
+                            .attr('fill', style.textColor || AppDefaults?.colors?.text?.primary || '#333')
                             .text(text);
                     }
                     break;
-                    
+
                 case 'horizontalLine':
                     // 水平線注釈
                     annotationElement.append('line')
@@ -736,17 +751,17 @@ class LineChartRenderer extends ChartRendererBase {
                         .attr('y1', 0)
                         .attr('x2', width - xPos) // チャート右端まで
                         .attr('y2', 0)
-                        .attr('stroke', style.color || window.AppDefaults?.colors?.text?.secondary || '#999')
-                        .attr('stroke-width', style.strokeWidth || window.AppDefaults?.strokeWidth?.normal || 1)
+                        .attr('stroke', style.color || AppDefaults?.colors?.text?.secondary || '#999')
+                        .attr('stroke-width', style.strokeWidth || AppDefaults?.strokeWidth?.normal || 1)
                         .attr('stroke-dasharray', style.dashArray || '3,3');
-                    
+
                     // ラベルテキストを追加
                     if (text) {
                         const position = annotation.position || 'right';
                         let textX = width - xPos - 5; // デフォルトは右端
                         let textY = -5; // 線の上側
                         let textAnchor = 'end'; // デフォルトは右寄せ
-                        
+
                         if (position.includes('left')) {
                             textX = -xPos + 5; // 左端に配置
                             textAnchor = 'start'; // テキストを左寄せ
@@ -754,21 +769,21 @@ class LineChartRenderer extends ChartRendererBase {
                             textX = (width - xPos) / 2; // 中央に配置
                             textAnchor = 'middle'; // テキストを中央寄せ
                         }
-                        
+
                         if (position.includes('below')) {
                             textY = 15; // 線の下側
                         }
-                        
+
                         annotationElement.append('text')
                             .attr('x', textX)
                             .attr('y', textY)
                             .attr('text-anchor', textAnchor)
                             .attr('font-size', style.fontSize || '12px')
-                            .attr('fill', style.textColor || window.AppDefaults?.colors?.text?.primary || '#333')
+                            .attr('fill', style.textColor || AppDefaults?.colors?.text?.primary || '#333')
                             .text(text);
                     }
                     break;
-                    
+
                 case 'text':
                 default:
                     // テキスト注釈
@@ -779,7 +794,7 @@ class LineChartRenderer extends ChartRendererBase {
                         .attr('fill', style.color || '#333')
                         .attr('text-anchor', style.textAnchor || 'start')
                         .text(text);
-                    
+
                     // 背景を追加（可読性向上）
                     if (style.background !== false) {
                         const bbox = textElement.node().getBBox();
@@ -789,7 +804,7 @@ class LineChartRenderer extends ChartRendererBase {
                             .attr('width', bbox.width + 4)
                             .attr('height', bbox.height + 4)
                             .attr('fill', style.backgroundColor || 'rgba(255, 255, 255, 0.8)')
-                            .attr('stroke', style.borderColor || window.AppConstants?.APP_COLORS?.ANNOTATIONS?.BORDER || '#ccc')
+                            .attr('stroke', style.borderColor || AppConstants?.APP_COLORS?.ANNOTATIONS?.BORDER || '#ccc')
                             .attr('stroke-width', 0.5)
                             .attr('rx', 2);
                     }
@@ -797,19 +812,4 @@ class LineChartRenderer extends ChartRendererBase {
             }
         });
     }
-
-
-
-
-    /**
-     * リサイズ処理
-     */
-    resize() {
-        if (this.currentChart && this.data && this.config) {
-            this.renderChart(this.currentChart, this.data, this.config);
-        }
-    }
 }
-
-// グローバルスコープで利用可能にする（ES6モジュール移行前の暫定措置）
-window.LineChartRenderer = LineChartRenderer;Renderer = LineChartRenderer;

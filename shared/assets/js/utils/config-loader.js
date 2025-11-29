@@ -1,9 +1,11 @@
+import { diseaseDetector } from '../config/disease-detector.js';
+
 /**
  * ConfigLoader - 外部設定ファイルの読み込みと管理
  * JSON設定ファイルを読み込み、フォールバック値を提供
  * 感染症別の動的パス解決に対応
  */
-class ConfigLoader {
+export class ConfigLoader {
     constructor() {
         this.configs = {
             app: null,
@@ -18,19 +20,7 @@ class ConfigLoader {
         this.environment = this._detectEnvironment();
         this.loaded = false;
         this.loadPromise = null;
-        this.diseaseDetector = null;
-        this._initializeDiseaseDetector();
-    }
-
-    /**
-     * 感染症検出器を初期化
-     * @private
-     */
-    _initializeDiseaseDetector() {
-        // DiseaseDetectorが利用可能な場合は使用
-        if (window.DiseaseDetector) {
-            this.diseaseDetector = window.DiseaseDetector;
-        }
+        this.diseaseDetector = diseaseDetector;
     }
 
     /**
@@ -56,11 +46,6 @@ class ConfigLoader {
      */
     async _loadConfigs() {
         try {
-            // 感染症検出器が未初期化の場合は再初期化
-            if (!this.diseaseDetector) {
-                this._initializeDiseaseDetector();
-            }
-
             // メイン設定ファイルを読み込み（感染症対応パス）
             const mainConfigPath = this._resolveConfigPath('main.config.json');
             this.mainConfig = await this._loadConfig(mainConfigPath);
@@ -71,7 +56,7 @@ class ConfigLoader {
 
             // 環境設定を生成（単一環境運用）
             this.configs.environment = this._createEnvironmentConfig();
-            
+
             // app-settings を読み込み（共通ベース + 疾患別上書き）
             const mergeStrategy = this.mainConfig?.mergeStrategy || {
                 deep: true,
@@ -110,7 +95,7 @@ class ConfigLoader {
                     responsive: { breakpoints: mergedAppSettings.breakpoints || {} }
                 };
             }
-            
+
             // content.jsonを読み込み
             if (this.mainConfig.configFiles.content) {
                 const contentPath = this._resolveConfigPath(this.mainConfig.configFiles.content);
@@ -125,10 +110,10 @@ class ConfigLoader {
             this._applyCSSVariables();
 
             this.loaded = true;
-            
+
             if (this.configs.environment?.debug?.showConfigLoading) {
             }
-            
+
             return this.mergedConfig;
 
         } catch (error) {
@@ -179,7 +164,7 @@ class ConfigLoader {
             settings: this._getDefaultSettingsConfig(),
             content: { steps: [] }
         };
-        
+
         this.mergedConfig = this._mergeConfigs();
         this._applyCSSVariables();
         this.loaded = true;
@@ -235,7 +220,7 @@ class ConfigLoader {
 
         // 他の設定を順序に従ってマージ
         const loadOrder = this.mainConfig?.loadOrder || ['app', 'theme', 'animation', 'settings', 'content'];
-        
+
         for (const configType of loadOrder) {
             if (configType !== 'environment' && this.configs[configType]) {
                 merged = this._deepMerge(merged, this.configs[configType], mergeStrategy);
@@ -353,7 +338,7 @@ class ConfigLoader {
         if (assetFile.startsWith('assets/')) {
             return assetFile;
         }
-        
+
         if (this.diseaseDetector) {
             return this.diseaseDetector.resolveAssetPath(assetFile, subType);
         }
@@ -469,11 +454,11 @@ class ConfigLoader {
      */
     _flattenObject(obj, prefix = '') {
         const result = [];
-        
+
         const flatten = (current, path = []) => {
             Object.entries(current).forEach(([key, value]) => {
                 const newPath = [...path, this._kebabCase(key)];
-                
+
                 if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
                     flatten(value, newPath);
                 } else {
@@ -484,7 +469,7 @@ class ConfigLoader {
                 }
             });
         };
-        
+
         flatten(obj);
         return result;
     }
@@ -708,7 +693,7 @@ class ConfigLoader {
     getLegacyCompatibleConfig() {
         const content = this.configs.content || {};
         const settings = this.configs.settings || {};
-        
+
         return {
             steps: content.steps || [],
             settings: settings
@@ -745,9 +730,5 @@ class ConfigLoader {
 }
 
 // グローバルインスタンスを作成
-window.ConfigLoader = new ConfigLoader();
+export const configLoader = new ConfigLoader();
 
-// 既存のコードとの互換性のため、設定を即座に読み込む
-(async () => {
-    await window.ConfigLoader.loadAll();
-})();

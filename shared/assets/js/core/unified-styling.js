@@ -1,10 +1,12 @@
+import { diseaseDetector } from '../config/disease-detector.js';
+
 /**
  * 統一スタイリングシステム
  * 感染症固有の色変数を動的に設定
  * DiseaseDetectorとDISEASE_CONFIGを使用
  */
 
-class UnifiedStylingSys {
+export class UnifiedStylingSys {
     constructor() {
         // 色情報はDISEASE_CONFIGから取得（重複排除）
     }
@@ -33,14 +35,14 @@ class UnifiedStylingSys {
     init() {
         const applyTheme = () => {
             const diseaseType =
-                window.DiseaseDetector?.getDiseaseType?.() ||
+                diseaseDetector?.getDiseaseType?.() ||
                 window.DISEASE_TYPE ||
                 'aids';
             this.applyCSSVariables(diseaseType);
         };
 
         const tryApply = () => {
-            if (window.DISEASE_CONFIG && window.DiseaseDetector) {
+            if (window.DISEASE_CONFIG && diseaseDetector) {
                 applyTheme();
                 return true;
             }
@@ -58,9 +60,5 @@ class UnifiedStylingSys {
 }
 
 // 自動初期化
-const unifiedStyling = new UnifiedStylingSys();
+export const unifiedStyling = new UnifiedStylingSys();
 unifiedStyling.init();
-
-// グローバルエクスポート
-window.UnifiedStylingSys = UnifiedStylingSys;
-window.unifiedStyling = unifiedStyling;

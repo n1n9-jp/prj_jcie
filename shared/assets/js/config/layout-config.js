@@ -3,13 +3,8 @@
  *
  * 全てのチャートレイアウトタイプの標準設定を提供
  * レイアウトの一貫性と保守性を確保
- *
- * 統合機能：
- * - LayoutHelper（計算・検証ロジック）
- * - ResponsiveHelper（レスポンシブ対応）
- * をここに統合し、単一の設定クラスとして提供
  */
-class LayoutConfig {
+export class LayoutConfig {
     /**
      * レイアウトタイプ定数
      */
@@ -517,7 +512,7 @@ class LayoutConfig {
      */
     static isBreakpoint(breakpoint) {
         const width = window.innerWidth;
-        switch(breakpoint) {
+        switch (breakpoint) {
             case 'mobile':
                 return width < this.BREAKPOINTS.mobile;
             case 'tablet':
@@ -573,8 +568,4 @@ class LayoutConfig {
             height: window.innerHeight
         };
     }
-
 }
-
-// グローバルスコープで利用可能にする
-window.LayoutConfig = LayoutConfig;

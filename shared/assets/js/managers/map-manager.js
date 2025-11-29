@@ -1,9 +1,16 @@
+import { BaseManager } from '../utils/base-manager.js';
+import { MapController } from '../map/map-controller.js';
+import { MapCityManager } from './map-city-manager.js';
+import { MapRenderer } from '../map/map-renderer.js';
+import { pubsub, EVENTS } from '../core/pubsub.js';
+import { AppConstants } from '../utils/app-constants.js';
+
 /**
  * MapManager - 地図管理クラス
  * D3.jsを使用した世界地図の描画・更新を管理
  * BaseManagerを継承し、共通機能を活用
  */
-class MapManager extends BaseManager {
+export class MapManager extends BaseManager {
     constructor(containerId) {
         super(containerId);
         this.svg = null;
@@ -32,10 +39,10 @@ class MapManager extends BaseManager {
         super.init();
 
         // MapController を初期化
-        this.controller = new window.MapController(this);
+        this.controller = new MapController(this);
 
         // MapCityManager を初期化
-        this.cityManager = new window.MapCityManager(this);
+        this.cityManager = new MapCityManager(this);
 
         // イベントリスナーを設定
         pubsub.subscribe(EVENTS.MAP_UPDATE, (data) => {
@@ -45,7 +52,7 @@ class MapManager extends BaseManager {
         pubsub.subscribe(EVENTS.MAP_PROGRESS, (data) => {
             this.controller.handleMapProgress(data);
         });
-        
+
         // 単一都市モード用の状態
         this.singleCityMode = false;
         this.currentCity = null;
@@ -58,7 +65,7 @@ class MapManager extends BaseManager {
      * @returns {string} 日本語の国名
      */
     getCountryNameJapanese(countryEn) {
-        return window.AppConstants?.getCountryNameJapanese(countryEn) || countryEn;
+        return AppConstants?.getCountryNameJapanese(countryEn) || countryEn;
     }
 
     /**
@@ -83,12 +90,12 @@ class MapManager extends BaseManager {
      */
     hide() {
         this.container.classed('visible', false);
-        
+
         // 地図非表示時は拡散矢印も即座にクリア
         if (this.renderer && this.renderer.clearSpreadingArrows) {
             this.renderer.clearSpreadingArrows();
         }
-        
+
     }
 
     /**
@@ -112,7 +119,7 @@ class MapManager extends BaseManager {
     initSVG(config = {}) {
         // MapRenderer のインスタンスを作成（初回のみ）
         if (!this.renderer) {
-            this.renderer = new window.MapRenderer(this.container, this);
+            this.renderer = new MapRenderer(this.container, this);
         }
 
         // MapRenderer の initSVG を使用
@@ -135,7 +142,7 @@ class MapManager extends BaseManager {
     renderMap(geoData, config = {}) {
         // MapRenderer のインスタンスを作成（初回のみ）
         if (!this.renderer) {
-            this.renderer = new window.MapRenderer(this.container, this);
+            this.renderer = new MapRenderer(this.container, this);
         }
 
         // MapRenderer の renderMap を使用
@@ -331,6 +338,3 @@ class MapManager extends BaseManager {
         super.destroy();
     }
 }
-
-// グローバルスコープで利用可能にする（ES6モジュール移行前の暫定措置）
-window.MapManager = MapManager;

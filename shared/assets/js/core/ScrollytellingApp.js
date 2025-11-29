@@ -1,15 +1,29 @@
+// import scrollama from 'scrollama'; // Using global scrollama from CDN
+import { DataLoader } from './data-loader.js';
+import { CityStepsGenerator } from './city-steps-generator.js';
+import { pubsub, EVENTS } from './pubsub.js';
+import { AppConstants } from '../utils/app-constants.js';
+import { colorScheme } from '../utils/color-scheme.js';
+import { ChartManager } from '../managers/chart-manager.js';
+import { MapManager } from '../managers/map-manager.js';
+import { ImageManager } from '../managers/image-manager.js';
+import { EventHandlers } from './event-handlers.js';
+import { StepMapper } from '../utils/step-mapper.js';
+import { PositionManager } from '../utils/position-manager.js';
+import { logger as Logger } from '../utils/logger.js';
+
 /**
  * Main Application - Scrollytelling メインアプリケーション
  * scrollama.jsとPubSubを使用してスクロールイベントを管理
  */
-class ScrollytellingApp {
+export class ScrollytellingApp {
     constructor() {
         this.scroller = null;
         this.chartManager = null;
         this.mapManager = null;
         this.config = null;
         this.data = {};
-        
+
         this.init();
     }
 
@@ -17,26 +31,26 @@ class ScrollytellingApp {
         try {
             // データを読み込み
             await this.loadData();
-            
+
             // マネージャーを初期化
             this.initManagers();
-            
+
             // テキストポジションを事前適用（ちらつき防止）
             this.preApplyTextPositions();
-            
+
             // スクロールを初期化（都市ステップ生成後）
             // DOM更新を待つため、次のティックで初期化
             setTimeout(() => {
                 this.initScroller();
             }, 0);
-            
+
             // リサイズイベントを設定
             this.initResizeHandler();
-            
-            
+
+
         } catch (error) {
-            if (window.Logger) {
-                window.Logger.error('Failed to initialize app:', error);
+            if (Logger) {
+                Logger.error('Failed to initialize app:', error);
             } else {
                 console.error('Failed to initialize app:', error);
             }
@@ -50,7 +64,7 @@ class ScrollytellingApp {
     async loadData() {
         try {
             // DataLoaderを使用してすべてのデータを読み込み
-            const { config, data } = await window.DataLoader.loadAll();
+            const { config, data } = await DataLoader.loadAll();
 
             this.config = config;
             this.data = data;
@@ -73,23 +87,17 @@ class ScrollytellingApp {
      * @returns {string} 日本語の国名
      */
     getCountryNameJapanese(countryEn) {
-        return window.AppConstants?.getCountryNameJapanese(countryEn) || countryEn;
+        return AppConstants?.getCountryNameJapanese(countryEn) || countryEn;
     }
 
     /**
      * マネージャーを初期化
      */
     initManagers() {
-        
-        // ColorSchemeを初期化
-        if (!window.colorScheme && window.ColorScheme) {
-            window.colorScheme = new ColorScheme();
-        }
-        
         this.chartManager = new ChartManager('#chart');
         this.mapManager = new MapManager('#map-container');
         this.imageManager = new ImageManager('#image-container');
-        
+
         // 地図データを設定
         if (this.data.map) {
             this.mapManager.setGeoData(this.data.map);
@@ -149,7 +157,7 @@ class ScrollytellingApp {
             // Special handling for africa_young data files (debug info removed)
             return data;
         }
-        
+
         console.warn(`Data file not found: ${dataFile}`);
         return [];
     }
@@ -160,7 +168,7 @@ class ScrollytellingApp {
      */
     initResizeHandler() {
         let resizeTimeout;
-        
+
         window.addEventListener('resize', () => {
             clearTimeout(resizeTimeout);
             resizeTimeout = setTimeout(() => {
@@ -174,12 +182,12 @@ class ScrollytellingApp {
      */
     handleResize() {
         // Handle window resize events
-        
+
         // スクローラーをリサイズ
         if (this.scroller) {
             this.scroller.resize();
         }
-        
+
         // リサイズイベントを発行
         pubsub.publish(EVENTS.RESIZE);
     }
@@ -192,9 +200,9 @@ class ScrollytellingApp {
         const errorDiv = document.createElement('div');
         errorDiv.className = 'fixed top-4 right-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded z-50';
         errorDiv.textContent = message;
-        
+
         document.body.appendChild(errorDiv);
-        
+
         // 5秒後に自動削除
         setTimeout(() => {
             if (errorDiv.parentNode) {
@@ -209,21 +217,21 @@ class ScrollytellingApp {
      */
     determineFooterStep() {
         // 1. StepMapperを使用してフッターステップを取得（最優先）
-        if (window.StepMapper) {
-            const footerIndex = window.StepMapper.getFooterStepIndex();
+        if (StepMapper) {
+            const footerIndex = StepMapper.getFooterStepIndex();
             if (footerIndex !== null) {
                 return footerIndex.toString();
             }
         }
-        
+
         // 2. 設定ファイルからフッターstepを探す
         if (this.config && this.config.steps) {
             for (let i = 0; i < this.config.steps.length; i++) {
                 const step = this.config.steps[i];
                 if (step.footer && step.footer.visible) {
                     // 論理名からインデックス番号を取得
-                    const stepIndex = window.StepMapper ? 
-                        window.StepMapper.getIndex(step.id) : 
+                    const stepIndex = StepMapper ?
+                        StepMapper.getIndex(step.id) :
                         null;
                     if (stepIndex !== null) {
                         return stepIndex.toString();
@@ -231,22 +239,22 @@ class ScrollytellingApp {
                 }
             }
         }
-        
+
         // 3. HTMLから最後のstepを探す（フォールバック）
         const allSteps = document.querySelectorAll('.step[data-step]');
         if (allSteps.length > 0) {
             const lastStep = allSteps[allSteps.length - 1];
             const lastStepLogicalName = lastStep.getAttribute('data-step');
             // 論理名をインデックス番号に変換
-            const lastStepIndex = window.StepMapper ? 
-                window.StepMapper.getIndex(lastStepLogicalName) : 
+            const lastStepIndex = StepMapper ?
+                StepMapper.getIndex(lastStepLogicalName) :
                 null;
             if (lastStepIndex !== null) {
                 console.log(`Footer step detected from HTML: ${lastStepLogicalName} → ${lastStepIndex}`);
                 return lastStepIndex.toString();
             }
         }
-        
+
         // 4. 感染症別フォールバック値
         const diseaseType = window.DISEASE_TYPE || this.detectDiseaseFromURL();
         const diseaseFooterSteps = {
@@ -254,12 +262,12 @@ class ScrollytellingApp {
             'malariae': '32',       // 03_malariae: step22-26(5都市) + step32(フッター)
             'tuberculosis': '30'    // 02_tuberculosis（仮値、将来調整予定）
         };
-        
+
         if (diseaseFooterSteps[diseaseType]) {
             console.log(`Footer step fallback for ${diseaseType}: ${diseaseFooterSteps[diseaseType]}`);
             return diseaseFooterSteps[diseaseType];
         }
-        
+
         // 5. 最終フォールバック
         console.log('Footer step using final fallback: 25');
         return '25';
@@ -313,7 +321,7 @@ class ScrollytellingApp {
             return;
         }
         footer.className = 'site-footer';
-        
+
         try {
             footer.innerHTML = `
             <div class="footer-container">
@@ -362,7 +370,7 @@ class ScrollytellingApp {
      * @param {string} stepLogicalName - ステップの論理名
      */
     applyStepPositioning(stepConfig, stepLogicalName) {
-        if (!window.PositionManager) {
+        if (!PositionManager) {
             console.warn('PositionManager not available, skipping positioning');
             return;
         }
@@ -438,7 +446,7 @@ class ScrollytellingApp {
             debugMode: true  // チャートのデバッグモードを有効化
         });
 
-        
+
         // Debug information removed for performance
     }
 
@@ -506,7 +514,7 @@ class ScrollytellingApp {
             debugMode: false
         });
 
-        
+
         // Debug information for image element styles (removed for performance)
     }
 
@@ -555,7 +563,7 @@ class ScrollytellingApp {
             });
 
             // レイアウトの競合チェック
-            this.checkLayoutConflicts(visibleContents, stepIndex);
+            this.checkLayoutConflicts(visibleContents, stepLogicalName);
         }
     }
 
@@ -598,7 +606,7 @@ class ScrollytellingApp {
      * @param {string} stepLogicalName - ステップの論理名
      */
     applyTextPositioning(stepConfig, stepLogicalName) {
-        if (!window.PositionManager) {
+        if (!PositionManager) {
             console.warn('PositionManager not available, skipping text positioning');
             return;
         }
@@ -610,9 +618,9 @@ class ScrollytellingApp {
 
         // 現在のステップ要素を取得
         let stepElement = document.querySelector(`[data-step="${stepConfig.id}"]`) ||
-                         document.querySelector(`[data-step="${stepConfig.id.replace(/^step/, '')}"]`) ||
-                         document.querySelector(`[data-step="${stepLogicalName}"]`);
-        
+            document.querySelector(`[data-step="${stepConfig.id.replace(/^step/, '')}"]`) ||
+            document.querySelector(`[data-step="${stepLogicalName}"]`);
+
         if (!stepElement) {
             console.warn(`Step element not found for step ${stepConfig.id} (logical name: ${stepLogicalName})`);
             return;
@@ -699,10 +707,10 @@ class ScrollytellingApp {
      * @param {HTMLElement} stepElement - ステップ要素
      */
     resetTextPosition(stepElement) {
-        if (!stepElement || !window.PositionManager) return;
+        if (!stepElement || !PositionManager) return;
 
         PositionManager.resetTextClasses(stepElement);
-        
+
         // 組み合わせクラスもリセット
         const combinationClasses = [
             'has-chart-left', 'has-chart-right', 'has-chart-center',
@@ -716,7 +724,7 @@ class ScrollytellingApp {
      * 全コンテンツのポジションをリセット
      */
     resetAllPositions() {
-        if (!window.PositionManager) return;
+        if (!PositionManager) return;
 
         // コンテンツコンテナのリセット
         const containers = [
@@ -746,26 +754,26 @@ class ScrollytellingApp {
      * テキストポジションを事前適用（ちらつき防止）
      */
     preApplyTextPositions() {
-        if (!window.PositionManager || !this.config?.steps) {
+        if (!PositionManager || !this.config?.steps) {
             return;
         }
 
         // Pre-apply text positions to prevent flickering
-        
+
         this.config.steps.forEach((stepConfig, stepIndex) => {
             if (stepConfig.text && stepConfig.text.visible === false) {
                 // 非表示設定の場合：論理名で直接HTMLを検索
                 let stepElement = document.querySelector(`[data-step="${stepConfig.id}"]`);
-                
+
                 if (stepElement) {
                     this.hideTextBox(stepElement);
                 }
             } else if (stepConfig.text && stepConfig.text.position) {
                 // 通常のポジション適用
                 let stepElement = document.querySelector(`[data-step="${stepConfig.id}"]`) ||
-                               document.querySelector(`[data-step="${stepConfig.id.replace(/^step/, '')}"]`) ||
-                               document.querySelector(`[data-step="${stepIndex}"]`);
-                
+                    document.querySelector(`[data-step="${stepConfig.id.replace(/^step/, '')}"]`) ||
+                    document.querySelector(`[data-step="${stepIndex}"]`);
+
                 if (stepElement) {
                     // フルのテキストポジションを適用（白い矩形の位置制御も含む）
                     this.applyTextPositioning(stepConfig, stepConfig.id);
@@ -781,16 +789,16 @@ class ScrollytellingApp {
      */
     hideTextBox(stepElement) {
         if (!stepElement) return;
-        
+
         // ステップ内の白い矩形（テキストコンテナ）を非表示にする
         const textContainers = stepElement.querySelectorAll('.max-w-lg, .text-container, [class*="bg-white"]');
         textContainers.forEach(container => {
             container.style.display = 'none';
         });
-        
+
         // Add debug class for hidden text
         stepElement.classList.add('text-hidden');
-        
+
     }
 
     /**
@@ -799,93 +807,13 @@ class ScrollytellingApp {
      */
     showTextBox(stepElement) {
         if (!stepElement) return;
-        
+
         // ステップ内の白い矩形（テキストコンテナ）を再表示する
         const textContainers = stepElement.querySelectorAll('.max-w-lg, .text-container, [class*="bg-white"]');
         textContainers.forEach(container => {
             container.style.display = '';
         });
-        
-        // Remove debug class for visible text
+
         stepElement.classList.remove('text-hidden');
-        
     }
-
-
 }
-
-// グローバルスコープで利用可能にする（ES6モジュール移行前の暫定措置）
-window.ScrollytellingApp = ScrollytellingApp;
-
-// DOMContentLoaded後にアプリケーションを開始
-document.addEventListener('DOMContentLoaded', () => {
-    // 診断モードでは自動初期化をスキップ
-    if (window.DIAGNOSIS_MODE) {
-        console.log('📋 Diagnosis Mode: ScrollytellingApp auto-initialization skipped');
-        return;
-    }
-    
-    window.app = new ScrollytellingApp();
-});
-
-// デバッグ用のグローバル関数
-window.debugScrollytelling = {
-    getApp: () => window.app,
-    getConfig: () => window.app?.config,
-    getData: () => window.app?.data,
-    getScroller: () => window.app?.scroller,
-    triggerResize: () => window.app?.handleResize(),
-    
-    // ステップを手動でトリガー
-    triggerStep: (index) => {
-        const stepConfig = window.app?.config?.steps?.[index];
-        if (stepConfig) {
-            const stepElement = document.querySelectorAll('.step[data-step]')[index];
-            if (stepElement) {
-                EventHandlers.handleStepEnter({ element: stepElement, index, direction: 'down' }, window.app);
-            } else {
-                console.error(`Debug: Step element not found at index ${index}`);
-            }
-        } else {
-            console.error(`Debug: No step config found for index ${index}`);
-        }
-    },
-    
-    // 地図を表示するステップ（step2）をトリガー
-    showMap: () => {
-        window.debugScrollytelling.triggerStep(2);
-    },
-    
-    // チャートを手動で更新
-    updateChart: (type, visible = true) => {
-        const chartData = {
-            type,
-            visible,
-            data: window.app?.getChartData(type),
-            config: { width: 600, height: 400 }
-        };
-        pubsub.publish(EVENTS.CHART_UPDATE, chartData);
-    },
-    
-    // 地図を手動で更新
-    updateMap: (center = [0, 0], zoom = 1, visible = true) => {
-        const mapData = {
-            center,
-            zoom,
-            visible,
-            data: window.app?.data?.map
-        };
-        pubsub.publish(EVENTS.MAP_UPDATE, mapData);
-    },
-    
-    // 地図マネージャーの状態を確認
-    checkMapManager: () => {
-        const mapManager = window.app?.mapManager;
-        return mapManager;
-    },
-    
-    // データ読み込み状況を確認
-    checkDataLoading: () => {
-        return window.app?.data;
-    }
-};

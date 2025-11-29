@@ -1,8 +1,10 @@
+import { DISEASE_CONFIG } from './disease-config.js';
+
 /**
  * DiseaseDetector - 現在の感染症タイプを検出・管理
  * 感染症の検出とパス解決を担当
  */
-class DiseaseDetector {
+export class DiseaseDetector {
     constructor() {
         this.currentDisease = null;
         this.config = null;
@@ -16,7 +18,7 @@ class DiseaseDetector {
      */
     _detectDisease() {
         // 1. window.DISEASE_TYPE が明示的に設定されている場合
-        if (window.DISEASE_TYPE && DISEASE_CONFIG[window.DISEASE_TYPE]) {
+        if (typeof window !== 'undefined' && window.DISEASE_TYPE && DISEASE_CONFIG[window.DISEASE_TYPE]) {
             this.currentDisease = window.DISEASE_TYPE;
             this.config = DISEASE_CONFIG[window.DISEASE_TYPE];
             this.basePath = this.config.paths.base;
@@ -24,15 +26,19 @@ class DiseaseDetector {
         }
 
         // 2. URLパスから感染症を検出
-        const path = window.location.pathname;
-        if (path.includes('/01_aids/')) {
-            this.currentDisease = 'aids';
-        } else if (path.includes('/02_tuberculosis/')) {
-            this.currentDisease = 'tuberculosis';
-        } else if (path.includes('/03_malariae/')) {
-            this.currentDisease = 'malariae';
+        if (typeof window !== 'undefined') {
+            const path = window.location.pathname;
+            if (path.includes('/01_aids/')) {
+                this.currentDisease = 'aids';
+            } else if (path.includes('/02_tuberculosis/')) {
+                this.currentDisease = 'tuberculosis';
+            } else if (path.includes('/03_malariae/')) {
+                this.currentDisease = 'malariae';
+            } else {
+                // デフォルトはエイズ
+                this.currentDisease = 'aids';
+            }
         } else {
-            // デフォルトはエイズ
             this.currentDisease = 'aids';
         }
 
@@ -144,12 +150,5 @@ class DiseaseDetector {
 }
 
 // グローバルインスタンスを作成
-window.DiseaseDetector = new DiseaseDetector();
+export const diseaseDetector = new DiseaseDetector();
 
-// デバッグ用
-if (window.DiseaseDetector.getDiseaseConfig().debug?.enabled) {
-    console.log('Disease Detection:', {
-        type: window.DiseaseDetector.getDiseaseType(),
-        config: window.DiseaseDetector.getDiseaseConfig()
-    });
-}

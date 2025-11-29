@@ -1,9 +1,14 @@
+import * as d3 from 'd3';
+import { BaseManager } from '../utils/base-manager.js';
+import { pubsub, EVENTS } from '../core/pubsub.js';
+import { PositionManager } from '../utils/position-manager.js';
+
 /**
  * ImageManager - 画像管理クラス
  * スクロールに応じた画像の表示・非表示を管理
  * BaseManagerを継承し、共通機能を活用
  */
-class ImageManager extends BaseManager {
+export class ImageManager extends BaseManager {
     constructor(containerId) {
         super(containerId);
         this.image = d3.select('#image');
@@ -40,7 +45,7 @@ class ImageManager extends BaseManager {
             this.loadImage(src, alt, config);
 
             // 位置設定を適用（main.jsでも適用されるが、確実にするため）
-            if (position && window.PositionManager) {
+            if (position && PositionManager) {
                 const container = document.getElementById('image-container');
                 if (container) {
                     const positionConfig = PositionManager.mergePositionConfig(position, 'image');
@@ -190,6 +195,3 @@ class ImageManager extends BaseManager {
         }
     }
 }
-
-// グローバルスコープで利用可能にする（ES6モジュール移行前の暫定措置）
-window.ImageManager = ImageManager;

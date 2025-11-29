@@ -1,10 +1,20 @@
+import * as d3 from 'd3';
+import { SVGHelper } from './svg-helper.js';
+import { LayoutConfig } from '../config/layout-config.js';
+import { ErrorHandler } from './error-handler.js';
+import { AppDefaults } from '../config/defaults.js';
+// TODO: Import renderers after refactoring them
+// import { LineChartRenderer } from '../renderers/line-chart-renderer.js';
+// import { BarChartRenderer } from '../renderers/bar-chart-renderer.js';
+// import { PieChartRenderer } from '../renderers/pie-chart-renderer.js';
+
 /**
  * BaseLayout - 全レイアウトタイプの統合基底クラス
  *
  * Dual/Triple/Single レイアウトの共通処理を提供
  * 以前の DualLayout/TripleLayout は本クラスに統合
  */
-class BaseLayout {
+export class BaseLayout {
     /**
      * コンストラクタ
      * @param {string} containerId - コンテナID
@@ -34,7 +44,7 @@ class BaseLayout {
      * @returns {number} 期待されるチャート数
      */
     getChartCountForType(layoutType) {
-        switch(layoutType) {
+        switch (layoutType) {
             case 'dual':
                 return 2;
             case 'triple':
@@ -76,14 +86,14 @@ class BaseLayout {
 
         // 既存のSVGをチェック
         let svg = this.container.select('svg');
-        
+
         if (svg.empty()) {
             // 新規作成
             svg = this.container.append('svg');
         }
 
         // SVGHelperを使用して初期化
-        if (window.SVGHelper) {
+        if (SVGHelper) {
             return SVGHelper.initSVG(this.container, width, height, {
                 className: `${this.layoutType}-layout-svg`,
                 responsive: true,
@@ -92,11 +102,11 @@ class BaseLayout {
         } else {
             // フォールバック
             svg.attr('width', width)
-               .attr('height', height)
-               .attr('viewBox', `0 0 ${width} ${height}`)
-               .attr('preserveAspectRatio', 'xMidYMid meet')
-               .classed(`${this.layoutType}-layout-svg`, true);
-            
+                .attr('height', height)
+                .attr('viewBox', `0 0 ${width} ${height}`)
+                .attr('preserveAspectRatio', 'xMidYMid meet')
+                .classed(`${this.layoutType}-layout-svg`, true);
+
             return svg;
         }
     }
@@ -142,7 +152,7 @@ class BaseLayout {
         if (config.aspectRatio || defaults.aspectRatio) {
             const aspectRatio = config.aspectRatio || defaults.aspectRatio;
             const calculatedHeight = width / aspectRatio;
-            
+
             if (calculatedHeight <= height) {
                 height = calculatedHeight;
             } else {
@@ -164,7 +174,7 @@ class BaseLayout {
      * @returns {Object} レスポンシブサイズ
      */
     getResponsiveSize(config = {}) {
-        if (window.SVGHelper) {
+        if (SVGHelper) {
             return SVGHelper.getResponsiveSize(this.container, {
                 defaultWidth: this.layoutDefaults.minWidth || 800,
                 defaultHeight: this.layoutDefaults.minHeight || 600,
@@ -185,9 +195,9 @@ class BaseLayout {
      * @returns {Object} 内部サイズ
      */
     getInnerSize(totalSize, margin) {
-        const defaultMargin = this.layoutDefaults.margin || 
-                            { top: 20, right: 20, bottom: 20, left: 20 };
-        
+        const defaultMargin = this.layoutDefaults.margin ||
+            { top: 20, right: 20, bottom: 20, left: 20 };
+
         const finalMargin = { ...defaultMargin, ...margin };
 
         return {
@@ -226,9 +236,10 @@ class BaseLayout {
 
             return true;
         } catch (error) {
-            ErrorHandler.handle(error, {
-                context: `BaseLayout.render (${this.layoutType})`,
-                config
+            ErrorHandler.handle(error, `BaseLayout.render (${this.layoutType})`, {
+                type: ErrorHandler.ERROR_TYPES.RENDER,
+                severity: ErrorHandler.SEVERITY.MEDIUM,
+                context: { config }
             });
             return false;
         }
@@ -316,8 +327,8 @@ class BaseLayout {
     getTransitionConfig(customTransition = {}) {
         // AppDefaults.animationから統一されたアニメーション設定を使用
         const defaults = {
-            duration: window.AppDefaults?.animation?.chartTransitionDuration || 1000,
-            easing: window.AppDefaults?.animation?.defaultEasing || 'easeInOut'
+            duration: AppDefaults?.animation?.chartTransitionDuration || 1000,
+            easing: AppDefaults?.animation?.defaultEasing || 'easeInOut'
         };
         return { ...defaults, ...customTransition };
     }
@@ -329,8 +340,8 @@ class BaseLayout {
      */
     handleError(error, context) {
         console.error(`BaseLayout.${context}:`, error);
-        
-        if (window.ErrorHandler) {
+
+        if (ErrorHandler) {
             ErrorHandler.handle(error, `BaseLayout.${context}`, {
                 type: ErrorHandler.ERROR_TYPES.RENDER,
                 severity: ErrorHandler.SEVERITY.MEDIUM,
@@ -366,7 +377,7 @@ class BaseLayout {
      * @returns {Object} マージされたレイアウト設定
      */
     getLayoutConfig(config) {
-        if (!window.LayoutConfig) {
+        if (!LayoutConfig) {
             console.warn('LayoutConfig not available, using basic config');
             return config;
         }
@@ -376,13 +387,11 @@ class BaseLayout {
         const presetConfig = LayoutConfig.PRESETS[preset] || {};
 
         // デフォルト設定との統合
-        return window.ConfigHelper ?
-            ConfigHelper.mergeConfig(
-                LayoutConfig.DEFAULT_SETTINGS,
-                presetConfig,
-                config
-            ) :
-            { ...presetConfig, ...config };
+        // ConfigHelper is not imported, using LayoutConfig.deepMerge
+        return LayoutConfig.deepMerge(
+            LayoutConfig.DEFAULTS[this.layoutType] || LayoutConfig.DEFAULTS.single,
+            LayoutConfig.deepMerge(presetConfig, config)
+        );
     }
 
     /**
@@ -460,19 +469,25 @@ class BaseLayout {
      */
     getOrCreateRenderer(chartType, index, containerId) {
         let renderer;
+        // TODO: Replace window references with imports once renderers are refactored
         switch (chartType) {
             case 'line':
-                renderer = new LineChartRenderer(`#${containerId}`);
+                renderer = window.LineChartRenderer ? new window.LineChartRenderer(`#${containerId}`) : null;
                 break;
             case 'bar':
-                renderer = new BarChartRenderer(`#${containerId}`);
+                renderer = window.BarChartRenderer ? new window.BarChartRenderer(`#${containerId}`) : null;
                 break;
             case 'pie':
-                renderer = new PieChartRenderer(`#${containerId}`);
+                renderer = window.PieChartRenderer ? new window.PieChartRenderer(`#${containerId}`) : null;
                 break;
             default:
                 throw new Error(`Unknown chart type: ${chartType}`);
         }
+
+        if (!renderer) {
+            console.warn(`Renderer for ${chartType} not found (window.${chartType.charAt(0).toUpperCase() + chartType.slice(1)}ChartRenderer is undefined)`);
+        }
+
         return renderer;
     }
 
@@ -524,28 +539,27 @@ class BaseLayout {
             container.node().id = containerId;
             const renderer = this.getOrCreateRenderer(chartConfig.type, i, containerId);
 
-            try {
-                // チャートの描画
-                renderer.renderChart(chartConfig.type, chartData.data, {
-                    ...chartConfig,
-                    ...chartConfig.config,
-                    width: size.width,
-                    height: size.height
-                });
+            if (renderer) {
+                try {
+                    // チャートの描画
+                    renderer.renderChart(chartConfig.type, chartData.data, {
+                        ...chartConfig,
+                        ...chartConfig.config,
+                        width: size.width,
+                        height: size.height
+                    });
 
-                this.charts[i] = {
-                    renderer,
-                    config: chartConfig,
-                    data: chartData.data
-                };
+                    this.charts[i] = {
+                        renderer,
+                        config: chartConfig,
+                        data: chartData.data
+                    };
 
-            } catch (error) {
-                console.error(`${this.layoutType} Layout: Error rendering chart ${i}:`, error);
-                this.renderErrorState(container, error);
+                } catch (error) {
+                    console.error(`${this.layoutType} Layout: Error rendering chart ${i}:`, error);
+                    this.renderErrorState(container, error);
+                }
             }
         }
     }
 }
-
-// グローバルスコープで利用可能にする
-window.BaseLayout = BaseLayout;

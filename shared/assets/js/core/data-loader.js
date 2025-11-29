@@ -1,8 +1,12 @@
+import * as d3 from 'd3';
+import { configLoader } from '../utils/config-loader.js';
+import { logger as Logger } from '../utils/logger.js';
+
 /**
  * DataLoader - アプリケーションデータの読み込みと整理
  * 設定ファイル、CSVデータ、地図データを読み込んで統合
  */
-class DataLoader {
+export class DataLoader {
     /**
      * すべてのデータを読み込み
      * @returns {Promise<Object>} {config, data}
@@ -10,17 +14,17 @@ class DataLoader {
     static async loadAll() {
         try {
             // 新しい設定システムを使用して設定を読み込む
-            await window.ConfigLoader.loadAll();
+            await configLoader.loadAll();
 
             // ロガーを初期化（ConfigLoader後に実行）
-            if (window.Logger) {
-                window.Logger.init();
+            if (Logger) {
+                Logger.init();
             }
 
-            const config = window.ConfigLoader.getLegacyCompatibleConfig();
+            const config = configLoader.getLegacyCompatibleConfig();
 
             // content-map.jsonを読み込む（感染症対応パス）
-            const citiesDataPath = window.ConfigLoader.resolveDataPath('content-map.json');
+            const citiesDataPath = configLoader.resolveDataPath('content-map.json');
             const citiesData = await d3.json(citiesDataPath);
 
             // 設定から必要なデータファイルを抽出
@@ -45,8 +49,8 @@ class DataLoader {
 
             // 動的にデータファイルを読み込む（感染症対応パス）
             const dataPromises = [
-                ...Array.from(dataFiles).map(file => d3.csv(window.ConfigLoader.resolveDataPath(file))),
-                d3.json(window.ConfigLoader.resolveDataPath('countries-110m.json'))
+                ...Array.from(dataFiles).map(file => d3.csv(configLoader.resolveDataPath(file))),
+                d3.json(configLoader.resolveDataPath('countries-110m.json'))
             ];
 
             const dataResults = await Promise.all(dataPromises);
@@ -72,6 +76,3 @@ class DataLoader {
         }
     }
 }
-
-// グローバルスコープで利用可能にする
-window.DataLoader = DataLoader;

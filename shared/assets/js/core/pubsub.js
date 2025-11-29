@@ -2,7 +2,7 @@
  * PubSub - シンプルなパブリッシュ・サブスクライブパターンの実装
  * イベント管理用ライブラリ
  */
-class PubSub {
+export class PubSub {
     constructor() {
         this.events = {};
     }
@@ -17,9 +17,9 @@ class PubSub {
         if (!this.events[event]) {
             this.events[event] = [];
         }
-        
+
         this.events[event].push(callback);
-        
+
         // 購読解除用の関数を返す
         return () => {
             this.events[event] = this.events[event].filter(cb => cb !== callback);
@@ -35,7 +35,7 @@ class PubSub {
         if (!this.events[event]) {
             return;
         }
-        
+
         this.events[event].forEach(callback => {
             try {
                 callback(data);
@@ -80,11 +80,11 @@ class PubSub {
     }
 }
 
-// グローバルインスタンス
-window.pubsub = new PubSub();
+// シングルトンインスタンス
+export const pubsub = new PubSub();
 
 // イベント名の定数定義
-window.EVENTS = {
+export const EVENTS = {
     STEP_ENTER: 'step-enter',
     STEP_EXIT: 'step-exit',
     STEP_PROGRESS: 'step-progress',

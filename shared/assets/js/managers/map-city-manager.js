@@ -1,3 +1,12 @@
+import * as d3 from 'd3';
+import { SVGHelper } from '../utils/svg-helper.js';
+import { MapHelper } from '../utils/map-helper.js';
+import { logger as Logger } from '../utils/logger.js';
+import { AppConstants } from '../utils/app-constants.js';
+import { AppDefaults } from '../config/defaults.js';
+import { countryRegionMapping } from '../utils/country-region-mapping.js';
+import { colorScheme } from '../utils/color-scheme.js';
+
 /**
  * CityManager - 都市管理クラス
  *
@@ -5,7 +14,7 @@
  * MapManagerから都市関連の責務を分離
  */
 
-class MapCityManager {
+export class MapCityManager {
     constructor(mapManager) {
         this.mapManager = mapManager;  // MapManager への参照
 
@@ -36,16 +45,16 @@ class MapCityManager {
             if (this.mapManager.geoData) {
                 this.renderTimelineMap();
             } else {
-                if (window.Logger) {
-                    window.Logger.error('MapCityManager: Cannot render timeline map - no geo data');
+                if (Logger) {
+                    Logger.error('MapCityManager: Cannot render timeline map - no geo data');
                 } else {
                     console.error('MapCityManager: Cannot render timeline map - no geo data');
                 }
             }
 
         } catch (error) {
-            if (window.Logger) {
-                window.Logger.error('MapCityManager: Failed to load cities timeline data:', error);
+            if (Logger) {
+                Logger.error('MapCityManager: Failed to load cities timeline data:', error);
             } else {
                 console.error('MapCityManager: Failed to load cities timeline data:', error);
             }
@@ -93,7 +102,7 @@ class MapCityManager {
 
             const targetCity = this.citiesTimelineData.cities.find(city => city.id === cityId);
             if (!targetCity) {
-                const logger = window.Logger || console;
+                const logger = Logger || console;
                 logger.error('MapCityManager: City not found:', cityId);
                 return;
             }
@@ -121,11 +130,11 @@ class MapCityManager {
                 });
                 this.mapManager.mapInitialized = true;
             } else {
-                const logger = window.Logger || console;
+                const logger = Logger || console;
                 logger.error('MapCityManager: Cannot render single city map - no geo data');
             }
         } catch (error) {
-            const logger = window.Logger || console;
+            const logger = Logger || console;
             logger.error('MapCityManager: Failed to load single city data:', error);
         }
     }
@@ -143,7 +152,7 @@ class MapCityManager {
         const svgHeight = actualSize.height || config.height || 600;
 
         // 投影法を設定（世界全体を表示）
-        if (window.MapHelper) {
+        if (MapHelper) {
             this.mapManager.projection = MapHelper.createProjection({
                 type: 'naturalEarth1',
                 scale: 150,
@@ -173,22 +182,22 @@ class MapCityManager {
                 .attr('d', this.mapManager.path)
                 .style('opacity', 0);
 
-            if (window.MapHelper) {
+            if (MapHelper) {
                 MapHelper.applyCountryStyles(countries, {
-                    fill: window.AppConstants?.APP_COLORS?.BACKGROUND?.LIGHT || '#d1d5db',
-                    stroke: window.AppConstants?.APP_COLORS?.TEXT?.WHITE || '#fff',
+                    fill: AppConstants?.APP_COLORS?.BACKGROUND?.LIGHT || '#d1d5db',
+                    stroke: AppConstants?.APP_COLORS?.TEXT?.WHITE || '#fff',
                     strokeWidth: 0.5
                 });
             } else {
                 countries
-                    .style('fill', window.AppConstants?.APP_COLORS?.BACKGROUND?.LIGHT || '#d1d5db')
-                    .style('stroke', window.AppConstants?.APP_COLORS?.TEXT?.WHITE || '#fff')
+                    .style('fill', AppConstants?.APP_COLORS?.BACKGROUND?.LIGHT || '#d1d5db')
+                    .style('stroke', AppConstants?.APP_COLORS?.TEXT?.WHITE || '#fff')
                     .style('stroke-width', 0.5);
             }
 
             countries
                 .transition()
-                .duration(window.AppDefaults?.animation?.shortDuration || 500)
+                .duration(AppDefaults?.animation?.shortDuration || 500)
                 .style('opacity', 1);
         }
     }
@@ -223,12 +232,12 @@ class MapCityManager {
                 .attr('cx', d => d.coords ? d.coords[0] : 0)
                 .attr('cy', d => d.coords ? d.coords[1] : 0);
 
-            if (window.MapHelper) {
+            if (MapHelper) {
                 MapHelper.applyCityMarkerStyles(citySelection, { markerType: 'timeline' });
             } else {
                 citySelection
                     .attr('r', 6)
-                    .style('fill', window.AppConstants?.APP_COLORS?.ACCENT?.INFO || '#3b82f6')
+                    .style('fill', AppConstants?.APP_COLORS?.ACCENT?.INFO || '#3b82f6')
                     .style('stroke', '#fff')
                     .style('stroke-width', 2);
             }
@@ -236,7 +245,7 @@ class MapCityManager {
             citySelection
                 .style('opacity', 0)
                 .transition()
-                .duration(window.AppDefaults?.animation?.defaultDuration || 300)
+                .duration(AppDefaults?.animation?.defaultDuration || 300)
                 .style('opacity', 0.8);
 
             // 都市ラベルを追加
@@ -249,19 +258,19 @@ class MapCityManager {
                 .attr('y', d => d.coords ? d.coords[1] - 12 : 0)
                 .text(d => d.name || d.id);
 
-            if (window.MapHelper) {
+            if (MapHelper) {
                 MapHelper.applyCityLabelStyles(labelSelection, { labelType: 'timeline' });
             } else {
                 labelSelection
                     .attr('text-anchor', 'middle')
                     .attr('font-size', '12px')
-                    .attr('fill', window.AppConstants?.APP_COLORS?.TEXT?.PRIMARY || '#1f2937');
+                    .attr('fill', AppConstants?.APP_COLORS?.TEXT?.PRIMARY || '#1f2937');
             }
 
             labelSelection
                 .style('opacity', 0)
                 .transition()
-                .duration(window.AppDefaults?.animation?.defaultDuration || 300)
+                .duration(AppDefaults?.animation?.defaultDuration || 300)
                 .delay(100)
                 .style('opacity', 1);
 
@@ -316,18 +325,18 @@ class MapCityManager {
                 .attr('cx', d => d.coords ? d.coords[0] : 0)
                 .attr('cy', d => d.coords ? d.coords[1] : 0);
 
-            if (window.MapHelper) {
+            if (MapHelper) {
                 MapHelper.applyCityMarkerStyles(citySelection, { markerType: 'default' });
             } else {
                 citySelection
                     .attr('r', 6)
-                    .style('fill', window.AppConstants?.APP_COLORS?.ACCENT?.INFO || '#3b82f6');
+                    .style('fill', AppConstants?.APP_COLORS?.ACCENT?.INFO || '#3b82f6');
             }
 
             citySelection
                 .style('opacity', 0)
                 .transition()
-                .duration(window.AppDefaults?.animation?.defaultDuration || 300)
+                .duration(AppDefaults?.animation?.defaultDuration || 300)
                 .style('opacity', 1);
 
             const labelSelection = mapGroup.selectAll('.city-label')
@@ -339,20 +348,20 @@ class MapCityManager {
                 .attr('y', d => d.coords ? d.coords[1] - 10 : 0)
                 .text(d => this.mapManager.getCountryNameJapanese(d.country));
 
-            if (window.MapHelper) {
+            if (MapHelper) {
                 MapHelper.applyCityLabelStyles(labelSelection, { labelType: 'default' });
             } else {
                 labelSelection
                     .attr('text-anchor', 'middle')
                     .attr('font-size', '16px')
-                    .attr('fill', window.AppConstants?.APP_COLORS?.TEXT?.PRIMARY || '#1f2937')
+                    .attr('fill', AppConstants?.APP_COLORS?.TEXT?.PRIMARY || '#1f2937')
                     .attr('font-weight', 'bold');
             }
 
             labelSelection
                 .style('opacity', 0)
                 .transition()
-                .duration(window.AppDefaults?.animation?.defaultDuration || 300)
+                .duration(AppDefaults?.animation?.defaultDuration || 300)
                 .delay(200)
                 .style('opacity', 1);
         }
@@ -372,7 +381,7 @@ class MapCityManager {
             scale: 300
         };
 
-        if (window.MapHelper) {
+        if (MapHelper) {
             MapHelper.animateProjectionTo(
                 this.mapManager.projection,
                 targetConfig,
@@ -393,7 +402,7 @@ class MapCityManager {
         } else {
             this.mapManager.svg
                 .transition()
-                .duration(window.AppDefaults?.animation?.chartTransitionDuration || 1000)
+                .duration(AppDefaults?.animation?.chartTransitionDuration || 1000)
                 .tween('projection', () => {
                     const currentCenter = this.mapManager.projection.center();
                     const currentScale = this.mapManager.projection.scale();
@@ -442,7 +451,7 @@ class MapCityManager {
      */
     getProjectedCoordinates(city) {
         const coords = this.getCityCoordinates(city);
-        if (window.MapHelper && this.mapManager.projection) {
+        if (MapHelper && this.mapManager.projection) {
             return MapHelper.safeProjection(this.mapManager.projection, coords);
         }
         if (this.mapManager.projection) {
@@ -481,7 +490,7 @@ class MapCityManager {
         const viewBoxHeight = parseFloat(viewBox[3]);
 
         // 投影法を設定（都市モードでは元スケール、viewBoxサイズを使用）
-        if (window.MapHelper) {
+        if (MapHelper) {
             this.mapManager.projection = MapHelper.createProjection({
                 type: 'naturalEarth1',
                 scale: 400,
@@ -512,10 +521,10 @@ class MapCityManager {
                 .style('fill', d => {
                     const countryName = d.properties.name || d.properties.NAME || d.properties.NAME_EN || 'Unknown';
 
-                    if (this.mapManager.currentView && this.mapManager.currentView.useRegionColors && window.CountryRegionMapping && window.ColorScheme) {
-                        const region = window.CountryRegionMapping.getRegionForCountry(countryName);
+                    if (this.mapManager.currentView && this.mapManager.currentView.useRegionColors && countryRegionMapping && colorScheme) {
+                        const region = countryRegionMapping.getRegionForCountry(countryName);
                         if (region) {
-                            let color = window.ColorScheme.getRegionColor(region);
+                            let color = colorScheme.getRegionColor(region);
 
                             if (this.mapManager.currentView.lightenNonVisited) {
                                 let visitedCountry = this.mapManager.getCurrentVisitedCountry();
@@ -526,7 +535,7 @@ class MapCityManager {
                                     visitedCountry = targetCity.country;
                                 }
                                 if (visitedCountry && countryName !== visitedCountry) {
-                                    color = window.ColorScheme.getLighterColor(color, 0.5);
+                                    color = colorScheme.getLighterColor(color, 0.5);
                                 }
                             }
 
@@ -534,13 +543,13 @@ class MapCityManager {
                         }
                     }
 
-                    return window.AppConstants?.APP_COLORS?.BACKGROUND?.LIGHT || '#d1d5db';
+                    return AppConstants?.APP_COLORS?.BACKGROUND?.LIGHT || '#d1d5db';
                 })
-                .style('stroke', this.mapManager.currentView && this.mapManager.currentView.useRegionColors ? window.AppConstants?.APP_COLORS?.ANNOTATIONS?.BORDER || '#ccc' : window.AppConstants?.APP_COLORS?.TEXT?.WHITE || '#fff')
+                .style('stroke', this.mapManager.currentView && this.mapManager.currentView.useRegionColors ? AppConstants?.APP_COLORS?.ANNOTATIONS?.BORDER || '#ccc' : AppConstants?.APP_COLORS?.TEXT?.WHITE || '#fff')
                 .style('stroke-width', this.mapManager.currentView && this.mapManager.currentView.useRegionColors ? 0.75 : 0.5)
                 .style('opacity', 0)
                 .transition()
-                .duration(window.AppDefaults?.animation?.shortDuration || 500)
+                .duration(AppDefaults?.animation?.shortDuration || 500)
                 .style('opacity', 1);
         }
 
@@ -562,7 +571,7 @@ class MapCityManager {
         const projectionCenter = this.mapManager.projection.center();
         const cityCoords = this.getCityCoordinates(city);
         const isCityCenter = Math.abs(projectionCenter[0] - cityCoords[0]) < 0.001 &&
-                            Math.abs(projectionCenter[1] - cityCoords[1]) < 0.001;
+            Math.abs(projectionCenter[1] - cityCoords[1]) < 0.001;
 
         let coords;
         if (isCityCenter) {
@@ -587,20 +596,20 @@ class MapCityManager {
             .attr('cy', coords[1])
             .attr('r', 0);
 
-        if (window.MapHelper) {
+        if (MapHelper) {
             MapHelper.applyCityMarkerStyles(marker, { markerType: 'single' });
         } else {
             marker
                 .attr('r', (city.style?.size || 8) * 1.5)
-                .style('fill', window.AppConstants?.APP_COLORS?.ACCENT?.INFO || '#3b82f6')
-                .style('stroke', window.AppConstants?.APP_COLORS?.TEXT?.WHITE || '#fff')
+                .style('fill', AppConstants?.APP_COLORS?.ACCENT?.INFO || '#3b82f6')
+                .style('stroke', AppConstants?.APP_COLORS?.TEXT?.WHITE || '#fff')
                 .style('stroke-width', 3);
         }
 
         marker
             .style('opacity', 0)
             .transition()
-            .duration((window.AppDefaults?.animation?.shortDuration || 500) * 1.6)
+            .duration((AppDefaults?.animation?.shortDuration || 500) * 1.6)
             .ease(d3.easeBackOut.overshoot(1.7))
             .style('opacity', 1);
 
@@ -611,7 +620,7 @@ class MapCityManager {
             .attr('y', coords[1] - ((city.style?.size || 8) * 1.5 + 8))
             .text(this.mapManager.getCountryNameJapanese(city.country));
 
-        if (window.MapHelper) {
+        if (MapHelper) {
             MapHelper.applyCityLabelStyles(label, { labelType: 'single' });
         } else {
             label
@@ -625,7 +634,7 @@ class MapCityManager {
         label
             .style('opacity', 0)
             .transition()
-            .duration((window.AppDefaults?.animation?.shortDuration || 500) * 1.2)
+            .duration((AppDefaults?.animation?.shortDuration || 500) * 1.2)
             .delay(400)
             .style('opacity', 1);
 
@@ -657,9 +666,4 @@ class MapCityManager {
         this.resetTimeline();
         this.mapManager = null;
     }
-}
-
-// グローバルスコープで利用可能にする（ES6モジュール移行前の暫定措置）
-if (typeof window !== 'undefined') {
-    window.MapCityManager = MapCityManager;
 }

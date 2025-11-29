@@ -1,3 +1,13 @@
+import * as d3 from 'd3';
+import { BaseManager } from './base-manager.js';
+import { pubsub, EVENTS } from '../core/pubsub.js';
+import { SVGHelper } from './svg-helper.js';
+import { ChartLayoutHelper } from './chart-layout-helper.js';
+import { ChartTransitions } from './chart-transitions.js';
+import { colorScheme } from './color-scheme.js';
+import { AppDefaults } from '../config/defaults.js';
+import { AppConstants } from './app-constants.js';
+
 /**
  * チャートレンダラーの基底クラス
  * 全チャートレンダラーに共通するメソッドを提供
@@ -5,7 +15,7 @@
  * 継承方法:
  * class LineChartRenderer extends ChartRendererBase { ... }
  */
-class ChartRendererBase extends BaseManager {
+export class ChartRendererBase extends BaseManager {
     /**
      * コンストラクタ
      * @param {string} containerId - コンテナのID
@@ -59,7 +69,7 @@ class ChartRendererBase extends BaseManager {
      * @returns {Object} { width: number, height: number }
      */
     getResponsiveSize(config = {}) {
-        if (window.SVGHelper) {
+        if (SVGHelper) {
             return SVGHelper.getResponsiveSize(this.container, {
                 defaultWidth: 800,
                 defaultHeight: 600,
@@ -135,7 +145,7 @@ class ChartRendererBase extends BaseManager {
     }
 
     /**
-     * チャートマージンを計算（ChartLayoutManager/Helper 統合版）
+     * チャートマージンを計算（ChartLayoutHelper 統合版）
      * 全レンダラーで共通実装
      *
      * @param {Array} data - チャートデータ
@@ -149,8 +159,7 @@ class ChartRendererBase extends BaseManager {
         const chartType = options.chartType || this.type;
         const hasLegend = options.hasLegend !== undefined ? options.hasLegend : false;
 
-        const layoutUtil = window.ChartLayoutManager || window.ChartLayoutHelper;
-        if (!layoutUtil) {
+        if (!ChartLayoutHelper) {
             // フォールバック：従来の固定マージン
             return config.margin || {
                 top: 40,
@@ -160,7 +169,7 @@ class ChartRendererBase extends BaseManager {
             };
         }
 
-        return layoutUtil.calculateDynamicMargins(data, config, {
+        return ChartLayoutHelper.calculateDynamicMargins(data, config, {
             chartType,
             hasLegend,
             screenWidth: window.innerWidth,
@@ -178,7 +187,7 @@ class ChartRendererBase extends BaseManager {
      */
     getTransitionConfig(chartType, customDuration = null) {
         const duration = customDuration !== null ? customDuration :
-                        (this.config?.transitionDuration || 600);
+            (this.config?.transitionDuration || 600);
         return {
             chartType: chartType || this.type,
             duration
@@ -226,24 +235,24 @@ class ChartRendererBase extends BaseManager {
         }
 
         // 優先度3: ColorScheme統一カラースキーム
-        if (window.ColorScheme && config.useUnifiedColors !== false) {
+        if (colorScheme && config.useUnifiedColors !== false) {
             // 系列データの場合（Array of objects with name/label field）
             if (Array.isArray(dataOrSeries) && fieldName) {
                 const field = fieldName || 'name';
                 return dataOrSeries.map(item => {
                     const key = item[field];
-                    return window.ColorScheme.getColorForRegion(key) ||
-                           window.ColorScheme.generateColorsForChart([item], { ...config, seriesField: field })[0] ||
-                           window.AppDefaults?.colors?.accent?.primary || '#3b82f6';
+                    return colorScheme.getColorForRegion(key) ||
+                        colorScheme.generateColorsForChart([item], { ...config, seriesField: field })[0] ||
+                        AppDefaults?.colors?.accent?.primary || '#3b82f6';
                 });
             }
         }
 
         // 優先度4: フォールバック
         return config.colors ||
-               window.AppConstants?.APP_COLORS?.PRIMARY_PALETTE ||
-               window.AppDefaults?.colors?.accent?.primary ? [window.AppDefaults.colors.accent.primary] :
-               d3.schemeCategory10;
+            AppConstants?.APP_COLORS?.PRIMARY_PALETTE ||
+            AppDefaults?.colors?.accent?.primary ? [AppDefaults.colors.accent.primary] :
+            d3.schemeCategory10;
     }
 
     /**
@@ -498,6 +507,3 @@ class ChartRendererBase extends BaseManager {
         };
     }
 }
-
-// グローバルスコープで提供
-window.ChartRendererBase = ChartRendererBase;

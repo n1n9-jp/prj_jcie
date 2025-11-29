@@ -1,14 +1,19 @@
+import * as d3 from 'd3';
+import { pubsub, EVENTS } from '../core/pubsub.js';
+import { AppDefaults } from '../config/defaults.js';
+import { ErrorHandler } from './error-handler.js';
+
 /**
  * BaseManager - すべてのManagerクラスの基底クラス
  * 共通の初期化処理、イベント処理、状態管理を提供
  */
-class BaseManager {
+export class BaseManager {
     constructor(containerId) {
         this.container = d3.select(containerId);
         this.currentState = null;
         this.config = null;
         this.isVisible = false;
-        
+
         // Don't auto-init - let subclasses control initialization timing
         // this.init();
     }
@@ -36,15 +41,15 @@ class BaseManager {
      * @param {Object} options - 表示オプション
      */
     show(options = {}) {
-        const { 
-            transitionDuration = window.AppDefaults?.animation?.defaultDuration || 300,
+        const {
+            transitionDuration = AppDefaults?.animation?.defaultDuration || 300,
             ease = d3.easeQuadInOut,
             delay = 0
         } = options;
 
         this.isVisible = true;
         this.container.classed('visible', true);
-        
+
         // フェードイン効果
         this.container
             .style('opacity', 0)
@@ -60,14 +65,14 @@ class BaseManager {
      * @param {Object} options - 非表示オプション
      */
     hide(options = {}) {
-        const { 
-            transitionDuration = window.AppDefaults?.animation?.defaultDuration || 300,
+        const {
+            transitionDuration = AppDefaults?.animation?.defaultDuration || 300,
             ease = d3.easeQuadInOut,
             delay = 0
         } = options;
 
         this.isVisible = false;
-        
+
         // フェードアウト効果
         this.container
             .transition()
@@ -94,13 +99,13 @@ class BaseManager {
      */
     applyPositionSettings(positionConfig) {
         if (!positionConfig) return;
-        
+
         const containerElement = this.container.node();
         if (!containerElement) return;
-        
+
         // 既存のposition関連クラスを削除
         this.clearPositionClasses();
-        
+
         // 垂直位置クラスを適用
         if (positionConfig.vertical) {
             switch (positionConfig.vertical) {
@@ -115,7 +120,7 @@ class BaseManager {
                     break;
             }
         }
-        
+
         // 水平位置クラスを適用
         if (positionConfig.horizontal) {
             switch (positionConfig.horizontal) {
@@ -130,7 +135,7 @@ class BaseManager {
                     break;
             }
         }
-        
+
         // サイズ設定をCSS変数として適用
         if (positionConfig.width) {
             containerElement.style.setProperty('--position-width', this.normalizeSize(positionConfig.width));
@@ -146,14 +151,14 @@ class BaseManager {
     clearPositionClasses() {
         const containerElement = this.container.node();
         if (!containerElement) return;
-        
+
         const positionClasses = [
             'position-center-v', 'position-top-v', 'position-bottom-v',
             'position-center-h', 'position-left-h', 'position-right-h'
         ];
-        
+
         containerElement.classList.remove(...positionClasses);
-        
+
         // CSS変数もクリア
         containerElement.style.removeProperty('--position-width');
         containerElement.style.removeProperty('--position-height');
@@ -189,12 +194,12 @@ class BaseManager {
      */
     static mergeConfig(defaultConfig, userConfig) {
         if (!userConfig) return defaultConfig;
-        
+
         const merged = { ...defaultConfig };
-        
+
         Object.keys(userConfig).forEach(key => {
-            if (typeof userConfig[key] === 'object' && 
-                !Array.isArray(userConfig[key]) && 
+            if (typeof userConfig[key] === 'object' &&
+                !Array.isArray(userConfig[key]) &&
                 userConfig[key] !== null) {
                 // オブジェクトの場合は再帰的にマージ
                 merged[key] = this.mergeConfig(defaultConfig[key] || {}, userConfig[key]);
@@ -202,7 +207,7 @@ class BaseManager {
                 merged[key] = userConfig[key];
             }
         });
-        
+
         return merged;
     }
 
@@ -216,23 +221,23 @@ class BaseManager {
         try {
             const previousState = this.currentState;
             this.currentState = newState;
-            
+
             if (callback) {
                 callback(newState, previousState);
             }
-            
+
             // 状態更新イベントを発行
             pubsub.publish(`${this.constructor.name.toUpperCase()}_STATE_UPDATED`, {
                 newState,
                 previousState,
                 manager: this
             });
-            
+
         } catch (error) {
             console.error(`${this.constructor.name}: State update failed:`, error);
-            
+
             // ErrorHandlerが利用可能な場合は使用
-            if (window.ErrorHandler) {
+            if (ErrorHandler) {
                 ErrorHandler.handle(error, `${this.constructor.name}.updateState`, {
                     type: ErrorHandler.ERROR_TYPES.RENDER,
                     severity: ErrorHandler.SEVERITY.MEDIUM,
@@ -243,7 +248,7 @@ class BaseManager {
                     }
                 });
             }
-            
+
             // 状態を元に戻す
             this.currentState = this.currentState; // previousStateを保持
         }
@@ -261,15 +266,15 @@ class BaseManager {
             return await asyncFunction();
         } catch (error) {
             console.error(`${this.constructor.name}: ${operationName} failed:`, error);
-            
-            if (window.ErrorHandler) {
+
+            if (ErrorHandler) {
                 ErrorHandler.handle(error, `${this.constructor.name}.${operationName}`, {
                     type: ErrorHandler.ERROR_TYPES.RENDER,
                     severity: ErrorHandler.SEVERITY.MEDIUM,
                     context: errorContext
                 });
             }
-            
+
             throw error; // 呼び出し元で処理できるよう再スロー
         }
     }
@@ -337,19 +342,19 @@ class BaseManager {
      */
     validateConfig(config, requiredFields = []) {
         const errors = [];
-        
+
         if (!config) {
             errors.push('Config is null or undefined');
             return { valid: false, errors };
         }
-        
+
         // 必須フィールドの検証
         requiredFields.forEach(field => {
             if (!(field in config)) {
                 errors.push(`Missing required field: ${field}`);
             }
         });
-        
+
         return {
             valid: errors.length === 0,
             errors
@@ -363,10 +368,7 @@ class BaseManager {
     destroy() {
         this.stopAnimations();
         this.clearContainer();
-        
+
         // イベントリスナーの削除（pubsubでは自動的に処理される）
     }
 }
-
-// グローバルスコープで利用可能にする（ES6モジュール移行前の暫定措置）
-window.BaseManager = BaseManager;

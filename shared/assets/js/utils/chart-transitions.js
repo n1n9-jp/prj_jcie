@@ -1,10 +1,14 @@
+import * as d3 from 'd3';
+import { AppDefaults } from '../config/defaults.js';
+import { configLoader } from './config-loader.js';
+
 /**
  * ChartTransitions - 統一されたチャート用トランジション管理クラス
  * 全てのチャートレンダラーで共通のトランジションロジックを提供
  * AnimationConfigの機能を統合（2024年6月）
  */
-class ChartTransitions {
-    
+export class ChartTransitions {
+
     /**
      * 外部設定からアニメーション速度を取得（AnimationConfigより統合）
      * @param {string} name - 速度名
@@ -12,8 +16,8 @@ class ChartTransitions {
      */
     static getSpeed(name) {
         // ConfigLoaderが利用可能で設定が読み込まれている場合
-        if (window.ConfigLoader && window.ConfigLoader.loaded) {
-            const config = window.ConfigLoader.mergedConfig;
+        if (configLoader && configLoader.loaded) {
+            const config = configLoader.mergedConfig;
             if (config?.animation?.durations) {
                 const speedName = name.toLowerCase();
                 return config.animation.durations[speedName] || this.CONFIG.DURATION[name];
@@ -29,8 +33,8 @@ class ChartTransitions {
      */
     static getEasing(name) {
         // ConfigLoaderが利用可能で設定が読み込まれている場合
-        if (window.ConfigLoader && window.ConfigLoader.loaded) {
-            const config = window.ConfigLoader.mergedConfig;
+        if (configLoader && configLoader.loaded) {
+            const config = configLoader.mergedConfig;
             if (config?.animation?.easings) {
                 const easingName = name.toLowerCase();
                 const easingValue = config.animation.easings[easingName];
@@ -71,7 +75,7 @@ class ChartTransitions {
             SLOW: 1000,
             VERY_SLOW: 1500
         },
-        
+
         // よく使われるイージング関数
         EASING: {
             QUAD_IN: d3.easeQuadIn,
@@ -85,7 +89,7 @@ class ChartTransitions {
             ELASTIC: d3.easeElastic,
             BOUNCE: d3.easeBounce
         },
-        
+
         // チャート種別ごとのデフォルト設定
         CHART_DEFAULTS: {
             line: {
@@ -121,27 +125,27 @@ class ChartTransitions {
     static createTransition(chartType = 'line', phase = 'update', customConfig = {}) {
         try {
             // デフォルト設定を取得
-            const defaultConfig = ChartTransitions.CONFIG.CHART_DEFAULTS[chartType]?.[phase] || 
-                                 ChartTransitions.CONFIG.CHART_DEFAULTS.line.update;
-            
+            const defaultConfig = ChartTransitions.CONFIG.CHART_DEFAULTS[chartType]?.[phase] ||
+                ChartTransitions.CONFIG.CHART_DEFAULTS.line.update;
+
             // AppDefaultsからの設定を考慮
-            const appDefaults = window.AppDefaults?.animation || {};
-            
+            const appDefaults = AppDefaults?.animation || {};
+
             // 設定をマージ
             const config = {
-                duration: customConfig.duration || 
-                         appDefaults.chartTransitionDuration || 
-                         defaultConfig.duration,
+                duration: customConfig.duration ||
+                    appDefaults.chartTransitionDuration ||
+                    defaultConfig.duration,
                 easing: customConfig.easing || defaultConfig.easing
             };
-            
+
             // 設定ファイルからの速度調整
             config.duration = this.getSpeed(config.duration);
-            
+
             return d3.transition()
                 .duration(config.duration)
                 .ease(config.easing);
-                
+
         } catch (error) {
             console.warn('ChartTransitions: Error creating transition, using fallback:', error);
             return d3.transition()
@@ -162,27 +166,27 @@ class ChartTransitions {
     static applyEnterUpdateExit(selection, data, keyFunction, callbacks = {}, transitionConfig = {}) {
         try {
             const chartType = transitionConfig.chartType || 'line';
-            
+
             // データバインディング
             const bound = selection.data(data, keyFunction);
-            
+
             // ENTER: 新しい要素
             const enterSelection = bound.enter();
             if (callbacks.onEnter) {
                 callbacks.onEnter(enterSelection);
             }
-            
+
             // UPDATE: 既存要素
             const updateSelection = bound;
-            
+
             // EXIT: 削除される要素
             const exitSelection = bound.exit();
-            
+
             // EXIT トランジション
             if (exitSelection.size() > 0) {
                 const exitTransition = ChartTransitions.createTransition(chartType, 'exit', transitionConfig.exit);
                 const exitWithTransition = exitSelection.transition(exitTransition);
-                
+
                 if (callbacks.onExit) {
                     callbacks.onExit(exitWithTransition);
                 } else {
@@ -192,22 +196,22 @@ class ChartTransitions {
                         .remove();
                 }
             }
-            
+
             // ENTER + UPDATE マージ
             const allSelection = enterSelection.merge(updateSelection);
-            
+
             // UPDATE トランジション
             const updateTransition = ChartTransitions.createTransition(chartType, 'update', transitionConfig.update);
             const allWithTransition = allSelection.transition(updateTransition);
-            
+
             if (callbacks.onUpdate) {
-                callbacks.onUpdate(allSelection, { 
-                    enter: enterSelection, 
+                callbacks.onUpdate(allSelection, {
+                    enter: enterSelection,
                     update: updateSelection,
                     allWithTransition: allWithTransition
                 });
             }
-            
+
             return {
                 enter: enterSelection,
                 update: updateSelection,
@@ -215,7 +219,7 @@ class ChartTransitions {
                 all: allSelection,
                 allWithTransition: allWithTransition
             };
-            
+
         } catch (error) {
             console.error('ChartTransitions: Error in enter/update/exit pattern:', error);
             throw error;
@@ -257,11 +261,11 @@ class ChartTransitions {
                 'update',
                 config
             );
-            
+
             return axisSelection
                 .transition(transition)
                 .call(axisGenerator);
-                
+
         } catch (error) {
             console.error('ChartTransitions: Error updating axis:', error);
             // フォールバック: 即座に更新
@@ -284,7 +288,7 @@ class ChartTransitions {
                 data = null,
                 animateEntry = true
             } = config;
-            
+
             if (phase === 'enter' && animateEntry) {
                 // 描画アニメーション: パスの長さに沿って描画
                 return ChartTransitions.animatePathDraw(pathSelection, lineGenerator, data, config);
@@ -301,7 +305,7 @@ class ChartTransitions {
                         }
                     });
             }
-            
+
         } catch (error) {
             console.error('ChartTransitions: Error animating line:', error);
             // フォールバック: 即座に更新
@@ -324,28 +328,28 @@ class ChartTransitions {
                 'enter',
                 config
             );
-            
-            pathSelection.each(function(d) {
+
+            pathSelection.each(function (d) {
                 const path = d3.select(this);
                 const pathData = d.values || d;
                 const totalLength = path.node().getTotalLength();
-                
+
                 path
                     .attr('d', lineGenerator(pathData))
                     .attr('stroke-dasharray', totalLength + ' ' + totalLength)
                     .attr('stroke-dashoffset', totalLength)
                     .transition(transition)
                     .attr('stroke-dashoffset', 0)
-                    .on('end', function() {
+                    .on('end', function () {
                         // アニメーション完了後、dashを除去
                         d3.select(this)
                             .attr('stroke-dasharray', null)
                             .attr('stroke-dashoffset', null);
                     });
             });
-            
+
             return transition;
-            
+
         } catch (error) {
             console.warn('ChartTransitions: Path drawing animation failed, using fallback:', error);
             // フォールバック: 即座に表示
@@ -369,9 +373,9 @@ class ChartTransitions {
                 yField = 'value',
                 innerHeight = 0
             } = config;
-            
+
             const transition = ChartTransitions.createTransition(chartType, phase, config);
-            
+
             if (phase === 'enter') {
                 // エントリーアニメーション: 下から伸びる
                 return barSelection
@@ -391,7 +395,7 @@ class ChartTransitions {
                     .attr('width', scales.x.bandwidth())
                     .attr('height', d => innerHeight - scales.y(+d[yField]));
             }
-            
+
         } catch (error) {
             console.error('ChartTransitions: Error animating bars:', error);
             throw error;
@@ -411,17 +415,17 @@ class ChartTransitions {
                 chartType = 'pie',
                 phase = 'update'
             } = config;
-            
+
             const transition = ChartTransitions.createTransition(chartType, phase, config);
-            
+
             if (phase === 'enter') {
                 // エントリーアニメーション: 角度を0から拡大
                 return arcSelection
                     .style('opacity', 0)
-                    .attrTween('d', function(d) {
-                        const interpolate = d3.interpolate({startAngle: 0, endAngle: 0}, d);
+                    .attrTween('d', function (d) {
+                        const interpolate = d3.interpolate({ startAngle: 0, endAngle: 0 }, d);
                         this._current = d; // 現在の角度を保存
-                        return function(t) {
+                        return function (t) {
                             return arcGenerator(interpolate(t));
                         };
                     })
@@ -431,15 +435,15 @@ class ChartTransitions {
                 // 更新アニメーション: スムーズな角度変更
                 return arcSelection
                     .transition(transition)
-                    .attrTween('d', function(d) {
-                        const interpolate = d3.interpolate(this._current || {startAngle: 0, endAngle: 0}, d);
+                    .attrTween('d', function (d) {
+                        const interpolate = d3.interpolate(this._current || { startAngle: 0, endAngle: 0 }, d);
                         this._current = interpolate(0);
-                        return function(t) {
+                        return function (t) {
                             return arcGenerator(interpolate(t));
                         };
                     });
             }
-            
+
         } catch (error) {
             console.error('ChartTransitions: Error animating arcs:', error);
             throw error;
@@ -463,9 +467,9 @@ class ChartTransitions {
                 radius = 3,
                 isYearData = true
             } = config;
-            
+
             const transition = ChartTransitions.createTransition(chartType, phase, config);
-            
+
             if (phase === 'enter') {
                 // エントリーアニメーション: 小さくフェードイン
                 return circleSelection
@@ -483,7 +487,7 @@ class ChartTransitions {
                     .attr('cx', d => isYearData ? scales.x(+d[xField]) : scales.x(new Date(d[xField])))
                     .attr('cy', d => scales.y(+d[yField]));
             }
-            
+
         } catch (error) {
             console.error('ChartTransitions: Error animating points:', error);
             throw error;
@@ -503,9 +507,9 @@ class ChartTransitions {
                 phase = 'update',
                 delay = 0
             } = config;
-            
+
             const transition = ChartTransitions.createTransition(chartType, phase, config);
-            
+
             if (phase === 'enter') {
                 // エントリーアニメーション: フェードイン
                 return textSelection
@@ -517,7 +521,7 @@ class ChartTransitions {
                 // 更新アニメーション: 位置や内容の変更
                 return textSelection.transition(transition);
             }
-            
+
         } catch (error) {
             console.error('ChartTransitions: Error animating text:', error);
             return textSelection;
@@ -537,7 +541,7 @@ class ChartTransitions {
                 phase = 'enter',
                 staggerDelay = 100
             } = config;
-            
+
             if (phase === 'enter') {
                 // 順次フェードイン
                 return ChartTransitions.createStaggered(legendSelection, {
@@ -549,7 +553,7 @@ class ChartTransitions {
                 const transition = ChartTransitions.createTransition(chartType, phase, config);
                 return legendSelection.transition(transition);
             }
-            
+
         } catch (error) {
             console.error('ChartTransitions: Error animating legend:', error);
             return legendSelection;
@@ -587,7 +591,7 @@ class ChartTransitions {
             return transitionFunction();
         } catch (error) {
             console.error(`ChartTransitions: Error in ${operation}:`, error);
-            
+
             // ErrorHandlerが利用可能な場合は使用
             if (window.ErrorHandler) {
                 window.ErrorHandler.handle(error, `ChartTransitions.${operation}`, {
@@ -596,7 +600,7 @@ class ChartTransitions {
                     context
                 });
             }
-            
+
             // フォールバックを返す（即座に実行）
             return null;
         }
@@ -611,11 +615,8 @@ class ChartTransitions {
             config: ChartTransitions.CONFIG,
             d3Version: d3.version,
             animationConfigAvailable: !!window.AnimationConfig,
-            appDefaultsAvailable: !!window.AppDefaults,
+            appDefaultsAvailable: !!AppDefaults,
             reducedMotion: window.matchMedia('(prefers-reduced-motion: reduce)').matches
         };
     }
 }
-
-// グローバルスコープで利用可能にする（ES6モジュール移行前の暫定措置）
-window.ChartTransitions = ChartTransitions;

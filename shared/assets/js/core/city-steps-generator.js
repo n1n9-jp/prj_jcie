@@ -1,8 +1,10 @@
+import { StepMapper } from '../utils/step-mapper.js';
+
 /**
  * CityStepsGenerator - 都市ステップの生成と管理
  * 動的にDOM要素を生成し、configに都市ステップを追加
  */
-class CityStepsGenerator {
+export class CityStepsGenerator {
     /**
      * 都市ステップを生成
      * @param {Object} citiesData - 都市データ
@@ -19,8 +21,8 @@ class CityStepsGenerator {
         // StepMapperを使用して都市ステップの開始番号を決定
         let startStep = 11; // デフォルト値
 
-        if (window.StepMapper) {
-            const cityRange = window.StepMapper.getCityStepsRange();
+        if (StepMapper) {
+            const cityRange = StepMapper.getCityStepsRange();
             if (cityRange && cityRange.start !== undefined) {
                 startStep = cityRange.start;
             }
@@ -167,6 +169,3 @@ class CityStepsGenerator {
         return 'aids'; // デフォルト
     }
 }
-
-// グローバルスコープで利用可能にする
-window.CityStepsGenerator = CityStepsGenerator;

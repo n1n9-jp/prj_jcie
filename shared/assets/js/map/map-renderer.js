@@ -1,3 +1,11 @@
+import * as d3 from 'd3';
+import { SVGHelper } from '../utils/svg-helper.js';
+import { countryRegionMapping } from '../utils/country-region-mapping.js';
+import { colorScheme } from '../utils/color-scheme.js';
+import { logger as Logger } from '../utils/logger.js';
+import { AppConstants } from '../utils/app-constants.js';
+import { AppDefaults } from '../config/defaults.js';
+
 /**
  * MapRenderer - 地図描画専門クラス
  *
@@ -5,7 +13,7 @@
  * MapManagerから描画関連メソッドを分離
  */
 
-class MapRenderer {
+export class MapRenderer {
     constructor(container, mapManager) {
         this.container = container;
         this.mapManager = mapManager;  // 参照用（getCityCoordinates等で使用）
@@ -40,7 +48,7 @@ class MapRenderer {
             }
 
             responsiveSize = { width, height };
-        } else if (window.SVGHelper) {
+        } else if (SVGHelper) {
             responsiveSize = SVGHelper.getResponsiveSize(this.container, {
                 defaultWidth: config.width || 800,
                 defaultHeight: config.height || 600,
@@ -68,7 +76,7 @@ class MapRenderer {
                 .style('height', 'auto')
                 .style('max-width', '100%')
                 .style('display', 'block');
-        } else if (window.SVGHelper) {
+        } else if (SVGHelper) {
             // 固定サイズの場合はSVGHelperを使用
             this.svg = SVGHelper.initSVG(this.container, width, height, {
                 responsive: true,
@@ -161,13 +169,13 @@ class MapRenderer {
                     const countryName = d.properties.name || d.properties.NAME || d.properties.NAME_EN || 'Unknown';
 
                     // 地域色を適用
-                    if (config.useRegionColors && window.CountryRegionMapping && window.ColorScheme) {
-                        const region = window.CountryRegionMapping.getRegionForCountry(countryName);
+                    if (config.useRegionColors && countryRegionMapping && colorScheme) {
+                        const region = countryRegionMapping.getRegionForCountry(countryName);
 
                         // デバッグ：地域マッピングに失敗した国をログ出力
                         if (!region) {
-                            if (window.Logger) {
-                                window.Logger.warn('MapRenderer: No region mapping found for country:', countryName);
+                            if (Logger) {
+                                Logger.warn('MapRenderer: No region mapping found for country:', countryName);
                             } else {
                                 console.warn('MapRenderer: No region mapping found for country:', countryName);
                             }
@@ -183,17 +191,20 @@ class MapRenderer {
                                 // 双方向部分一致（正当な名前の変形に対応）
                                 if (countryName.includes(hc) || hc.includes(countryName)) return true;
 
+                                // 逆方向の部分一致も確認
+                                if (hc.includes(countryName)) return true;
+
                                 return false;
                             });
 
                             if (isHighlighted) {
                                 if (region) {
-                                    return window.ColorScheme.getRegionColor(region); // ハイライト国は地域色
+                                    return colorScheme.getRegionColor(region); // ハイライト国は地域色
                                 } else {
-                                    return window.AppConstants?.APP_COLORS?.ACCENT?.INFO || '#3b82f6'; // 地域不明のハイライト国は情報色
+                                    return AppConstants?.APP_COLORS?.ACCENT?.INFO || '#3b82f6'; // 地域不明のハイライト国は情報色
                                 }
                             } else {
-                                return window.AppConstants?.APP_COLORS?.BACKGROUND?.GRAY || '#f3f4f6'; // ハイライト国以外は薄いグレー
+                                return AppConstants?.APP_COLORS?.BACKGROUND?.GRAY || '#f3f4f6'; // ハイライト国以外は薄いグレー
                             }
                         }
 
@@ -201,11 +212,11 @@ class MapRenderer {
                             // targetRegionsが指定されている場合、対象地域のみ色を付ける
                             if (config.targetRegions && config.targetRegions.length > 0) {
                                 if (!config.targetRegions.includes(region)) {
-                                    return window.AppConstants?.APP_COLORS?.BACKGROUND?.GRAY || '#f3f4f6'; // 対象外の地域は薄いグレー
+                                    return AppConstants?.APP_COLORS?.BACKGROUND?.GRAY || '#f3f4f6'; // 対象外の地域は薄いグレー
                                 }
                             }
 
-                            let color = window.ColorScheme.getRegionColor(region);
+                            let color = colorScheme.getRegionColor(region);
 
                             // lightenNonVisitedが有効な場合、訪問国以外を明るくする
                             if (config.lightenNonVisited && this.mapManager) {
@@ -216,13 +227,13 @@ class MapRenderer {
                                     visitedCountry = this.mapManager.currentCity.country;
                                 }
                                 if (visitedCountry && countryName !== visitedCountry) {
-                                    color = window.ColorScheme.getLighterColor(color, 0.5);
+                                    color = colorScheme.getLighterColor(color, 0.5);
                                 }
                             }
 
                             // lightenAllCountriesが有効な場合：すべての国を50%明るくする
                             if (lightenAllCountries) {
-                                color = window.ColorScheme.getLighterColor(color, 0.5);
+                                color = colorScheme.getLighterColor(color, 0.5);
                             }
 
                             return color;
@@ -231,11 +242,11 @@ class MapRenderer {
 
                     // 地域色が設定されていない場合のみハイライト色を適用
                     if (highlightCountries.includes(countryName)) {
-                        return window.AppConstants?.APP_COLORS?.ACCENT?.INFO || '#3b82f6';
+                        return AppConstants?.APP_COLORS?.ACCENT?.INFO || '#3b82f6';
                     }
 
                     // デフォルト色（未分類）
-                    return window.AppConstants?.APP_COLORS?.BACKGROUND?.LIGHT || '#d1d5db';
+                    return AppConstants?.APP_COLORS?.BACKGROUND?.LIGHT || '#d1d5db';
                 })
                 .style('stroke', d => {
                     // 地図データの実際の構造に合わせて国名を取得（空文字列の場合はデフォルト値を使用）
@@ -243,15 +254,15 @@ class MapRenderer {
 
                     // 地域色適用時は境界を強調（ハイライト国も含む）
                     if (config.useRegionColors) {
-                        return window.AppConstants?.APP_COLORS?.ANNOTATIONS?.BORDER || '#ccc';
+                        return AppConstants?.APP_COLORS?.ANNOTATIONS?.BORDER || '#ccc';
                     }
 
                     // 地域色が無効な場合のみハイライト色を適用
                     if (highlightCountries.includes(countryName)) {
-                        return window.AppConstants?.APP_COLORS?.ACCENT?.INFO || '#1d4ed8';
+                        return AppConstants?.APP_COLORS?.ACCENT?.INFO || '#1d4ed8';
                     }
 
-                    return window.AppConstants?.APP_COLORS?.TEXT?.WHITE || '#fff';
+                    return AppConstants?.APP_COLORS?.TEXT?.WHITE || '#fff';
                 })
                 .style('stroke-width', d => {
                     // 地図データの実際の構造に合わせて国名を取得（空文字列の場合はデフォルト値を使用）
@@ -273,12 +284,12 @@ class MapRenderer {
 
 
             paths.transition()
-                .duration(window.AppDefaults?.animation?.shortDuration || 500)
+                .duration(AppDefaults?.animation?.shortDuration || 500)
                 .delay((d, i) => i * 10)
                 .style('opacity', 1);
 
         } else {
-            const logger = window.Logger || console;
+            const logger = Logger || console;
             logger.error('MapRenderer: No geoData or geoData.features available for drawing');
             logger.error('geoData:', geoData);
         }
@@ -294,7 +305,7 @@ class MapRenderer {
                 .attr('cy', d => this.projection(this.mapManager.getCityCoordinates(d))[1])
                 .attr('r', 0)
                 .transition()
-                .duration(window.AppDefaults?.animation?.shortDuration || 500)
+                .duration(AppDefaults?.animation?.shortDuration || 500)
                 .delay(1000)
                 .attr('r', 6);
 
@@ -308,13 +319,13 @@ class MapRenderer {
                 .attr('y', d => this.projection(this.mapManager.getCityCoordinates(d))[1] - 10)
                 .attr('text-anchor', 'middle')
                 .attr('font-size', '16px')
-                .attr('fill', window.AppConstants?.APP_COLORS?.TEXT?.PRIMARY || '#1f2937')
+                .attr('fill', AppConstants?.APP_COLORS?.TEXT?.PRIMARY || '#1f2937')
                 .attr('font-weight', 'bold')
-                .attr('font-family', window.AppConstants?.FONT_CONFIG?.FAMILIES?.SERIF || '"Shippori Mincho", "Yu Mincho", "YuMincho", "Hiragino Mincho ProN", "Hiragino Mincho Pro", "Noto Serif JP", "HG Mincho E", "MS Mincho", serif')
+                .attr('font-family', AppConstants?.FONT_CONFIG?.FAMILIES?.SERIF || '"Shippori Mincho", "Yu Mincho", "YuMincho", "Hiragino Mincho ProN", "Hiragino Mincho Pro", "Noto Serif JP", "HG Mincho E", "MS Mincho", serif')
                 .text(d => this.mapManager.getCountryNameJapanese(d.country))
                 .style('opacity', 0)
                 .transition()
-                .duration(window.AppDefaults?.animation?.shortDuration || 500)
+                .duration(AppDefaults?.animation?.shortDuration || 500)
                 .delay(1200)
                 .style('opacity', 1);
         }
@@ -369,8 +380,8 @@ class MapRenderer {
             .style('fill', d => {
                 const countryName = d.properties.name || d.properties.NAME || d.properties.NAME_EN || 'Unknown';
 
-                if (useRegionColors && window.CountryRegionMapping && window.ColorScheme) {
-                    const region = window.CountryRegionMapping.getRegionForCountry(countryName);
+                if (useRegionColors && countryRegionMapping && colorScheme) {
+                    const region = countryRegionMapping.getRegionForCountry(countryName);
 
                     if (highlightCountries && highlightCountries.length > 0) {
                         const isHighlighted = highlightCountries.some(hc => {
@@ -381,23 +392,23 @@ class MapRenderer {
 
                         if (isHighlighted) {
                             if (region) {
-                                return window.ColorScheme.getRegionColor(region);
+                                return colorScheme.getRegionColor(region);
                             } else {
-                                return window.AppConstants?.APP_COLORS?.ACCENT?.INFO || '#3b82f6';
+                                return AppConstants?.APP_COLORS?.ACCENT?.INFO || '#3b82f6';
                             }
                         } else {
-                            return window.AppConstants?.APP_COLORS?.BACKGROUND?.GRAY || '#f3f4f6';
+                            return AppConstants?.APP_COLORS?.BACKGROUND?.GRAY || '#f3f4f6';
                         }
                     }
 
                     if (region) {
                         if (targetRegions && targetRegions.length > 0) {
                             if (!targetRegions.includes(region)) {
-                                return window.AppConstants?.APP_COLORS?.BACKGROUND?.GRAY || '#f3f4f6';
+                                return AppConstants?.APP_COLORS?.BACKGROUND?.GRAY || '#f3f4f6';
                             }
                         }
 
-                        let color = window.ColorScheme.getRegionColor(region);
+                        let color = colorScheme.getRegionColor(region);
 
                         if (lightenNonVisited && this.mapManager && this.mapManager.getCurrentVisitedCountry) {
                             let visitedCountry = this.mapManager.getCurrentVisitedCountry();
@@ -405,12 +416,12 @@ class MapRenderer {
                                 visitedCountry = this.mapManager.currentCity.country;
                             }
                             if (visitedCountry && countryName !== visitedCountry) {
-                                color = window.ColorScheme.getLighterColor(color, 0.5);
+                                color = colorScheme.getLighterColor(color, 0.5);
                             }
                         }
 
                         if (lightenAllCountries) {
-                            color = window.ColorScheme.getLighterColor(color, 0.5);
+                            color = colorScheme.getLighterColor(color, 0.5);
                         }
 
                         return color;
@@ -418,23 +429,23 @@ class MapRenderer {
                 }
 
                 if (highlightCountries.includes(countryName)) {
-                    return window.AppConstants?.APP_COLORS?.ACCENT?.INFO || '#3b82f6';
+                    return AppConstants?.APP_COLORS?.ACCENT?.INFO || '#3b82f6';
                 }
 
-                return window.AppConstants?.APP_COLORS?.BACKGROUND?.LIGHT || '#d1d5db';
+                return AppConstants?.APP_COLORS?.BACKGROUND?.LIGHT || '#d1d5db';
             })
             .style('stroke', d => {
                 const countryName = d.properties.name || d.properties.NAME || d.properties.NAME_EN || 'Unknown';
 
                 if (useRegionColors) {
-                    return window.AppConstants?.APP_COLORS?.ANNOTATIONS?.BORDER || '#ccc';
+                    return AppConstants?.APP_COLORS?.ANNOTATIONS?.BORDER || '#ccc';
                 }
 
                 if (highlightCountries.includes(countryName)) {
-                    return window.AppConstants?.APP_COLORS?.ACCENT?.INFO || '#1d4ed8';
+                    return AppConstants?.APP_COLORS?.ACCENT?.INFO || '#1d4ed8';
                 }
 
-                return window.AppConstants?.APP_COLORS?.TEXT?.WHITE || '#fff';
+                return AppConstants?.APP_COLORS?.TEXT?.WHITE || '#fff';
             })
             .style('stroke-width', d => {
                 const countryName = d.properties.name || d.properties.NAME || d.properties.NAME_EN || 'Unknown';
@@ -476,7 +487,7 @@ class MapRenderer {
             .attr('cx', d => this.mapManager && this.mapManager.projection ? this.mapManager.projection(this.mapManager.getCityCoordinates(d))[0] : 0)
             .attr('cy', d => this.mapManager && this.mapManager.projection ? this.mapManager.projection(this.mapManager.getCityCoordinates(d))[1] : 0)
             .attr('r', 6)
-            .style('fill', window.AppConstants?.APP_COLORS?.ACCENT?.INFO || '#3b82f6')
+            .style('fill', AppConstants?.APP_COLORS?.ACCENT?.INFO || '#3b82f6')
             .style('opacity', 0.8);
 
         // 都市ラベルを追加
@@ -489,7 +500,7 @@ class MapRenderer {
             .attr('y', d => this.mapManager && this.mapManager.projection ? this.mapManager.projection(this.mapManager.getCityCoordinates(d))[1] - 10 : 0)
             .attr('text-anchor', 'middle')
             .attr('font-size', '14px')
-            .attr('fill', window.AppConstants?.APP_COLORS?.TEXT?.PRIMARY || '#1f2937')
+            .attr('fill', AppConstants?.APP_COLORS?.TEXT?.PRIMARY || '#1f2937')
             .text(d => this.mapManager && this.mapManager.getCountryNameJapanese ? this.mapManager.getCountryNameJapanese(d.country) : d.country);
     }
 
@@ -537,7 +548,7 @@ class MapRenderer {
                 .attr('orient', 'auto')
                 .append('path')
                 .attr('d', 'M0,-5L10,0L0,5')
-                .attr('fill', window.AppConstants?.APP_COLORS?.ANNOTATIONS?.LINE || '#999999')
+                .attr('fill', AppConstants?.APP_COLORS?.ANNOTATIONS?.LINE || '#999999')
                 .attr('stroke', 'none');
         }
 
@@ -549,7 +560,7 @@ class MapRenderer {
             const toCoords = this.projection(flow.to.coords);
 
             if (!fromCoords || !toCoords) {
-                const logger = window.Logger || console;
+                const logger = Logger || console;
                 logger.warn('MapRenderer: Invalid coordinates for flow:', flow.id);
                 return;
             }
@@ -562,7 +573,7 @@ class MapRenderer {
                 .attr('class', `spreading-flow ${flow.id}`)
                 .attr('d', pathData)
                 .attr('fill', 'none')
-                .attr('stroke', window.AppConstants?.APP_COLORS?.ANNOTATIONS?.LINE || '#999999')
+                .attr('stroke', AppConstants?.APP_COLORS?.ANNOTATIONS?.LINE || '#999999')
                 .attr('stroke-width', 3)
                 .attr('stroke-dasharray', '5,5')
                 .style('opacity', 0);
@@ -572,7 +583,7 @@ class MapRenderer {
             path.attr('stroke-dasharray', `${totalLength} ${totalLength}`)
                 .attr('stroke-dashoffset', totalLength)
                 .transition()
-                .duration(window.AppConstants?.ANIMATION_CONFIG?.DURATION?.SLOW || 1200)
+                .duration(AppConstants?.ANIMATION_CONFIG?.DURATION?.SLOW || 1200)
                 .delay(flow.delay + 100)
                 .ease(d3.easeQuadOut)
                 .attr('stroke-dashoffset', 0)
@@ -591,13 +602,13 @@ class MapRenderer {
      */
     animateToView(center, zoom, mode = null) {
         if (!this.projection || !this.svg) {
-            if (window.Logger) {
-                window.Logger.warn('MapRenderer.animateToView: Projection or SVG not initialized yet');
+            if (Logger) {
+                Logger.warn('MapRenderer.animateToView: Projection or SVG not initialized yet');
             }
             return;
         }
 
-        const duration = window.AppDefaults?.animation?.chartTransitionDuration || 1000;
+        const duration = AppDefaults?.animation?.chartTransitionDuration || 1000;
         const currentCenter = this.projection.center();
         const currentScale = this.projection.scale();
         const scaleMultiplier = (mode === 'single-city') ? 1.0 : 1.5;
@@ -650,9 +661,4 @@ class MapRenderer {
                 };
             });
     }
-}
-
-// グローバルスコープで利用可能にする（ES6モジュール移行前の暫定措置）
-if (typeof window !== 'undefined') {
-    window.MapRenderer = MapRenderer;
 }

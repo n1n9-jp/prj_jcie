@@ -1,8 +1,10 @@
+import { AppDefaults } from '../config/defaults.js';
+
 /**
  * PositionManager - コンテンツの位置管理ユーティリティクラス
  * チャート、地図、画像の表示位置を動的に制御
  */
-class PositionManager {
+export class PositionManager {
     /**
      * コンテナにポジション設定を適用
      * @param {HTMLElement} container - 対象コンテナ
@@ -41,11 +43,11 @@ class PositionManager {
         // 基本ポジショニングクラスを適用
         const horizontalClass = this.getHorizontalClass(horizontal);
         const verticalClass = this.getVerticalClass(vertical);
-        
+
         container.classList.add('positioned-content');
         container.classList.add(horizontalClass);
         container.classList.add(verticalClass);
-        
+
         // Debug information for position classes (removed for performance)
 
         // レスポンシブクラスを追加
@@ -103,16 +105,16 @@ class PositionManager {
             'items-start', 'items-center', 'items-end',
             'inset-0'
         ];
-        
+
         // 重要：visibleクラスなど、位置制御以外のクラスは保持する
         // 保持すべきTailwindクラスとその他の重要なクラス
         const importantClasses = ['absolute', 'flex', 'visible'];
         const preserveClasses = Array.from(container.classList).filter(
             cls => !positionClasses.includes(cls) || importantClasses.includes(cls)
         );
-        
+
         container.classList.remove(...positionClasses);
-        
+
         // 保持すべきクラスが削除されていた場合は復元
         preserveClasses.forEach(cls => {
             if (!container.classList.contains(cls)) {
@@ -258,7 +260,7 @@ class PositionManager {
             const screenHeight = window.innerHeight;
 
             // 小画面の閾値
-            const smallScreenThreshold = window.AppDefaults?.breakpoints?.mobile || 768;
+            const smallScreenThreshold = AppDefaults?.breakpoints?.mobile || 768;
             const verySmallScreenThreshold = 480;
 
             if (screenWidth <= verySmallScreenThreshold) {
@@ -335,7 +337,7 @@ class PositionManager {
 
             // 小画面での積み重ねレイアウト
             if (stackOnSmallScreen) {
-                const mediaQuery = window.matchMedia(`(max-width: ${window.AppDefaults?.breakpoints?.mobile || 768}px)`);
+                const mediaQuery = window.matchMedia(`(max-width: ${AppDefaults?.breakpoints?.mobile || 768}px)`);
                 const handleSmallScreen = (e) => {
                     if (e.matches) {
                         container.element.style.position = 'relative';
@@ -478,7 +480,7 @@ class PositionManager {
         // テキストポジション用のクラスを追加
         const textAlignClass = this.getTextHorizontalClass(textAlign);
         const verticalClass = this.getTextVerticalClass(vertical);
-        
+
         stepElement.classList.add('positioned-text');
         stepElement.classList.add(textAlignClass);
         stepElement.classList.add(verticalClass);
@@ -486,14 +488,14 @@ class PositionManager {
         // テキストコンテナ（白背景の部分）とその親要素を取得
         const textContainer = stepElement.querySelector('.max-w-lg, .text-content, div[class*="bg-white"]');
         const parentContainer = stepElement.querySelector('.w-full.min-h-screen.flex');
-        
+
         // Debug mode text container information (removed for performance)
-        
+
         if (textContainer && parentContainer) {
             // 親要素のFlexboxで白い矩形の位置を制御
             parentContainer.classList.remove('justify-center', 'justify-start', 'justify-end');
             textContainer.classList.remove('mx-auto', 'ml-auto', 'mr-auto', 'mr-0', 'ml-0');
-            
+
             switch (horizontal.toLowerCase()) {
                 case 'right':
                     parentContainer.classList.add('justify-end');
@@ -510,7 +512,7 @@ class PositionManager {
                     textContainer.classList.add('mx-auto');
                     break;
             }
-            
+
             // テキストコンテナのスタイルを適用
             this.applyTextContainerStyles(textContainer, {
                 width,
@@ -574,7 +576,7 @@ class PositionManager {
             'text-top', 'text-middle', 'text-bottom',
             'text-small-screen'
         ];
-        
+
         stepElement.classList.remove(...textClasses);
     }
 
@@ -615,7 +617,7 @@ class PositionManager {
     static applyTextResponsiveAdjustments(stepElement, positionConfig) {
         const checkScreenSize = () => {
             const screenWidth = window.innerWidth;
-            const smallScreenThreshold = window.AppDefaults?.breakpoints?.mobile || 768;
+            const smallScreenThreshold = AppDefaults?.breakpoints?.mobile || 768;
 
             if (screenWidth <= smallScreenThreshold) {
                 // 小画面では中央配置に強制変更
@@ -657,6 +659,3 @@ class PositionManager {
         // Previously contained container getBoundingClientRect and computed styles logging
     }
 }
-
-// グローバルスコープで利用可能にする
-window.PositionManager = PositionManager;

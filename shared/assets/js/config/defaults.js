@@ -3,7 +3,7 @@
  * アプリケーション全体で使用される共通の設定値を定義
  */
 
-window.AppDefaults = {
+export const AppDefaults = {
     // アニメーション設定
     animation: {
         // 基本的なトランジション時間
@@ -114,10 +114,10 @@ window.AppDefaults = {
 };
 
 // 設定値を変更不可にする（Freeze）
-Object.freeze(window.AppDefaults.animation);
-Object.freeze(window.AppDefaults.breakpoints);
-Object.freeze(window.AppDefaults.chartSize);
-Object.freeze(window.AppDefaults.chartMargin);
-Object.freeze(window.AppDefaults.colors);
-Object.freeze(window.AppDefaults.strokeWidth);
-Object.freeze(window.AppDefaults.errorModal);
+Object.freeze(AppDefaults.animation);
+Object.freeze(AppDefaults.breakpoints);
+Object.freeze(AppDefaults.chartSize);
+Object.freeze(AppDefaults.chartMargin);
+Object.freeze(AppDefaults.colors);
+Object.freeze(AppDefaults.strokeWidth);
+Object.freeze(AppDefaults.errorModal);

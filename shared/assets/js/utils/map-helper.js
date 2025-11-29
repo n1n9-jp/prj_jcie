@@ -1,3 +1,8 @@
+import * as d3 from 'd3';
+import { countryRegionMapping } from './country-region-mapping.js';
+import { colorScheme } from './color-scheme.js';
+import { AppDefaults } from '../config/defaults.js';
+
 /**
  * MapHelper - 地図関連のユーティリティクラス（統合版）
  *
@@ -11,7 +16,7 @@
  * - スタイルのSVG要素への適用
  */
 
-class MapHelper {
+export class MapHelper {
 
     // ================================================
     // セクション 1: プロジェクション管理
@@ -64,7 +69,7 @@ class MapHelper {
      */
     static animateProjectionTo(projection, targetConfig, svg, pathGenerator, options = {}) {
         const {
-            duration = window.AppDefaults?.animation?.chartTransitionDuration || 1000,
+            duration = AppDefaults?.animation?.chartTransitionDuration || 1000,
             ease = d3.easeCubicInOut,
             onUpdate = null,
             onComplete = null
@@ -422,7 +427,7 @@ class MapHelper {
 
         const countryName = this.getCountryName(countryFeature);
         let style = {
-            fill: window.AppDefaults?.colors?.border?.light || '#d1d5db',
+            fill: AppDefaults?.colors?.border?.light || '#d1d5db',
             stroke: '#fff',
             strokeWidth: '0.5'
         };
@@ -448,7 +453,7 @@ class MapHelper {
         // 地域色が無効な場合のみハイライト色を適用
         else if (highlightCountries.includes(countryName)) {
             style = {
-                fill: window.AppDefaults?.colors?.accent?.info || '#3b82f6',
+                fill: AppDefaults?.colors?.accent?.info || '#3b82f6',
                 stroke: '#1d4ed8',
                 strokeWidth: '1.5'
             };
@@ -473,7 +478,7 @@ class MapHelper {
 
         if (!this.isRegionColoringAvailable()) return null;
 
-        const region = window.CountryRegionMapping.getRegionForCountry(countryName);
+        const region = countryRegionMapping.getRegionForCountry(countryName);
         if (!region) return null;
 
         // targetRegionsが指定されている場合、対象地域のみ色を付ける
@@ -483,16 +488,16 @@ class MapHelper {
             }
         }
 
-        let color = window.ColorScheme.getRegionColor(region);
+        let color = colorScheme.getRegionColor(region);
 
         // lightenNonVisitedが有効な場合、訪問国以外を明るくする
         if (lightenNonVisited && visitedCountry && countryName !== visitedCountry) {
-            color = window.ColorScheme.getLighterColor(color, 0.5);
+            color = colorScheme.getLighterColor(color, 0.5);
         }
 
         // すべての国を50%明るくする（step8の場合など）
         if (lightenAllCountries) {
-            color = window.ColorScheme.getLighterColor(color, 0.5);
+            color = colorScheme.getLighterColor(color, 0.5);
         }
 
         return { fill: color };
@@ -515,7 +520,7 @@ class MapHelper {
      * @returns {boolean} 利用可能性
      */
     static isRegionColoringAvailable() {
-        return !!(window.CountryRegionMapping && window.ColorScheme);
+        return !!(countryRegionMapping && colorScheme);
     }
 
     /**
@@ -564,19 +569,19 @@ class MapHelper {
      */
     static getCityColor(city, useRegionColor = true) {
         if (!city || !city.country) {
-            return window.AppDefaults?.colors?.border?.medium || '#808080';
+            return AppDefaults?.colors?.border?.medium || '#808080';
         }
 
         // 地域色機能が利用可能かチェック
         if (useRegionColor && this.isRegionColoringAvailable()) {
-            const region = window.CountryRegionMapping.getRegionForCountry(city.country);
+            const region = countryRegionMapping.getRegionForCountry(city.country);
             if (region) {
-                return window.ColorScheme.getRegionColor(region);
+                return colorScheme.getRegionColor(region);
             }
         }
 
         // フォールバック：元のstyle.colorまたはデフォルト色
-        return city.style?.color || window.AppDefaults?.colors?.border?.medium || '#808080';
+        return city.style?.color || AppDefaults?.colors?.border?.medium || '#808080';
     }
 
     /**
@@ -589,7 +594,7 @@ class MapHelper {
         const {
             fontSize = '12px',
             fontWeight = 'bold',
-            fill = window.AppDefaults?.colors?.text?.primary || '#1f2937',
+            fill = AppDefaults?.colors?.text?.primary || '#1f2937',
             textAnchor = 'middle',
             labelType = 'default'
         } = options;
@@ -625,7 +630,7 @@ class MapHelper {
      * @returns {Object} デフォルトスタイル
      */
     static getDefaultStyle(elementType) {
-        const defaults = window.AppDefaults;
+        const defaults = AppDefaults;
 
         switch (elementType) {
             case 'country':
@@ -666,7 +671,7 @@ class MapHelper {
     static applyStyle(selection, style, options = {}) {
         const {
             transition = null,
-            duration = window.AppDefaults?.animation?.shortDuration || 500
+            duration = AppDefaults?.animation?.shortDuration || 500
         } = options;
 
         const target = transition ? selection.transition(transition).duration(duration) : selection;
@@ -711,10 +716,10 @@ class MapHelper {
     static applyCountryStyles(countrySelection, styleConfig, options = {}) {
         const {
             transition = null,
-            duration = window.AppDefaults?.animation?.shortDuration || 500
+            duration = AppDefaults?.animation?.shortDuration || 500
         } = options;
 
-        countrySelection.each(function(d) {
+        countrySelection.each(function (d) {
             const style = MapHelper.getCountryStyle(d, styleConfig);
             MapHelper.applyStyle(d3.select(this), style, { transition, duration });
         });
@@ -729,10 +734,10 @@ class MapHelper {
     static applyCityMarkerStyles(citySelection, styleOptions, options = {}) {
         const {
             transition = null,
-            duration = window.AppDefaults?.animation?.shortDuration || 500
+            duration = AppDefaults?.animation?.shortDuration || 500
         } = options;
 
-        citySelection.each(function(d) {
+        citySelection.each(function (d) {
             const style = MapHelper.getCityMarkerStyle(d, styleOptions);
             MapHelper.applyStyle(d3.select(this), style, { transition, duration });
         });
@@ -747,15 +752,14 @@ class MapHelper {
     static applyCityLabelStyles(labelSelection, styleOptions, options = {}) {
         const {
             transition = null,
-            duration = window.AppDefaults?.animation?.shortDuration || 500
+            duration = AppDefaults?.animation?.shortDuration || 500
         } = options;
 
-        labelSelection.each(function(d) {
+        labelSelection.each(function (d) {
             const style = MapHelper.getCityLabelStyle(d, styleOptions);
             MapHelper.applyStyle(d3.select(this), style, { transition, duration });
         });
     }
 }
 
-// グローバルスコープで利用可能にする
-window.MapHelper = MapHelper;
+

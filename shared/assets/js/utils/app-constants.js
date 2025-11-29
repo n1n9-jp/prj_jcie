@@ -6,7 +6,7 @@
 /**
  * 国名マッピング - 英語→日本語
  */
-const COUNTRY_MAPPING = {
+export const COUNTRY_MAPPING = {
     'Nigeria': 'ナイジェリア',
     'Malawi': 'マラウイ',
     'Kenya': 'ケニア',
@@ -26,14 +26,14 @@ const COUNTRY_MAPPING = {
  * @param {string} countryEn - 英語の国名
  * @returns {string} 日本語の国名
  */
-function getCountryNameJapanese(countryEn) {
+export function getCountryNameJapanese(countryEn) {
     return COUNTRY_MAPPING[countryEn] || countryEn;
 }
 
 /**
  * アプリケーション共通色彩定義
  */
-const APP_COLORS = {
+export const APP_COLORS = {
     // プライマリカラーパレット
     PRIMARY_PALETTE: [
         '#2563eb', // ブルー
@@ -45,7 +45,7 @@ const APP_COLORS = {
         '#be185d', // ピンク
         '#65a30d'  // ライム
     ],
-    
+
     // テキスト色
     TEXT: {
         PRIMARY: '#333',
@@ -53,7 +53,7 @@ const APP_COLORS = {
         LIGHT: '#888',
         WHITE: '#fff'
     },
-    
+
     // アクセント色
     ACCENT: {
         SUCCESS: '#10b981',
@@ -61,14 +61,14 @@ const APP_COLORS = {
         WARNING: '#f59e0b',
         ERROR: '#ef4444'
     },
-    
+
     // 背景色
     BACKGROUND: {
         LIGHT: '#e5e7eb',
         WHITE: '#fff',
         GRAY: '#f3f4f6'
     },
-    
+
     // 地域別色（theme.config.jsonと統一）
     REGIONS: {
         'アジア・太平洋地域': '#1f78b4',
@@ -82,7 +82,7 @@ const APP_COLORS = {
         '世界': '#808080',
         '全世界': '#808080'
     },
-    
+
     // アノテーション・装飾用
     ANNOTATIONS: {
         LINE: '#999',
@@ -95,7 +95,7 @@ const APP_COLORS = {
 /**
  * アニメーション設定
  */
-const ANIMATION_CONFIG = {
+export const ANIMATION_CONFIG = {
     DURATION: {
         INSTANT: 0,
         FAST: 150,
@@ -104,7 +104,7 @@ const ANIMATION_CONFIG = {
         LONG: 800,
         SLOW: 1200
     },
-    
+
     EASING: {
         LINEAR: 'linear',
         EASE: 'ease',
@@ -117,25 +117,25 @@ const ANIMATION_CONFIG = {
 /**
  * レスポンシブ設定
  */
-const RESPONSIVE_CONFIG = {
+export const RESPONSIVE_CONFIG = {
     BREAKPOINTS: {
         MOBILE: 768,
         TABLET: 1024,
         DESKTOP: 1200
     },
-    
+
     MARGIN_RATIOS: {
         MOBILE: { top: 0.1, bottom: 0.1, left: 0.1, right: 0.1 },
         TABLET: { top: 0.08, bottom: 0.08, left: 0.08, right: 0.08 },
         DESKTOP: { top: 0.05, bottom: 0.08, left: 0.06, right: 0.04 }
     },
-    
+
     MIN_SIZES: {
         CHART_WIDTH: 300,
         CHART_HEIGHT: 200,
         FONT_SIZE: 10
     },
-    
+
     MAX_SIZES: {
         CHART_WIDTH: 1200,
         CHART_HEIGHT: 800,
@@ -146,12 +146,12 @@ const RESPONSIVE_CONFIG = {
 /**
  * フォント設定
  */
-const FONT_CONFIG = {
+export const FONT_CONFIG = {
     FAMILIES: {
         PRIMARY: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif',
         SERIF: '"Shippori Mincho", "Yu Mincho", "YuMincho", "Hiragino Mincho ProN", "Hiragino Mincho Pro", "Noto Serif JP", "HG Mincho E", "MS Mincho", serif'
     },
-    
+
     SIZES: {
         XS: '10px',
         SM: '12px',
@@ -160,7 +160,7 @@ const FONT_CONFIG = {
         XL: '18px',
         XXL: '20px'
     },
-    
+
     WEIGHTS: {
         NORMAL: 'normal',
         MEDIUM: '500',
@@ -168,36 +168,12 @@ const FONT_CONFIG = {
     }
 };
 
-// グローバルスコープで利用可能にする（ES6モジュール移行前の暫定措置）
-if (typeof window !== 'undefined') {
-    window.AppConstants = {
-        COUNTRY_MAPPING,
-        getCountryNameJapanese,
-        APP_COLORS,
-        ANIMATION_CONFIG,
-        RESPONSIVE_CONFIG,
-        FONT_CONFIG
-    };
-
-    // 新しい設定システムとの統合ヘルパー
-    window.AppConstants.getConfigValue = function(path, fallback) {
-        if (window.ConfigLoader && window.ConfigLoader.loaded) {
-            return window.ConfigLoader.get(path, fallback);
-        }
-        return fallback;
-    };
-
-    window.AppConstants.getAnimationDuration = function(name) {
-        if (window.ConfigLoader && window.ConfigLoader.loaded) {
-            return window.ConfigLoader.getAnimationDuration(name);
-        }
-        return ANIMATION_CONFIG.DURATION[name.toUpperCase()] || ANIMATION_CONFIG.DURATION.DEFAULT;
-    };
-
-    window.AppConstants.getColor = function(path) {
-        if (window.ConfigLoader && window.ConfigLoader.loaded) {
-            return window.ConfigLoader.getColor(path);
-        }
-        return null;
-    };
-}
+// Default export for backward compatibility if needed, but named exports are preferred
+export const AppConstants = {
+    COUNTRY_MAPPING,
+    getCountryNameJapanese,
+    APP_COLORS,
+    ANIMATION_CONFIG,
+    RESPONSIVE_CONFIG,
+    FONT_CONFIG
+};

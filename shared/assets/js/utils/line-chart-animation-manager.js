@@ -1,8 +1,12 @@
+import * as d3 from 'd3';
+import { AppDefaults } from '../config/defaults.js';
+import { colorScheme } from './color-scheme.js';
+
 /**
  * LineChartAnimationManager - 折れ線グラフのアニメーション処理を専門的に扱うクラス
  * プログレッシブアニメーション、色スケール管理、タイマー管理を統合
  */
-class LineChartAnimationManager {
+export class LineChartAnimationManager {
     constructor() {
         // アニメーションタイマーを管理
         this.animationTimers = [];
@@ -64,7 +68,7 @@ class LineChartAnimationManager {
         const self = this;
 
         // 各系列に対して段階的アニメーションを実行
-        seriesGroups.each(function(seriesData, seriesIndex) {
+        seriesGroups.each(function (seriesData, seriesIndex) {
             const group = d3.select(this);
             const color = colorScale(seriesData.name);
 
@@ -75,7 +79,7 @@ class LineChartAnimationManager {
             const linePath = group.append('path')
                 .attr('class', 'chart-line')
                 .attr('stroke', color)
-                .attr('stroke-width', window.AppDefaults?.strokeWidth?.thick || 2)
+                .attr('stroke-width', AppDefaults?.strokeWidth?.thick || 2)
                 .attr('fill', 'none')
                 .attr('d', fullLinePath); // 完全なパスを設定
 
@@ -125,7 +129,7 @@ class LineChartAnimationManager {
                 const pointTimer = setTimeout(() => {
                     // 該当年度の点を表示
                     allPoints
-                        .filter(function(d) { return +d[xField] === year; })
+                        .filter(function (d) { return +d[xField] === year; })
                         .transition()
                         .duration(300)
                         .ease(d3.easeBackOut.overshoot(1.2))
@@ -150,16 +154,8 @@ class LineChartAnimationManager {
         } else if (config.colors && config.colors.length > 0 && config.multiSeries === false) {
             // 単一系列の明示色
             return d3.scaleOrdinal(config.colors).domain(series.map(d => d.name));
-        } else if (window.ColorScheme && config.useUnifiedColors !== false) {
+        } else if (colorScheme && config.useUnifiedColors !== false) {
             // 統一カラースキーム：地域名→色の直接マッピング
-
-            // ColorSchemeインスタンスを取得または作成
-            let colorScheme = window.colorScheme;
-            if (!colorScheme) {
-                colorScheme = new ColorScheme();
-                window.colorScheme = colorScheme;
-            }
-
             const regionColors = series.map(s => {
                 const color = colorScheme.getRegionColor(s.name);
                 return color;
@@ -169,7 +165,7 @@ class LineChartAnimationManager {
                 .range(regionColors);
         } else {
             // フォールバック
-            const colors = config.colors || window.AppConstants?.APP_COLORS?.PRIMARY_PALETTE || d3.schemeCategory10;
+            const colors = config.colors || AppDefaults?.APP_COLORS?.PRIMARY_PALETTE || d3.schemeCategory10;
             return d3.scaleOrdinal(colors).domain(series.map(d => d.name));
         }
     }
@@ -197,6 +193,3 @@ class LineChartAnimationManager {
         this.clearAllAnimationTimers();
     }
 }
-
-// グローバルスコープで利用可能にする
-window.LineChartAnimationManager = LineChartAnimationManager;

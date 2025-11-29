@@ -1,10 +1,17 @@
+import * as d3 from 'd3';
+import { BaseManager } from './base-manager.js';
+import { SVGHelper } from './svg-helper.js';
+import { colorScheme } from './color-scheme.js';
+import { AppDefaults } from '../config/defaults.js';
+import { AppConstants } from './app-constants.js';
+
 /**
  * ChartSVGRenderer - SVG直接描画を専門的に扱うクラス
  * ChartSVGDrawer を吸収した統合版
  * ChartManagerから抽出されたSVG描画ロジックを集約
  * レンダラーを使わない直接描画処理を担当
  */
-class ChartSVGRenderer extends BaseManager {
+export class ChartSVGRenderer extends BaseManager {
     /**
      * コンストラクタ
      * @param {string} containerId - コンテナの ID
@@ -119,7 +126,7 @@ class ChartSVGRenderer extends BaseManager {
         const config = chartConfig.config;
 
         // ★重要: データを系列別に変換（複数系列対応）
-        const series = this.transformToSeries(data, chartConfig.config);
+        const series = ChartSVGRenderer.transformToSeries(data, chartConfig.config);
 
         // 全データからドメインを計算
         const allValues = series.flatMap(s => s.values);
@@ -203,7 +210,7 @@ class ChartSVGRenderer extends BaseManager {
             .attr('d', d => line(d.values));
 
         // 各系列にドット（データポイント）を追加
-        seriesGroups.each(function(seriesData) {
+        seriesGroups.each(function (seriesData) {
             const group = d3.select(this);
 
             group.selectAll('.chart-circle')
@@ -262,7 +269,7 @@ class ChartSVGRenderer extends BaseManager {
         }
 
         // SVGHelperを使用してレスポンシブSVGを作成
-        if (window.SVGHelper) {
+        if (SVGHelper) {
             return SVGHelper.initSVG(this.container, totalWidth, totalHeight, {
                 preserveAspectRatio: 'xMidYMid meet',
                 responsive: true
@@ -409,7 +416,7 @@ class ChartSVGRenderer extends BaseManager {
         }
 
         // SVGHelperを使用してSVGを作成
-        if (window.SVGHelper) {
+        if (SVGHelper) {
             return SVGHelper.initSVG(this.container, totalWidth, totalHeight, {
                 className: 'chart-svg',
                 responsive: true,
@@ -424,11 +431,11 @@ class ChartSVGRenderer extends BaseManager {
 
             if (layoutType === 'dual') {
                 svg.style('width', '100%')
-                   .style('height', 'auto')
-                   .style('max-width', '100%');
+                    .style('height', 'auto')
+                    .style('max-width', '100%');
             } else {
                 svg.style('width', '100%')
-                   .style('height', 'auto');
+                    .style('height', 'auto');
             }
 
             return svg;
@@ -545,13 +552,10 @@ class ChartSVGRenderer extends BaseManager {
         } else if (config.colors && config.colors.length > 0 && config.multiSeries === false) {
             // 単一系列の明示色
             return d3.scaleOrdinal(config.colors).domain(series.map(d => d.name));
-        } else if (window.ColorScheme && config.useUnifiedColors !== false) {
+        } else if (colorScheme && config.useUnifiedColors !== false) {
             // 統一カラースキーム：地域名→色の直接マッピング
-            let colorScheme = window.colorScheme;
-            if (!colorScheme) {
-                colorScheme = new ColorScheme();
-                window.colorScheme = colorScheme;
-            }
+            // 統一カラースキーム：地域名→色の直接マッピング
+            // let colorScheme = window.colorScheme; // Removed global usage
 
             const regionColors = series.map(s => {
                 const color = colorScheme.getRegionColor(s.name);
@@ -562,7 +566,7 @@ class ChartSVGRenderer extends BaseManager {
                 .range(regionColors);
         } else {
             // フォールバック
-            const colors = config.colors || window.AppConstants?.APP_COLORS?.PRIMARY_PALETTE || d3.schemeCategory10;
+            const colors = config.colors || AppConstants?.APP_COLORS?.PRIMARY_PALETTE || d3.schemeCategory10;
             return d3.scaleOrdinal(colors).domain(series.map(d => d.name));
         }
     }
@@ -745,7 +749,7 @@ class ChartSVGRenderer extends BaseManager {
             .attr('d', d => line(d.values));
 
         // 各系列にドット（データポイント）を追加
-        seriesGroups.each(function(seriesData) {
+        seriesGroups.each(function (seriesData) {
             const group = d3.select(this);
 
             group.selectAll('.chart-circle')
@@ -790,13 +794,8 @@ class ChartSVGRenderer extends BaseManager {
         } else if (config.colors && config.colors.length > 0 && config.multiSeries === false) {
             // 単一系列の明示色
             return d3.scaleOrdinal(config.colors).domain(series.map(d => d.name));
-        } else if (window.ColorScheme && config.useUnifiedColors !== false) {
+        } else if (colorScheme && config.useUnifiedColors !== false) {
             // 統一カラースキーム：地域名→色の直接マッピング
-            let colorScheme = window.colorScheme;
-            if (!colorScheme) {
-                colorScheme = new ColorScheme();
-                window.colorScheme = colorScheme;
-            }
 
             const regionColors = series.map(s => {
                 const color = colorScheme.getRegionColor(s.name);
@@ -807,13 +806,13 @@ class ChartSVGRenderer extends BaseManager {
                 .range(regionColors);
         } else {
             // フォールバック
-            const colors = config.colors || window.AppConstants?.APP_COLORS?.PRIMARY_PALETTE || d3.schemeCategory10;
+            const colors = config.colors || AppConstants?.APP_COLORS?.PRIMARY_PALETTE || d3.schemeCategory10;
             return d3.scaleOrdinal(colors).domain(series.map(d => d.name));
         }
     }
 
     /**
-     * インラインラベル追加の静的メソッド版
+     * インラインラベルを追加（静的メソッド版）
      * @param {d3.Selection} g - グループ
      * @param {Array} series - 系列データ
      * @param {Function} colorScale - 色スケール
@@ -845,6 +844,3 @@ class ChartSVGRenderer extends BaseManager {
         });
     }
 }
-
-// グローバルスコープで提供
-window.ChartSVGRenderer = ChartSVGRenderer;

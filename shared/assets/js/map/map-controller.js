@@ -1,3 +1,6 @@
+// import * as topojson from 'topojson-client'; // Using global topojson from CDN
+import { logger as Logger } from '../utils/logger.js';
+
 /**
  * MapController - 地図制御クラス
  *
@@ -5,7 +8,7 @@
  * MapManagerから制御ロジックを分離
  */
 
-class MapController {
+export class MapController {
     constructor(mapManager) {
         this.mapManager = mapManager;  // MapManagerへの参照（状態・データアクセス用）
         this.renderer = null;           // MapRenderer への参照（遅延初期化）
@@ -60,8 +63,8 @@ class MapController {
                     this.updateExistingMap({ center, zoom, highlightCountries, cities, useRegionColors, lightenNonVisited, lightenAllCountries, targetRegions, width, height, widthPercent, heightPercent, aspectRatio, showSpreadingArrows, mode });
                 }
             } else {
-                if (window.Logger) {
-                    window.Logger.error('MapController: No geo data available for rendering');
+                if (Logger) {
+                    Logger.error('MapController: No geo data available for rendering');
                 } else {
                     console.error('MapController: No geo data available for rendering');
                 }
@@ -77,8 +80,8 @@ class MapController {
      */
     setGeoData(topoData) {
         if (!topoData || !topoData.objects) {
-            if (window.Logger) {
-                window.Logger.error('MapController: Invalid topoData structure');
+            if (Logger) {
+                Logger.error('MapController: Invalid topoData structure');
             } else {
                 console.error('MapController: Invalid topoData structure');
             }
@@ -163,8 +166,8 @@ class MapController {
     handleMapProgress(progressData) {
         const { progress, step } = progressData;
 
-        if (window.Logger) {
-            window.Logger.debug('MapController: Map progress event', { progress, step });
+        if (Logger) {
+            Logger.debug('MapController: Map progress event', { progress, step });
         }
 
         if (this.mapManager?.cityManager?.handleTimelineProgress) {
@@ -210,9 +213,4 @@ class MapController {
         this.mapManager = null;
         this.renderer = null;
     }
-}
-
-// グローバルスコープで利用可能にする（ES6モジュール移行前の暫定措置）
-if (typeof window !== 'undefined') {
-    window.MapController = MapController;
 }

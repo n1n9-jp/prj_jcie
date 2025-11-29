@@ -2,7 +2,7 @@
  * UN統計区分に基づく国から地域へのマッピング
  * HIV/エイズ対策の地域分類に合わせて調整
  */
-class CountryRegionMapping {
+export class CountryRegionMapping {
     constructor() {
         // UN統計区分をベースに、HIV/エイズ対策の地域分類に合わせたマッピング
         this.countryToRegion = {
@@ -48,7 +48,7 @@ class CountryRegionMapping {
             'Tuvalu': 'アジア・太平洋地域',
             'Taiwan': 'アジア・太平洋地域',
             'New Caledonia': 'アジア・太平洋地域',
-            
+
             // カリブ海地域
             'Antigua and Barbuda': 'カリブ海地域',
             'Bahamas': 'カリブ海地域',
@@ -63,7 +63,7 @@ class CountryRegionMapping {
             'Saint Lucia': 'カリブ海地域',
             'Saint Vincent and the Grenadines': 'カリブ海地域',
             'Trinidad and Tobago': 'カリブ海地域',
-            
+
             // 東部・南部アフリカ
             'Angola': '東部・南部アフリカ',
             'Botswana': '東部・南部アフリカ',
@@ -90,7 +90,7 @@ class CountryRegionMapping {
             'Zambia': '東部・南部アフリカ',
             'Zimbabwe': '東部・南部アフリカ',
             'Somaliland': '東部・南部アフリカ',
-            
+
             // 東ヨーロッパ・中央アジア
             'Albania': '東ヨーロッパ・中央アジア',
             'Armenia': '東ヨーロッパ・中央アジア',
@@ -122,7 +122,7 @@ class CountryRegionMapping {
             'Turkmenistan': '東ヨーロッパ・中央アジア',
             'Ukraine': '東ヨーロッパ・中央アジア',
             'Uzbekistan': '東ヨーロッパ・中央アジア',
-            
+
             // 中南米（ラテンアメリカ）
             'Argentina': '中南米（ラテンアメリカ）',
             'Belize': '中南米（ラテンアメリカ）',
@@ -145,7 +145,7 @@ class CountryRegionMapping {
             'Uruguay': '中南米（ラテンアメリカ）',
             'Venezuela': '中南米（ラテンアメリカ）',
             'French Guiana': '中南米（ラテンアメリカ）',
-            
+
             // 中東・北アフリカ
             'Algeria': '中東・北アフリカ',
             'Bahrain': '中東・北アフリカ',
@@ -168,7 +168,7 @@ class CountryRegionMapping {
             'United Arab Emirates': '中東・北アフリカ',
             'W. Sahara': '中東・北アフリカ',
             'Yemen': '中東・北アフリカ',
-            
+
             // 西部・中部アフリカ
             'Benin': '西部・中部アフリカ',
             'Burkina Faso': '西部・中部アフリカ',
@@ -194,7 +194,7 @@ class CountryRegionMapping {
             'Senegal': '西部・中部アフリカ',
             'Sierra Leone': '西部・中部アフリカ',
             'Togo': '西部・中部アフリカ',
-            
+
             // 西・中央ヨーロッパおよび北米
             'Andorra': '西・中央ヨーロッパおよび北米',
             'Austria': '西・中央ヨーロッパおよび北米',
@@ -229,12 +229,12 @@ class CountryRegionMapping {
             'Falkland Islands': '西・中央ヨーロッパおよび北米',
             'Greenland': '西・中央ヨーロッパおよび北米',
             'Puerto Rico': '西・中央ヨーロッパおよび北米',
-            
+
             // その他・特別地域（南極地域など）
             'Antarctica': 'その他・特別地域',
             'Fr. S. Antarctic Lands': 'その他・特別地域'
         };
-        
+
         // 別名・表記ゆれ対応
         this.countryAliases = {
             'Czechia': 'Czech Republic',
@@ -268,7 +268,7 @@ class CountryRegionMapping {
             'Fr. Guiana': 'French Guiana'
         };
     }
-    
+
     /**
      * 国名から地域を取得
      * @param {string} countryName - 国名
@@ -277,7 +277,7 @@ class CountryRegionMapping {
     getRegionForCountry(countryName) {
         // まず直接マッチを試みる
         let region = this.countryToRegion[countryName];
-        
+
         // エイリアスをチェック
         if (!region) {
             const standardName = this.countryAliases[countryName];
@@ -285,7 +285,7 @@ class CountryRegionMapping {
                 region = this.countryToRegion[standardName];
             }
         }
-        
+
         // それでも見つからない場合は部分一致を試みる
         if (!region) {
             // 国名の一部が含まれているかチェック
@@ -296,27 +296,28 @@ class CountryRegionMapping {
                 }
             }
         }
-        
+
         return region || null;
     }
-    
+
     /**
      * 地域ごとの国リストを取得
      * @returns {Object} 地域名をキー、国名配列を値とするオブジェクト
      */
     getCountriesByRegion() {
         const regionToCountries = {};
-        
+
         for (const [country, region] of Object.entries(this.countryToRegion)) {
             if (!regionToCountries[region]) {
                 regionToCountries[region] = [];
             }
             regionToCountries[region].push(country);
         }
-        
+
         return regionToCountries;
     }
 }
 
 // グローバルインスタンスを作成
-window.CountryRegionMapping = new CountryRegionMapping();
+export const countryRegionMapping = new CountryRegionMapping();
+window.CountryRegionMapping = countryRegionMapping;
