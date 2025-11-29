@@ -117,9 +117,8 @@ export class GridDataTransformer {
                 const valueStr = row[field];
                 const value = parseInt(valueStr?.replace('%', '') || '0');
 
-                // カテゴリごとに異なる色を使用
-                const categoryColor = index === 0 ? treatmentColor :
-                    (colorScheme ? colorScheme.getLighterColor(treatmentColor) : '#60a5fa');
+                // カテゴリごとに異なる色を使用しない（ユーザー要望により統一）
+                const categoryColor = treatmentColor;
 
                 categoryData.push({
                     region: region,
@@ -178,9 +177,8 @@ export class GridDataTransformer {
                         colorScheme.getRegionColor(label) :
                         AppDefaults?.colors?.accent?.info || '#3b82f6';
 
-                    // フィールドごとに色の調子を変える
-                    const color = fieldIndex === 0 ? baseColor :
-                        (colorScheme ? colorScheme.getDarkerColor(baseColor) : baseColor);
+                    // フィールドごとに色の調子を変えない（ユーザー要望により統一）
+                    const color = baseColor;
 
                     result.push({
                         region: label,
