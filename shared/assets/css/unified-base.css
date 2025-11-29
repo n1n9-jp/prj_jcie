@@ -208,8 +208,8 @@ body {
 }
 
 /* リンク項目の感染症カラーバー - エイズ */
-#site-header .site-nav a[href*="aids"]::before,
-#site-header .site-nav li:nth-child(1) a::before {
+#site-header .site-nav a[href*="aids"]:hover::before,
+#site-header .site-nav li:nth-child(1) a:hover::before {
     content: '';
     position: absolute;
     top: -10px;
@@ -227,8 +227,8 @@ body {
 }
 
 /* リンク項目の感染症カラーバー - 結核 */
-#site-header .site-nav a[href*="tuberculosis"]::before,
-#site-header .site-nav li:nth-child(2) a::before {
+#site-header .site-nav a[href*="tuberculosis"]:hover::before,
+#site-header .site-nav li:nth-child(2) a:hover::before {
     content: '';
     position: absolute;
     top: -10px;
@@ -246,8 +246,8 @@ body {
 }
 
 /* リンク項目の感染症カラーバー - マラリア */
-#site-header .site-nav a[href*="malaria"]::before,
-#site-header .site-nav li:nth-child(3) a::before {
+#site-header .site-nav a[href*="malaria"]:hover::before,
+#site-header .site-nav li:nth-child(3) a:hover::before {
     content: '';
     position: absolute;
     top: -10px;
