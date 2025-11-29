@@ -297,10 +297,10 @@ export class PieChartRenderer extends ChartRendererBase {
 
         // タイトルを追加
         if (title) {
-            svg.append('text')
+            g.append('text')
                 .attr('class', 'chart-title')
-                .attr('x', 20)
-                .attr('y', 30)
+                .attr('x', 0)
+                .attr('y', -10)
                 .attr('text-anchor', 'start')
                 .attr('fill', AppDefaults?.colors?.text?.primary || '#333')
                 .style('font-family', 'var(--font-family-serif)')
