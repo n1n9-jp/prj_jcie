@@ -105,6 +105,14 @@
     --header-height: 60px;
 }
 
+body {
+    font-family: var(--font-family-serif);
+    color: var(--color-text-body);
+    line-height: var(--line-height-relaxed);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
 /* ==================================================
    ヘッダー共通スタイル
    ================================================== */
@@ -128,6 +136,18 @@
     font-size: var(--font-size-lg);
     font-weight: var(--font-weight-bold);
     color: var(--color-text-primary);
+    font-family: var(--font-family-serif);
+}
+
+.site-title a {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+.site-title a:hover {
+    opacity: 0.8;
+    transition: opacity var(--animation-fast) var(--easing-ease);
 }
 
 .site-nav ul {
@@ -139,6 +159,7 @@
     color: var(--color-text-light);
     text-decoration: none;
     transition: color var(--animation-short) var(--easing-ease-in-out);
+    position: relative;
 }
 
 #site-header .site-nav a:hover {
@@ -167,6 +188,25 @@
     height: 6px;
     background-color: var(--disease-primary);
     border-radius: 3px;
+}
+
+/* リンク項目の感染症カラーバー - エイズ */
+#site-header .site-nav a[href*="aids"]::before,
+#site-header .site-nav li:nth-child(1) a::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 6px;
+    background-color: #ff6b6b; /* エイズの赤色 */
+    border-radius: 3px;
+}
+
+#site-header .site-nav a[href*="aids"]:hover,
+#site-header .site-nav li:nth-child(1) a:hover {
+    color: #ff6b6b;
 }
 
 /* リンク項目の感染症カラーバー - 結核 */
@@ -523,4 +563,16 @@
         flex-direction: column;
         gap: 10px;
     }
+}
+
+/* ==================================================
+   トップページ用スタイル
+   ================================================== */
+.content-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.content-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
 }

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JCIEスペシャルコンテンツ「感染症との闘い」</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- 統一スタイリングシステム -->
+    <!-- 統一スタイリングシステム -->
+    <link rel="stylesheet" href="/shared/assets/css/shared-base.css">
+    <link rel="stylesheet" href="/shared/assets/css/unified-base.css">
+    <script type="module" src="shared/assets/js/core/unified-styling.js"></script>
+
+    <!-- アプリケーションエントリーポイント -->
+    <script type="module" src="/main.js"></script>
+
+</head>
+
+<body>
+    <!-- ヘッダー -->
+    <header id="site-header">
+        <div class="site-title">
+            <h1>JCIEスペシャルコンテンツ「感染症との闘い」</h1>
+        </div>
+        <nav class="site-nav">
+            <ul>
+                <!-- ナビゲーションはJavaScriptで動的に生成される -->
+            </ul>
+        </nav>
+    </header>
+
+    <!-- メインコンテンツ -->
+    <main class="container mx-auto px-4 py-12 mt-20">
+        <div class="text-center mb-16">
+            <h2 class="text-4xl font-bold text-gray-800 mb-4">データで見る世界三大感染症</h2>
+            <p class="text-xl text-gray-600">エイズ、結核、マラリア。人類を脅かす感染症の現状と課題をデータで紐解く。</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            <!-- エイズ -->
+            <a href="01_aids/"
+                class="content-card block bg-white rounded-xl overflow-hidden shadow-lg hover:no-underline group">
+                <div class="h-48 bg-red-500 flex items-center justify-center">
+                    <span class="text-white text-3xl font-bold">HIV/エイズ</span>
+                </div>
+                <div class="p-6">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-2 group-hover:text-red-600 transition-colors">
+                        HIV/エイズとの闘い</h3>
+                    <p class="text-gray-600">データで見る希望と課題。治療法の進歩と残された課題について。</p>
+                </div>
+            </a>
+
+            <!-- 結核 -->
+            <a href="02_tuberculosis/"
+                class="content-card block bg-white rounded-xl overflow-hidden shadow-lg hover:no-underline group">
+                <div class="h-48 bg-blue-500 flex items-center justify-center">
+                    <span class="text-white text-3xl font-bold">結核</span>
+                </div>
+                <div class="p-6">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-2 group-hover:text-blue-600 transition-colors">結核との闘い
+                    </h3>
+                    <p class="text-gray-600">世界で最も多くの命を奪う感染症の一つ。その現状と対策。</p>
+                </div>
+            </a>
+
+            <!-- マラリア -->
+            <a href="03_malariae/"
+                class="content-card block bg-white rounded-xl overflow-hidden shadow-lg hover:no-underline group">
+                <div class="h-48 bg-yellow-500 flex items-center justify-center">
+                    <span class="text-white text-3xl font-bold">マラリア</span>
+                </div>
+                <div class="p-6">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-2 group-hover:text-yellow-600 transition-colors">
+                        マラリアとの闘い</h3>
+                    <p class="text-gray-600">蚊が運ぶ脅威。予防と治療の最前線。</p>
+                </div>
+            </a>
+        </div>
+    </main>
+
+    <footer class="bg-gray-800 text-white py-8 mt-20">
+        <div class="container mx-auto px-4 text-center">
+            <p>&copy; JCIE (Japan Center for International Exchange)</p>
+        </div>
+    </footer>
+</body>
+
+</html>

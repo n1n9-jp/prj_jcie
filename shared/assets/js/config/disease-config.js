@@ -77,5 +77,27 @@ export const DISEASE_CONFIG = {
             assets: 'assets/',
             images: 'assets/images/'
         }
+    },
+    'top': {
+        id: 'top',
+        name: '感染症との闘い',
+        nameEn: 'Fighting Infectious Diseases',
+        subtitle: '～データで見る希望と課題～',
+        color: {
+            primary: '#6b7280',
+            secondary: '#9ca3af',
+            accent: '#4b5563'
+        },
+        navigation: {
+            current: null,
+            others: []
+        },
+        paths: {
+            base: '',
+            config: '',
+            data: '',
+            assets: 'shared/assets/',
+            images: 'shared/assets/images/'
+        }
     }
 };

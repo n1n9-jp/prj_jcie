@@ -54,12 +54,17 @@ export class NavigationManager {
         let html = '';
 
         this.diseases.forEach(disease => {
-            if (disease.type === currentType) {
+            let path = disease.path;
+            if (currentType === 'top') {
+                path = disease.folder + '/';
+            }
+
+            if (currentType !== 'top' && disease.type === currentType) {
                 // 現在のページ - span要素で表示
                 html += `                <li><span class="nav-current">${disease.name}</span></li>\n`;
             } else {
                 // 他のページ - aリンクで表示
-                html += `                <li><a href="${disease.path}" class="nav-link">${disease.name}</a></li>\n`;
+                html += `                <li><a href="${path}" class="nav-link">${disease.name}</a></li>\n`;
             }
         });
 
