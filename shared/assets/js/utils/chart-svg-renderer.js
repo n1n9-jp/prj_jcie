@@ -4,6 +4,7 @@ import { SVGHelper } from './svg-helper.js';
 import { colorScheme } from './color-scheme.js';
 import { AppDefaults } from '../config/defaults.js';
 import { AppConstants } from './app-constants.js';
+import { LineChartLabelManager } from './line-chart-label-manager.js';
 
 /**
  * ChartSVGRenderer - SVG直接描画を専門的に扱うクラス
@@ -119,7 +120,8 @@ export class ChartSVGRenderer extends BaseManager {
 
         // 複数系列でインラインレジェンドの場合、右マージンを拡大
         if (chartConfig.config.multiSeries && chartConfig.config.legendType === 'inline') {
-            margin = { ...margin, right: Math.max(margin.right, 240) };
+            const legendWidth = chartConfig.config.legendWidth || 240;
+            margin = { ...margin, right: Math.max(margin.right, legendWidth) };
         }
 
         const width = layout.chartWidth - margin.left - margin.right;
@@ -592,39 +594,6 @@ export class ChartSVGRenderer extends BaseManager {
     }
 
     /**
-     * インラインラベルを追加
-     * @param {d3.Selection} g - グループ
-     * @param {Array} series - 系列データ
-     * @param {Function} colorScale - 色スケール
-     * @param {number} width - 幅
-     * @param {number} height - 高さ
-     * @param {string} xField - X軸フィールド
-     * @param {string} yField - Y軸フィールド
-     */
-    addInlineLabelsToGroup(g, series, colorScale, width, height, xField, yField) {
-        if (!series || series.length <= 1) return;
-
-        // 最後のデータポイント位置から系列ラベルを配置
-        series.forEach((seriesData, index) => {
-            if (seriesData.values.length === 0) return;
-
-            const lastDataPoint = seriesData.values[seriesData.values.length - 1];
-            const x = width + 10;
-            const y = 0; // グループ内相対座標（調整は必要に応じて）
-
-            g.append('text')
-                .attr('class', 'series-label inline-label')
-                .attr('x', x)
-                .attr('y', y)
-                .attr('dy', '0.35em')
-                .attr('font-size', '12px')
-                .attr('fill', colorScale(seriesData.name))
-                .style('font-weight', 'bold')
-                .text(seriesData.name);
-        });
-    }
-
-    /**
      * リソースを破棄
      */
     destroy() {
@@ -666,7 +635,8 @@ export class ChartSVGRenderer extends BaseManager {
 
         // 複数系列でインラインレジェンドの場合、右マージンを拡大
         if (chartConfig.config.multiSeries && chartConfig.config.legendType === 'inline') {
-            margin = { ...margin, right: Math.max(margin.right, 240) };
+            const legendWidth = chartConfig.config.legendWidth || 240;
+            margin = { ...margin, right: Math.max(margin.right, legendWidth) };
         }
 
         const width = layout.chartWidth - margin.left - margin.right;
@@ -791,20 +761,33 @@ export class ChartSVGRenderer extends BaseManager {
         });
 
         // インラインラベルを追加（複数系列の場合）
+        // LineChartLabelManagerを使用して一貫性のあるラベル表示を実現
         if (series.length > 1 && config.legendType === 'inline') {
-            ChartSVGRenderer.addInlineLabelsToGroupStatic(chartGroup, series, colorScale, width, height, xField, yField);
+            const context = {
+                xScale,
+                yScale,
+                width,
+                height,
+                isYearData: true, // ここでは年データと仮定
+                xField,
+                yField,
+                isDualLayout: true // デュアルレイアウトとして処理
+            };
+
+            // 静的メソッド内なのでインスタンスを作成して使用
+            const labelManager = new LineChartLabelManager();
+            labelManager.addInlineLabels(chartGroup, series, colorScale, context);
         }
 
         // データソースを表示
         if (config.dataSource) {
             svgGroup.append('text')
-                .attr('class', 'chart-data-source')
-                .attr('x', 0)
-                .attr('y', layout.chartHeight - 5)
-                .attr('text-anchor', 'start')
-                .style('font-size', '12px')
-                .style('fill', '#888')
-                .style('font-style', 'normal')
+                .attr('class', 'data-source')
+                .attr('x', layout.chartWidth - 10)
+                .attr('y', layout.chartHeight - 10)
+                .attr('text-anchor', 'end')
+                .style('font-size', '10px')
+                .style('fill', '#999')
                 .text(`出典: ${config.dataSource}`);
         }
     }
@@ -839,36 +822,5 @@ export class ChartSVGRenderer extends BaseManager {
         }
     }
 
-    /**
-     * インラインラベルを追加（静的メソッド版）
-     * @param {d3.Selection} g - グループ
-     * @param {Array} series - 系列データ
-     * @param {Function} colorScale - 色スケール
-     * @param {number} width - 幅
-     * @param {number} height - 高さ
-     * @param {string} xField - X軸フィールド
-     * @param {string} yField - Y軸フィールド
-     */
-    static addInlineLabelsToGroupStatic(g, series, colorScale, width, height, xField, yField) {
-        if (!series || series.length <= 1) return;
 
-        // 最後のデータポイント位置から系列ラベルを配置
-        series.forEach((seriesData, index) => {
-            if (seriesData.values.length === 0) return;
-
-            const lastDataPoint = seriesData.values[seriesData.values.length - 1];
-            const x = width + 10;
-            const y = 0; // グループ内相対座標（調整は必要に応じて）
-
-            g.append('text')
-                .attr('class', 'series-label inline-label')
-                .attr('x', x)
-                .attr('y', y)
-                .attr('dy', '0.35em')
-                .attr('font-size', '12px')
-                .attr('fill', colorScale(seriesData.name))
-                .style('font-weight', 'bold')
-                .text(seriesData.name);
-        });
-    }
 }

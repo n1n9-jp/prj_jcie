@@ -703,7 +703,7 @@
       "text": {
         "content": "それでもなお存在する課題",
         "position": {
-          "width": "30%",
+          "width": "25%",
           "horizontal": "right",
           "vertical": "center"
         }
@@ -714,7 +714,7 @@
         "position": {
           "horizontal": "left",
           "vertical": "center",
-          "width": "70%",
+          "width": "75%",
           "height": "100%"
         },
         "charts": [
@@ -735,6 +735,7 @@
               "yRange": [0, 500000],
               "multiSeries": true,
               "legendType": "inline",
+              "legendWidth": 120,
               "yAxisFormat": {
                 "type": "japanese",
                 "decimals": 0,
@@ -761,6 +762,7 @@
               "yRange": [0, 500000],
               "multiSeries": true,
               "legendType": "inline",
+              "legendWidth": 120,
               "yAxisFormat": {
                 "type": "japanese",
                 "decimals": 0,
