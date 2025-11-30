@@ -109,7 +109,7 @@ export class ColorScheme {
         // 未知の地域の場合はフォールバック色を使用
         // 設定読み込み前の場合もここに来る可能性があるが、ハッシュベースなので一貫性は保たれる
         if (this.configAvailable) {
-            console.warn(`ColorScheme: Unknown region: ${regionName} (standard: ${standardName}). Using fallback color.`);
+            console.warn(`ColorScheme: Unknown region: "${regionName}" (standard: "${standardName}"). Using fallback color.`);
         }
         const fallbackColor = this.getFallbackColor(regionName);
         return fallbackColor;

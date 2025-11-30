@@ -1,4 +1,5 @@
 import { diseaseDetector } from '../config/disease-detector.js';
+import { DISEASE_CONFIG } from '../config/disease-config.js';
 
 /**
  * 統一スタイリングシステム
@@ -16,7 +17,7 @@ export class UnifiedStylingSys {
      */
     applyCSSVariables(diseaseType) {
         // DISEASE_CONFIGから色情報を取得
-        const diseaseConfig = window.DISEASE_CONFIG?.[diseaseType];
+        const diseaseConfig = DISEASE_CONFIG?.[diseaseType];
         if (!diseaseConfig || !diseaseConfig.color) {
             console.warn(`Unknown disease type or color config: ${diseaseType}`);
             return;
@@ -42,7 +43,7 @@ export class UnifiedStylingSys {
         };
 
         const tryApply = () => {
-            if (window.DISEASE_CONFIG && diseaseDetector) {
+            if (DISEASE_CONFIG && diseaseDetector) {
                 applyTheme();
                 return true;
             }

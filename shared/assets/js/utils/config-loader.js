@@ -24,6 +24,16 @@ export class ConfigLoader {
     }
 
     /**
+     * 感染症タイプを明示的に設定
+     * @param {string} type - 感染症ID
+     */
+    setDiseaseType(type) {
+        if (this.diseaseDetector) {
+            this.diseaseDetector.setDiseaseType(type);
+        }
+    }
+
+    /**
      * 全ての設定ファイルを読み込む
      * @returns {Promise<Object>} 読み込まれた設定
      */
@@ -46,49 +56,59 @@ export class ConfigLoader {
      */
     async _loadConfigs() {
         try {
+            // 1. メイン設定の読み込み
+            // 感染症タイプを再検出（window.DISEASE_TYPEが設定された後に実行するため）
+            if (this.diseaseDetector) {
+                this.diseaseDetector.detect();
+            }
+
             // メイン設定ファイルを読み込み（感染症対応パス）
             const mainConfigPath = this._resolveConfigPath('main.config.json');
             this.mainConfig = await this._loadConfig(mainConfigPath);
+
             if (!this.mainConfig) {
-                // console.warn('Main config not found, using legacy mode');
+                console.warn('ConfigLoader: Main config not found, using legacy mode');
                 return this._loadLegacyConfigs();
             }
 
-            // 環境設定を生成（単一環境運用）
-            this.configs.environment = this._createEnvironmentConfig();
-
-            // app-settings を読み込み（共通ベース + 疾患別上書き）
-            const mergeStrategy = this.mainConfig?.mergeStrategy || {
+            // マージ戦略の設定
+            const mergeStrategy = this.mainConfig.mergeStrategy || {
                 deep: true,
                 arrayMerge: 'replace',
                 overwriteOnConflict: true
             };
 
-            let mergedAppSettings = null;
+            // 環境設定を生成（単一環境運用）
+            this.configs.environment = this._createEnvironmentConfig();
+
+            // 共通設定（app-settings.base.json）を読み込み
+            let mergedAppSettings = {};
 
             if (this.mainConfig.configFiles.appSettingsBase) {
                 const basePath = this._resolveConfigPath(this.mainConfig.configFiles.appSettingsBase);
-                const baseSettings = await this._loadConfig(basePath);
-                if (baseSettings) {
-                    mergedAppSettings = baseSettings;
+                const baseConfig = await this._loadConfig(basePath);
+                if (baseConfig) {
+                    mergedAppSettings = baseConfig;
                 }
             }
 
+            // アプリケーション設定（app-settings.json）を読み込み
             if (this.mainConfig.configFiles.appSettings) {
                 const appSettingsPath = this._resolveConfigPath(this.mainConfig.configFiles.appSettings);
                 const appSettings = await this._loadConfig(appSettingsPath);
+
+                // ベース設定とマージ
                 if (appSettings) {
-                    mergedAppSettings = mergedAppSettings
-                        ? this._deepMerge(mergedAppSettings, appSettings, mergeStrategy)
-                        : appSettings;
+                    mergedAppSettings = this._deepMerge(mergedAppSettings, appSettings, mergeStrategy);
                 }
             }
 
+            // 統合設定から個別の設定に分解
             if (mergedAppSettings) {
-                // 統合設定から個別の設定に分解
                 this.configs.app = mergedAppSettings.app || {};
                 this.configs.theme = mergedAppSettings.theme || {};
                 this.configs.animation = mergedAppSettings.animation || {};
+
                 this.configs.settings = {
                     transition: mergedAppSettings.transitions || {},
                     layout: mergedAppSettings.app?.layout || {},
@@ -101,6 +121,18 @@ export class ConfigLoader {
                 const contentPath = this._resolveConfigPath(this.mainConfig.configFiles.content);
                 const content = await this._loadConfig(contentPath) || {};
                 this.configs.content = content;
+            }
+
+            // theme.config.jsonを読み込み（個別指定がある場合）
+            if (this.mainConfig.configFiles.theme) {
+                const themePath = this._resolveConfigPath(this.mainConfig.configFiles.theme);
+                const themeConfig = await this._loadConfig(themePath);
+                if (themeConfig) {
+                    // 既存のtheme設定（appSettingsから来たもの）とマージ
+                    this.configs.theme = this._deepMerge(this.configs.theme || {}, themeConfig, mergeStrategy);
+                } else {
+                    console.warn('ConfigLoader: Failed to load theme config from', themePath);
+                }
             }
 
             // 設定をマージ
@@ -117,13 +149,7 @@ export class ConfigLoader {
             return this.mergedConfig;
 
         } catch (error) {
-            // console.error('Failed to load configurations, using defaults', error);
-            // console.error('Error details:', {
-            //     message: error.message,
-            //     stack: error.stack,
-            //     diseaseDetector: !!this.diseaseDetector,
-            //     mainConfig: this.mainConfig
-            // });
+            console.error('ConfigLoader: Failed to load configurations', error);
             return this._loadFallbackConfigs();
         }
     }
@@ -363,14 +389,13 @@ export class ConfigLoader {
      */
     async _loadConfig(path) {
         try {
-            // console.log(`📁 Loading config: ${path}`);
             const response = await fetch(path);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             return await response.json();
         } catch (error) {
-            // console.warn(`❌ Failed to load ${path}:`, error);
+            console.error(`ConfigLoader: Failed to load config ${path}:`, error);
             return null;
         }
     }
@@ -712,10 +737,15 @@ export class ConfigLoader {
     /**
      * 色を取得
      * @param {string} path - 色のパス
-     * @returns {string} 色コード
+     * @returns {string|null} 色コードまたはnull
      */
     getColor(path) {
-        return this.get(`theme.colors.${path}`, '#000000');
+        // マージ済み設定（フラット構造）から検索
+        let color = this.get(`colors.${path}`, null);
+        if (color) return color;
+
+        // レガシー/未マージ設定（ネスト構造）から検索
+        return this.get(`theme.colors.${path}`, null);
     }
 
     /**

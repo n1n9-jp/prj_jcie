@@ -4,7 +4,8 @@
   "configFiles": {
     "content": "content.json",
     "appSettingsBase": "../shared/config/app-settings.base.json",
-    "appSettings": "app-settings.json"
+    "appSettings": "app-settings.json",
+    "theme": "../shared/config/theme.config.json"
   },
   "loadOrder": [
     "app",

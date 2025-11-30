@@ -23,6 +23,8 @@ export class DiseaseDetector {
             this.config = DISEASE_CONFIG[window.DISEASE_TYPE];
             this.basePath = this.config.paths.base;
             return;
+        } else if (typeof window !== 'undefined' && window.DISEASE_TYPE) {
+            console.warn('DiseaseDetector: window.DISEASE_TYPE is set but not found in config:', window.DISEASE_TYPE);
         }
 
         // 2. URLパスから感染症を検出
@@ -44,6 +46,29 @@ export class DiseaseDetector {
 
         this.config = DISEASE_CONFIG[this.currentDisease];
         this.basePath = this.config.paths.base;
+    }
+
+    /**
+     * 感染症タイプを再検出（公開メソッド）
+     */
+    detect() {
+        this._detectDisease();
+        return this.currentDisease;
+    }
+
+    /**
+     * 感染症タイプを明示的に設定
+     * @param {string} type - 感染症ID
+     */
+    setDiseaseType(type) {
+        if (DISEASE_CONFIG[type]) {
+            this.currentDisease = type;
+            this.config = DISEASE_CONFIG[type];
+            this.basePath = this.config.paths.base;
+            console.log(`DiseaseDetector: Explicitly set disease type to ${type}`);
+        } else {
+            console.error(`DiseaseDetector: Invalid disease type ${type}`);
+        }
     }
 
     /**
