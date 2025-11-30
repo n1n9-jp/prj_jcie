@@ -26,7 +26,8 @@ export class PositionManager {
             margin = null,
             maxWidth = null,
             maxHeight = null,
-            zIndex = null
+            zIndex = null,
+            mobile = null // モバイル設定
         } = positionConfig;
 
         const {
@@ -34,8 +35,6 @@ export class PositionManager {
             animationDuration = '0.5s',
             debugMode = false
         } = options;
-
-        // Debug mode information (removed for performance)
 
         // 基本クラスをリセット
         this.resetContainerClasses(container);
@@ -47,8 +46,6 @@ export class PositionManager {
         container.classList.add('positioned-content');
         container.classList.add(horizontalClass);
         container.classList.add(verticalClass);
-
-        // Debug information for position classes (removed for performance)
 
         // レスポンシブクラスを追加
         if (responsive) {
@@ -86,8 +83,6 @@ export class PositionManager {
         if (responsive) {
             this.applyResponsiveAdjustments(container, positionConfig);
         }
-
-        // Debug information for final container styles and SVG elements (removed for performance)
     }
 
     /**
@@ -99,7 +94,7 @@ export class PositionManager {
             'positioned-content', 'responsive-content',
             'content-left', 'content-center', 'content-right',
             'content-top', 'content-middle', 'content-bottom',
-            'content-small-screen',
+            'content-small-screen', 'mobile-layout-active',
             // Tailwindクラスも削除
             'justify-start', 'justify-center', 'justify-end',
             'items-start', 'items-center', 'items-end',
@@ -176,14 +171,10 @@ export class PositionManager {
         } = styleConfig;
 
         // トランジション設定
-        // 重要：#chart-containerの場合、d3.jsのtransitionと競合を避けるため
-        // opacity以外のプロパティのみにtransitionを適用
         if (animationDuration) {
             if (container.id === 'chart-container' || container.id === 'map-container' || container.id === 'image-container') {
-                // メインコンテナはopacityをd3.jsで管理するため、位置・サイズのみtransition
                 container.style.transition = `width ${animationDuration} ease-in-out, height ${animationDuration} ease-in-out, transform ${animationDuration} ease-in-out, top ${animationDuration} ease-in-out, left ${animationDuration} ease-in-out`;
             } else {
-                // その他の要素は全プロパティにtransition適用
                 container.style.transition = `all ${animationDuration} ease-in-out`;
             }
         }
@@ -228,11 +219,9 @@ export class PositionManager {
             return `${value}px`;
         }
         if (typeof value === 'string') {
-            // 既に単位が含まれている場合はそのまま返す
             if (value.match(/(%|px|em|rem|vh|vw|vmin|vmax)$/)) {
                 return value;
             }
-            // 数値のみの場合はpxを追加
             if (!isNaN(parseFloat(value))) {
                 return `${value}px`;
             }
@@ -257,21 +246,35 @@ export class PositionManager {
     static applyResponsiveAdjustments(container, positionConfig) {
         const checkScreenSize = () => {
             const screenWidth = window.innerWidth;
-            const screenHeight = window.innerHeight;
-
-            // 小画面の閾値
             const smallScreenThreshold = AppDefaults?.breakpoints?.mobile || 768;
             const verySmallScreenThreshold = 480;
 
-            if (screenWidth <= verySmallScreenThreshold) {
-                // 非常に小さい画面: 強制的に中央配置・フルサイズ
-                this.applySmallScreenLayout(container, 'very-small');
-            } else if (screenWidth <= smallScreenThreshold) {
-                // 小画面: 中央配置だが一部カスタマイズを保持
-                this.applySmallScreenLayout(container, 'small');
+            if (screenWidth <= smallScreenThreshold) {
+                // モバイル設定の確認
+                if (positionConfig.mobile && (positionConfig.mobile.position || typeof positionConfig.mobile === 'object')) {
+                    const mobilePosConfig = positionConfig.mobile.position || positionConfig.mobile;
+                    const mergedConfig = { ...positionConfig, ...mobilePosConfig };
+
+                    // 再帰呼び出し（responsive: false でループ防止）
+                    this.applyPosition(container, mergedConfig, { responsive: false });
+                    container.classList.add('mobile-layout-active');
+                    return;
+                }
+
+                // 既存のフォールバックロジック
+                if (screenWidth <= verySmallScreenThreshold) {
+                    this.applySmallScreenLayout(container, 'very-small');
+                } else {
+                    this.applySmallScreenLayout(container, 'small');
+                }
             } else {
                 // 通常画面: 設定通りに配置
-                container.classList.remove('content-small-screen');
+                const wasMobile = container.classList.contains('mobile-layout-active');
+                container.classList.remove('content-small-screen', 'mobile-layout-active');
+                // 必要に応じて元の設定を再適用（モバイルから戻った場合など）
+                if (wasMobile) {
+                    this.applyPosition(container, positionConfig, { responsive: false });
+                }
             }
         };
 
@@ -464,15 +467,14 @@ export class PositionManager {
             maxWidth = 'none',
             padding = '2rem',
             margin = null,
-            textAlign = 'left'  // 矩形内のテキスト揃え（矩形位置とは独立）
+            textAlign = 'left',  // 矩形内のテキスト揃え（矩形位置とは独立）
+            mobile = null // モバイル設定
         } = positionConfig;
 
         const {
             responsive = true,
             debugMode = false
         } = options;
-
-        // Debug mode information (removed for performance)
 
         // ステップ要素のクラスをリセット
         this.resetTextClasses(stepElement);
@@ -488,8 +490,6 @@ export class PositionManager {
         // テキストコンテナ（白背景の部分）とその親要素を取得
         const textContainer = stepElement.querySelector('.max-w-lg, .text-content, div[class*="bg-white"]');
         const parentContainer = stepElement.querySelector('.w-full.min-h-screen.flex');
-
-        // Debug mode text container information (removed for performance)
 
         if (textContainer && parentContainer) {
             // 親要素のFlexboxで白い矩形の位置を制御
@@ -526,8 +526,6 @@ export class PositionManager {
         if (responsive) {
             this.applyTextResponsiveAdjustments(stepElement, positionConfig);
         }
-
-        // Debug information for text position applied (removed for performance)
     }
 
     /**
@@ -574,7 +572,7 @@ export class PositionManager {
             'positioned-text',
             'text-left', 'text-center', 'text-right',
             'text-top', 'text-middle', 'text-bottom',
-            'text-small-screen'
+            'text-small-screen', 'mobile-layout-active'
         ];
 
         stepElement.classList.remove(...textClasses);
@@ -620,14 +618,27 @@ export class PositionManager {
             const smallScreenThreshold = AppDefaults?.breakpoints?.mobile || 768;
 
             if (screenWidth <= smallScreenThreshold) {
+                // モバイル設定の確認
+                if (positionConfig.mobile && (positionConfig.mobile.position || typeof positionConfig.mobile === 'object')) {
+                    const mobilePosConfig = positionConfig.mobile.position || positionConfig.mobile;
+                    const mergedConfig = { ...positionConfig, ...mobilePosConfig };
+
+                    // 再帰呼び出し（responsive: false でループ防止）
+                    this.applyTextPosition(stepElement, mergedConfig, { responsive: false });
+                    stepElement.classList.add('mobile-layout-active');
+                    return;
+                }
+
+                // 既存のフォールバックロジック
                 // 小画面では中央配置に強制変更
                 this.resetTextClasses(stepElement);
                 stepElement.classList.add('positioned-text', 'text-center', 'text-middle', 'text-small-screen');
             } else {
-                // 通常画面では設定通りに配置
-                stepElement.classList.remove('text-small-screen');
+                // 通常画面: 設定通りに配置
+                const wasMobile = stepElement.classList.contains('mobile-layout-active');
+                stepElement.classList.remove('text-small-screen', 'mobile-layout-active');
                 // 必要に応じて元の設定を再適用
-                if (!stepElement.classList.contains('positioned-text')) {
+                if (!stepElement.classList.contains('positioned-text') || wasMobile) {
                     this.applyTextPosition(stepElement, positionConfig, { responsive: false });
                 }
             }
