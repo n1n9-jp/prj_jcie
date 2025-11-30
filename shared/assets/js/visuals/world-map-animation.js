@@ -84,7 +84,7 @@ export class WorldMapAnimation {
                 lightenAllCountries: true, // 全体を薄くする
                 disableZoom: true, // ズーム無効化
                 projectionType: 'orthographic', // 3D地球儀モード
-                offsetY: -300, // 上へ移動
+                offsetY: -50, // 位置調整
                 scaleMultiplier: 1.5 // 大きさを1.5倍
             });
 

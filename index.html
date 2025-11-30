@@ -31,14 +31,14 @@
     <div id="hero-map-container" class="relative w-full h-[500px] bg-gray-50 overflow-hidden shadow-inner">
         <div id="hero-map" class="w-full h-full"></div>
         <div id="hero-map-overlay" class="absolute inset-0 pointer-events-none">
-            <!-- サイトタイトルと説明（中央） -->
-            <div class="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
+            <!-- サイトタイトルと説明（上部へ移動） -->
+            <div class="absolute inset-x-0 top-24 flex flex-col items-center justify-center text-center px-4">
                 <h2 class="text-4xl md:text-6xl font-bold text-gray-800 mb-4">JCIEスペシャルコンテンツ<br>「感染症との闘い」</h2>
                 <p class="text-xl text-gray-800">エイズ、結核、マラリア。人類を脅かす感染症の現状と課題をデータで紐解く。</p>
             </div>
 
-            <!-- 国名表示（上部100pxへ移動、黒文字、背景なし） -->
-            <div class="absolute inset-x-0 top-24 flex justify-center">
+            <!-- 国名表示（下部へ移動） -->
+            <div class="absolute inset-x-0 bottom-32 flex justify-center">
                 <span id="country-name-display"
                     class="text-xl md:text-3xl font-bold text-black px-6 py-3 opacity-0 transition-opacity duration-500 font-serif drop-shadow-sm"></span>
             </div>
