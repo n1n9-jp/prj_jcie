@@ -94,15 +94,17 @@ export class MapRenderer {
         }
 
 
-        // ズーム機能を追加
-        const zoom = d3.zoom()
-            .scaleExtent([0.5, 8])
-            .on('zoom', (event) => {
-                this.svg.select('.map-group')
-                    .attr('transform', event.transform);
-            });
+        // ズーム機能を追加（設定で無効化可能）
+        if (!config.disableZoom) {
+            const zoom = d3.zoom()
+                .scaleExtent([0.5, 8])
+                .on('zoom', (event) => {
+                    this.svg.select('.map-group')
+                        .attr('transform', event.transform);
+                });
 
-        this.svg.call(zoom);
+            this.svg.call(zoom);
+        }
 
         return this.svg;
     }
@@ -146,10 +148,22 @@ export class MapRenderer {
         ];
         const safeZoom = (typeof zoom === 'number' && !isNaN(zoom) && zoom > 0) ? zoom : 1;
 
-        this.projection = d3.geoNaturalEarth1()
-            .scale(safeZoom * 150 * scaleMultiplier)
-            .center(safeCenter)
-            .translate([svgWidth / 2, svgHeight / 2]);
+        const offsetY = config.offsetY || 0;
+        const baseScale = config.projectionType === 'orthographic' ? 250 : 150;
+        const customScaleMultiplier = config.scaleMultiplier || 1.0;
+
+        if (config.projectionType === 'orthographic') {
+            this.projection = d3.geoOrthographic()
+                .scale(safeZoom * baseScale * scaleMultiplier * customScaleMultiplier)
+                .center(safeCenter)
+                .rotate([-safeCenter[0], -safeCenter[1]])
+                .translate([svgWidth / 2, (svgHeight / 2) + offsetY]);
+        } else {
+            this.projection = d3.geoNaturalEarth1()
+                .scale(safeZoom * baseScale * scaleMultiplier * customScaleMultiplier)
+                .center(safeCenter)
+                .translate([svgWidth / 2, (svgHeight / 2) + offsetY]);
+        }
 
         this.path = d3.geoPath().projection(this.projection);
 
@@ -258,9 +272,7 @@ export class MapRenderer {
                     }
 
                     // 地域色が無効な場合のみハイライト色を適用
-                    if (highlightCountries.includes(countryName)) {
-                        return AppConstants?.APP_COLORS?.ACCENT?.INFO || '#1d4ed8';
-                    }
+
 
                     return AppConstants?.APP_COLORS?.TEXT?.WHITE || '#fff';
                 })
@@ -370,8 +382,9 @@ export class MapRenderer {
      * @param {boolean} lightenNonVisited - 未訪問国を明るくするか
      * @param {boolean} lightenAllCountries - すべての国を明るくするか
      * @param {Array} targetRegions - 対象地域
+     * @param {string} highlightColor - ハイライト色（オプション）
      */
-    updateCountryHighlights(highlightCountries, useRegionColors = false, lightenNonVisited = false, lightenAllCountries = false, targetRegions = []) {
+    updateCountryHighlights(highlightCountries, useRegionColors = false, lightenNonVisited = false, lightenAllCountries = false, targetRegions = [], highlightColor = null) {
         if (!this.svg) {
             return;
         }
@@ -429,7 +442,7 @@ export class MapRenderer {
                 }
 
                 if (highlightCountries.includes(countryName)) {
-                    return AppConstants?.APP_COLORS?.ACCENT?.INFO || '#3b82f6';
+                    return highlightColor || AppConstants?.APP_COLORS?.ACCENT?.INFO || '#3b82f6';
                 }
 
                 return AppConstants?.APP_COLORS?.BACKGROUND?.LIGHT || '#d1d5db';
@@ -441,9 +454,7 @@ export class MapRenderer {
                     return AppConstants?.APP_COLORS?.ANNOTATIONS?.BORDER || '#ccc';
                 }
 
-                if (highlightCountries.includes(countryName)) {
-                    return AppConstants?.APP_COLORS?.ACCENT?.INFO || '#1d4ed8';
-                }
+
 
                 return AppConstants?.APP_COLORS?.TEXT?.WHITE || '#fff';
             })
@@ -628,10 +639,25 @@ export class MapRenderer {
                 const interpolateCenter = d3.interpolate(currentCenter, safeCenter);
                 const interpolateScale = d3.interpolate(currentScale, targetScale);
 
+                // For Orthographic, we interpolate rotation instead of center
+                const isOrthographic = this.projection.clipAngle; // Simple check for Orthographic
+                let interpolateRotate;
+                if (isOrthographic) {
+                    const currentRotate = this.projection.rotate();
+                    const targetRotate = [-safeCenter[0], -safeCenter[1]];
+                    interpolateRotate = d3.interpolate(currentRotate, targetRotate);
+                }
+
                 return (t) => {
-                    this.projection
-                        .center(interpolateCenter(t))
-                        .scale(interpolateScale(t));
+                    if (isOrthographic) {
+                        this.projection
+                            .rotate(interpolateRotate(t))
+                            .scale(interpolateScale(t));
+                    } else {
+                        this.projection
+                            .center(interpolateCenter(t))
+                            .scale(interpolateScale(t));
+                    }
 
                     // パスを再描画
                     this.svg.selectAll('.map-country')

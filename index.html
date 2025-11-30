@@ -10,6 +10,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600;700&display=swap"
         rel="stylesheet">
 
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://d3js.org/topojson.v3.min.js"></script>
+
     <!-- 統一スタイリングシステム -->
     <!-- 統一スタイリングシステム -->
 
@@ -22,76 +25,78 @@
 
 <body class="bg-gray-100 flex flex-col min-h-screen">
     <!-- ヘッダー -->
-    <header id="site-header">
-        <div class="site-title">
-            <h1>JCIEスペシャルコンテンツ「感染症との闘い」</h1>
+
+
+    <!-- 世界地図アニメーション -->
+    <div id="hero-map-container" class="relative w-full h-[500px] bg-gray-50 overflow-hidden shadow-inner">
+        <div id="hero-map" class="w-full h-full"></div>
+        <div id="hero-map-overlay" class="absolute inset-0 pointer-events-none">
+            <!-- サイトタイトルと説明（中央） -->
+            <div class="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
+                <h2 class="text-4xl md:text-6xl font-bold text-gray-800 mb-4">JCIEスペシャルコンテンツ<br>「感染症との闘い」</h2>
+                <p class="text-xl text-gray-800">エイズ、結核、マラリア。人類を脅かす感染症の現状と課題をデータで紐解く。</p>
+            </div>
+
+            <!-- 国名表示（上部100pxへ移動、黒文字、背景なし） -->
+            <div class="absolute inset-x-0 top-24 flex justify-center">
+                <span id="country-name-display"
+                    class="text-xl md:text-3xl font-bold text-black px-6 py-3 opacity-0 transition-opacity duration-500 font-serif drop-shadow-sm"></span>
+            </div>
         </div>
-        <nav class="site-nav">
-            <ul>
-                <!-- ナビゲーションはJavaScriptで動的に生成される -->
-            </ul>
-        </nav>
-    </header>
+    </div>
 
-    <!-- メインコンテンツ -->
-    <main class="container mx-auto px-4 py-12 mt-20 flex-grow">
-        <div class="text-center mb-16">
-            <h2 class="text-4xl font-bold text-gray-800 mb-4">データで見る世界三大感染症</h2>
-            <p class="text-xl text-gray-600">エイズ、結核、マラリア。人類を脅かす感染症の現状と課題をデータで紐解く。</p>
-        </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+        <!-- エイズ -->
+        <a href="01_aids/"
+            class="content-card block bg-white rounded-xl overflow-hidden shadow-lg hover:no-underline group">
+            <div class="h-48 flex items-center justify-center relative overflow-hidden"
+                style="background-color: #C3002F;">
+                <div class="absolute inset-0"
+                    style="background-image: linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent); background-size: 1rem 1rem;">
+                </div>
+                <span class="text-white text-3xl font-bold relative z-10">HIV/エイズ</span>
+            </div>
+            <div class="p-6">
+                <h3 class="text-2xl font-bold text-gray-800 mb-2 group-hover:text-red-600 transition-colors">
+                    HIV/エイズとの闘い</h3>
+                <p class="text-gray-600">データで見る希望と課題。治療法の進歩と残された課題について。</p>
+            </div>
+        </a>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            <!-- エイズ -->
-            <a href="01_aids/"
-                class="content-card block bg-white rounded-xl overflow-hidden shadow-lg hover:no-underline group">
-                <div class="h-48 flex items-center justify-center relative overflow-hidden"
-                    style="background-color: #C3002F;">
-                    <div class="absolute inset-0"
-                        style="background-image: linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent); background-size: 1rem 1rem;">
-                    </div>
-                    <span class="text-white text-3xl font-bold relative z-10">HIV/エイズ</span>
+        <!-- 結核 -->
+        <a href="02_tuberculosis/"
+            class="content-card block bg-white rounded-xl overflow-hidden shadow-lg hover:no-underline group">
+            <div class="h-48 flex items-center justify-center relative overflow-hidden"
+                style="background-color: #003580;">
+                <div class="absolute inset-0"
+                    style="background-image: linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent); background-size: 1rem 1rem;">
                 </div>
-                <div class="p-6">
-                    <h3 class="text-2xl font-bold text-gray-800 mb-2 group-hover:text-red-600 transition-colors">
-                        HIV/エイズとの闘い</h3>
-                    <p class="text-gray-600">データで見る希望と課題。治療法の進歩と残された課題について。</p>
-                </div>
-            </a>
+                <span class="text-white text-3xl font-bold relative z-10">結核</span>
+            </div>
+            <div class="p-6">
+                <h3 class="text-2xl font-bold text-gray-800 mb-2 group-hover:text-blue-600 transition-colors">結核との闘い
+                </h3>
+                <p class="text-gray-600">世界で最も多くの命を奪う感染症の一つ。その現状と対策。</p>
+            </div>
+        </a>
 
-            <!-- 結核 -->
-            <a href="02_tuberculosis/"
-                class="content-card block bg-white rounded-xl overflow-hidden shadow-lg hover:no-underline group">
-                <div class="h-48 flex items-center justify-center relative overflow-hidden"
-                    style="background-color: #003580;">
-                    <div class="absolute inset-0"
-                        style="background-image: linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent); background-size: 1rem 1rem;">
-                    </div>
-                    <span class="text-white text-3xl font-bold relative z-10">結核</span>
+        <!-- マラリア -->
+        <a href="03_malariae/"
+            class="content-card block bg-white rounded-xl overflow-hidden shadow-lg hover:no-underline group">
+            <div class="h-48 flex items-center justify-center relative overflow-hidden"
+                style="background-color: #F08C00;">
+                <div class="absolute inset-0"
+                    style="background-image: linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent); background-size: 1rem 1rem;">
                 </div>
-                <div class="p-6">
-                    <h3 class="text-2xl font-bold text-gray-800 mb-2 group-hover:text-blue-600 transition-colors">結核との闘い
-                    </h3>
-                    <p class="text-gray-600">世界で最も多くの命を奪う感染症の一つ。その現状と対策。</p>
-                </div>
-            </a>
-
-            <!-- マラリア -->
-            <a href="03_malariae/"
-                class="content-card block bg-white rounded-xl overflow-hidden shadow-lg hover:no-underline group">
-                <div class="h-48 flex items-center justify-center relative overflow-hidden"
-                    style="background-color: #F08C00;">
-                    <div class="absolute inset-0"
-                        style="background-image: linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent); background-size: 1rem 1rem;">
-                    </div>
-                    <span class="text-white text-3xl font-bold relative z-10">マラリア</span>
-                </div>
-                <div class="p-6">
-                    <h3 class="text-2xl font-bold text-gray-800 mb-2 group-hover:text-yellow-600 transition-colors">
-                        マラリアとの闘い</h3>
-                    <p class="text-gray-600">蚊が運ぶ脅威。予防と治療の最前線。</p>
-                </div>
-            </a>
-        </div>
+                <span class="text-white text-3xl font-bold relative z-10">マラリア</span>
+            </div>
+            <div class="p-6">
+                <h3 class="text-2xl font-bold text-gray-800 mb-2 group-hover:text-yellow-600 transition-colors">
+                    マラリアとの闘い</h3>
+                <p class="text-gray-600">蚊が運ぶ脅威。予防と治療の最前線。</p>
+            </div>
+        </a>
+    </div>
     </main>
 
     <footer class="text-white py-8 mt-20" style="background-color: rgb(118, 80, 127);">
