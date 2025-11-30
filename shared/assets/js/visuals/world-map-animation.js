@@ -34,26 +34,23 @@ export class WorldMapAnimation {
 
         // 巡回する国のリスト
         this.targetCountries = [
-            'Japan',
-            'United States of America',
-            'China',
-            'India',
-            'Brazil',
-            'Nigeria',
-            'South Africa',
-            'United Kingdom',
-            'France',
-            'Germany',
-            'Australia',
-            'Russia',
-            'Canada',
-            'Mexico',
-            'Indonesia',
-            'Kenya',
-            'Thailand',
             'Vietnam',
+            'El Salvador',
+            'Nigeria',
+            'Indonesia',
+            'Niger',
+            'Malawi',
+            'Kenya',
+            'Zimbabwe',
+            'Cameroon',
+            'India',
+            'Belize',
+            'South Africa',
+            'Myanmar',
+            'United States of America',
             'Philippines',
-            'Egypt'
+            'Pakistan',
+            'Afghanistan'
         ];
     }
 
