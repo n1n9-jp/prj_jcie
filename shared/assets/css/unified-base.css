@@ -150,7 +150,7 @@ body {
     font-size: var(--font-size-lg);
     font-weight: var(--font-weight-bold);
     color: var(--color-text-primary);
-    font-family: var(--font-family-serif);
+    font-family: "Hiragino Kaku Gothic Pro", sans-serif;
 }
 
 .site-title a {
@@ -174,7 +174,7 @@ body {
     text-decoration: none;
     transition: color var(--animation-short) var(--easing-ease-in-out);
     position: relative;
-    font-family: var(--font-family-serif) !important;
+    font-family: "Hiragino Kaku Gothic Pro", sans-serif !important;
 }
 
 #site-header .site-nav a:hover {
@@ -185,12 +185,13 @@ body {
 #site-header .site-nav span,
 #site-header .site-nav .nav-current {
     color: var(--color-text-primary);
-    font-weight: var(--font-weight-bold);
+    font-weight: 800;
     font-size: var(--font-size-sm);
     display: block;
     padding: 4px 8px;
     cursor: default;
     position: relative;
+    font-family: "Hiragino Kaku Gothic Pro", sans-serif;
 }
 
 /* 現在のページの感染症カラーバー */
