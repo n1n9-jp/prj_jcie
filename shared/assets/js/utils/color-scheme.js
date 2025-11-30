@@ -3,7 +3,7 @@ import { configLoader } from './config-loader.js';
 /**
  * ColorScheme - コンテンツ全体で統一された色設定
  * 地域名に対して一貫した色を提供
- * 外部設定ファイルからの色設定を利用
+ * 外部設定ファイル(theme.config.json)からの色設定を利用
  */
 export class ColorScheme {
     constructor() {
@@ -24,47 +24,6 @@ export class ColorScheme {
             '#cab2d6', '#6a3d9a', '#ffff99', '#b15928'
         ];
 
-        // 地域名と色のマッピング（theme.config.jsonと完全一致）
-        this.regionColorMap = {
-
-            // エイズで使用されている地域名
-            'アジア・太平洋地域': '#1f78b4',           // 青
-            '東部・南部アフリカ': '#33a02c',           // 緑  
-            '西部・中部アフリカ': '#e31a1c',           // 赤
-            '中東・北アフリカ': '#ff7f00',             // オレンジ
-            '東ヨーロッパ・中央アジア': '#6a3d9a',       // 紫
-            '中南米（ラテンアメリカ）': '#fb9a99',        // 薄いピンク
-            '西・中央ヨーロッパおよび北米': '#a6cee3',    // 薄い青
-            'カリブ海地域': '#fdbf6f',                // 薄いオレンジ
-
-            // 特別なカテゴリ（無彩色）
-            '世界': '#808080',                        // グレー（合計値）
-            '全世界': '#808080',                      // グレー（合計値の別表記）
-
-            // マラリアで使用されている地域名
-            'アフリカ': '#8b4513',          // 茶色（土の色、アフリカ大陸を想起）
-            'アメリカ': '#2e8b57',          // 海緑色（南北アメリカ大陸）
-            '東地中海': '#daa520',          // ゴールデンロッド（砂漠地域）
-            '欧州': '#4169e1',              // ロイヤルブルー（EU旗の青）
-            '東南アジア': '#ff6347',        // トマト色（熱帯地域）
-            '西太平洋': '#20b2aa',          // ライトシーグリーン（太平洋）
-
-            // 資金源（別の色系統）
-            'Global Fund': '#2e8b57',                // シーグリーン
-            'United States Bilateral': '#4682b4',   // スチールブルー
-            'Other International': '#9370db',       // ミディアムパープル
-            'Domestic Public Private': '#cd853f',   // ペルー
-
-            // 結核対策予算の系列
-            '国内予算': '#ff7f0e',                     // オレンジ
-            '国際予算': '#2ca02c',                     // 緑
-
-            // その他のカテゴリ
-            '母子感染': '#ff69b4',                    // ホットピンク（特別なカテゴリ）
-            'その他地域': '#d3d3d3',                   // ライトグレー
-            'その他・特別地域': '#f0f0f0'               // 非常に薄いグレー（南極地域など）
-        };
-
         // 別名（ファイル間の表記揺れ）を標準名にマッピング
         this.regionAliases = {
             // 古いapp-constants.jsの表記 -> 新しい標準名
@@ -74,10 +33,10 @@ export class ColorScheme {
             '西部および中央アフリカ': '西部・中部アフリカ',
             '東欧・中央アジア': '東ヨーロッパ・中央アジア',
             'ラテンアメリカ・カリブ海地域': '中南米（ラテンアメリカ）',
+            'ラテンアメリカ': '中南米（ラテンアメリカ）',
 
             // その他のエイリアス
             'アジア太平洋': 'アジア・太平洋地域',
-            'ラテンアメリカ': '中南米（ラテンアメリカ）',
             '西欧・中欧・北アメリカ': '西・中央ヨーロッパおよび北米',
             'カリブ海沿岸': 'カリブ海地域',
 
@@ -96,11 +55,9 @@ export class ColorScheme {
 
             // テーマ設定が正しく読み込まれているかテスト
             const testColor = configLoader.getColor('regions.アジア・太平洋地域');
-            if (testColor) {
-            } else {
-                console.warn('ColorScheme: Theme colors not loaded properly');
+            if (!testColor) {
+                console.warn('ColorScheme: Theme colors not loaded properly from theme.config.json');
             }
-        } else {
         }
     }
 
@@ -112,6 +69,14 @@ export class ColorScheme {
      */
     getConfigColor(colorPath, fallback) {
         if (this.configAvailable) {
+            const color = configLoader.getColor(colorPath);
+            if (color) {
+                return color;
+            }
+        }
+        // 設定がまだロードされていない場合は再チェック
+        if (!this.configAvailable && configLoader && configLoader.loaded) {
+            this.configAvailable = true;
             const color = configLoader.getColor(colorPath);
             if (color) {
                 return color;
@@ -134,20 +99,18 @@ export class ColorScheme {
         // まず標準名を取得（エイリアス解決）
         const standardName = this.getStandardRegionName(regionName);
 
-        // まず内部マップから取得（確実に動作する）
-        let color = this.regionColorMap[standardName];
-        if (color) {
-            return color;
-        }
-
-        // 外部設定から色を取得を試行（二次的）
-        color = this.getConfigColor(`regions.${standardName}`, null);
+        // 外部設定から色を取得（theme.config.json）
+        // パスは 'regions.地域名' となる
+        const color = this.getConfigColor(`regions.${standardName}`, null);
         if (color) {
             return color;
         }
 
         // 未知の地域の場合はフォールバック色を使用
-        console.warn(`ColorScheme: Unknown region: ${regionName} (standard: ${standardName}). Using fallback color.`);
+        // 設定読み込み前の場合もここに来る可能性があるが、ハッシュベースなので一貫性は保たれる
+        if (this.configAvailable) {
+            console.warn(`ColorScheme: Unknown region: ${regionName} (standard: ${standardName}). Using fallback color.`);
+        }
         const fallbackColor = this.getFallbackColor(regionName);
         return fallbackColor;
     }
@@ -301,11 +264,13 @@ export class ColorScheme {
      * デバッグ用：全ての地域と色のマッピングを表示
      */
     logColorMappings() {
-        Object.entries(this.regionColorMap).forEach(([region, color]) => {
-        });
-
-        Object.entries(this.regionAliases).forEach(([alias, standard]) => {
-        });
+        if (this.configAvailable) {
+            // configLoaderから全設定を取得するメソッドがあればそれを使うが、
+            // 現状は個別に取得する形なので、既知のエイリアスなどを使ってテスト出力する
+            console.log('ColorScheme: Loaded from theme.config.json');
+        } else {
+            console.warn('ColorScheme: Config not loaded yet');
+        }
     }
 }
 
