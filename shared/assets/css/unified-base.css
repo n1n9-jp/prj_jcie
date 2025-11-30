@@ -204,7 +204,7 @@ body {
     width: 60px;
     height: 6px;
     background-color: var(--disease-primary);
-    border-radius: 3px;
+    border-radius: 0;
 }
 
 /* リンク項目の感染症カラーバー - エイズ */
@@ -218,7 +218,7 @@ body {
     width: 60px;
     height: 6px;
     background-color: #ff6b6b; /* エイズの赤色 */
-    border-radius: 3px;
+    border-radius: 0;
 }
 
 #site-header .site-nav a[href*="aids"]:hover,
@@ -237,7 +237,7 @@ body {
     width: 60px;
     height: 6px;
     background-color: #4ecdc4; /* 結核のteal色 */
-    border-radius: 3px;
+    border-radius: 0;
 }
 
 #site-header .site-nav a[href*="tuberculosis"]:hover,
@@ -256,7 +256,7 @@ body {
     width: 60px;
     height: 6px;
     background-color: #f4a620; /* マラリアの黄色 */
-    border-radius: 3px;
+    border-radius: 0;
 }
 
 #site-header .site-nav a[href*="malaria"]:hover,
