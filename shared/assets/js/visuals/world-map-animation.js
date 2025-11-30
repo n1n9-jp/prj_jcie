@@ -63,8 +63,10 @@ export class WorldMapAnimation {
     async init() {
         try {
             // 地図データの読み込み
+            // 地図データの読み込み
             // 注意: topojsonはグローバルに読み込まれている前提
-            const response = await fetch('shared/data/countries-110m.json');
+            const dataUrl = new URL('../../../data/countries-110m.json', import.meta.url).href;
+            const response = await fetch(dataUrl);
             const topoData = await response.json();
 
             if (!window.topojson) {
