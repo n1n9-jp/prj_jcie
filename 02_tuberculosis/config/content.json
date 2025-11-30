@@ -545,7 +545,7 @@
         "content": "",
         "visible": true,
         "position": {
-          "width": "30%",
+          "width": "25%",
           "horizontal": "right",
           "vertical": "center"
         }
@@ -556,7 +556,7 @@
         "position": {
           "horizontal": "left",
           "vertical": "center",
-          "width": "70%",
+          "width": "75%",
           "height": "100%"
         },
         "charts": [
