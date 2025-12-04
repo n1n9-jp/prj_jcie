@@ -1,7 +1,7 @@
+import { ErrorHandler } from '../utils/error-handler.js';
 import * as d3 from 'd3';
 import { configLoader } from '../utils/config-loader.js';
 import { logger as Logger } from '../utils/logger.js';
-import { ErrorHandler } from '../utils/error-handler.js';
 
 /**
  * DataLoader - アプリケーションデータの読み込みと整理

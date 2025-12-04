@@ -1,4 +1,5 @@
 // import scrollama from 'scrollama'; // Using global scrollama from CDN
+import { ErrorHandler } from '../utils/error-handler.js';
 import { DataLoader } from './data-loader.js';
 import { CityStepsGenerator } from './city-steps-generator.js';
 import { pubsub, EVENTS } from './pubsub.js';
@@ -11,7 +12,6 @@ import { EventHandlers } from './event-handlers.js';
 import { StepMapper } from '../utils/step-mapper.js';
 import { PositionManager } from '../utils/position-manager.js';
 import { logger as Logger } from '../utils/logger.js';
-import { ErrorHandler } from '../utils/error-handler.js';
 
 /**
  * Main Application - Scrollytelling メインアプリケーション
