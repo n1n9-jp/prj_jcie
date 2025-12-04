@@ -52,11 +52,13 @@ export class ScrollytellingApp {
         } catch (error) {
             if (Logger) {
                 Logger.error('Failed to initialize app:', error);
-            } else {
+            } else if (typeof ErrorHandler !== 'undefined' && ErrorHandler) {
                 ErrorHandler.handle(error, 'ScrollytellingApp.init', {
                     type: ErrorHandler.ERROR_TYPES.INITIALIZATION,
                     severity: ErrorHandler.SEVERITY.CRITICAL
                 });
+            } else {
+                console.error('CRITICAL ERROR (ErrorHandler not available):', error);
             }
             this.showError('アプリケーションの初期化に失敗しました。');
         }
@@ -79,10 +81,14 @@ export class ScrollytellingApp {
             pubsub.publish(EVENTS.DATA_LOADED, this.data);
 
         } catch (error) {
-            ErrorHandler.handle(error, 'ScrollytellingApp.loadData', {
-                type: ErrorHandler.ERROR_TYPES.DATA_LOAD,
-                severity: ErrorHandler.SEVERITY.CRITICAL
-            });
+            if (typeof ErrorHandler !== 'undefined' && ErrorHandler) {
+                ErrorHandler.handle(error, 'ScrollytellingApp.loadData', {
+                    type: ErrorHandler.ERROR_TYPES.DATA_LOAD,
+                    severity: ErrorHandler.SEVERITY.CRITICAL
+                });
+            } else {
+                console.error('CRITICAL DATA LOAD ERROR (ErrorHandler not available):', error);
+            }
             pubsub.publish(EVENTS.DATA_ERROR, error);
             throw error;
         }
@@ -109,10 +115,14 @@ export class ScrollytellingApp {
         if (this.data.map) {
             this.mapManager.setGeoData(this.data.map);
         } else {
-            ErrorHandler.handle(new Error('No map data available for setting geo data'), 'ScrollytellingApp.initManagers', {
-                type: ErrorHandler.ERROR_TYPES.DATA_LOAD,
-                severity: ErrorHandler.SEVERITY.HIGH
-            });
+            if (typeof ErrorHandler !== 'undefined' && ErrorHandler) {
+                ErrorHandler.handle(new Error('No map data available for setting geo data'), 'ScrollytellingApp.initManagers', {
+                    type: ErrorHandler.ERROR_TYPES.DATA_LOAD,
+                    severity: ErrorHandler.SEVERITY.HIGH
+                });
+            } else {
+                console.warn('No map data available for setting geo data (ErrorHandler not available)');
+            }
         }
     }
 

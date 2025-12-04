@@ -75,11 +75,15 @@ export class DataLoader {
             return { config, data };
 
         } catch (error) {
-            ErrorHandler.handle(
-                error,
-                'DataLoader.loadAll',
-                { type: ErrorHandler.ERROR_TYPES.DATA, severity: ErrorHandler.SEVERITY.CRITICAL }
-            );
+            if (typeof ErrorHandler !== 'undefined' && ErrorHandler) {
+                ErrorHandler.handle(
+                    error,
+                    'DataLoader.loadAll',
+                    { type: ErrorHandler.ERROR_TYPES.DATA, severity: ErrorHandler.SEVERITY.CRITICAL }
+                );
+            } else {
+                console.error('CRITICAL DATA LOADER ERROR (ErrorHandler not available):', error);
+            }
             throw error;
         }
     }
