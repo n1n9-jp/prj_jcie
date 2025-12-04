@@ -69,8 +69,8 @@ export class ScrollytellingApp {
      */
     async loadData() {
         try {
-            // DataLoaderを使用してすべてのデータを読み込み
-            const { config, data } = await DataLoader.loadAll();
+            // ErrorHandlerを依存注入して循環参照を回避
+            const { config, data } = await DataLoader.loadAll(ErrorHandler);
 
             this.config = config;
             this.data = data;

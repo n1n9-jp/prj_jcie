@@ -1,4 +1,3 @@
-import { ErrorHandler } from '../utils/error-handler.js';
 import * as d3 from 'd3';
 import { configLoader } from '../utils/config-loader.js';
 import { logger as Logger } from '../utils/logger.js';
@@ -44,47 +43,79 @@ export class DataLoader {
                 }
                 // Grid chart の場合
                 if (step.chart?.config?.dataFile) {
-                    dataFiles.add(step.chart.config.dataFile);
-                }
-            });
+                    // CSVデータの読み込み
+                    const csvData = await this.loadCSVData(config);
 
-            // 動的にデータファイルを読み込む（感染症対応パス）
-            const dataPromises = [
-                ...Array.from(dataFiles).map(file => {
+                    // 地図データの読み込み
+                    const mapData = await this.loadMapData();
+
+                    const data = {
+                        config,
+                        csv: csvData,
+                        map: mapData,
+                        cities: citiesData
+                    };
+
+                    return { config, data };
+
+                } catch (error) {
+                    if (errorHandler) {
+                        errorHandler.handle(
+                            error,
+                            'DataLoader.loadAll',
+                            { type: errorHandler.ERROR_TYPES.DATA, severity: errorHandler.SEVERITY.CRITICAL }
+                        );
+                    } else {
+                        console.error('CRITICAL DATA LOADER ERROR (ErrorHandler not provided):', error);
+                    }
+                    throw error;
+                }
+            }
+
+    /**
+     * 設定に基づいてCSVデータを読み込む
+     * @param {Object} config - アプリケーション設定
+     * @returns {Promise<Object>} ファイル名をキーとするCSVデータのオブジェクト
+     */
+    static async loadCSVData(config) {
+                const dataFiles = new Set();
+                config.steps.forEach(step => {
+                    if (step.chart?.dataFile) {
+                        dataFiles.add(step.chart.dataFile);
+                    }
+                    // Dual chart の場合
+                    if (step.chart?.charts) {
+                        step.chart.charts.forEach(chartConfig => {
+                            if (chartConfig.dataFile) {
+                                dataFiles.add(chartConfig.dataFile);
+                            }
+                        });
+                    }
+                    // Grid chart の場合
+                    if (step.chart?.config?.dataFile) {
+                        dataFiles.add(step.chart.config.dataFile);
+                    }
+                });
+
+                const dataPromises = Array.from(dataFiles).map(file => {
                     const path = configLoader.resolveDataPath(file);
                     return file.endsWith('.json') ? d3.json(path) : d3.csv(path);
-                }),
-                d3.json(configLoader.resolveDataPath('countries-110m.json'))
-            ];
+                });
 
-            const dataResults = await Promise.all(dataPromises);
-            const mapData = dataResults.pop(); // 最後は地図データ
+                const dataResults = await Promise.all(dataPromises);
 
-            // ファイル名でデータをマッピング（元のファイル名をキーとして使用）
-            const csvData = {};
-            Array.from(dataFiles).forEach((file, index) => {
-                csvData[file] = dataResults[index];
-            });
-
-            const data = {
-                csv: csvData,
-                map: mapData,
-                cities: citiesData
-            };
-
-            return { config, data };
-
-        } catch (error) {
-            if (typeof ErrorHandler !== 'undefined' && ErrorHandler) {
-                ErrorHandler.handle(
-                    error,
-                    'DataLoader.loadAll',
-                    { type: ErrorHandler.ERROR_TYPES.DATA, severity: ErrorHandler.SEVERITY.CRITICAL }
-                );
-            } else {
-                console.error('CRITICAL DATA LOADER ERROR (ErrorHandler not available):', error);
+                const csvData = {};
+                Array.from(dataFiles).forEach((file, index) => {
+                    csvData[file] = dataResults[index];
+                });
+                return csvData;
             }
-            throw error;
-        }
-    }
+
+    /**
+     * 地図データを読み込む
+     * @returns {Promise<Object>} 地図データ
+     */
+    static async loadMapData() {
+                return d3.json(configLoader.resolveDataPath('countries-110m.json'));
+            }
 }
