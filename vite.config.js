@@ -36,30 +36,6 @@ export default defineConfig({
         {
           src: 'shared/data/*.json',
           dest: 'shared/data'
-        },
-        {
-          src: 'public/01_aids/config/*.json',
-          dest: '01_aids/config'
-        },
-        {
-          src: 'public/01_aids/data/*.json',
-          dest: '01_aids/data'
-        },
-        {
-          src: 'public/02_tuberculosis/config/*.json',
-          dest: '02_tuberculosis/config'
-        },
-        {
-          src: 'public/02_tuberculosis/data/*.json',
-          dest: '02_tuberculosis/data'
-        },
-        {
-          src: 'public/03_malariae/config/*.json',
-          dest: '03_malariae/config'
-        },
-        {
-          src: 'public/03_malariae/data/*.json',
-          dest: '03_malariae/data'
         }
       ]
     })
