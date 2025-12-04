@@ -36,6 +36,18 @@ export default defineConfig({
         {
           src: 'shared/data/*.json',
           dest: 'shared/data'
+        },
+        {
+          src: '01_aids/data/*.{json,csv}',
+          dest: '01_aids/data'
+        },
+        {
+          src: '02_tuberculosis/data/*.{json,csv}',
+          dest: '02_tuberculosis/data'
+        },
+        {
+          src: '03_malariae/data/*.{json,csv}',
+          dest: '03_malariae/data'
         }
       ]
     })
