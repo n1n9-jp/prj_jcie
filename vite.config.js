@@ -42,12 +42,36 @@ export default defineConfig({
           dest: '01_aids/data'
         },
         {
+          src: '01_aids/thumb/*.{jpg,jpeg,png,webp}',
+          dest: '01_aids/thumb'
+        },
+        {
+          src: '01_aids/assets/images/*.{jpg,jpeg,png,svg,webp}',
+          dest: '01_aids/assets/images'
+        },
+        {
           src: '02_tuberculosis/data/*.{json,csv}',
           dest: '02_tuberculosis/data'
         },
         {
+          src: '02_tuberculosis/thumb/*.{jpg,jpeg,png,webp}',
+          dest: '02_tuberculosis/thumb'
+        },
+        {
+          src: '02_tuberculosis/assets/images/*.{jpg,jpeg,png,svg,webp}',
+          dest: '02_tuberculosis/assets/images'
+        },
+        {
           src: '03_malariae/data/*.{json,csv}',
           dest: '03_malariae/data'
+        },
+        {
+          src: '03_malariae/thumb/*.{jpg,jpeg,png,webp}',
+          dest: '03_malariae/thumb'
+        },
+        {
+          src: '03_malariae/assets/images/*.{jpg,jpeg,png,svg,webp}',
+          dest: '03_malariae/assets/images'
         }
       ]
     })
