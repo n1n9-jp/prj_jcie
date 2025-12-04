@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite';
 import { resolve } from 'path';
+import { viteStaticCopy } from 'vite-plugin-static-copy';
 
 export default defineConfig({
   root: './',
@@ -24,5 +25,19 @@ export default defineConfig({
   },
   server: {
     open: true
-  }
+  },
+  plugins: [
+    viteStaticCopy({
+      targets: [
+        {
+          src: 'shared/config/*.json',
+          dest: 'shared/config'
+        },
+        {
+          src: 'shared/data/*.json',
+          dest: 'shared/data'
+        }
+      ]
+    })
+  ]
 });
