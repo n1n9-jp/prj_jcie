@@ -1,1 +1,0 @@
-import{m as e}from"./map-renderer-C3o_aiIm.js";import{S as o}from"./ScrollytellingApp-B4TDs9Jt.js";window.DISEASE_TYPE="tuberculosis";e.setDiseaseType("tuberculosis");document.addEventListener("DOMContentLoaded",()=>{window.app=new o});

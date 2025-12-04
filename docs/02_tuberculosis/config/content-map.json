@@ -1,0 +1,104 @@
+{
+  "timeline": {
+    "title": "グローバルファンド 結核対策の物語",
+    "description": "世界各地で結核と闘う人々の取り組みをたどる旅"
+  },
+  "cities": [
+    {
+      "id": "indonesia1",
+      "name": "ジャカルタ",
+      "nameEn": "Jakarta",
+      "country": "Indonesia",
+      "latitude": -6.2088,
+      "longitude": 106.8456,
+      "order": 1,
+      "data": {
+        "title": "コロナと結核「二正面」強いられた医師",
+        "description": "酸素足りず患者の受け入れ断念、夜中に電話も ",
+        "thumbnail": "tb_jakarta_1.jpg",
+        "url": "https://globe.asahi.com/article/14450999"
+      },
+      "style": {
+        "color": "#4ecdc4",
+        "size": 8
+      },
+      "transitions": {
+        "distanceFromPrevious": 0,
+        "scrollHeight": "100vh",
+        "routeType": "start"
+      }
+    },
+    {
+      "id": "indonesia2",
+      "name": "ジャカルタ",
+      "nameEn": "Jakarta",
+      "country": "Indonesia",
+      "latitude": -6.2088,
+      "longitude": 106.8456,
+      "order": 2,
+      "data": {
+        "title": "インドネシアの結核対策を取材して",
+        "description": "世界で3番目に結核の負荷が高いインドネシアで、結核対策に取り組む人々の取材を行い、国際機関・グローバルファンドの役割を描き出しました。",
+        "thumbnail": "tb_jakarta_2.jpg",
+        "url": "https://www.youtube.com/watch?v=yL1LvpLCNQI"
+      },
+      "style": {
+        "color": "#4ecdc4",
+        "size": 7
+      },
+      "transitions": {
+        "distanceFromPrevious": 0,
+        "scrollHeight": "100vh",
+        "routeType": "same-location"
+      }
+    },
+    {
+      "id": "vietnam",
+      "name": "ハノイ",
+      "nameEn": "Hanoi",
+      "country": "Vietnam",
+      "latitude": 21.0285,
+      "longitude": 105.8542,
+      "order": 3,
+      "data": {
+        "title": "生死をさまよい、今は希望をつなぐ当事者代表へ",
+        "description": "高校生だったフィオナの人生は一変する。結核により生死をさまよい、身体が不自由になっても、彼女は前を向き、同じ状況で苦しむ人びとを支え、当初描いた夢を実現させていく。",
+        "thumbnail": "tb_vietnum.jpg",
+        "url": "https://www.youtube.com/watch?v=3coUafjHoGM"
+      },
+      "style": {
+        "color": "#4ecdc4",
+        "size": 8
+      },
+      "transitions": {
+        "distanceFromPrevious": 1200,
+        "scrollHeight": "100vh",
+        "routeType": "flight"
+      }
+    },
+    {
+      "id": "southafrica",
+      "name": "ヨハネスブルグ",
+      "nameEn": "Johannesburg",
+      "country": "South Africa",
+      "latitude": -26.2041,
+      "longitude": 28.0473,
+      "order": 4,
+      "data": {
+        "title": "私たち全員が呼吸をしているからこそ、結核は私たち全員の問題",
+        "description": "ゾレワ医師のような人々は、HIV、結核、マラリアとの闘いの最前線に立っています。",
+        "thumbnail": "tb_southafrica.jpg",
+        "url": "https://www.youtube.com/watch?v=oix9xLZkZCc"
+      },
+      "style": {
+        "color": "#4ecdc4",
+        "size": 8
+      },
+      "transitions": {
+        "distanceFromPrevious": 8500,
+        "scrollHeight": "100vh",
+        "routeType": "flight"
+      }
+    }
+  ]
+}

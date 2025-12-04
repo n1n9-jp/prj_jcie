@@ -1,0 +1,33 @@
+{
+  "metadata": {
+    "description": "エイズコンテンツ用の統一設定ファイル",
+    "disease": "aids",
+    "diseaseNameJa": "エイズ"
+  },
+  "app": {
+    "info": {
+      "name": "エイズとの闘い"
+    }
+  },
+  "design": {
+    "colors": {
+      "disease": {
+        "primary": "#dc2626",
+        "secondary": "#ef4444",
+        "accent": "#b91c1c"
+      },
+      "chart": {
+        "line": ["#dc2626", "#2563eb", "#059669", "#d97706", "#7c3aed", "#0891b2"],
+        "bar": ["#ef4444", "#3b82f6", "#10b981", "#f59e0b", "#8b5cf6", "#06b6d4"],
+        "pie": ["#b91c1c", "#1e40af", "#047857", "#b45309", "#6d28d9", "#0e7490"],
+        "map": {
+          "hover": "#dc2626",
+          "active": "#b91c1c"
+        }
+      }
+    }
+  },
+  "ui": {
+    "theme": "aids"
+  }
+}

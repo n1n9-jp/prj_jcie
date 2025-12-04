@@ -1,0 +1,182 @@
+{
+  "timeline": {
+    "title": "グローバルファンド エイズ対策の物語",
+    "description": "世界各地で活動する人々の物語をたどる旅"
+  },
+  "cities": [
+    {
+      "id": "lagos",
+      "name": "ラゴス",
+      "nameEn": "Lagos",
+      "country": "Nigeria",
+      "latitude": 6.5244,
+      "longitude": 3.3792,
+      "order": 1,
+      "data": {
+        "title": "ムリカットの物語",
+        "url": "https://fgfj.jcie.or.jp/news/2022-11-30_globalfund_20th-anniversary-film-episode3/",
+        "thumbnail": "aids_nigeria.jpg",
+        "description": "未来へ命と想いを繋ぐ メンターマザー"
+      },
+      "style": {
+        "color": "#ff6b6b",
+        "size": 8
+      },
+      "transitions": {
+        "distanceFromPrevious": 0,
+        "scrollHeight": "100vh",
+        "routeType": "start"
+      }
+    },
+    {
+      "id": "lilongwe",
+      "name": "リロングウェ",
+      "nameEn": "Lilongwe",
+      "country": "Malawi",
+      "latitude": -13.9626,
+      "longitude": 33.7741,
+      "order": 2,
+      "data": {
+        "title": "闘うマラウイの女性達",
+        "url": "https://www.youtube.com/watch?v=Z2LoukbqIH8",
+        "thumbnail": "aids_malawi.jpg",
+        "description": "今なお続くHIVへの差別・偏見と闘うマラウイの女性達"
+      },
+      "style": {
+        "color": "#4ecdc4",
+        "size": 7
+      },
+      "transitions": {
+        "distanceFromPrevious": 3500,
+        "scrollHeight": "150vh",
+        "routeType": "flight",
+        "crossedFeatures": ["Central Africa", "East Africa"]
+      }
+    },
+    {
+      "id": "nairobi",
+      "name": "ナイロビ",
+      "nameEn": "Nairobi",
+      "country": "Kenya",
+      "latitude": -1.2921,
+      "longitude": 36.8219,
+      "order": 3,
+      "data": {
+        "title": "ローズマリーの物語",
+        "url": "https://www.youtube.com/watch?v=eTvkmWYVHqc",
+        "thumbnail": "aids_kenya_1.jpg",
+        "description": "コロナ禍でも命を救いたいとの情熱は衰えない"
+      },
+      "style": {
+        "color": "#45b7d1",
+        "size": 7
+      },
+      "transitions": {
+        "distanceFromPrevious": 1500,
+        "scrollHeight": "120vh",
+        "routeType": "flight",
+        "crossedFeatures": ["Tanzania", "Kenya Highlands"]
+      }
+    },
+    {
+      "id": "belmopan",
+      "name": "ベルモパン",
+      "nameEn": "Belmopan",
+      "country": "Belize",
+      "latitude": 17.2514,
+      "longitude": -88.7590,
+      "order": 4,
+      "data": {
+        "title": "エリカ・カステヤノスの物語",
+        "url": "https://globe.asahi.com/article/13886312",
+        "thumbnail": "aids_belize.jpg",
+        "description": "夢を叶えたトランスジェンダーのHIV活動家"
+      },
+      "style": {
+        "color": "#f7d794",
+        "size": 6
+      },
+      "transitions": {
+        "distanceFromPrevious": 14000,
+        "scrollHeight": "200vh",
+        "routeType": "flight",
+        "crossedFeatures": ["Indian Ocean", "Arabian Sea", "Middle East", "Atlantic Ocean", "Caribbean Sea"]
+      }
+    },
+    {
+      "id": "washington",
+      "name": "ワシントンD.C.",
+      "nameEn": "Washington D.C.",
+      "country": "United States of America",
+      "latitude": 38.9072,
+      "longitude": -77.0369,
+      "order": 5,
+      "data": {
+        "title": "マーク・ダイブル（支援者）の物語",
+        "url": "https://globe.asahi.com/article/14279191",
+        "thumbnail": "aids_america.jpg",
+        "description": "アフリカを絶望から希望へと変えたエイズ対策　30年の歩みを振り返る"
+      },
+      "style": {
+        "color": "#ff9ff3",
+        "size": 7
+      },
+      "transitions": {
+        "distanceFromPrevious": 2500,
+        "scrollHeight": "130vh",
+        "routeType": "flight",
+        "crossedFeatures": ["Gulf of Mexico", "United States"]
+      }
+    },
+    {
+      "id": "nairobi2",
+      "name": "ナイロビ",
+      "nameEn": "Nairobi",
+      "country": "Kenya",
+      "latitude": -1.2921,
+      "longitude": 36.8219,
+      "order": 6,
+      "data": {
+        "title": "モーリーン・ムレンガの物語",
+        "url": "https://globe.asahi.com/article/14338985",
+        "thumbnail": "aids_kenya_2.jpg",
+        "description": "妊娠4カ月でHIV感染が発覚　余命2年の宣告から聖火ランナーになるまで"
+      },
+      "style": {
+        "color": "#54a0ff",
+        "size": 7
+      },
+      "transitions": {
+        "distanceFromPrevious": 11000,
+        "scrollHeight": "180vh",
+        "routeType": "flight",
+        "crossedFeatures": ["Atlantic Ocean", "Africa"]
+      }
+    },
+    {
+      "id": "manila",
+      "name": "マニラ",
+      "nameEn": "Manila",
+      "country": "Philippines",
+      "latitude": 14.5995,
+      "longitude": 120.9842,
+      "order": 7,
+      "data": {
+        "title": "ジェフリー・アカバの物語",
+        "url": "https://globe.asahi.com/article/14405967",
+        "thumbnail": "aids_philippines.jpg",
+        "description": "HIV啓発するはずの自分が感染　ゲイの男性が感じた負い目と教訓「自分も人間」"
+      },
+      "style": {
+        "color": "#2ed573",
+        "size": 7
+      },
+      "transitions": {
+        "distanceFromPrevious": 8500,
+        "scrollHeight": "170vh",
+        "routeType": "flight",
+        "crossedFeatures": ["Indian Ocean", "Southeast Asia", "South China Sea"]
+      }
+    }
+  ]
+}

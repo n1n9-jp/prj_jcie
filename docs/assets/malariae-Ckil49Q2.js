@@ -1,0 +1,1 @@
+import{m as e}from"./map-renderer-DsnCYM8v.js";import{S as a}from"./ScrollytellingApp-D26Fsra_.js";window.DISEASE_TYPE="malariae";e.setDiseaseType("malariae");document.addEventListener("DOMContentLoaded",()=>{window.app=new a});

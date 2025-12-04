@@ -1,0 +1,27 @@
+{
+  "version": "2.0.0",
+  "description": "Simplified 3-file configuration system",
+  "configFiles": {
+    "content": "content.json",
+    "appSettingsBase": "../shared/config/app-settings.base.json",
+    "appSettings": "app-settings.json",
+    "theme": "../shared/config/theme.config.json"
+  },
+  "loadOrder": [
+    "app",
+    "theme",
+    "animation",
+    "settings",
+    "content"
+  ],
+  "mergeStrategy": {
+    "deep": true,
+    "arrayMerge": "replace",
+    "overwriteOnConflict": true
+  },
+  "fallbacks": {
+    "useDefaults": true,
+    "continueOnError": true,
+    "logErrors": true
+  }
+}
