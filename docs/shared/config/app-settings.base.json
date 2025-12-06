@@ -84,7 +84,8 @@
       "minZoom": 0.5,
       "maxZoom": 20,
       "zoomStep": 0.5,
-      "defaultProjection": "naturalEarth1",
+      "defaultProjection": "mercator",
+      "heroProjection": "orthographic",
       "enableInteraction": false,
       "responsive": true,
       "interactions": {

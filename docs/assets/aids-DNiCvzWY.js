@@ -1,1 +1,0 @@
-import{m as e}from"./map-renderer-DsnCYM8v.js";import{S as o}from"./ScrollytellingApp-D26Fsra_.js";window.DISEASE_TYPE="aids";e.setDiseaseType("aids");document.addEventListener("DOMContentLoaded",()=>{window.app=new o});
