@@ -11,6 +11,7 @@ import { ImageManager } from '../managers/image-manager.js';
 import { EventHandlers } from './event-handlers.js';
 import { StepMapper } from '../utils/step-mapper.js';
 import { PositionManager } from '../utils/position-manager.js';
+import { configLoader } from '../utils/config-loader.js';
 import { logger as Logger } from '../utils/logger.js';
 
 /**
@@ -110,6 +111,13 @@ export class ScrollytellingApp {
         this.chartManager = new ChartManager('#chart');
         this.mapManager = new MapManager('#map-container');
         this.imageManager = new ImageManager('#image-container');
+        const legacyMaps = configLoader.getLegacyCompatibleConfig?.();
+        const legacyMapsConfig = legacyMaps?.maps || {};
+        const mapConfig = {
+            defaultProjection: 'mercator',
+            ...legacyMapsConfig
+        };
+        this.mapManager.config = mapConfig;
 
         // 地図データを設定
         if (this.data.map) {

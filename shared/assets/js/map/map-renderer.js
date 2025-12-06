@@ -115,6 +115,9 @@ export class MapRenderer {
      * @param {Object} config - 設定オプション
      */
     renderMap(geoData, config = {}) {
+        if (typeof console !== 'undefined' && console.info) {
+            console.info('[MapRenderer] rendering with projectionType:', config.projectionType || 'naturalEarth1');
+        }
         // 再描画時は既存の拡散矢印を即座にクリア
         this.clearSpreadingArrows();
 
@@ -157,6 +160,11 @@ export class MapRenderer {
                 .scale(safeZoom * baseScale * scaleMultiplier * customScaleMultiplier)
                 .center(safeCenter)
                 .rotate([-safeCenter[0], -safeCenter[1]])
+                .translate([svgWidth / 2, (svgHeight / 2) + offsetY]);
+        } else if (config.projectionType === 'mercator') {
+            this.projection = d3.geoMercator()
+                .scale(safeZoom * baseScale * scaleMultiplier * customScaleMultiplier)
+                .center(safeCenter)
                 .translate([svgWidth / 2, (svgHeight / 2) + offsetY]);
         } else {
             this.projection = d3.geoNaturalEarth1()

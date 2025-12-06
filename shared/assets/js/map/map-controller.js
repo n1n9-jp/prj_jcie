@@ -19,7 +19,12 @@ export class MapController {
      * @param {Object} mapData - 地図データとオプション
      */
     updateMap(mapData) {
-        const { center, zoom, visible, data, highlightCountries = [], cities = [], mode, citiesFile, cityId, useRegionColors = false, lightenNonVisited = false, lightenAllCountries = false, targetRegions = [], width = 800, height = 600, widthPercent, heightPercent, aspectRatio, showSpreadingArrows = false, position } = mapData;
+        const { center, zoom, visible, data, highlightCountries = [], cities = [], mode, citiesFile, cityId, useRegionColors = false, lightenNonVisited = false, lightenAllCountries = false, targetRegions = [], width = 800, height = 600, widthPercent, heightPercent, aspectRatio, showSpreadingArrows = false, position, projectionType: requestedProjection } = mapData;
+
+        const projectionType = requestedProjection || this.mapManager?.config?.defaultProjection || 'mercator';
+        if (typeof console !== 'undefined' && console.info) {
+            console.info('[MapController] projectionType resolved to:', projectionType);
+        }
 
         // BaseManagerの統一position処理を適用
         if (position && this.mapManager.applyPositionSettings) {
@@ -33,7 +38,8 @@ export class MapController {
             renderer.clearSpreadingArrows();
         }
 
-        this.mapManager.currentView = { center, zoom, highlightCountries, cities, mode, citiesFile, cityId, useRegionColors, lightenNonVisited, lightenAllCountries, targetRegions };
+        const previousProjectionType = this.mapManager.currentView?.projectionType;
+        this.mapManager.currentView = { center, zoom, highlightCountries, cities, mode, citiesFile, cityId, useRegionColors, lightenNonVisited, lightenAllCountries, targetRegions, projectionType };
 
         if (visible) {
             this.mapManager.show();
@@ -57,10 +63,13 @@ export class MapController {
 
             if (this.mapManager.geoData) {
                 // 地図が既に描画されているかチェック
-                if (!this.mapManager.svg || this.mapManager.svg.selectAll('.map-country').empty()) {
-                    this.mapManager.renderMap(this.mapManager.geoData, { center, zoom, highlightCountries, cities, useRegionColors, lightenNonVisited, lightenAllCountries, targetRegions, width, height, widthPercent, heightPercent, aspectRatio, showSpreadingArrows, mode });
+                const renderConfig = { center, zoom, highlightCountries, cities, useRegionColors, lightenNonVisited, lightenAllCountries, targetRegions, width, height, widthPercent, heightPercent, aspectRatio, showSpreadingArrows, mode, projectionType };
+                const needsRerender = previousProjectionType && previousProjectionType !== projectionType;
+
+                if (!this.mapManager.svg || this.mapManager.svg.selectAll('.map-country').empty() || needsRerender) {
+                    this.mapManager.renderMap(this.mapManager.geoData, renderConfig);
                 } else {
-                    this.updateExistingMap({ center, zoom, highlightCountries, cities, useRegionColors, lightenNonVisited, lightenAllCountries, targetRegions, width, height, widthPercent, heightPercent, aspectRatio, showSpreadingArrows, mode });
+                    this.updateExistingMap(renderConfig);
                 }
             } else {
                 if (Logger) {
@@ -107,8 +116,8 @@ export class MapController {
             this.mapManager.mapInitialized = true;
             // 初期地図描画
             if (this.mapManager.currentView) {
-                const { center, zoom, highlightCountries, cities, useRegionColors, lightenNonVisited, lightenAllCountries, targetRegions, width, height, widthPercent, heightPercent, aspectRatio, showSpreadingArrows, mode } = this.mapManager.currentView;
-                this.mapManager.renderMap(geoData, { center, zoom, highlightCountries, cities, useRegionColors, lightenNonVisited, lightenAllCountries, targetRegions, width, height, widthPercent, heightPercent, aspectRatio, showSpreadingArrows, mode });
+                const { center, zoom, highlightCountries, cities, useRegionColors, lightenNonVisited, lightenAllCountries, targetRegions, width, height, widthPercent, heightPercent, aspectRatio, showSpreadingArrows, mode, projectionType } = this.mapManager.currentView;
+                this.mapManager.renderMap(geoData, { center, zoom, highlightCountries, cities, useRegionColors, lightenNonVisited, lightenAllCountries, targetRegions, width, height, widthPercent, heightPercent, aspectRatio, showSpreadingArrows, mode, projectionType });
             }
         }
     }
@@ -119,7 +128,7 @@ export class MapController {
      * @param {Object} config - 更新設定
      */
     updateExistingMap(config = {}) {
-        const { center, zoom, highlightCountries, cities, useRegionColors = false, lightenNonVisited = false, lightenAllCountries = false, targetRegions = [], showSpreadingArrows = false, mode } = config;
+        const { center, zoom, highlightCountries, cities, useRegionColors = false, lightenNonVisited = false, lightenAllCountries = false, targetRegions = [], showSpreadingArrows = false, mode, projectionType } = config;
 
         if (!this.mapManager.svg || !this.mapManager.geoData) {
             return;

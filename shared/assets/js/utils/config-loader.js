@@ -718,10 +718,13 @@ export class ConfigLoader {
     getLegacyCompatibleConfig() {
         const content = this.configs.content || {};
         const settings = this.configs.settings || {};
+        const appMaps = this.configs.app?.maps || {};
+        const contentMaps = content.maps || {};
 
         return {
             steps: content.steps || [],
-            settings: settings
+            settings: settings,
+            maps: { ...appMaps, ...contentMaps }
         };
     }
 
@@ -761,4 +764,3 @@ export class ConfigLoader {
 
 // グローバルインスタンスを作成
 export const configLoader = new ConfigLoader();
-

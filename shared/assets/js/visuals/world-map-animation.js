@@ -1,5 +1,6 @@
 import * as d3 from 'd3';
 import { MapRenderer } from '../map/map-renderer.js';
+import { ConfigLoader } from '../utils/config-loader.js';
 import { AppConstants } from '../utils/app-constants.js';
 
 /**
@@ -18,6 +19,7 @@ export class WorldMapAnimation {
     constructor(containerId, overlayId) {
         this.container = d3.select(containerId);
         this.overlayText = d3.select(overlayId);
+        this.configLoader = new ConfigLoader();
 
         // MapRenderer用の簡易マネージャー（依存解決用）
         const mockMapManager = {
@@ -59,6 +61,19 @@ export class WorldMapAnimation {
      */
     async init() {
         try {
+            // 設定から投影法を取得（フォールバックはorthographic）
+            let projectionType = 'orthographic';
+            try {
+                if (this.configLoader?.setDiseaseType && window?.DISEASE_TYPE) {
+                    this.configLoader.setDiseaseType(window.DISEASE_TYPE);
+                }
+                const configs = await this.configLoader.loadAll();
+                const mapsConfig = configs?.app?.maps || {};
+                projectionType = mapsConfig.heroProjection || mapsConfig.defaultProjection || projectionType;
+            } catch (configError) {
+                console.warn('WorldMapAnimation: Failed to load map projection config, using default', configError);
+            }
+
             // 地図データの読み込み
             // 地図データの読み込み
             // 注意: topojsonはグローバルに読み込まれている前提
@@ -82,7 +97,7 @@ export class WorldMapAnimation {
                 useRegionColors: false,
                 lightenAllCountries: true, // 全体を薄くする
                 disableZoom: true, // ズーム無効化
-                projectionType: 'orthographic', // 3D地球儀モード
+                projectionType, // 設定で指定された投影法を使用
                 offsetY: -50, // 位置調整
                 scaleMultiplier: 1.5 // 大きさを1.5倍
             });

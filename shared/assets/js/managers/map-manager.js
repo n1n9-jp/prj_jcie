@@ -18,6 +18,7 @@ export class MapManager extends BaseManager {
         this.path = null;
         this.geoData = null;
         this.currentView = null;
+        this.config = null; // map関連の設定を保持
 
         // MapRenderer のインスタンス化
         this.renderer = null;
