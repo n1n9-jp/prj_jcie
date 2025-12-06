@@ -339,7 +339,7 @@ export class ChartManager extends BaseManager {
      * @param {Object} chartData - チャートデータ
      */
     async handleDualLayout(chartData) {
-        console.log('ChartManager: handleDualLayout called with:', chartData);
+        // console.log('ChartManager: handleDualLayout called with:', chartData);
         try {
             // データ読み込み（不足している場合）
             if (chartData.charts) {
@@ -347,7 +347,7 @@ export class ChartManager extends BaseManager {
                     if ((!chart.data || chart.data.length === 0) && chart.dataFile) {
                         try {
                             const dataPath = configLoader.resolveDataPath(chart.dataFile);
-                            console.log(`ChartManager: Loading data for ${chart.id} from ${dataPath}`);
+                            // console.log(`ChartManager: Loading data for ${chart.id} from ${dataPath}`);
                             chart.data = await d3.csv(dataPath);
                         } catch (e) {
                             ErrorHandler.handle(e, `ChartManager.handleDualLayout (loading ${chart.id})`, {

@@ -50,7 +50,7 @@ export class SankeyChartRenderer extends ChartRendererBase {
      * @param {Object} config - 設定
      */
     renderSankeyChart(data, config) {
-        console.log('SankeyChartRenderer: renderSankeyChart called with data:', data);
+        // console.log('SankeyChartRenderer: renderSankeyChart called with data:', data);
         try {
             if (!data || !data.nodes || !data.links) {
                 console.error('SankeyChartRenderer: Invalid data structure', data);

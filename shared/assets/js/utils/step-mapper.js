@@ -114,10 +114,10 @@ export class StepMapper {
 
         // デバッグ情報
         // if (window.DEBUG_STEP_MAPPER) {
-        console.log('StepMapper: 計算されたマッピング', mappings);
+        // console.log('StepMapper: 計算されたマッピング', mappings);
         // インデックス順にソートして表示
         const sorted = Object.entries(mappings).sort((a, b) => a[1] - b[1]);
-        console.log('StepMapper: Sorted Mappings:', sorted);
+        // console.log('StepMapper: Sorted Mappings:', sorted);
         // }
 
         return mappings;

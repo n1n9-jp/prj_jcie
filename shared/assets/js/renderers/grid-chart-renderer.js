@@ -279,7 +279,7 @@ export class GridChartRenderer extends ChartRendererBase {
         const centerX = x + width / 2;
         const centerY = y + height / 2;
 
-        console.log('GridChartRenderer: renderGridCell - width:', width, 'height:', height, 'radius:', radius);
+        // console.log('GridChartRenderer: renderGridCell - width:', width, 'height:', height, 'radius:', radius);
 
         try {
             // セルグループを作成
@@ -445,7 +445,7 @@ export class GridChartRenderer extends ChartRendererBase {
     initSVG(width, height) {
         this.clearContainer();
 
-        console.log('GridChartRenderer: initSVG called with width:', width, 'height:', height);
+        // console.log('GridChartRenderer: initSVG called with width:', width, 'height:', height);
 
         // グリッドチャートでは固定サイズを使用（レスポンシブではなく）
         this.svg = this.container
@@ -456,7 +456,7 @@ export class GridChartRenderer extends ChartRendererBase {
             .style('display', 'block')
             .style('margin', '0 auto'); // センタリング
 
-        console.log('GridChartRenderer: SVG created with actual size:', width, 'x', height);
+        // console.log('GridChartRenderer: SVG created with actual size:', width, 'x', height);
         return this.svg;
     }
 

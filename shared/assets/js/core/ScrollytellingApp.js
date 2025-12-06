@@ -270,7 +270,7 @@ export class ScrollytellingApp {
                 StepMapper.getIndex(lastStepLogicalName) :
                 null;
             if (lastStepIndex !== null) {
-                console.log(`Footer step detected from HTML: ${lastStepLogicalName} → ${lastStepIndex}`);
+                // console.log(`Footer step detected from HTML: ${lastStepLogicalName} → ${lastStepIndex}`);
                 return lastStepIndex.toString();
             }
         }
@@ -284,12 +284,12 @@ export class ScrollytellingApp {
         };
 
         if (diseaseFooterSteps[diseaseType]) {
-            console.log(`Footer step fallback for ${diseaseType}: ${diseaseFooterSteps[diseaseType]}`);
+            // console.log(`Footer step fallback for ${diseaseType}: ${diseaseFooterSteps[diseaseType]}`);
             return diseaseFooterSteps[diseaseType];
         }
 
         // 5. 最終フォールバック
-        console.log('Footer step using final fallback: 25');
+        // console.log('Footer step using final fallback: 25');
         return '25';
     }
 

@@ -53,7 +53,7 @@ export class ChartLayoutManager extends BaseLayout {
             initialized: true,
             timestamp: Date.now()
         };
-        console.log(`ChartLayoutManager: Initialized ${type} layout`);
+        // console.log(`ChartLayoutManager: Initialized ${type} layout`);
     }
 
     /**

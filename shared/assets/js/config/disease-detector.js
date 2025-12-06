@@ -65,7 +65,7 @@ export class DiseaseDetector {
             this.currentDisease = type;
             this.config = DISEASE_CONFIG[type];
             this.basePath = this.config.paths.base;
-            console.log(`DiseaseDetector: Explicitly set disease type to ${type}`);
+            // console.log(`DiseaseDetector: Explicitly set disease type to ${type}`);
         } else {
             console.error(`DiseaseDetector: Invalid disease type ${type}`);
         }

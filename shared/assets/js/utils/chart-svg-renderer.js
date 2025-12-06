@@ -44,7 +44,7 @@ export class ChartSVGRenderer extends BaseManager {
             return;
         }
 
-        console.log('ChartSVGRenderer: Starting direct dual layout rendering (no renderer contamination)');
+        // console.log('ChartSVGRenderer: Starting direct dual layout rendering (no renderer contamination)');
 
         // 統一コンテナ管理：完全にクリア
         this.clearContainer();
@@ -83,7 +83,7 @@ export class ChartSVGRenderer extends BaseManager {
         this.drawSingleChartInSVG(leftChartSVG, charts[0], layout, 'left');
         this.drawSingleChartInSVG(rightChartSVG, charts[1], layout, 'right');
 
-        console.log('ChartSVGRenderer: Direct dual layout rendering completed');
+        // console.log('ChartSVGRenderer: Direct dual layout rendering completed');
     }
 
     /**
@@ -342,7 +342,7 @@ export class ChartSVGRenderer extends BaseManager {
         const chartWidth = Math.max((availableWidth - spacing) / 2, 400);
         const chartHeight = Math.max(availableHeight, 300);
 
-        console.log(`DEBUG: calculateDualLayoutDimensions - totalWidth: ${totalWidth}, totalHeight: ${totalHeight}, chartWidth: ${chartWidth}, chartHeight: ${chartHeight}`);
+        // console.log(`DEBUG: calculateDualLayoutDimensions - totalWidth: ${totalWidth}, totalHeight: ${totalHeight}, chartWidth: ${chartWidth}, chartHeight: ${chartHeight}`);
 
         return {
             totalWidth,

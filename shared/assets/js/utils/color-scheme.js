@@ -267,7 +267,7 @@ export class ColorScheme {
         if (this.configAvailable) {
             // configLoaderから全設定を取得するメソッドがあればそれを使うが、
             // 現状は個別に取得する形なので、既知のエイリアスなどを使ってテスト出力する
-            console.log('ColorScheme: Loaded from theme.config.json');
+            // console.log('ColorScheme: Loaded from theme.config.json');
         } else {
             console.warn('ColorScheme: Config not loaded yet');
         }

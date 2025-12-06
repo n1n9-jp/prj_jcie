@@ -83,8 +83,6 @@ export class NavigationManager {
 
         const html = this.generateNavigationHTML();
         navUl.innerHTML = html;
-
-        // console.log(`Navigation rendered for: ${this.getCurrentDiseaseType()}`);
     }
 
     /**
