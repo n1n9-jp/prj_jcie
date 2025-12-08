@@ -1,0 +1,23 @@
+{
+  "version": "2.0.0",
+  "description": "Top page unified configuration",
+  "configFiles": {
+    "appSettingsBase": "app-settings.base.json",
+    "theme": "theme.config.json"
+  },
+  "loadOrder": [
+    "app",
+    "theme",
+    "settings"
+  ],
+  "mergeStrategy": {
+    "deep": true,
+    "arrayMerge": "replace",
+    "overwriteOnConflict": true
+  },
+  "fallbacks": {
+    "useDefaults": true,
+    "continueOnError": true,
+    "logErrors": true
+  }
+}
