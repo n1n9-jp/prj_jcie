@@ -136,7 +136,7 @@
       },
       "map": {
         "visible": true,
-        "center": [70, 10],
+        "center": [25, 10],
         "zoom": 1.8,
         "widthPercent": 100,
         "heightPercent": 100,

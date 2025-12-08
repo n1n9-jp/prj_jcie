@@ -155,13 +155,16 @@ export class MapRenderer {
         const baseScale = config.projectionType === 'orthographic' ? 250 : 150;
         const customScaleMultiplier = config.scaleMultiplier || 1.0;
 
-        if (config.projectionType === 'orthographic') {
+        // Initialize projectionType
+        this.projectionType = config.projectionType || 'naturalEarth1';
+
+        if (this.projectionType === 'orthographic') {
             this.projection = d3.geoOrthographic()
                 .scale(safeZoom * baseScale * scaleMultiplier * customScaleMultiplier)
-                .center(safeCenter)
+                .center([0, 0])
                 .rotate([-safeCenter[0], -safeCenter[1]])
                 .translate([svgWidth / 2, (svgHeight / 2) + offsetY]);
-        } else if (config.projectionType === 'mercator') {
+        } else if (this.projectionType === 'mercator') {
             this.projection = d3.geoMercator()
                 .scale(safeZoom * baseScale * scaleMultiplier * customScaleMultiplier)
                 .center(safeCenter)
@@ -647,8 +650,9 @@ export class MapRenderer {
                 const interpolateCenter = d3.interpolate(currentCenter, safeCenter);
                 const interpolateScale = d3.interpolate(currentScale, targetScale);
 
-                // For Orthographic, we interpolate rotation instead of center
-                const isOrthographic = this.projection.clipAngle; // Simple check for Orthographic
+                // Use the explicitly stored projectionType
+                const isOrthographic = this.projectionType === 'orthographic';
+
                 let interpolateRotate;
                 if (isOrthographic) {
                     const currentRotate = this.projection.rotate();

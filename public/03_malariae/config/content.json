@@ -735,8 +735,8 @@
       },
       "map": {
         "visible": true,
-        "center": [8, 13],
-        "zoom": 3.5,
+        "center": [10, 18],
+        "zoom": 3.0,
         "widthPercent": 100,
         "heightPercent": 100,
         "useRegionColors": true,

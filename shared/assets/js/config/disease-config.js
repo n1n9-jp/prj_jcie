@@ -94,7 +94,7 @@ export const DISEASE_CONFIG = {
         },
         paths: {
             base: '',
-            config: '',
+            config: 'shared/config/',
             data: '',
             assets: 'shared/assets/',
             images: 'shared/assets/images/'
