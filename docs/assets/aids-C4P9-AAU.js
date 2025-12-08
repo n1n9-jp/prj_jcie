@@ -1,0 +1,1 @@
+import{m as e}from"./map-renderer-BM3gmNKA.js";import{S as o}from"./ScrollytellingApp-CystaeTI.js";window.DISEASE_TYPE="aids";e.setDiseaseType("aids");document.addEventListener("DOMContentLoaded",()=>{window.app=new o});
